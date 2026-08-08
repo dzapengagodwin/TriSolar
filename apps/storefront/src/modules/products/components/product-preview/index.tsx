@@ -1,0 +1,89 @@
+import { getProductPrice } from "@lib/util/get-product-price"
+import { HttpTypes } from "@medusajs/types"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Thumbnail from "../thumbnail"
+import PreviewPrice from "./price"
+
+export default async function ProductPreview({
+  product,
+  isFeatured,
+  region: _region,
+}: {
+  product: HttpTypes.StoreProduct
+  isFeatured?: boolean
+  region: HttpTypes.StoreRegion
+}) {
+  const { cheapestPrice } = getProductPrice({
+    product,
+  })
+
+  const priceObj = cheapestPrice || product.variants?.[0]?.calculated_price
+
+  // Format category breadcrumb / tags string
+  const categoriesString = product.categories && product.categories.length > 0
+    ? product.categories.map((c: any) => c.name).join(", ")
+    : "General Category"
+
+  return (
+    <div
+      data-testid="product-wrapper"
+      className="group bg-white rounded-2xl p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-[#063A34] transition-colors"
+    >
+      {/* Product Image & Sale Badge */}
+      <div className="relative mb-3">
+        <span className="absolute top-0 left-0 z-10 bg-[#E53935] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+          Sale!
+        </span>
+
+        <LocalizedClientLink href={`/products/${product.handle}`} className="block">
+          <div className="overflow-hidden bg-gray-50 flex items-center justify-center p-3 h-44 rounded-xl">
+            <Thumbnail
+              thumbnail={product.thumbnail}
+              images={product.images}
+              size="full"
+              isFeatured={isFeatured}
+            />
+          </div>
+        </LocalizedClientLink>
+      </div>
+
+      {/* Category Subtitle */}
+      <div className="space-y-1.5 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="text-[10px] font-semibold text-gray-400 line-clamp-1">
+            {categoriesString}
+          </div>
+
+          {/* Product Title */}
+          <LocalizedClientLink href={`/products/${product.handle}`}>
+            <h3
+              className="text-xs font-bold text-gray-900 group-hover:text-[#063A34] transition-colors line-clamp-2 leading-snug mt-1"
+              data-testid="product-title"
+            >
+              {product.title}
+            </h3>
+          </LocalizedClientLink>
+        </div>
+
+        {/* 5-Star Ratings & Price & Add to Cart Button */}
+        <div className="pt-2 border-t border-gray-50 space-y-2">
+          <div className="flex items-center gap-1 text-amber-400 text-[10px]">
+            ★★★★★
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            {priceObj && <PreviewPrice price={priceObj} />}
+
+            <LocalizedClientLink
+              href={`/products/${product.handle}`}
+              className="bg-[#063A34] hover:bg-[#042723] text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
+            >
+              Add to Cart
+            </LocalizedClientLink>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
