@@ -12,8 +12,11 @@ export const listRegions = async () => {
   return await sdk.client
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
+      query: {
+        fields: "*countries",
+      },
       next,
-      cache: "force-cache",
+      cache: "no-store",
     })
     .then(({ regions }) => regions)
 }
@@ -27,7 +30,7 @@ export const retrieveRegion = async (id: string) => {
     .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
       method: "GET",
       next,
-      cache: "force-cache",
+      cache: "no-store",
     })
     .then(({ region }) => region)
 }
@@ -35,25 +38,39 @@ export const retrieveRegion = async (id: string) => {
 const regionMap = new Map<string, HttpTypes.StoreRegion>()
 
 export const getRegion = async (countryCode: string) => {
-  if (regionMap.has(countryCode)) {
-    return regionMap.get(countryCode)
-  }
+  const code = countryCode?.toLowerCase()
 
+  // Always refetch to avoid stale in-memory cache during debugging
   const regions = await listRegions()
 
-  if (!regions) {
+  if (!regions || regions.length === 0) {
+    console.log("[getRegion] No regions returned from Medusa")
     return null
   }
 
+  // Debug: log all regions and their countries
+  console.log("[getRegion] Looking up country code:", code)
+  regions.forEach((region) => {
+    const countryCodes = region.countries?.map((c) => c?.iso_2) || []
+    console.log(`[getRegion] Region: "${region.name}" (${region.id}), currency: ${region.currency_code}, countries:`, countryCodes)
+  })
+
+  // Clear and rebuild the map every time
+  regionMap.clear()
   regions.forEach((region) => {
     region.countries?.forEach((c) => {
-      regionMap.set(c?.iso_2 ?? "", region)
+      if (c?.iso_2) {
+        regionMap.set(c.iso_2.toLowerCase(), region)
+      }
     })
   })
 
-  const region = countryCode
-    ? regionMap.get(countryCode)
-    : regionMap.get("us")
+  const region = code
+    ? regionMap.get(code)
+    : regionMap.get("us") || regions[0]
 
-  return region
+  const result = region || regions[0] || null
+  console.log(`[getRegion] Resolved "${code}" -> region: "${result?.name}", currency: ${result?.currency_code}`)
+
+  return result
 }

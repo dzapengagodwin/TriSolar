@@ -4,9 +4,9 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export default function CategoryAvatars({
   categories,
 }: {
-  categories?: HttpTypes.StoreProductCategory[]
+  categories?: HttpTypes.StoreCategory[]
 }) {
-  const bgColors = ["bg-amber-100", "bg-pink-100", "bg-blue-100", "bg-rose-100", "bg-emerald-100", "bg-orange-100"]
+  const bgColors = ["bg-amber-100", "bg-pink-100", "bg-blue-100", "bg-rose-100", "bg-gray-200", "bg-orange-100"]
 
   // Display categories from Medusa or fallback if empty
   const displayCategories =
@@ -44,11 +44,11 @@ export default function CategoryAvatars({
                 className="group flex flex-col items-center gap-3"
               >
                 <div
-                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-black text-gray-800 shadow-sm group-hover:scale-105 transition-transform border border-gray-100`}
+                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-black text-gray-900 shadow-sm group-hover:scale-105 transition-transform border border-gray-100`}
                 >
                   {firstLetter}
                 </div>
-                <span className="text-xs font-bold text-gray-800 group-hover:text-[#063A34] transition-colors line-clamp-1">
+                <span className="text-xs font-bold text-gray-800 group-hover:text-black transition-colors line-clamp-1">
                   {cat.name}
                 </span>
               </LocalizedClientLink>
@@ -56,8 +56,8 @@ export default function CategoryAvatars({
           })}
         </div>
 
-        {/* Full-width Dark Green Coupon Banner */}
-        <div className="bg-[#063A34] text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+        {/* Full-width Black Coupon Banner */}
+        <div className="bg-black text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg border border-gray-800">
           <div className="space-y-1 text-center sm:text-left">
             <span className="text-[10px] font-bold text-[#FF9F0D] uppercase tracking-wider">SPECIAL CATALOG SELECTION</span>
             <h3 className="text-xl sm:text-2xl font-extrabold font-sans">

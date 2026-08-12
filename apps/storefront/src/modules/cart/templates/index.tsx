@@ -2,7 +2,6 @@ import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
-import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
 
 const CartTemplate = ({
@@ -13,33 +12,29 @@ const CartTemplate = ({
   customer: HttpTypes.StoreCustomer | null
 }) => {
   return (
-    <div className="py-12">
+    <div className="py-8 sm:py-12 bg-[#F8FAF9] min-h-screen">
       <div className="content-container" data-testid="cart-container">
         {cart?.items?.length ? (
-          <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
-            <div className="flex flex-col bg-white py-6 gap-y-6">
+          <div className="grid grid-cols-1 small:grid-cols-[1fr_340px] medium:grid-cols-[1fr_380px] gap-6 sm:gap-8 items-start">
+            {/* Left Main Card: Cart Items & Sign-In Prompt */}
+            <div className="bg-white rounded-2xl p-5 sm:p-8 border border-gray-100 shadow-sm flex flex-col gap-y-6">
               {!customer && (
-                <>
-                  <SignInPrompt />
-                  <Divider />
-                </>
+                <SignInPrompt />
               )}
               <ItemsTemplate cart={cart} />
             </div>
-            <div className="relative">
-              <div className="flex flex-col gap-y-8 sticky top-12">
-                {cart && cart.region && (
-                  <>
-                    <div className="bg-white py-6">
-                      <Summary cart={cart} />
-                    </div>
-                  </>
-                )}
-              </div>
+
+            {/* Right Card: Sticky Order Summary */}
+            <div className="sticky top-28">
+              {cart && cart.region && (
+                <div className="bg-white rounded-2xl p-5 sm:p-8 border border-gray-100 shadow-sm">
+                  <Summary cart={cart} />
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          <div>
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
             <EmptyCartMessage />
           </div>
         )}

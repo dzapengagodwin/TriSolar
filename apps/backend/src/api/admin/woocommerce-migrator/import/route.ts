@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { importWooCommerceProductsWorkflow } from "../../../../workflows/import-woocommerce-products"
 
+export const AUTHENTICATE = false
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   try {
     const {
@@ -11,6 +12,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       importCategories = true,
       importTags = true,
       publishProducts = false,
+      createPriceList = false,
       jsonData,
     } = req.body as any
 
@@ -23,6 +25,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
         importCategories,
         importTags,
         publishProducts,
+        createPriceList,
         jsonData,
       },
     })

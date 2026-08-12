@@ -1,5 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { ArrowDownTray } from "@medusajs/icons"
+import { ArrowDownTray, Trash } from "@medusajs/icons"
 import {
   Container,
   Heading,
@@ -38,8 +38,6 @@ type ImportResult = {
   importedProductDetails: ImportedProduct[]
 }
 
-const BACKEND_URL = __BACKEND_URL__ ?? ""
-
 const WooCommerceMigratorPage = () => {
   // Connection form state
   const [wooUrl, setWooUrl] = useState("")
@@ -54,6 +52,7 @@ const WooCommerceMigratorPage = () => {
   const [importCategories, setImportCategories] = useState(true)
   const [importTags, setImportTags] = useState(true)
   const [publishProducts, setPublishProducts] = useState(false)
+  const [createPriceList, setCreatePriceList] = useState(false)
 
   // JSON upload state
   const [useJsonUpload, setUseJsonUpload] = useState(false)
@@ -65,6 +64,11 @@ const WooCommerceMigratorPage = () => {
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
   const [importError, setImportError] = useState("")
 
+  // Delete state
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteConfirming, setDeleteConfirming] = useState(false)
+  const [deleteMessage, setDeleteMessage] = useState("")
+
   const handleTestConnection = useCallback(async () => {
     if (!wooUrl || !consumerKey || !consumerSecret) return
 
@@ -73,7 +77,7 @@ const WooCommerceMigratorPage = () => {
 
     try {
       const response = await fetch(
-        `${BACKEND_URL}/admin/woocommerce-migrator/test-connection`,
+        "/admin/woocommerce-migrator/test-connection",
         {
           method: "POST",
           credentials: "include",
@@ -136,6 +140,7 @@ const WooCommerceMigratorPage = () => {
       importCategories,
       importTags,
       publishProducts,
+      createPriceList,
     }
 
     if (useJsonUpload && jsonData) {
@@ -148,7 +153,7 @@ const WooCommerceMigratorPage = () => {
 
     try {
       const response = await fetch(
-        `${BACKEND_URL}/admin/woocommerce-migrator/import`,
+        "/admin/woocommerce-migrator/import",
         {
           method: "POST",
           credentials: "include",
@@ -161,10 +166,10 @@ const WooCommerceMigratorPage = () => {
 
       if (response.ok) {
         setImportStatus("complete")
-        setImportResult(data)
+        setImportResult(data.result || data)
       } else {
         setImportStatus("error")
-        setImportError(data.error || "Import failed")
+        setImportError(data.error || data.message || "Import failed")
       }
     } catch (err: any) {
       setImportStatus("error")
@@ -178,9 +183,39 @@ const WooCommerceMigratorPage = () => {
     importCategories,
     importTags,
     publishProducts,
+    createPriceList,
     useJsonUpload,
     jsonData,
   ])
+
+  const handleDeleteAllProducts = useCallback(async () => {
+    setIsDeleting(true)
+    setDeleteMessage("")
+
+    try {
+      const response = await fetch(
+        "/admin/woocommerce-migrator/delete-all",
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      )
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setDeleteMessage(data.message || `Deleted ${data.deletedCount} products.`)
+        setDeleteConfirming(false)
+        setImportResult(null)
+      } else {
+        setDeleteMessage(`Delete failed: ${data.error || "Unknown error"}`)
+      }
+    } catch (err: any) {
+      setDeleteMessage(`Delete error: ${err.message || "Network error"}`)
+    } finally {
+      setIsDeleting(false)
+    }
+  }, [])
 
   const canImport =
     useJsonUpload && jsonData
@@ -199,16 +234,55 @@ const WooCommerceMigratorPage = () => {
               into Medusa.
             </Text>
           </div>
-          {importResult && (
-            <Badge
-              color={importResult.failedProducts > 0 ? "orange" : "green"}
-              size="small"
-            >
-              {importResult.importedProducts} / {importResult.totalProducts}{" "}
-              imported
-            </Badge>
-          )}
+          <div className="flex items-center gap-x-2">
+            {importResult && (
+              <Badge
+                color={importResult.failedProducts > 0 ? "orange" : "green"}
+                size="small"
+              >
+                {importResult.importedProducts} / {importResult.totalProducts}{" "}
+                imported
+              </Badge>
+            )}
+            {!deleteConfirming ? (
+              <Button
+                variant="danger"
+                size="small"
+                onClick={() => setDeleteConfirming(true)}
+              >
+                <Trash />
+                Bulk Delete Products
+              </Button>
+            ) : (
+              <div className="flex items-center gap-x-2">
+                <Button
+                  variant="danger"
+                  size="small"
+                  onClick={handleDeleteAllProducts}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Confirm Delete All"}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={() => setDeleteConfirming(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
+
+        {deleteMessage && (
+          <div className="mt-3 p-3 bg-ui-bg-subtle rounded-md">
+            <Text size="small" className="text-ui-fg-subtle">
+              {deleteMessage}
+            </Text>
+          </div>
+        )}
       </Container>
 
       {/* Data Source Toggle */}
@@ -240,7 +314,7 @@ const WooCommerceMigratorPage = () => {
                   Loaded: {jsonFile.name}
                   {jsonData?.products &&
                     ` (${jsonData.products.length} products found)`}
-                  {jsonData && !jsonData.products &&
+                  {jsonData &&
                     Array.isArray(jsonData) &&
                     ` (${jsonData.length} products found)`}
                 </Text>
@@ -361,6 +435,13 @@ const WooCommerceMigratorPage = () => {
                 onCheckedChange={setPublishProducts}
               />
               <Label>Publish products immediately</Label>
+            </div>
+            <div className="flex items-center gap-x-3">
+              <Switch
+                checked={createPriceList}
+                onCheckedChange={setCreatePriceList}
+              />
+              <Label>Create Price List on import</Label>
             </div>
           </div>
         </div>

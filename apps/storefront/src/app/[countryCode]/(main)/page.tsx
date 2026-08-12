@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
+import PromoCardsRow from "@modules/home/components/promo-cards-row"
 import MonthlyDeals from "@modules/home/components/monthly-deals"
 import CategoryAvatars from "@modules/home/components/category-avatars"
 import FeaturedProducts from "@modules/home/components/featured-products"
@@ -13,9 +14,9 @@ import { listCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "NexCart | TV, Audio, Home, Tech & Fashion E-Commerce Store",
+  title: "Laptop Zone | Laptops, Computers & Tech Store",
   description:
-    "NexCart - TV, Audio, Home & Tech. A building a scalable high performance e-commerce experience.",
+    "Laptop Zone - Premium Laptops, Computers, Tech & Accessories. High performance e-commerce store.",
 }
 
 export default async function Home(props: {
@@ -46,28 +47,29 @@ export default async function Home(props: {
   }
 
   return (
-    <div className="bg-[#F8FAF9] min-h-screen pb-12">
-      {/* 1. Hero Grid (4 Pastel Banners) */}
+    <div className="bg-[#F9FAFB] min-h-screen pb-12">
+      {/* 1. Hero Grid (Black Theme Banners) */}
       <Hero />
 
-      {/* 2. Monthly Best Deals (#063A34 Forest Background Section) */}
-      {products.length > 0 && <MonthlyDeals products={products} region={region} />}
+      {/* 2. 5 Vertical Deal Cards Row (Catalogue, RedStar Clearance, Flash Sale, Galaxy Z8, Smart Air) */}
+      {/* <PromoCardsRow /> */}
 
-      {/* 3. Deep Deals by Category (Avatars + Coupon Banner) */}
-      {categories.length > 0 && <CategoryAvatars categories={categories} />}
+      {/* 3. Monthly Best Deals (Sleek Black Background Section) */}
+   <MonthlyDeals
+        products={products}
+        region={region}
+      />
 
-      {/* 4. Popular Products Grid */}
-      <div className="py-4">
+      {/* 4. Deep Deals by Category (Avatars + Coupon Banner) */}
+      {/* {categories.length > 0 && <CategoryAvatars categories={categories} />} */}
+
+      {/* 5. Popular Products Grid */}
+  
         <FeaturedProducts collections={collections} region={region} sectionIndex={0} />
-      </div>
+        <FeaturedProducts collections={collections} region={region} sectionIndex={0} />
+    
 
-      {/* 5. NexCart Mobile App Banner */}
-      <AppBanner />
-
-      {/* 6. Most Popular Seller Grid */}
-      <SellerGrid />
-
-      {/* 7. 3-Pillar Guarantee Strip */}
+      {/* 8. 3-Pillar Guarantee Strip */}
       <TrustBar />
     </div>
   )

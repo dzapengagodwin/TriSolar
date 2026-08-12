@@ -13,11 +13,13 @@ type PaginatedProductsParams = {
   category_id?: string[]
   id?: string[]
   order?: string
+  q?: string
 }
 
 export default async function PaginatedProducts({
   sortBy,
   page,
+  q,
   collectionId,
   categoryId,
   productsIds,
@@ -26,6 +28,7 @@ export default async function PaginatedProducts({
 }: {
   sortBy?: SortOptions
   page: number
+  q?: string
   collectionId?: string
   categoryId?: string
   productsIds?: string[]
@@ -34,6 +37,10 @@ export default async function PaginatedProducts({
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: 12,
+  }
+
+  if (q) {
+    queryParams["q"] = q
   }
 
   if (collectionId) {
@@ -69,6 +76,19 @@ export default async function PaginatedProducts({
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
+
+  if (products.length === 0) {
+    return (
+      <div className="py-12 text-center bg-white rounded-2xl border border-gray-100 p-8">
+        <p className="text-base font-bold text-gray-800">
+          No products found {q ? `matching "${q}"` : ""}
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          Try adjusting your search terms or browse all categories.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <>

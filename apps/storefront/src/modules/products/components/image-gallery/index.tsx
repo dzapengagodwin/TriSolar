@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
+import { XMark, ChevronLeft, ChevronRight, ArrowsPointingOut } from "@medusajs/icons"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
@@ -46,7 +47,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               onMouseEnter={() => setSelectedIndex(idx)}
               className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl border-2 overflow-hidden bg-white p-1.5 transition-all flex items-center justify-center shrink-0 ${
                 selectedIndex === idx
-                  ? "border-[#063A34] shadow-md ring-2 ring-[#063A34]/20"
+                  ? "border-black shadow-md ring-2 ring-black/20"
                   : "border-gray-200 hover:border-gray-400 opacity-75 hover:opacity-100"
               }`}
             >
@@ -84,15 +85,13 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
             )}
           </div>
 
-          {/* Circular Expand Button (Matching Screenshot Layout) */}
+          {/* Circular Expand Button with Real Icon */}
           <button
             onClick={() => setIsModalOpen(true)}
             aria-label="Expand Image Modal"
             className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 w-11 h-11 bg-white hover:bg-gray-100 text-gray-800 rounded-full shadow-lg border border-gray-200 flex items-center justify-center transition-transform hover:scale-110 z-10"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
+            <ArrowsPointingOut className="w-5 h-5 text-gray-700" />
           </button>
         </div>
 
@@ -110,9 +109,10 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
 
             <button
               onClick={() => setIsModalOpen(false)}
-              className="w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors text-xl font-bold border border-white/20"
+              className="w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-colors border border-white/20"
+              aria-label="Close modal"
             >
-              ✕
+              <XMark className="w-6 h-6" />
             </button>
           </div>
 
@@ -124,10 +124,10 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               onClick={() =>
                 setSelectedIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))
               }
-              className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors text-2xl font-bold border border-white/20 z-20 shrink-0"
+              className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors border border-white/20 z-20 shrink-0"
               aria-label="Previous Image"
             >
-              ‹
+              <ChevronLeft className="w-7 h-7" />
             </button>
 
             {/* Center Expanded High-Res Image */}
@@ -149,10 +149,10 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               onClick={() =>
                 setSelectedIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))
               }
-              className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors text-2xl font-bold border border-white/20 z-20 shrink-0"
+              className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors border border-white/20 z-20 shrink-0"
               aria-label="Next Image"
             >
-              ›
+              <ChevronRight className="w-7 h-7" />
             </button>
           </div>
 

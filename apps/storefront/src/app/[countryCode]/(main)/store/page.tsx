@@ -5,13 +5,14 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import StoreTemplate from "@modules/store/templates"
 
 export const metadata: Metadata = {
-  title: "Store",
+  title: "Store | NexCart",
   description: "Explore all of our products.",
 }
 
 type StorePageSearchParams = Record<string, string | string[] | undefined> & {
   sortBy?: SortOptions
   page?: string
+  q?: string
   optionValueIds?: string | string[]
 }
 
@@ -23,15 +24,16 @@ type Params = {
 }
 
 export default async function StorePage(props: Params) {
-  const params = await props.params;
-  const searchParams = await props.searchParams;
-  const { sortBy, page } = searchParams
+  const params = await props.params
+  const searchParams = await props.searchParams
+  const { sortBy, page, q } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
   return (
     <StoreTemplate
       sortBy={sortBy}
       page={page}
+      q={typeof q === "string" ? q : undefined}
       countryCode={params.countryCode}
       optionValueIds={optionValueIds}
     />

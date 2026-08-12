@@ -50,8 +50,8 @@
 }
 
 body {
-  background-color: #F8FAF9;
-  color: #0F172A;
+  background-color: #F9FAFB;
+  color: #111827;
 }
 
 @layer components {
@@ -59,8 +59,8 @@ body {
     @apply max-w-[1440px] w-full mx-auto px-4 sm:px-6;
   }
 
-  .nexcart-btn-forest {
-    @apply px-5 py-2.5 bg-[#063A34] hover:bg-[#042723] text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
+  .nexcart-btn-black {
+    @apply px-5 py-2.5 bg-black hover:bg-gray-800 text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
   }
 
   .nexcart-btn-amber {

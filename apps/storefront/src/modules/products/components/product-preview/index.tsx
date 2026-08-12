@@ -1,10 +1,10 @@
-import { getProductPrice } from "@lib/util/get-product-price"
+import { getProductPrice, getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 
-export default async function ProductPreview({
+export default function ProductPreview({
   product,
   isFeatured,
   region: _region,
@@ -17,7 +17,7 @@ export default async function ProductPreview({
     product,
   })
 
-  const priceObj = cheapestPrice || product.variants?.[0]?.calculated_price
+  const priceInfo = cheapestPrice || (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
 
   // Format category breadcrumb / tags string
   const categoriesString = product.categories && product.categories.length > 0
@@ -27,7 +27,7 @@ export default async function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="group bg-white rounded-2xl p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-[#063A34] transition-colors"
+      className="group bg-white rounded-2xl p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-black transition-colors shadow-xs"
     >
       {/* Product Image & Sale Badge */}
       <div className="relative mb-3">
@@ -57,7 +57,7 @@ export default async function ProductPreview({
           {/* Product Title */}
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-xs font-bold text-gray-900 group-hover:text-[#063A34] transition-colors line-clamp-2 leading-snug mt-1"
+              className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-snug mt-1"
               data-testid="product-title"
             >
               {product.title}
@@ -72,11 +72,11 @@ export default async function ProductPreview({
           </div>
 
           <div className="flex items-center justify-between gap-2">
-            {priceObj && <PreviewPrice price={priceObj} />}
+            {priceInfo && <PreviewPrice price={priceInfo} />}
 
             <LocalizedClientLink
               href={`/products/${product.handle}`}
-              className="bg-[#063A34] hover:bg-[#042723] text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
+              className="bg-black hover:bg-gray-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
             >
               Add to Cart
             </LocalizedClientLink>

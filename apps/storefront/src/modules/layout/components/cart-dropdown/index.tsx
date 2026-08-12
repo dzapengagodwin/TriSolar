@@ -16,6 +16,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
+import { ShoppingBag } from "@medusajs/icons"
 
 const CartDropdown = ({
   cart: cartState,
@@ -82,15 +83,18 @@ const CartDropdown = ({
       <Popover className="relative h-full">
         <PopoverButton className="h-full flex items-center">
           <LocalizedClientLink
-            className="flex items-center gap-2 bg-[#063A34] hover:bg-[#042723] text-white px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm"
             href="/cart"
             data-testid="nav-cart-link"
           >
-            <span>$ {subtotal ? (subtotal / 100).toFixed(2) : "0.00"}</span>
+            <span>
+              {convertToLocale({
+                amount: subtotal,
+                currency_code: cartState?.currency_code || "usd",
+              })}
+            </span>
             <div className="relative">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
+              <ShoppingBag className="w-4 h-4 text-white" />
               <span className="absolute -top-2 -right-2 bg-[#FF9F0D] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                 {totalItems}
               </span>
@@ -109,15 +113,15 @@ const CartDropdown = ({
         >
           <PopoverPanel
             static
-            className="hidden small:block absolute top-[calc(100%+1px)] right-0 bg-white border-x border-b border-gray-200 w-[420px] text-ui-fg-base"
+            className="hidden small:block absolute top-[calc(100%+1px)] right-0 bg-white border border-gray-100 rounded-2xl shadow-2xl w-[420px] text-ui-fg-base z-50 overflow-hidden mt-2"
             data-testid="nav-cart-dropdown"
           >
-            <div className="p-4 flex items-center justify-center">
-              <h3 className="text-large-semi">Cart</h3>
+            <div className="p-4 flex items-center justify-center border-b border-gray-100">
+              <h3 className="text-sm font-bold text-black">Shopping Cart</h3>
             </div>
             {cartState && cartState.items?.length ? (
               <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-8 no-scrollbar p-px">
+                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-6 no-scrollbar py-4">
                   {cartState.items
                     .sort((a, b) => {
                       return (a.created_at ?? "") > (b.created_at ?? "")
@@ -126,13 +130,13 @@ const CartDropdown = ({
                     })
                     .map((item) => (
                       <div
-                        className="grid grid-cols-[122px_1fr] gap-x-4"
+                        className="grid grid-cols-[100px_1fr] gap-x-4"
                         key={item.id}
                         data-testid="cart-item"
                       >
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-24"
+                          className="w-20"
                         >
                           <Thumbnail
                             thumbnail={item.thumbnail}
@@ -144,7 +148,7 @@ const CartDropdown = ({
                           <div className="flex flex-col flex-1">
                             <div className="flex items-start justify-between">
                               <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                <h3 className="text-base-regular overflow-hidden text-ellipsis">
+                                <h3 className="text-xs font-bold text-gray-800 overflow-hidden text-ellipsis">
                                   <LocalizedClientLink
                                     href={`/products/${item.product_handle}`}
                                     data-testid="product-link"
@@ -158,10 +162,11 @@ const CartDropdown = ({
                                   data-value={item.variant}
                                 />
                                 <span
+                                  className="text-[11px] text-gray-500 mt-0.5"
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
                                 >
-                                  Quantity: {item.quantity}
+                                  Qty: {item.quantity}
                                 </span>
                               </div>
                               <div className="flex justify-end">
@@ -175,7 +180,7 @@ const CartDropdown = ({
                           </div>
                           <DeleteButton
                             id={item.id}
-                            className="mt-1"
+                            className="mt-1 text-xs text-red-500"
                             data-testid="cart-item-remove-button"
                           >
                             Remove
@@ -184,14 +189,14 @@ const CartDropdown = ({
                       </div>
                     ))}
                 </div>
-                <div className="p-4 flex flex-col gap-y-4 text-small-regular">
+                <div className="p-4 flex flex-col gap-y-4 text-xs border-t border-gray-100 bg-gray-50/50">
                   <div className="flex items-center justify-between">
-                    <span className="text-ui-fg-base font-semibold">
+                    <span className="text-gray-700 font-bold">
                       Subtotal{" "}
-                      <span className="font-normal">(excl. taxes)</span>
+                      <span className="font-normal text-gray-500">(excl. shipping & taxes)</span>
                     </span>
                     <span
-                      className="text-large-semi"
+                      className="text-sm font-black text-black"
                       data-testid="cart-subtotal"
                       data-value={subtotal}
                     >
@@ -202,28 +207,29 @@ const CartDropdown = ({
                     </span>
                   </div>
                   <LocalizedClientLink href="/cart" passHref>
-                    <Button
-                      className="w-full"
-                      size="large"
+                    <button
+                      className="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-full text-xs transition-colors shadow-sm"
                       data-testid="go-to-cart-button"
                     >
                       Go to cart
-                    </Button>
+                    </button>
                   </LocalizedClientLink>
                 </div>
               </>
             ) : (
               <div>
-                <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
-                  <div className="bg-gray-900 text-small-regular flex items-center justify-center w-6 h-6 rounded-full text-white">
-                    <span>0</span>
+                <div className="flex py-12 flex-col gap-y-3 items-center justify-center">
+                  <div className="bg-gray-100 text-xs flex items-center justify-center w-8 h-8 rounded-full text-gray-500 font-bold">
+                    0
                   </div>
-                  <span>Your shopping bag is empty.</span>
+                  <span className="text-xs text-gray-500 font-medium">Your shopping bag is empty.</span>
                   <div>
                     <LocalizedClientLink href="/store">
                       <>
                         <span className="sr-only">Go to all products page</span>
-                        <Button onClick={close}>Explore products</Button>
+                        <button onClick={close} className="bg-black text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
+                          Explore products
+                        </button>
                       </>
                     </LocalizedClientLink>
                   </div>

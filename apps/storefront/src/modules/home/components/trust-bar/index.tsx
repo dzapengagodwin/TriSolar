@@ -1,9 +1,11 @@
+import { CurrencyDollar, TruckFast } from "@medusajs/icons"
+
 export default function TrustBar() {
   const items = [
     {
       icon: (
-        <div className="w-12 h-12 bg-emerald-50 text-[#063A34] rounded-full flex items-center justify-center text-xl font-bold border border-emerald-100">
-          💸
+        <div className="w-12 h-12 bg-gray-100 text-gray-900 rounded-full flex items-center justify-center border border-gray-200 shrink-0">
+          <CurrencyDollar className="w-6 h-6" />
         </div>
       ),
       title: "Money Back Guarantee",
@@ -11,8 +13,10 @@ export default function TrustBar() {
     },
     {
       icon: (
-        <div className="w-12 h-12 bg-[#063A34] text-white rounded-full flex items-center justify-center text-xl font-bold shadow-md">
-          🎧
+        <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center shadow-md shrink-0">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
         </div>
       ),
       title: "24/7 Customer Service",
@@ -20,8 +24,8 @@ export default function TrustBar() {
     },
     {
       icon: (
-        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-xl font-bold border border-amber-100">
-          ⚡
+        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center border border-amber-100 shrink-0">
+          <TruckFast className="w-6 h-6 text-amber-600" />
         </div>
       ),
       title: "Fast & Free Shipping",
