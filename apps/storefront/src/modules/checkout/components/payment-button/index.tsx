@@ -1,6 +1,6 @@
 "use client"
 
-import { isManual, isStripeLike } from "@lib/constants"
+import { isManual, isPesepay, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -31,6 +31,14 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <StripePaymentButton
           notReady={notReady}
           cart={cart}
+          data-testid={dataTestId}
+        />
+      )
+    case isPesepay(paymentSession?.provider_id):
+      return (
+        <PesepayPaymentButton
+          cart={cart}
+          notReady={notReady}
           data-testid={dataTestId}
         />
       )
@@ -157,6 +165,65 @@ const StripePaymentButton = ({
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"
+      />
+    </>
+  )
+}
+
+const PesepayPaymentButton = ({
+  cart,
+  notReady,
+  "data-testid": dataTestId,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+  "data-testid"?: string
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const redirectUrl =
+    ((paymentSession?.data as Record<string, unknown>)?.redirectUrl as string | undefined) ??
+    ((paymentSession?.data as Record<string, unknown>)?.redirect_url as string | undefined) ??
+    undefined
+
+  const handlePayment = async () => {
+    setSubmitting(true)
+
+    if (redirectUrl) {
+      // Redirect to Pesepay's hosted checkout page for payment
+      window.location.href = redirectUrl
+      return
+    }
+
+    // Fallback: place order directly if no redirect URL
+    await placeOrder()
+      .catch((err) => {
+        setErrorMessage(err.message)
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
+
+  return (
+    <>
+      <button
+        disabled={notReady || submitting}
+        onClick={handlePayment}
+        data-testid={dataTestId}
+        className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      >
+        {submitting ? (
+          <span>Redirecting to payment...</span>
+        ) : (
+          <span>Pay with Pesepay</span>
+        )}
+      </button>
+      <ErrorMessage
+        error={errorMessage}
+        data-testid="pesepay-payment-error-message"
       />
     </>
   )

@@ -33,6 +33,10 @@ export const paymentInfoMap: Record<
     title: "Manual Payment",
     icon: <CreditCard />,
   },
+  "pp_pesepay_pesepay": {
+    title: "Pesepay (Ecocash, Innbucks, Visa, Mastercard)",
+    icon: <CreditCard />,
+  },
   // Add more payment providers here
 }
 
@@ -48,6 +52,9 @@ export const isPaypal = (providerId?: string) => {
 }
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")
+}
+export const isPesepay = (providerId?: string) => {
+  return providerId?.startsWith("pp_pesepay")
 }
 
 // Add currencies that don't need to be divided by 100

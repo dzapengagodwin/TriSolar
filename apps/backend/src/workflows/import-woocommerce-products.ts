@@ -400,13 +400,16 @@ export const importWooCommerceStep = createStep(
             })
 
             if (input.createPriceList && medusaProduct.variants) {
-              for (const variant of medusaProduct.variants) {
-                const price = variant.prices?.[0]
-                if (price) {
+              const payloadProduct = productsPayload[j]
+              for (let k = 0; k < medusaProduct.variants.length; k++) {
+                const variant = medusaProduct.variants[k]
+                const payloadVariant = payloadProduct.variants?.[k]
+                const payloadPrice = payloadVariant?.prices?.[0]
+                if (payloadPrice) {
                   importedVariantsPrices.push({
                     variantId: variant.id,
-                    amount: price.amount,
-                    currencyCode: price.currency_code || input.currencyCode.toLowerCase(),
+                    amount: payloadPrice.amount,
+                    currencyCode: payloadPrice.currency_code || input.currencyCode.toLowerCase(),
                   })
                 }
               }
@@ -446,8 +449,7 @@ export const importWooCommerceStep = createStep(
               {
                 title: `WooCommerce Import - ${timestamp}`,
                 description: `Prices imported from WooCommerce (${input.wooUrl || "JSON Upload"})`,
-                type: "override",
-                status: "active",
+                status: "active" as any,
                 prices: importedVariantsPrices.map((vp) => ({
                   variant_id: vp.variantId,
                   amount: vp.amount,
