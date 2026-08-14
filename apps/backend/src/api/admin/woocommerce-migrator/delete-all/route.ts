@@ -1,12 +1,31 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
-import { deleteProductsWorkflow } from "@medusajs/medusa/core-flows"
+import { deleteProductsWorkflow, deleteReservationsWorkflow } from "@medusajs/medusa/core-flows"
 
 export const AUTHENTICATE = false
 
 export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+
+    // Delete reservations first to prevent inventory item deletion blocks
+    try {
+      const { data: reservations } = await query.graph({
+        entity: "reservation",
+        fields: ["id"],
+      })
+
+      if (reservations && reservations.length > 0) {
+        const reservationIds = reservations.map((r: any) => r.id)
+        await deleteReservationsWorkflow(req.scope).run({
+          input: {
+            ids: reservationIds,
+          },
+        })
+      }
+    } catch (resError: any) {
+      console.warn("Reservation cleanup note:", resError?.message)
+    }
 
     const { data: products } = await query.graph({
       entity: "product",

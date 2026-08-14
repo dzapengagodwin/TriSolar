@@ -2,6 +2,8 @@ import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 
 export const AUTHENTICATE = false
 
+const VALIDATE_BODY = false
+
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   try {
     const imageUrl = req.query.url as string

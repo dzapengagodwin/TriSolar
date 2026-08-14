@@ -9,5 +9,10 @@ export default defineMiddlewares({
         sizeLimit: "50mb",
       },
     },
+    {
+      matcher: "/store/image-proxy",
+      method: ["GET"],
+      bodyParser: false,
+    },
   ],
 })

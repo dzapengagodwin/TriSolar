@@ -34,7 +34,7 @@ export default function TrustBar() {
   ]
 
   return (
-    <div className="bg-white py-8 border-t border-gray-100 my-6">
+    <div className="bg-white py-8 border-t border-gray-100 mt-6 mb-0">
       <div className="content-container">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center sm:text-left">
           {items.map((item, idx) => (

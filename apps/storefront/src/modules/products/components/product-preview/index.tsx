@@ -36,12 +36,14 @@ export default function ProductPreview({
         </span>
 
         <LocalizedClientLink href={`/products/${product.handle}`} className="block">
-          <div className="overflow-hidden bg-gray-50 flex items-center justify-center p-3 h-44 rounded-xl">
+          <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-44 rounded-xl p-4">
             <Thumbnail
               thumbnail={product.thumbnail}
               images={product.images}
               size="full"
               isFeatured={isFeatured}
+              className="w-full h-full !bg-transparent !shadow-none !border-none !p-0"
+              objectFit="contain"
             />
           </div>
         </LocalizedClientLink>
@@ -65,12 +67,8 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        {/* 5-Star Ratings & Price & Add to Cart Button */}
+        {/* Price & Add to Cart Button */}
         <div className="pt-2 border-t border-gray-50 space-y-2">
-          <div className="flex items-center gap-1 text-amber-400 text-[10px]">
-            ★★★★★
-          </div>
-
           <div className="flex items-center justify-between gap-2">
             {priceInfo && <PreviewPrice price={priceInfo} />}
 

@@ -158,11 +158,13 @@ function DealProductCard({
 
       {/* Product image */}
       <LocalizedClientLink href={`/products/${product.handle}`} className="block mb-3">
-        <div className="overflow-hidden bg-gray-50 flex items-center justify-center p-3 h-36 sm:h-44 rounded-xl">
+        <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-36 sm:h-44 rounded-xl p-4">
           <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
             size="full"
+            className="w-full h-full !bg-transparent !shadow-none !border-none !p-0"
+            objectFit="contain"
           />
         </div>
       </LocalizedClientLink>
@@ -182,7 +184,6 @@ function DealProductCard({
 
         {/* Price + CTA */}
         <div className="pt-2 border-t border-gray-50 space-y-2">
-          <div className="flex items-center gap-1 text-amber-400 text-[10px]">★★★★★</div>
           <div className="flex items-center justify-between gap-2">
             {priceInfo && (
               <div className="flex items-baseline gap-x-1.5">

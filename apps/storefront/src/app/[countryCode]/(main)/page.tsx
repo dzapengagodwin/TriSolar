@@ -47,7 +47,7 @@ export default async function Home(props: {
   }
 
   return (
-    <div className="bg-[#F9FAFB] min-h-screen pb-12">
+    <div className="bg-[#F9FAFB] min-h-screen pb-0">
       {/* 1. Hero Grid (Black Theme Banners) */}
       <Hero />
 

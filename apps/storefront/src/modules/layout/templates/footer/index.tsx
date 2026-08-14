@@ -149,8 +149,8 @@ export default async function Footer() {
               <Image
                 src="/payment-methods.png"
                 alt="Accepted Payment Methods - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
-                width={240}
-                height={32}
+                width={340}
+                height={42}
                 className="h-6 w-auto object-contain"
               />
             </div>

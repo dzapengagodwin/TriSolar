@@ -37,13 +37,15 @@ export interface MedusaProductPayload {
 
 export class WooCommerceTransformer {
   private formatImageUrl(src: string): string {
-    if (!src) return ""
-    if (src.startsWith("http://localhost") || src.includes("/store/image-proxy")) {
-      return src
-    }
-    // Respect configured backend URL or fallback to localhost:9000
-    const backendUrl = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
-    return `${backendUrl}/store/image-proxy?url=${encodeURIComponent(src)}`
+    return src || ""
+  }
+
+  private parsePrice(val?: string | number | null): number {
+    if (val === undefined || val === null || val === "") return 0
+    if (typeof val === "number") return val
+    const cleaned = String(val).replace(/,/g, "").replace(/[^0-9.-]/g, "")
+    const parsed = parseFloat(cleaned)
+    return isNaN(parsed) ? 0 : parsed
   }
 
   private cleanHtml(html?: string): string {
@@ -148,11 +150,9 @@ export class WooCommerceTransformer {
         }
 
         for (const variation of variations) {
-          const priceAmount = variation.price
-            ? Math.round(parseFloat(variation.price) * 100)
-            : product.price
-            ? Math.round(parseFloat(product.price) * 100)
-            : 0
+          const priceAmount = variation.price && variation.price !== ""
+            ? this.parsePrice(variation.price)
+            : this.parsePrice(product.price || product.regular_price)
 
           const variantOptions: Record<string, string> = {}
 
@@ -183,11 +183,7 @@ export class WooCommerceTransformer {
         values: ["Default Value"],
       })
 
-      const priceAmount = product.price
-        ? Math.round(parseFloat(product.price) * 100)
-        : product.regular_price
-        ? Math.round(parseFloat(product.regular_price) * 100)
-        : 0
+      const priceAmount = this.parsePrice(product.price || product.regular_price)
 
       variants.push({
         title: "Default Variant",
