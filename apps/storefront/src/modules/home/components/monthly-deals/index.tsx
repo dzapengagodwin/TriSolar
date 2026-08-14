@@ -158,13 +158,13 @@ function DealProductCard({
 
       {/* Product image */}
       <LocalizedClientLink href={`/products/${product.handle}`} className="block mb-3">
-        <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-36 sm:h-44 rounded-xl p-4">
+        <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-36 sm:h-44 rounded-xl">
           <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
             size="full"
-            className="w-full h-full !bg-transparent !shadow-none !border-none !p-0"
-            objectFit="contain"
+            className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto"
+            objectFit="cover"
           />
         </div>
       </LocalizedClientLink>
