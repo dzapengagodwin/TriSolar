@@ -5,7 +5,7 @@ export default function Loading() {
     <div className="w-full min-h-[70vh] flex flex-col items-center justify-center gap-4 py-24 bg-[#F9FAFB]">
       <div className="relative flex items-center justify-center">
         {/* Outer glowing pulsing circle */}
-        <div className="absolute w-16 h-16 rounded-full border-4 border-[#FF9F0D]/10 animate-ping duration-[1.5s]" />
+        <div className="absolute w-16 h-16 rounded-full border-4 border-[#FF9F0D]/10 animate-ping" />
         {/* Brand colored animated spinner */}
         <Spinner size="44" className="text-[#FF9F0D]" />
       </div>
