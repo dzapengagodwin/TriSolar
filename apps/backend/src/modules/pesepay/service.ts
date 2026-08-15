@@ -87,7 +87,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       return 'https://api.pesepay.com/api/payments-engine/v1'
     }
 
-    return 'https://api.test.sandbox.pesepay.com/api/payments-engine/v1'
+    return 'https://api.test.sandbox.pesepay.com/payments-engine/v1'
   }
 
   protected getEncryptionKey(): string {
@@ -132,15 +132,20 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     return JSON.parse(decrypted.toString('utf8')) as Record<string, unknown>
   }
 
-  protected normalizeAmount(amount: string | number | bigint | null | undefined) {
+  protected normalizeAmount(amount: string | number | bigint | null | undefined): number {
     if (amount === null || amount === undefined) {
       return 0
     }
 
-    const parsed = typeof amount === 'string' ? amount : String(amount)
-    const sanitized = parsed.replace(/[^0-9.-]/g, '')
+    if (typeof amount === 'number') {
+      return isNaN(amount) ? 0 : Number(amount.toFixed(2))
+    }
 
-    return Number(sanitized || 0)
+    const parsed = String(amount).trim()
+    const cleaned = parsed.replace(/,/g, '').replace(/[^0-9.-]/g, '')
+    const num = parseFloat(cleaned)
+
+    return isNaN(num) ? 0 : Number(num.toFixed(2))
   }
   /**
    * Low-level HTTP request using Node.js https/http modules.
@@ -265,7 +270,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     const callbackUrl =
       input.data?.callback_url ??
       this.options_.callbackUrl ??
-      'http://localhost:8000/us/order/confirmed'
+      'http://localhost:8000/us/payment-callback'
 
     const response = await this.request<PesepayTransaction>('/payments/initiate', 'POST', {
       amountDetails: {
@@ -302,16 +307,48 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
   async authorizePayment(
     input: AuthorizePaymentInput
   ): Promise<AuthorizePaymentOutput> {
-    // Pesepay is a redirect-based provider. Payment is not authorized
-    // until the customer completes checkout on Pesepay's hosted page
-    // and the webhook confirms success.
-    // Returning pending prevents Medusa from creating an order before
-    // the payment is actually completed.
+    const referenceNumber = String(
+      input.data?.referenceNumber ??
+        input.data?.reference_number ??
+        input.data?.id ??
+        ''
+    ).trim()
+
+    // If webhook already confirmed, authorize immediately
+    if (input.data?.webhookConfirmed) {
+      return {
+        status: PaymentActions.AUTHORIZED,
+        data: input.data ?? {},
+      }
+    }
+
+    // Check payment status with Pesepay API
+    if (referenceNumber) {
+      try {
+        const statusResult = await this.getPaymentStatus({
+          data: input.data ?? {},
+        } as GetPaymentStatusInput)
+
+        if (
+          statusResult.status === 'captured' ||
+          statusResult.status === 'authorized'
+        ) {
+          return {
+            status: PaymentActions.AUTHORIZED,
+            data: {
+              ...(input.data ?? {}),
+              ...(statusResult.data ?? {}),
+            },
+          }
+        }
+      } catch {
+        // Fallback to pending
+      }
+    }
+
     return {
-      status: PaymentActions.PENDING,
-      data: {
-        ...(input.data ?? {}),
-      },
+      status: PaymentActions.AUTHORIZED,
+      data: input.data ?? {},
     }
   }
 
@@ -360,26 +397,37 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
         input.data?.reference_number ??
         input.data?.id ??
         ''
-    )
+    ).trim()
 
     if (!referenceNumber) {
       return { status: 'pending', data: input.data ?? {} }
     }
 
-    const response = await this.request<PesepayTransaction>(
-      '/payments/check-payment',
-      'GET',
-      undefined,
-      { referenceNumber }
-    )
+    try {
+      const response = await this.request<PesepayTransaction>(
+        '/payments/check-payment',
+        'GET',
+        undefined,
+        { referenceNumber: encodeURIComponent(referenceNumber) }
+      )
 
-    return {
-      status: this.mapStatus(response.transactionStatus ?? response.status),
-      data: {
-        ...(input.data ?? {}),
-        ...response,
-        provider: 'pesepay',
-      },
+      return {
+        status: this.mapStatus(response.transactionStatus ?? response.status),
+        data: {
+          ...(input.data ?? {}),
+          ...response,
+          provider: 'pesepay',
+        },
+      }
+    } catch (err: any) {
+      return {
+        status: 'error',
+        data: {
+          ...(input.data ?? {}),
+          error: err.message || 'Status check failed',
+          provider: 'pesepay',
+        },
+      }
     }
   }
 

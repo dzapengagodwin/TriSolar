@@ -181,42 +181,69 @@ const PesepayPaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const sessionData = paymentSession?.data as Record<string, unknown> | undefined
   const redirectUrl =
-    ((paymentSession?.data as Record<string, unknown>)?.redirectUrl as string | undefined) ??
-    ((paymentSession?.data as Record<string, unknown>)?.redirect_url as string | undefined) ??
+    (sessionData?.redirectUrl as string | undefined) ??
+    (sessionData?.redirect_url as string | undefined) ??
+    (sessionData?.payment_url as string | undefined) ??
     undefined
+
+  // Validate redirect URL to prevent open redirect attacks while allowing all Pesepay endpoints
+  const isValidRedirectUrl = (url: string | undefined): boolean => {
+    if (!url || typeof url !== "string") return false
+    try {
+      const parsedUrl = new URL(url)
+      const isHttp =
+        parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:"
+      const isPesepay =
+        parsedUrl.hostname.endsWith("pesepay.com") ||
+        parsedUrl.hostname.includes("pesepay") ||
+        parsedUrl.hostname === "localhost"
+      return isHttp && isPesepay
+    } catch {
+      return false
+    }
+  }
 
   const handlePayment = async () => {
     setSubmitting(true)
 
-    if (redirectUrl) {
-      // Redirect to Pesepay's hosted checkout page for payment
-      window.location.href = redirectUrl
+    if (!redirectUrl) {
+      setErrorMessage(
+        "Payment session not initialized. Please re-select payment method or refresh the page."
+      )
+      setSubmitting(false)
       return
     }
 
-    // Fallback: place order directly if no redirect URL
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    if (!isValidRedirectUrl(redirectUrl)) {
+      console.warn("Pesepay redirect URL rejected:", redirectUrl)
+      setErrorMessage(
+        `Invalid payment redirect URL (${redirectUrl}). Please contact support.`
+      )
+      setSubmitting(false)
+      return
+    }
+
+    // Redirect to Pesepay's hosted checkout page for customer payment
+    window.location.href = redirectUrl
   }
+
+  const isButtonDisabled = notReady || submitting || !redirectUrl
 
   return (
     <>
       <button
-        disabled={notReady || submitting}
+        disabled={isButtonDisabled}
         onClick={handlePayment}
         data-testid={dataTestId}
         className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
-          <span>Redirecting to payment...</span>
+          <span>Redirecting to Pesepay...</span>
+        ) : !redirectUrl ? (
+          <span>Initializing Pesepay...</span>
         ) : (
           <span>Pay with Pesepay</span>
         )}

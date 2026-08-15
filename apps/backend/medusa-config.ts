@@ -37,7 +37,7 @@ module.exports = defineConfig({
                   webhookSecret: process.env.PESEPAY_WEBHOOK_SECRET,
                   callbackUrl:
                     process.env.PESEPAY_CALLBACK_URL ||
-                    'http://localhost:8000/us/order/confirmed',
+                    'http://localhost:8000/us/payment-callback',
                 },
               },
             ]
