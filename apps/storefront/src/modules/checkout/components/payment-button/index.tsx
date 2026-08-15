@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
+import Spinner from "@modules/common/icons/spinner"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -155,7 +156,10 @@ const StripePaymentButton = ({
         className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
-          <span>Processing Order...</span>
+          <>
+            <Spinner size="16" />
+            <span>Processing Order...</span>
+          </>
         ) : (
           <>
             <span>Place Order Now ⚡</span>
@@ -241,9 +245,15 @@ const PesepayPaymentButton = ({
         className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
-          <span>Redirecting to Pesepay...</span>
+          <>
+            <Spinner size="16" />
+            <span>Redirecting to Pesepay...</span>
+          </>
         ) : !redirectUrl ? (
-          <span>Initializing Pesepay...</span>
+          <>
+            <Spinner size="16" />
+            <span>Initializing Pesepay...</span>
+          </>
         ) : (
           <span>Pay with Pesepay</span>
         )}
@@ -284,7 +294,10 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
-          <span>Processing Order...</span>
+          <>
+            <Spinner size="16" />
+            <span>Processing Order...</span>
+          </>
         ) : (
           <>
             <span>Place Order Now ⚡</span>

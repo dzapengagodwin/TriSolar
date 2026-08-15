@@ -266,11 +266,25 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
   async initiatePayment(
     input: InitiatePaymentInput
   ): Promise<InitiatePaymentOutput> {
-    const amount = this.normalizeAmount(input.amount as string | number | bigint)
-    const callbackUrl =
+    const amount = this.normalizeAmount(
+      input.amount as string | number | bigint
+    )
+    const cartId = String(
+      input.data?.cart_id ??
+      input.data?.cartId ??
+      (input as any).cart_id ??
+      ''
+    )
+
+    let callbackUrl =
       input.data?.callback_url ??
       this.options_.callbackUrl ??
-      'http://localhost:8000/us/payment-callback'
+      'http://localhost:8000/zw/payment-callback'
+
+    if (cartId && !callbackUrl.includes('cart_id=')) {
+      const sep = callbackUrl.includes('?') ? '&' : '?'
+      callbackUrl = `${callbackUrl}${sep}cart_id=${encodeURIComponent(cartId)}`
+    }
 
     const response = await this.request<PesepayTransaction>('/payments/initiate', 'POST', {
       amountDetails: {
@@ -283,7 +297,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       returnUrl: callbackUrl,
       paymentMetadata: {
         source: 'medusa',
-        cart_id: input.data?.cart_id ?? input.data?.cartId ?? '',
+        cart_id: cartId,
       },
     })
 
