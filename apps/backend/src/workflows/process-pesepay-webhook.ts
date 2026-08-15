@@ -6,16 +6,26 @@ import {
 } from "@medusajs/framework/workflows-sdk"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 
-type ProcessPesepayWebhookInput = {
+export type ProcessPesepayWebhookInput = {
   referenceNumber: string
   status: string
   isSuccessful: boolean
   webhookData: Record<string, unknown>
 }
 
+export type ProcessPesepayWebhookOutput = {
+  processed: boolean
+  sessionId?: string
+  referenceNumber?: string
+  note?: string
+}
+
 export const processPesepayWebhookStep = createStep(
   "process-pesepay-webhook",
-  async (input: ProcessPesepayWebhookInput, { container }) => {
+  async (
+    input: ProcessPesepayWebhookInput,
+    { container }
+  ): Promise<StepResponse<ProcessPesepayWebhookOutput>> => {
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
     const paymentModule = container.resolve(Modules.PAYMENT)
@@ -23,7 +33,10 @@ export const processPesepayWebhookStep = createStep(
     const { referenceNumber, status, isSuccessful, webhookData } = input
 
     if (!referenceNumber) {
-      return new StepResponse({ processed: false, note: "No reference number" })
+      return new StepResponse<ProcessPesepayWebhookOutput>({
+        processed: false,
+        note: "No reference number",
+      })
     }
 
     try {
@@ -48,16 +61,21 @@ export const processPesepayWebhookStep = createStep(
         logger.info(
           `Successfully authorized payment session ${matchingSession.id} via webhook workflow`
         )
-        return new StepResponse({
+        return new StepResponse<ProcessPesepayWebhookOutput>({
           processed: true,
           sessionId: matchingSession.id,
         })
       }
     } catch (err: any) {
-      logger.warn(`Could not authorize payment session in workflow: ${err.message}`)
+      logger.warn(
+        `Could not authorize payment session in workflow: ${err.message}`
+      )
     }
 
-    return new StepResponse({ processed: false, referenceNumber })
+    return new StepResponse<ProcessPesepayWebhookOutput>({
+      processed: false,
+      referenceNumber,
+    })
   }
 )
 

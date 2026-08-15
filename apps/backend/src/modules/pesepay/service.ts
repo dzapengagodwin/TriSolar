@@ -276,10 +276,11 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       ''
     )
 
-    let callbackUrl =
-      input.data?.callback_url ??
-      this.options_.callbackUrl ??
+    let callbackUrl = String(
+      input.data?.callback_url ||
+      this.options_.callbackUrl ||
       'http://localhost:8000/zw/payment-callback'
+    )
 
     if (cartId && !callbackUrl.includes('cart_id=')) {
       const sep = callbackUrl.includes('?') ? '&' : '?'
