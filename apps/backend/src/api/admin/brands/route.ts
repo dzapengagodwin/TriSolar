@@ -25,8 +25,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       "products.handle",
     ],
     pagination: {
-      take: req.query.limit ? Number(req.query.limit) : 50,
-      skip: req.query.offset ? Number(req.query.offset) : 0,
+      take: Math.max(1, Number(req.query.limit) || 50),
+      skip: Math.max(0, Number(req.query.offset) || 0),
     },
   })
 
@@ -54,17 +54,32 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return res.status(400).json({ message: "Brand name is required" })
   }
 
-  const { result: brand } = await createBrandWorkflow(req.scope).run({
-    input: {
-      name,
-      handle,
-      logo,
-      description,
-      website,
-      is_active: is_active ?? true,
-      metadata,
-    },
-  })
+  try {
+    const { result: brand } = await createBrandWorkflow(req.scope).run({
+      input: {
+        name,
+        handle,
+        logo,
+        description,
+        website,
+        is_active: is_active ?? true,
+        metadata,
+      },
+    })
 
-  return res.status(201).json({ brand })
+    return res.status(201).json({ brand })
+  } catch (error: any) {
+    const isConflict =
+      error.message?.includes("unique") ||
+      error.message?.includes("duplicate") ||
+      error.code === "23505"
+    if (isConflict) {
+      return res.status(409).json({
+        message: `A brand with this handle or name already exists`,
+      })
+    }
+    return res.status(500).json({
+      message: error.message || "Failed to create brand",
+    })
+  }
 }

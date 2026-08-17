@@ -15,7 +15,7 @@ export default async function ProductRail({
 }) {
   let pricedProducts: HttpTypes.StoreProduct[] = []
 
-  const queryParams: any = {
+  const queryParams: HttpTypes.StoreProductParams = {
     limit: 10,
     fields: "*variants.calculated_price,*categories",
   }

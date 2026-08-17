@@ -137,8 +137,7 @@ export class WooCommerceTransformer {
     product: WooProduct,
     variations: WooVariation[],
     currencyCode: string,
-    categoryMap: Map<number, string>,
-    collectionMap: Map<number, string>
+    categoryMap: Map<number, string>
   ): MedusaProductPayload {
     const status = product.status === "publish" ? ProductStatus.PUBLISHED : ProductStatus.DRAFT
 
@@ -151,11 +150,6 @@ export class WooCommerceTransformer {
     const category_ids = (product.categories || [])
       .map((cat) => categoryMap.get(cat.id))
       .filter((id): id is string => id !== undefined)
-
-    const collection_id =
-      product.tags && product.tags.length > 0
-        ? collectionMap.get(product.tags[0].id)
-        : undefined
 
     // Clean description & short_description HTML markup separately
     const cleanShortDesc = this.cleanHtml(product.short_description || "")
@@ -265,7 +259,6 @@ export class WooCommerceTransformer {
       options,
       variants,
       category_ids,
-      collection_id,
       brand,
       metadata: {
         woo_product_id: product.id,
@@ -273,7 +266,7 @@ export class WooCommerceTransformer {
         brand_name: brand?.name || "",
         brand_handle: brand?.handle || "",
         short_description: cleanShortDesc,
-        woo_attributes: metadataAttributes,
+        woo_tags: (product.tags || []).map((t) => t.name),
       },
     }
   }
@@ -282,12 +275,11 @@ export class WooCommerceTransformer {
     products: WooProduct[],
     variationsMap: Map<number, WooVariation[]>,
     currencyCode: string,
-    categoryMap: Map<number, string>,
-    collectionMap: Map<number, string>
+    categoryMap: Map<number, string>
   ): MedusaProductPayload[] {
     return products.map((product) => {
       const variations = variationsMap.get(product.id) || []
-      return this.transformProduct(product, variations, currencyCode, categoryMap, collectionMap)
+      return this.transformProduct(product, variations, currencyCode, categoryMap)
     })
   }
 }

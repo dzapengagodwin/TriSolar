@@ -9,44 +9,22 @@ type CategoryDropdownProps = {
   categories?: HttpTypes.StoreProductCategory[]
 }
 
-// Sample subcategories fallback map if categories don't have children in DB yet
+// Subcategories fallback map if categories don't have children in DB yet
 const FALLBACK_SUBCATEGORIES: Record<string, string[]> = {
-  furniture: [
-    "Executive Chairs",
-    "Executive Desks",
-    "Filing Cabinets",
-    "Standard Chairs",
-    "Standard Desks",
-    "White Boards",
-  ],
-  electronics: [
-    "Laptops & Computers",
-    "Smartphones & Tablets",
-    "Audio & Headphones",
-    "TV & Home Theatre",
-    "Cameras & Accessories",
-  ],
-  fashion: [
-    "Men's Clothing",
-    "Women's Clothing",
-    "Footwear & Sneakers",
-    "Bags & Backpacks",
-    "Watches & Accessories",
-  ],
-  merch: ["Hoodies & Sweatshirts", "T-Shirts & Tops", "Caps & Accessories"],
-  pants: ["Jeans", "Trousers", "Shorts", "Joggers"],
-  shirts: ["Casual Shirts", "Formal Shirts", "Polo Shirts"],
-  sweatshirts: ["Hoodies", "Crewnecks", "Zip-Up Sweatshirts"],
-  laptops: ["Gaming Laptops", "Ultrabooks", "MacBooks", "Workstations"],
+  laptops: ["Gaming Laptops", "Office Laptops", "MacBooks & iPads", "Refurbished Tech"],
+  desktops: ["Custom Gaming Towers", "All-in-One PCs", "Mini PCs", "Workstation PCs"],
+  printers: ["Laser Printers", "Inkjet Printers", "3D Printers", "Toner & Cartridges"],
+  accessories: ["Keyboards & Mice", "USB Cables & Hubs", "Laptop Backpacks", "External SSDs"],
+  audio: ["Wireless Headphones", "Gaming Headsets", "Bluetooth Speakers", "Studio Mics"],
 }
 
-export default function CategoryDropdown({ categories }: CategoryDropdownProps) {
+export default function CategoryDropdown({ categories = [] }: CategoryDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({})
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Click outside to close dropdown
+  // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -57,32 +35,35 @@ export default function CategoryDropdown({ categories }: CategoryDropdownProps) 
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  const toggleCategoryAccordion = (catId: string, e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [catId]: !prev[catId],
-    }))
-  }
-
-  // Get root categories (or fallback to all)
-  const rootCategories = categories?.filter(
+  // Filter out subcategories to get root level categories only
+  const rootCategories = categories.filter(
     (c) => !c.parent_category_id && !c.parent_category
   )
-  const displayCategories =
-    rootCategories && rootCategories.length > 0 ? rootCategories : categories || []
+  const displayCategories = rootCategories.length > 0 ? rootCategories : categories
+
+  // Set first category active by default when opening
+  useEffect(() => {
+    if (isOpen && displayCategories.length > 0 && !activeCategoryId) {
+      setActiveCategoryId(displayCategories[0].id)
+    }
+  }, [isOpen, displayCategories, activeCategoryId])
+
+  const activeCategory = displayCategories.find((c) => c.id === activeCategoryId)
 
   return (
     <div ref={dropdownRef} className="relative">
-      {/* Browse Categories Pill Button */}
+      {/* Category Toggle Button (Orange with Hamburger icon) */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="bg-black hover:bg-gray-800 text-white px-5 py-2 rounded-full flex items-center gap-2 cursor-pointer transition-colors text-xs font-bold shadow-sm"
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative z-50 shadow-sm ${
+          isOpen
+            ? "bg-[#FF9F0D] text-white"
+            : "bg-[#FF9F0D] text-white hover:bg-[#E58B00] rounded-b-xl"
+        }`}
         aria-expanded={isOpen}
       >
         <BarsThree className="w-4 h-4 text-white" />
-        <span>Browse Categories</span>
+        <span>All Categories</span>
         <ChevronDown
           className={`w-3.5 h-3.5 text-white transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
@@ -90,83 +71,189 @@ export default function CategoryDropdown({ categories }: CategoryDropdownProps) 
         />
       </button>
 
-      {/* Accordion Style Dropdown Menu */}
+      {/* Multi-Tier Mega Menu Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 z-50 animate-fade-in max-h-[480px] overflow-y-auto">
-          {displayCategories && displayCategories.length > 0 ? (
-            displayCategories.map((cat) => {
-              const handleKey = cat.handle ? cat.handle.toLowerCase() : ""
-              const children = cat.category_children || []
+        <div 
+          className="absolute top-full left-0 w-[920px] bg-white border border-gray-100 rounded-b-3xl rounded-tr-3xl shadow-2xl z-50 grid grid-cols-[220px_300px_1fr] min-h-[460px] overflow-hidden animate-fade-in"
+          style={{ transformOrigin: "top left" }}
+        >
+          {/* Column 1: Custom Tools & Links */}
+          <div className="bg-gray-50/70 border-r border-gray-100 p-5 flex flex-col justify-between text-xs text-gray-700">
+            <div className="space-y-6">
+              {/* Quick Links Group */}
+              <div className="space-y-2.5">
+                <LocalizedClientLink
+                  href="/store"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 font-bold text-gray-800 hover:text-black transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#FF9F0D] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <span>Smart Tech Deals</span>
+                </LocalizedClientLink>
+                <LocalizedClientLink
+                  href="/store"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 font-bold text-gray-800 hover:text-black transition-colors"
+                >
+                  <svg className="w-4 h-4 text-[#FF9F0D] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span>Clearance Sales</span>
+                </LocalizedClientLink>
+              </div>
 
-              // Get subcategories (from Medusa DB or fallback map)
-              const fallbackSubs = FALLBACK_SUBCATEGORIES[handleKey] || []
-              const hasSubcategories = children.length > 0 || fallbackSubs.length > 0
-              const isExpanded = !!expandedCategories[cat.id]
-
-              return (
-                <div key={cat.id} className="border-b border-gray-50 last:border-0">
-                  {/* Category Header Row */}
-                  <div className="flex items-center justify-between px-4 py-2.5 hover:bg-gray-50 transition-colors">
-                    <LocalizedClientLink
-                      href={`/categories/${cat.handle}`}
-                      onClick={() => setIsOpen(false)}
-                      className="text-xs font-bold text-gray-900 hover:text-black flex-1 truncate"
-                    >
-                      {cat.name}
+              {/* Trending Section */}
+              <div className="space-y-2">
+                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Trending</h4>
+                <ul className="space-y-1.5 font-bold text-gray-600">
+                  <li>
+                    <LocalizedClientLink href="/store?q=gaming" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors">
+                      Gaming Zone
                     </LocalizedClientLink>
+                  </li>
+                  <li>
+                    <LocalizedClientLink href="/store" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors flex items-center gap-1.5">
+                      <span>Today&apos;s Deal</span>
+                      <span className="bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase scale-90">Hot</span>
+                    </LocalizedClientLink>
+                  </li>
+                </ul>
+              </div>
 
-                    {/* Accordion Caret Button */}
-                    {hasSubcategories && (
+              {/* Shopping Tools Section */}
+              <div className="space-y-2">
+                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Shopping Tools</h4>
+                <ul className="space-y-2 font-bold text-gray-600">
+                  <li>
+                    <LocalizedClientLink href="/store" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      <span>Custom PC Builders</span>
+                    </LocalizedClientLink>
+                  </li>
+                  <li>
+                    <LocalizedClientLink href="/account" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                      <span>Track Order</span>
+                    </LocalizedClientLink>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Bottom Support Info */}
+            <div className="pt-4 border-t border-gray-100 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+              Laptop Zone Support
+            </div>
+          </div>
+
+          {/* Column 2: Main Categories (Hover to reveal column 3) */}
+          <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto">
+            <div className="px-4 pb-2 border-b border-gray-50 mb-2">
+              <h4 className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">All Products</h4>
+            </div>
+            {displayCategories.length > 0 ? (
+              <ul className="space-y-0.5 px-2">
+                {displayCategories.map((cat) => {
+                  const isActive = activeCategoryId === cat.id
+                  return (
+                    <li key={cat.id}>
                       <button
-                        onClick={(e) => toggleCategoryAccordion(cat.id, e)}
-                        className="p-1 text-gray-500 hover:text-black rounded hover:bg-gray-200/60 transition-colors"
-                        aria-label={`Toggle subcategories for ${cat.name}`}
+                        onMouseEnter={() => setActiveCategoryId(cat.id)}
+                        className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-xs font-bold transition-all text-left uppercase tracking-wider cursor-pointer ${
+                          isActive
+                            ? "bg-gray-100 text-[#FF9F0D]"
+                            : "text-gray-700 hover:bg-gray-50 hover:text-black"
+                        }`}
                       >
-                        <ChevronDown
-                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                            isExpanded ? "rotate-180 text-black" : "text-gray-500"
+                        <span>{cat.name}</span>
+                        <svg
+                          className={`w-3.5 h-3.5 transition-colors ${
+                            isActive ? "text-[#FF9F0D]" : "text-gray-300"
                           }`}
-                        />
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2.5}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
                       </button>
-                    )}
-                  </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : (
+              <div className="px-4 py-3 text-xs text-gray-500 text-center">
+                No categories found.
+              </div>
+            )}
+          </div>
 
-                  {/* Inline Accordion Subcategories List */}
-                  {hasSubcategories && isExpanded && (
-                    <div className="bg-gray-50/80 border-t border-gray-100 py-1.5 px-4 space-y-1">
-                      {children.length > 0
-                        ? children.map((child) => (
-                            <LocalizedClientLink
-                              key={child.id}
-                              href={`/categories/${child.handle}`}
-                              onClick={() => setIsOpen(false)}
-                              className="block py-1.5 pl-3 text-xs font-medium text-gray-600 hover:text-black hover:font-semibold transition-colors"
-                            >
-                              {child.name}
-                            </LocalizedClientLink>
-                          ))
-                        : fallbackSubs.map((subName, idx) => {
-                            return (
-                              <LocalizedClientLink
-                                key={idx}
-                                href={`/store?q=${encodeURIComponent(subName)}`}
-                                onClick={() => setIsOpen(false)}
-                                className="block py-1.5 pl-3 text-xs font-medium text-gray-600 hover:text-black hover:font-semibold transition-colors"
-                              >
-                                {subName}
-                              </LocalizedClientLink>
-                            )
-                          })}
-                    </div>
+          {/* Column 3: Subcategories (Children of the active category) */}
+          <div className="p-6 bg-white max-h-[500px] overflow-y-auto">
+            {activeCategory ? (
+              <div className="space-y-6">
+                {/* Active Category Header */}
+                <div className="pb-3 border-b border-gray-100">
+                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{activeCategory.name}</h3>
+                </div>
+
+                {/* Subcategories list */}
+                <div className="grid grid-cols-1 gap-y-3">
+                  {/* Real subcategories from DB if any */}
+                  {activeCategory.category_children && activeCategory.category_children.length > 0 ? (
+                    activeCategory.category_children.map((child) => (
+                      <LocalizedClientLink
+                        key={child.id}
+                        href={`/categories/${child.handle}`}
+                        onClick={() => setIsOpen(false)}
+                        className="text-xs font-bold text-gray-500 hover:text-black transition-colors uppercase tracking-wider block"
+                      >
+                        {child.name}
+                      </LocalizedClientLink>
+                    ))
+                  ) : (
+                    /* Fallback subcategories list if DB has no children */
+                    (FALLBACK_SUBCATEGORIES[activeCategory.handle ? activeCategory.handle.toLowerCase() : ""] || []).map((subName, idx) => (
+                      <LocalizedClientLink
+                        key={idx}
+                        href={`/store?q=${encodeURIComponent(subName)}`}
+                        onClick={() => setIsOpen(false)}
+                        className="text-xs font-bold text-gray-500 hover:text-[#FF9F0D] transition-colors uppercase tracking-wider block"
+                      >
+                        {subName}
+                      </LocalizedClientLink>
+                    ))
                   )}
                 </div>
-              )
-            })
-          ) : (
-            <div className="px-4 py-3 text-xs text-gray-500 text-center">
-              No categories available
-            </div>
-          )}
+
+                {/* Shop All link */}
+                <div className="pt-4 border-t border-gray-50">
+                  <LocalizedClientLink
+                    href={`/categories/${activeCategory.handle}`}
+                    onClick={() => setIsOpen(false)}
+                    className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#FF9F0D] hover:text-[#E58B00] uppercase tracking-wider"
+                  >
+                    <span>Shop all {activeCategory.name}</span>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </LocalizedClientLink>
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-gray-400 text-center py-12">
+                Hover a category to view subcategories.
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

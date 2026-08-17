@@ -14,12 +14,12 @@ const MONTH_NAMES = [
 ]
 
 /** Returns true when Medusa 2.x pricing signals a genuine sale / price-list discount. */
-function isVariantOnSale(variant: any): boolean {
-  const calc = variant?.calculated_price
+function isVariantOnSale(variant: HttpTypes.StoreProductVariant): boolean {
+  const calc = variant?.calculated_price as Record<string, unknown> | undefined
   if (!calc) return false
 
-  const calculatedAmount = calc.calculated_amount ?? calc.amount ?? 0
-  const originalAmount = calc.original_amount ?? calculatedAmount
+  const calculatedAmount = (calc.calculated_amount ?? calc.amount ?? 0) as number
+  const originalAmount = (calc.original_amount ?? calculatedAmount) as number
 
   // Primary signal: original price is higher than the calculated (discounted) price
   if (typeof originalAmount === "number" && typeof calculatedAmount === "number" && originalAmount > calculatedAmount) {
@@ -35,11 +35,11 @@ function isVariantOnSale(variant: any): boolean {
 /** Returns the best (highest) discount percentage across a product's variants. */
 function getProductDiscountPct(product: HttpTypes.StoreProduct): number {
   let best = 0
-  for (const variant of (product.variants ?? []) as any[]) {
-    const calc = variant?.calculated_price
+  for (const variant of (product.variants ?? []) as HttpTypes.StoreProductVariant[]) {
+    const calc = variant?.calculated_price as Record<string, unknown> | undefined
     if (!calc) continue
-    const orig = calc.original_amount ?? 0
-    const curr = calc.calculated_amount ?? calc.amount ?? orig
+    const orig = (calc.original_amount ?? 0) as number
+    const curr = (calc.calculated_amount ?? calc.amount ?? orig) as number
     if (orig > curr && orig > 0) {
       best = Math.max(best, Math.round(((orig - curr) / orig) * 100))
     }
@@ -124,7 +124,7 @@ function CountdownTimer() {
 
 function DealProductCard({
   product,
-  region,
+  region: _region,
   discountPct,
 }: {
   product: HttpTypes.StoreProduct
@@ -133,18 +133,20 @@ function DealProductCard({
 }) {
   const priceInfo = useMemo(() => {
     if (!product.variants?.length) return null
-    const saleVariant = (product.variants as any[])
+    const saleVariant = (product.variants as HttpTypes.StoreProductVariant[])
       .filter((v) => !!v.calculated_price)
       .sort((a, b) => {
-        const aAmt = a.calculated_price?.calculated_amount ?? a.calculated_price?.amount ?? 0
-        const bAmt = b.calculated_price?.calculated_amount ?? b.calculated_price?.amount ?? 0
+        const aCalc = a.calculated_price as Record<string, unknown> | undefined
+        const bCalc = b.calculated_price as Record<string, unknown> | undefined
+        const aAmt = (aCalc?.calculated_amount ?? aCalc?.amount ?? 0) as number
+        const bAmt = (bCalc?.calculated_amount ?? bCalc?.amount ?? 0) as number
         return aAmt - bAmt
       })[0]
     return saleVariant ? getPricesForVariant(saleVariant) : null
   }, [product.variants])
 
   const categoryLabel = product.categories?.length
-    ? product.categories.map((c: any) => c.name).join(", ")
+    ? product.categories.map((c: HttpTypes.StoreProductCategory) => c.name).join(", ")
     : null
 
   return (
@@ -220,7 +222,7 @@ export default function MonthlyDeals({
   // 1. Filter to genuinely discounted products only
   const promoProducts = useMemo(() => {
     const onSale = products.filter((p) =>
-      p.variants?.some((v: any) => isVariantOnSale(v))
+      p.variants?.some((v: HttpTypes.StoreProductVariant) => isVariantOnSale(v))
     )
     return monthShuffle(onSale)
   }, [products])
@@ -229,7 +231,7 @@ export default function MonthlyDeals({
   const categoryTabs = useMemo(() => {
     const catMap = new Map<string, { id: string; name: string; count: number }>()
     for (const product of promoProducts) {
-      for (const cat of (product.categories ?? []) as any[]) {
+      for (const cat of (product.categories ?? []) as HttpTypes.StoreProductCategory[]) {
         if (!cat?.id || !cat?.name) continue
         const existing = catMap.get(cat.id)
         if (existing) existing.count++
@@ -259,7 +261,9 @@ export default function MonthlyDeals({
 
     const catId = activeTabId.replace("cat-", "")
     const filtered = promoProducts.filter((p) =>
-      (p.categories as any[])?.some((c: any) => c.id === catId)
+      (p.categories as HttpTypes.StoreProductCategory[])?.some(
+        (c: HttpTypes.StoreProductCategory) => c.id === catId
+      )
     )
     return filtered
   }, [activeTabId, promoProducts])

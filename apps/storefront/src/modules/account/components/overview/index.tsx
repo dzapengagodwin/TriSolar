@@ -99,7 +99,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                           Date placed
                         </span>
                         <span className="text-gray-800 font-bold mt-0.5" data-testid="order-created-date">
-                          {new Date(order.created_at).toLocaleDateString()}
+                          {new Date(order.created_at).toDateString()}
                         </span>
                       </div>
                       <div className="flex flex-col">

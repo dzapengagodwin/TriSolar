@@ -10,7 +10,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       consumerSecret,
       currencyCode = "usd",
       importCategories = true,
-      importTags = true,
+      importTags = false,
       publishProducts = false,
       createPriceList = false,
       jsonData,

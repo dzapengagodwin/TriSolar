@@ -31,7 +31,12 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             className="text-medium text-ui-fg-subtle whitespace-pre-line"
             data-testid="product-description"
           >
-            {product.subtitle || product.description}
+            {product.subtitle ||
+              (product.description
+                ? product.description.length > 160
+                  ? `${product.description.slice(0, 160).trim()}...`
+                  : product.description
+                : null)}
           </Text>
         )}
       </div>

@@ -2,12 +2,16 @@ import { HttpTypes } from "@medusajs/types"
 import { getPercentageDiff } from "./get-percentage-diff"
 import { convertToLocale } from "./money"
 
-export const getPricesForVariant = (variant: any) => {
+export const getPricesForVariant = (
+  variant?: HttpTypes.StoreProductVariant | null
+) => {
   if (!variant) {
     return null
   }
 
-  const calcObj = variant.calculated_price
+  const calcObj = variant.calculated_price as
+    | Record<string, unknown>
+    | undefined
   if (!calcObj) {
     return null
   }
@@ -19,7 +23,7 @@ export const getPricesForVariant = (variant: any) => {
       : typeof calcObj.amount === "number"
       ? calcObj.amount
       : typeof calcObj === "number"
-      ? calcObj
+      ? (calcObj as number)
       : 0
 
   const originalAmount =
@@ -28,12 +32,12 @@ export const getPricesForVariant = (variant: any) => {
       : amount
 
   const currencyCode =
-    calcObj.currency_code || variant.currency_code || "usd"
+    (calcObj.currency_code as string) || (calcObj.currency_code as string) || "usd"
 
   const priceType =
     typeof calcObj.price_list_type === "string"
       ? calcObj.price_list_type
-      : calcObj.price_type || "default"
+      : (calcObj.price_type as string) || "default"
 
   return {
     calculated_price_number: amount,
@@ -68,11 +72,13 @@ export function getProductPrice({
       return null
     }
 
-    const cheapestVariant = (product.variants as any[])
+    const cheapestVariant = (product.variants as HttpTypes.StoreProductVariant[])
       .filter((v) => !!v.calculated_price)
       .sort((a, b) => {
-        const aAmount = a.calculated_price?.calculated_amount ?? a.calculated_price?.amount ?? 0
-        const bAmount = b.calculated_price?.calculated_amount ?? b.calculated_price?.amount ?? 0
+        const aCalc = a.calculated_price as Record<string, unknown> | undefined
+        const bCalc = b.calculated_price as Record<string, unknown> | undefined
+        const aAmount = (aCalc?.calculated_amount ?? aCalc?.amount ?? 0) as number
+        const bAmount = (bCalc?.calculated_amount ?? bCalc?.amount ?? 0) as number
         return aAmount - bAmount
       })[0]
 

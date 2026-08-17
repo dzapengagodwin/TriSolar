@@ -34,7 +34,18 @@ export const updateBrandStep = createStep(
     if (!prevBrand) return
     const brandModuleService: BrandModuleService =
       container.resolve(BRAND_MODULE)
-    await brandModuleService.updateBrands(prevBrand)
+    const { id, name, handle, logo, description, website, is_active, metadata } =
+      prevBrand as any
+    await brandModuleService.updateBrands({
+      id,
+      name,
+      handle,
+      logo,
+      description,
+      website,
+      is_active,
+      metadata,
+    })
   }
 )
 

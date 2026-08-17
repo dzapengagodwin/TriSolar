@@ -21,8 +21,21 @@ export default function ProductPreview({
 
   // Format category breadcrumb / tags string
   const categoriesString = product.categories && product.categories.length > 0
-    ? product.categories.map((c: any) => c.name).join(", ")
+    ? product.categories.map((c: HttpTypes.StoreProductCategory) => c.name).join(", ")
     : "General Category"
+
+  const isSale = Boolean(
+    priceInfo &&
+      (priceInfo.price_type === "sale" ||
+        (typeof priceInfo.percentage_diff === "number" && priceInfo.percentage_diff > 0) ||
+        (typeof priceInfo.percentage_diff === "string" && parseInt(priceInfo.percentage_diff) > 0) ||
+        priceInfo.original_price_number > priceInfo.calculated_price_number)
+  )
+
+  const discountText =
+    priceInfo?.percentage_diff && parseInt(String(priceInfo.percentage_diff)) > 0
+      ? `-${priceInfo.percentage_diff}%`
+      : "Sale!"
 
   return (
     <div
@@ -31,9 +44,11 @@ export default function ProductPreview({
     >
       {/* Product Image & Sale Badge */}
       <div className="relative mb-3">
-        <span className="absolute top-0 left-0 z-10 bg-[#E53935] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
-          Sale!
-        </span>
+        {isSale && (
+          <span className="absolute top-0 left-0 z-10 bg-[#E53935] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+            {discountText}
+          </span>
+        )}
 
         <LocalizedClientLink href={`/products/${product.handle}`} className="block">
           <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-44 rounded-xl">

@@ -23,8 +23,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       is_active: true,
     },
     pagination: {
-      take: req.query.limit ? Number(req.query.limit) : 50,
-      skip: req.query.offset ? Number(req.query.offset) : 0,
+      take: Math.max(1, Number(req.query.limit) || 50),
+      skip: Math.max(0, Number(req.query.offset) || 0),
     },
   })
 

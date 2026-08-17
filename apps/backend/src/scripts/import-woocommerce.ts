@@ -11,7 +11,7 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
   let currency = "usd"
   let publish = false
   let importCategories = true
-  let importTags = true
+  let importTags = false
 
   for (const arg of args) {
     if (arg.startsWith("--url=")) url = arg.split("=").slice(1).join("=")

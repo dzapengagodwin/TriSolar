@@ -27,7 +27,18 @@ export const deleteBrandStep = createStep(
     if (!prevBrand) return
     const brandModuleService: BrandModuleService =
       container.resolve(BRAND_MODULE)
-    await brandModuleService.createBrands(prevBrand)
+    const { id, name, handle, logo, description, website, is_active, metadata } =
+      prevBrand as any
+    await brandModuleService.createBrands({
+      id,
+      name,
+      handle,
+      logo,
+      description,
+      website,
+      is_active,
+      metadata,
+    })
   }
 )
 

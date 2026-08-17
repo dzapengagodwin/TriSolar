@@ -1,6 +1,10 @@
 import { convertToLocale } from "@lib/util/money"
 
-export default function PreviewPrice({ price }: { price: any }) {
+export type PreviewPriceProps = {
+  price?: Record<string, unknown> | string | number | null
+}
+
+export default function PreviewPrice({ price }: PreviewPriceProps) {
   if (!price) {
     return null
   }

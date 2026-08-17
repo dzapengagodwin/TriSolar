@@ -7,8 +7,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
   const { handle } = req.params
 
-  const limit = parseInt(req.query.limit as string) || 20
-  const offset = parseInt(req.query.offset as string) || 0
+  const limit = Math.max(1, parseInt(req.query.limit as string) || 20)
+  const offset = Math.max(0, parseInt(req.query.offset as string) || 0)
 
   const { data: brands } = await query.graph({
     entity: "brand",
@@ -43,13 +43,17 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   }
 
   const brandData = brands[0] as any
-  const allProducts = Array.isArray(brandData.products)
+  const rawProducts = Array.isArray(brandData.products)
     ? brandData.products
     : brandData.product
     ? [brandData.product]
     : []
 
-  const paginatedProducts = allProducts.slice(offset, offset + limit)
+  const publishedProducts = rawProducts.filter(
+    (p: any) => !p.status || p.status === "published"
+  )
+
+  const paginatedProducts = publishedProducts.slice(offset, offset + limit)
 
   return res.status(200).json({
     brand: {
@@ -61,7 +65,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       website: brandData.website,
       products: paginatedProducts,
       count: paginatedProducts.length,
-      total_products: allProducts.length,
+      total_products: publishedProducts.length,
       limit,
       offset,
       metadata: brandData.metadata,

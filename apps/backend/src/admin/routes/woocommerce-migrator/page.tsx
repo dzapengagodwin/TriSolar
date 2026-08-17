@@ -50,7 +50,7 @@ const WooCommerceMigratorPage = () => {
   // Import options state
   const [currencyCode, setCurrencyCode] = useState("usd")
   const [importCategories, setImportCategories] = useState(true)
-  const [importTags, setImportTags] = useState(true)
+  const [importTags, setImportTags] = useState(false)
   const [publishProducts, setPublishProducts] = useState(false)
   const [createPriceList, setCreatePriceList] = useState(false)
 
@@ -421,13 +421,6 @@ const WooCommerceMigratorPage = () => {
                 onCheckedChange={setImportCategories}
               />
               <Label>Import categories</Label>
-            </div>
-            <div className="flex items-center gap-x-3">
-              <Switch
-                checked={importTags}
-                onCheckedChange={setImportTags}
-              />
-              <Label>Import tags as collections</Label>
             </div>
             <div className="flex items-center gap-x-3">
               <Switch

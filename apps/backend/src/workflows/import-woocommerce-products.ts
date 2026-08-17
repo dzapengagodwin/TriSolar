@@ -6,7 +6,6 @@ import {
 } from "@medusajs/framework/workflows-sdk"
 import {
   createProductCategoriesWorkflow,
-  createCollectionsWorkflow,
   createProductsWorkflow,
   createPriceListsWorkflow,
   createSalesChannelsWorkflow,
@@ -287,70 +286,6 @@ export const importWooCommerceStep = createStep(
     }
 
     // Fetch existing collections to prevent duplicates
-    let existingCollections: any[] = []
-    try {
-      const { data } = await query.graph({
-        entity: "product_collection",
-        fields: ["id", "title", "handle"],
-      })
-      existingCollections = data || []
-    } catch (err: any) {
-      logger.warn(`Failed to fetch existing collections: ${err.message}`)
-    }
-
-    // Import tags as collections
-    if (input.importTags && wooTags.length > 0) {
-      logger.info(`Importing ${wooTags.length} tags as collections`)
-      try {
-        const transformedCollections = transformer.transformTags(wooTags)
-
-        // Filter out collections that already exist in Medusa
-        const collectionsToCreate = transformedCollections.filter((newColl) => {
-          const matched = existingCollections.find(
-            (ec) =>
-              ec.handle === newColl.handle ||
-              ec.title.toLowerCase() === newColl.title.toLowerCase()
-          )
-          if (matched) {
-            const wcTag = wooTags.find(
-              (wt) =>
-                transformer.sanitizeHandle(wt.slug || wt.name) === newColl.handle ||
-                wt.name.toLowerCase() === newColl.title.toLowerCase()
-            )
-            if (wcTag) {
-              collectionMap.set(wcTag.id, matched.id)
-            }
-            return false
-          }
-          return true
-        })
-
-        if (collectionsToCreate.length > 0) {
-          const collectionsResult = await createCollectionsWorkflow(container).run({
-            input: {
-              collections: collectionsToCreate,
-            },
-          })
-
-          const createdCollections = collectionsResult.result
-          result.importedCollections = createdCollections.length
-
-          for (const wcTag of wooTags) {
-            const sanitizedTagHandle = transformer.sanitizeHandle(wcTag.slug || wcTag.name)
-            const medusaCollection =
-              createdCollections.find((c: any) => c.handle === sanitizedTagHandle) ||
-              existingCollections.find((ec: any) => ec.handle === sanitizedTagHandle)
-            if (medusaCollection) {
-              collectionMap.set(wcTag.id, medusaCollection.id)
-            }
-          }
-        }
-      } catch (error: any) {
-        logger.error(`Failed to import collections: ${error.message}`)
-        result.errors.push(`Category import error: ${error.message}`)
-      }
-    }
-
     // Fetch existing products to prevent unique constraint handle failures
     let existingProducts: any[] = []
     try {
@@ -416,8 +351,7 @@ export const importWooCommerceStep = createStep(
           wcProduct,
           variations,
           input.currencyCode,
-          categoryMap,
-          collectionMap
+          categoryMap
         )
       })
 
