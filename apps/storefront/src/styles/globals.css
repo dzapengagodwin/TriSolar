@@ -2,6 +2,13 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --primary: #F9501F;
+  --primary-hover: #D83D0F;
+  --primary-rgb: 249 80 31;
+  --theme-grey: #646464;
+}
+
 @layer utilities {
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
@@ -64,7 +71,7 @@ body {
   }
 
   .nexcart-btn-amber {
-    @apply px-5 py-2.5 bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
+    @apply px-5 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
   }
 
   .text-xsmall-regular {

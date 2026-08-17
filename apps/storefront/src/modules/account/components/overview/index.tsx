@@ -114,7 +114,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                         <span className="font-extrabold text-[9px] text-gray-400 uppercase tracking-wider">
                           Total amount
                         </span>
-                        <span className="text-[#FF9F0D] font-extrabold mt-0.5" data-testid="order-amount">
+                        <span className="text-primary font-extrabold mt-0.5" data-testid="order-amount">
                           {convertToLocale({
                             amount: order.total,
                             currency_code: order.currency_code,

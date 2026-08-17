@@ -58,7 +58,7 @@ export default function PaymentCallbackPage() {
       <div className="max-w-md w-full bg-white border border-gray-100 rounded-3xl p-8 sm:p-10 shadow-lg text-center">
         {isFinalizing ? (
           <div className="flex flex-col items-center justify-center space-y-4 py-6">
-            <div className="w-16 h-16 rounded-full bg-orange-50 text-[#FF9F0D] flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-orange-50 text-primary flex items-center justify-center">
               <Spinner size="32" />
             </div>
             <h1 className="text-xl font-bold text-gray-900">
@@ -87,7 +87,7 @@ export default function PaymentCallbackPage() {
                   setErrorMessage(null)
                   setAttempted(false)
                 }}
-                className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3 px-6 rounded-full text-xs transition-all shadow-md"
+                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-full text-xs transition-all shadow-md"
               >
                 Retry Finalization
               </button>

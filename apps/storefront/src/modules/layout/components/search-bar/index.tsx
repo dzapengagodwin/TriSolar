@@ -153,7 +153,7 @@ export default function SearchBar({ categories }: SearchBarProps) {
         {/* Submit Button with MagnifyingGlass Icon */}
         <button
           type="submit"
-          className="bg-[#FF9F0D] hover:bg-[#E58B00] text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
+          className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
         >
           <MagnifyingGlass className="w-4 h-4" />
           <span>Search</span>

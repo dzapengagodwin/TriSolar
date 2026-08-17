@@ -41,7 +41,7 @@ export default async function ContactPage() {
                 <input
                   type="text"
                   placeholder="e.g. John Doe"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#FF9F0D]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-primary"
                 />
               </div>
               <div>
@@ -49,7 +49,7 @@ export default async function ContactPage() {
                 <input
                   type="email"
                   placeholder="e.g. john@example.com"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-[#FF9F0D]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs text-gray-900 focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -58,12 +58,12 @@ export default async function ContactPage() {
               <textarea
                 rows={4}
                 placeholder="How can we help you today?"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-900 focus:outline-none focus:border-[#FF9F0D]"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-900 focus:outline-none focus:border-primary"
               ></textarea>
             </div>
             <button
               type="button"
-              className="bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold text-xs px-8 py-3 rounded-full transition-colors shadow-md"
+              className="bg-primary hover:bg-primary-hover text-white font-bold text-xs px-8 py-3 rounded-full transition-colors shadow-md"
             >
               Send Inquiry
             </button>

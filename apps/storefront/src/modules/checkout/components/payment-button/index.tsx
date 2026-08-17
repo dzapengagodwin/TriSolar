@@ -153,7 +153,7 @@ const StripePaymentButton = ({
         disabled={disabled || notReady || submitting}
         onClick={handlePayment}
         data-testid={dataTestId}
-        className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
           <>
@@ -242,7 +242,7 @@ const PesepayPaymentButton = ({
         disabled={isButtonDisabled}
         onClick={handlePayment}
         data-testid={dataTestId}
-        className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
           <>
@@ -291,7 +291,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
         disabled={notReady || submitting}
         onClick={handlePayment}
         data-testid="submit-order-button"
-        className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {submitting ? (
           <>

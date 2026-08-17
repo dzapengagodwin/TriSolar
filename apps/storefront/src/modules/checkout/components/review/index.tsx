@@ -23,7 +23,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
     <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
       <div className="flex flex-row items-center justify-between pb-4 border-b border-gray-100 mb-6">
         <div className="flex items-center gap-x-3">
-          <span className="w-8 h-8 rounded-full bg-[#FF9F0D] text-white flex items-center justify-center font-bold text-xs">
+          <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
             4
           </span>
           <h2

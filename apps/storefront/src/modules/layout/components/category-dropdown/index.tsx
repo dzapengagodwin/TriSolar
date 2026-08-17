@@ -55,10 +55,10 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
       {/* Category Toggle Button (Orange with Hamburger icon) */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer relative z-50 shadow-sm ${
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer relative z-50 shadow-sm ${
           isOpen
-            ? "bg-[#FF9F0D] text-white"
-            : "bg-[#FF9F0D] text-white hover:bg-[#E58B00] rounded-b-xl"
+            ? "bg-primary text-white"
+            : "bg-primary text-white hover:bg-primary-hover rounded-b-xl"
         }`}
         aria-expanded={isOpen}
       >
@@ -87,7 +87,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2 font-bold text-gray-800 hover:text-black transition-colors"
                 >
-                  <svg className="w-4 h-4 text-[#FF9F0D] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   <span>Smart Tech Deals</span>
@@ -97,7 +97,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-2 font-bold text-gray-800 hover:text-black transition-colors"
                 >
-                  <svg className="w-4 h-4 text-[#FF9F0D] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   <span>Clearance Sales</span>
@@ -106,8 +106,8 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
 
               {/* Trending Section */}
               <div className="space-y-2">
-                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Trending</h4>
-                <ul className="space-y-1.5 font-bold text-gray-600">
+                <h4 className="text-[11px] font-bold text-gray-400">Trending</h4>
+                <ul className="space-y-1.5 font-medium text-gray-600">
                   <li>
                     <LocalizedClientLink href="/store?q=gaming" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors">
                       Gaming Zone
@@ -124,8 +124,8 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
 
               {/* Shopping Tools Section */}
               <div className="space-y-2">
-                <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Shopping Tools</h4>
-                <ul className="space-y-2 font-bold text-gray-600">
+                <h4 className="text-[11px] font-bold text-gray-400">Shopping Tools</h4>
+                <ul className="space-y-2 font-medium text-gray-600">
                   <li>
                     <LocalizedClientLink href="/store" onClick={() => setIsOpen(false)} className="hover:text-black transition-colors flex items-center gap-2">
                       <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -148,7 +148,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
             </div>
 
             {/* Bottom Support Info */}
-            <div className="pt-4 border-t border-gray-100 text-[10px] text-gray-400 font-semibold uppercase tracking-wider">
+            <div className="pt-4 border-t border-gray-100 text-[10px] text-gray-400 font-medium">
               Laptop Zone Support
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
           {/* Column 2: Main Categories (Hover to reveal column 3) */}
           <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto">
             <div className="px-4 pb-2 border-b border-gray-50 mb-2">
-              <h4 className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">All Products</h4>
+              <h4 className="text-[11px] font-bold text-gray-400">All Products</h4>
             </div>
             {displayCategories.length > 0 ? (
               <ul className="space-y-0.5 px-2">
@@ -166,16 +166,16 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                     <li key={cat.id}>
                       <button
                         onMouseEnter={() => setActiveCategoryId(cat.id)}
-                        className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-xs font-bold transition-all text-left uppercase tracking-wider cursor-pointer ${
+                        className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-xs font-semibold transition-all text-left cursor-pointer ${
                           isActive
-                            ? "bg-gray-100 text-[#FF9F0D]"
+                            ? "bg-gray-100 text-primary"
                             : "text-gray-700 hover:bg-gray-50 hover:text-black"
                         }`}
                       >
                         <span>{cat.name}</span>
                         <svg
                           className={`w-3.5 h-3.5 transition-colors ${
-                            isActive ? "text-[#FF9F0D]" : "text-gray-300"
+                            isActive ? "text-primary" : "text-gray-300"
                           }`}
                           fill="none"
                           viewBox="0 0 24 24"
@@ -202,7 +202,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
               <div className="space-y-6">
                 {/* Active Category Header */}
                 <div className="pb-3 border-b border-gray-100">
-                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-tight">{activeCategory.name}</h3>
+                  <h3 className="text-sm font-bold text-gray-900">{activeCategory.name}</h3>
                 </div>
 
                 {/* Subcategories list */}
@@ -214,7 +214,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                         key={child.id}
                         href={`/categories/${child.handle}`}
                         onClick={() => setIsOpen(false)}
-                        className="text-xs font-bold text-gray-500 hover:text-black transition-colors uppercase tracking-wider block"
+                        className="text-xs font-medium text-gray-600 hover:text-black transition-colors block"
                       >
                         {child.name}
                       </LocalizedClientLink>
@@ -226,7 +226,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                         key={idx}
                         href={`/store?q=${encodeURIComponent(subName)}`}
                         onClick={() => setIsOpen(false)}
-                        className="text-xs font-bold text-gray-500 hover:text-[#FF9F0D] transition-colors uppercase tracking-wider block"
+                        className="text-xs font-medium text-gray-600 hover:text-primary transition-colors block"
                       >
                         {subName}
                       </LocalizedClientLink>
@@ -239,7 +239,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                   <LocalizedClientLink
                     href={`/categories/${activeCategory.handle}`}
                     onClick={() => setIsOpen(false)}
-                    className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#FF9F0D] hover:text-[#E58B00] uppercase tracking-wider"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover"
                   >
                     <span>Shop all {activeCategory.name}</span>
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

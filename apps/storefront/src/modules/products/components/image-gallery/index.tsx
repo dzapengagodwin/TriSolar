@@ -164,7 +164,7 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
                 onClick={() => setSelectedIndex(idx)}
                 className={`relative w-16 h-16 rounded-xl border-2 overflow-hidden bg-white p-1 transition-all shrink-0 ${
                   selectedIndex === idx
-                    ? "border-[#FF9F0D] ring-2 ring-[#FF9F0D]/50 scale-105"
+                    ? "border-primary ring-2 ring-primary/50 scale-105"
                     : "border-transparent opacity-60 hover:opacity-100"
                 }`}
               >

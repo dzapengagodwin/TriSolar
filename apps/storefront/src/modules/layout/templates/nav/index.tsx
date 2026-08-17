@@ -32,9 +32,9 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
       {/* Row 1: Top Announcement Bar (Black Header) */}
       <div className="bg-black text-white text-xs py-2 text-center font-medium" suppressHydrationWarning>
         <div className="content-container flex justify-center items-center gap-2" suppressHydrationWarning>
-          <Sparkles className="w-4 h-4 text-[#FF9F0D]" />
+          <Sparkles className="w-4 h-4 text-primary" />
           <span>Introducing Our Fastest Express Delivery Service In Your City!</span>
-          <LocalizedClientLink href="/store" className="text-[#FF9F0D] font-bold underline hover:text-amber-300 flex items-center gap-1">
+          <LocalizedClientLink href="/store" className="text-primary font-bold underline hover:text-orange-400 flex items-center gap-1">
             <span>Order Now</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </LocalizedClientLink>
@@ -66,7 +66,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
             <LocalizedClientLink href="/account" className="flex items-center gap-1.5 hover:text-black transition-colors relative" aria-label="Wishlist">
               <div className="relative">
                 <Heart className="w-6 h-6 text-gray-800" />
-                <span className="absolute -top-1 -right-1 bg-[#FF9F0D] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
               </div>
             </LocalizedClientLink>
 

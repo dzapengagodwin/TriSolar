@@ -94,7 +94,7 @@ const CartDropdown = ({
             </span>
             <div className="relative">
               <ShoppingBag className="w-4 h-4 text-white" />
-              <span className="absolute -top-2 -right-2 bg-[#FF9F0D] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+              <span className="absolute -top-2 -right-2 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                 {totalItems}
               </span>
             </div>

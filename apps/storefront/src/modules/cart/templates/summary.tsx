@@ -37,7 +37,7 @@ const Summary = ({ cart }: SummaryProps) => {
         data-testid="checkout-button"
         className="w-full"
       >
-        <button className="w-full bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold text-sm py-3.5 px-6 rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+        <button className="w-full bg-primary hover:bg-primary-hover text-white font-bold text-sm py-3.5 px-6 rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
           <span>Go to checkout</span>
           <ArrowRight className="w-4 h-4 text-white" />
         </button>

@@ -19,7 +19,7 @@ export default function CheckoutLayout({
       {/* 1. Top Announcement Bar (Black Header) */}
       <div className="bg-black text-white text-xs py-2 text-center font-medium">
         <div className="content-container flex justify-center items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#FF9F0D]" />
+          <Sparkles className="w-4 h-4 text-primary" />
           <span>Fast & Secure Checkout • 100% Money Back Guarantee</span>
         </div>
       </div>

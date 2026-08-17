@@ -59,7 +59,7 @@ export default function CategoryAvatars({
         {/* Full-width Black Coupon Banner */}
         <div className="bg-black text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg border border-gray-800">
           <div className="space-y-1 text-center sm:text-left">
-            <span className="text-[10px] font-bold text-[#FF9F0D] uppercase tracking-wider">SPECIAL CATALOG SELECTION</span>
+            <span className="text-[10px] font-bold text-primary uppercase tracking-wider">SPECIAL CATALOG SELECTION</span>
             <h3 className="text-xl sm:text-2xl font-extrabold font-sans">
               Shop Top Rated Hardware & Accessories
             </h3>
@@ -67,7 +67,7 @@ export default function CategoryAvatars({
 
           <LocalizedClientLink
             href="/store"
-            className="bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md whitespace-nowrap"
+            className="bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md whitespace-nowrap"
           >
             Explore Catalog
           </LocalizedClientLink>

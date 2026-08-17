@@ -13,7 +13,7 @@ export default function Hero() {
             {/* 1. Top Large Card: Premium Black Card with Gaming Laptops Showcase */}
             <div className="bg-black rounded-3xl p-8 sm:p-12 relative overflow-hidden flex flex-col justify-between min-h-[320px] sm:min-h-[360px] border border-gray-800 shadow-xl">
               <div className="max-w-xs sm:max-w-sm space-y-4 z-10">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-black bg-[#FF9F0D] px-3 py-1 rounded-full inline-block">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-black bg-primary px-3 py-1 rounded-full inline-block">
                   GAMING & PERFORMANCE SALE
                 </span>
 
@@ -28,7 +28,7 @@ export default function Hero() {
                 <div className="pt-2">
                   <LocalizedClientLink
                     href="/store"
-                    className="inline-block bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md"
+                    className="inline-block bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md"
                   >
                     Shop Laptops
                   </LocalizedClientLink>
@@ -62,7 +62,7 @@ export default function Hero() {
                   <h3 className="text-lg font-bold text-gray-900 leading-snug">
                     Curved Displays & Monitors
                   </h3>
-                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-[#FF9F0D]">
+                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-primary">
                     Shop Monitors
                   </LocalizedClientLink>
                 </div>
@@ -86,7 +86,7 @@ export default function Hero() {
                   <h3 className="text-lg font-bold text-gray-900 leading-snug">
                     Flagship Smartphones & Devices
                   </h3>
-                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-[#FF9F0D]">
+                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-primary">
                     Shop Phones
                   </LocalizedClientLink>
                 </div>

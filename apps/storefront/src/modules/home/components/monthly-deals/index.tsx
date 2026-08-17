@@ -90,7 +90,7 @@ function CountdownTimer() {
     return (
       <div className="flex items-center gap-1.5" aria-label="Countdown timer loading">
         {["--", "--", "--", "--"].map((v, i) => (
-          <span key={i} className="bg-[#E53935] text-white w-10 text-center py-1.5 rounded-lg font-mono text-sm font-bold shadow-lg shadow-red-900/30">{v}</span>
+          <span key={i} className="bg-primary text-white w-10 text-center py-1.5 rounded-lg font-mono text-sm font-bold shadow-lg shadow-orange-900/30">{v}</span>
         ))}
       </div>
     )
@@ -108,7 +108,7 @@ function CountdownTimer() {
       {segments.map((seg, i) => (
         <div key={seg.label} className="flex items-center gap-1.5">
           <div className="flex flex-col items-center">
-            <span className="bg-[#E53935] text-white w-10 text-center py-1.5 rounded-lg font-mono text-sm font-bold shadow-lg shadow-red-900/30 tabular-nums transition-all duration-300">
+            <span className="bg-primary text-white w-10 text-center py-1.5 rounded-lg font-mono text-sm font-bold shadow-lg shadow-orange-900/30 tabular-nums transition-all duration-300">
               {String(seg.value).padStart(2, "0")}
             </span>
             <span className="text-[9px] text-gray-500 mt-0.5 font-medium">{seg.label}</span>
@@ -153,7 +153,7 @@ function DealProductCard({
     <div className="group bg-white rounded-2xl p-3 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-gray-300 hover:shadow-lg transition-all duration-300">
       {/* Discount badge */}
       {discountPct > 0 && (
-        <span className="absolute top-2 left-2 z-10 bg-[#E53935] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+        <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
           -{discountPct}%
         </span>
       )}
@@ -281,7 +281,7 @@ export default function MonthlyDeals({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-block w-1 h-6 bg-[#E53935] rounded-full" />
+              <span className="inline-block w-1 h-6 bg-primary rounded-full" />
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 {currentMonth} Best Deals
               </h2>
@@ -311,7 +311,7 @@ export default function MonthlyDeals({
                     onClick={() => setActiveTabId(tab.id)}
                     className={`px-4 py-2 rounded-full whitespace-nowrap text-xs font-semibold transition-all duration-200 cursor-pointer ${
                       isActive
-                        ? "bg-[#E53935] text-white shadow-lg shadow-red-900/30 scale-105"
+                        ? "bg-primary text-white shadow-lg shadow-orange-900/30 scale-105"
                         : "bg-gray-900/80 hover:bg-gray-800 text-gray-400 border border-gray-800 hover:text-white"
                     }`}
                   >

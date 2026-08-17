@@ -44,7 +44,7 @@ export default async function ReturnsPage() {
             <div className="pt-2">
               <LocalizedClientLink
                 href="/contact"
-                className="inline-block bg-[#FF9F0D] hover:bg-[#E58B00] text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors shadow-md"
+                className="inline-block bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors shadow-md"
               >
                 Contact Support Team
               </LocalizedClientLink>

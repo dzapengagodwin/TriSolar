@@ -45,7 +45,7 @@ export default function ProductPreview({
       {/* Product Image & Sale Badge */}
       <div className="relative mb-3">
         {isSale && (
-          <span className="absolute top-0 left-0 z-10 bg-[#E53935] text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
             {discountText}
           </span>
         )}

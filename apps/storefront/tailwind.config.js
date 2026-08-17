@@ -20,11 +20,25 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
+        primary: {
+          DEFAULT: "rgb(var(--primary-rgb) / <alpha-value>)",
+          hover: "var(--primary-hover)",
+        },
+        "theme-grey": "var(--theme-grey)",
+        brand: {
+          orange: "rgb(var(--primary-rgb) / <alpha-value>)",
+          "orange-hover": "var(--primary-hover)",
+          grey: "var(--theme-grey)",
+        },
         nexcart: {
           forest: "#063A34",
           "forest-dark": "#042723",
-          amber: "#FF9F0D",
-          "amber-dark": "#E58B00",
+          amber: "rgb(var(--primary-rgb) / <alpha-value>)",
+          "amber-dark": "var(--primary-hover)",
+          orange: "rgb(var(--primary-rgb) / <alpha-value>)",
+          "orange-dark": "var(--primary-hover)",
+          grey: "var(--theme-grey)",
+          "grey-muted": "var(--theme-grey)",
           mint: "#E6F4F1",
           beige: "#F6EFEB",
           lavender: "#EBF1F5",

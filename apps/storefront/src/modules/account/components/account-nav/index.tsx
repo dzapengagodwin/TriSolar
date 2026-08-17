@@ -190,7 +190,7 @@ const AccountNavLink = ({
       className={clx(
         "flex items-center gap-x-2 py-2 px-3 rounded-xl transition-all duration-200 text-[10px] font-extrabold w-full uppercase tracking-wider",
         active
-          ? "bg-[#FF9F0D]/10 text-[#FF9F0D]"
+          ? "bg-primary/10 text-primary"
           : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
       )}
       data-testid={dataTestId}
