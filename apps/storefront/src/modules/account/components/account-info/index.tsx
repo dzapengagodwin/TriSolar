@@ -42,13 +42,13 @@ const AccountInfo = ({
   }, [isSuccess, close])
 
   return (
-    <div className="text-small-regular" data-testid={dataTestid}>
-      <div className="flex items-end justify-between">
-        <div className="flex flex-col">
-          <span className="uppercase text-ui-fg-base">{label}</span>
-          <div className="flex items-center flex-1 basis-0 justify-end gap-x-4">
+    <div className="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 hover:bg-gray-50/80 transition-all duration-200 shadow-xs w-full" data-testid={dataTestid}>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col space-y-1">
+          <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest">{label}</span>
+          <div className="flex items-center gap-x-4">
             {typeof currentInfo === "string" ? (
-              <span className="font-semibold" data-testid="current-info">{currentInfo}</span>
+              <span className="text-sm font-bold text-gray-900" data-testid="current-info">{currentInfo}</span>
             ) : (
               currentInfo
             )}
@@ -57,7 +57,7 @@ const AccountInfo = ({
         <div>
           <Button
             variant="secondary"
-            className="w-[100px] min-h-[25px] py-1"
+            className="text-[10px] font-extrabold uppercase tracking-wider py-1.5 px-4 rounded-xl cursor-pointer"
             onClick={handleToggle}
             type={state ? "reset" : "button"}
             data-testid="edit-button"
@@ -81,8 +81,8 @@ const AccountInfo = ({
           )}
           data-testid="success-message"
         >
-          <Badge className="p-2 my-4" color="green">
-            <span>{label} updated succesfully</span>
+          <Badge className="p-2 my-4 rounded-lg text-xs" color="green">
+            <span>{label} updated successfully</span>
           </Badge>
         </Disclosure.Panel>
       </Disclosure>
@@ -100,7 +100,7 @@ const AccountInfo = ({
           )}
           data-testid="error-message"
         >
-          <Badge className="p-2 my-4" color="red">
+          <Badge className="p-2 my-4 rounded-lg text-xs" color="red">
             <span>{errorMessage}</span>
           </Badge>
         </Disclosure.Panel>
@@ -117,12 +117,12 @@ const AccountInfo = ({
             }
           )}
         >
-          <div className="flex flex-col gap-y-2 py-4">
+          <div className="flex flex-col gap-y-2 py-4 mt-2 border-t border-gray-100">
             <div>{children}</div>
             <div className="flex items-center justify-end mt-2">
               <Button
                 isLoading={pending}
-                className="w-full small:max-w-[140px]"
+                className="w-full bg-black hover:bg-gray-800 text-white text-[10px] font-extrabold uppercase tracking-wider py-2.5 rounded-xl transition-all shadow-md cursor-pointer"
                 type="submit"
                 data-testid="save-button"
               >

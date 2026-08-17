@@ -61,7 +61,7 @@ export default function CategoryGrid() {
               <span className="w-2.5 h-6 bg-laptopzone-orange rounded-sm inline-block"></span>
               Explore Hardware Categories
             </h2>
-            <p className="text-xs text-gray-600">Zimbabwe's trusted IT inventory listed in USD ($)</p>
+            <p className="text-xs text-gray-600">Zimbabwe&apos;s trusted IT inventory listed in USD ($)</p>
           </div>
           <LocalizedClientLink
             href="/store"

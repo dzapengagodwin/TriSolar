@@ -26,6 +26,7 @@ export interface WooCategory {
   id: number
   name: string
   slug: string
+  parent?: number
 }
 
 export interface WooTag {

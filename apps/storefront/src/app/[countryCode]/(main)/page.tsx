@@ -1,12 +1,8 @@
 import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
-import PromoCardsRow from "@modules/home/components/promo-cards-row"
 import MonthlyDeals from "@modules/home/components/monthly-deals"
-import CategoryAvatars from "@modules/home/components/category-avatars"
 import FeaturedProducts from "@modules/home/components/featured-products"
-import AppBanner from "@modules/home/components/app-banner"
-import SellerGrid from "@modules/home/components/seller-grid"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
 import { listCollections } from "@lib/data/collections"
@@ -34,7 +30,7 @@ export default async function Home(props: {
     region
       ? listProducts({
           regionId: region.id,
-          queryParams: { limit: 10, fields: "*variants.calculated_price" },
+          queryParams: { limit: 10, fields: "*variants.calculated_price,*categories" },
         }).catch(() => ({ response: { products: [] } }))
       : Promise.resolve({ response: { products: [] } }),
   ])
@@ -64,9 +60,11 @@ export default async function Home(props: {
       {/* {categories.length > 0 && <CategoryAvatars categories={categories} />} */}
 
       {/* 5. Popular Products Grid */}
-  
-        <FeaturedProducts collections={collections} region={region} sectionIndex={0} />
-        <FeaturedProducts collections={collections} region={region} sectionIndex={0} />
+      <div className="space-y-4">
+        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={0} />
+        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={1} />
+        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={2} />
+      </div>
     
 
       {/* 8. 3-Pillar Guarantee Strip */}

@@ -1,8 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'node:crypto'
 import https from 'node:https'
 import http from 'node:http'
-import { AbstractPaymentProvider } from '@medusajs/framework/utils'
-import { PaymentActions } from '@medusajs/utils'
+import { AbstractPaymentProvider, PaymentActions } from '@medusajs/framework/utils'
 import {
   AuthorizePaymentInput,
   AuthorizePaymentOutput,
@@ -58,48 +57,111 @@ type PesepayTransaction = {
 class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
   static identifier = 'pesepay'
 
+  protected container_: any
   protected readonly options_: PesepayOptions
 
   constructor(
-    container: Record<string, unknown>,
+    container: any,
     options: PesepayOptions = {}
   ) {
     super(container, options)
+    this.container_ = container
     this.options_ = options
   }
 
-  static validateOptions(options: Record<string, unknown>) {
-    if (!options.integrationKey || !options.encryptionKey) {
-      throw new Error(
-        'Pesepay provider requires integrationKey and encryptionKey options.'
-      )
+  static validateOptions(_options: Record<string, unknown>) {
+    // Dynamic credentials can be resolved at runtime from PostgreSQL pesepay_config table
+  }
+
+  protected async getActiveConfig(): Promise<{
+    integrationKey: string
+    encryptionKey: string
+    baseUrl: string
+    environment: 'sandbox' | 'production'
+    callbackUrl?: string
+    webhookSecret?: string
+  }> {
+    let dbConfig: any = null
+    try {
+      if (this.container_) {
+        const pesepayConfigService =
+          this.container_.pesepayConfigModuleService ||
+          this.container_.pesepayConfig
+        if (
+          pesepayConfigService &&
+          typeof pesepayConfigService.listPesepayConfigs === 'function'
+        ) {
+          const configs = await pesepayConfigService.listPesepayConfigs(
+            { is_active: true },
+            { take: 1, order: { created_at: 'DESC' } }
+          )
+          if (configs && configs.length > 0) {
+            dbConfig = configs[0]
+          }
+        }
+      }
+    } catch {
+      // Fallback if DB is not available
+    }
+
+    const integrationKey =
+      dbConfig?.integration_key ||
+      this.options_.integrationKey ||
+      process.env.PESEPAY_INTEGRATION_KEY ||
+      ''
+
+    const encryptionKey =
+      dbConfig?.encryption_key ||
+      this.options_.encryptionKey ||
+      process.env.PESEPAY_ENCRYPTION_KEY ||
+      ''
+
+    const environment =
+      (
+        dbConfig?.environment ||
+        this.options_.environment ||
+        process.env.PESEPAY_ENV ||
+        'sandbox'
+      ).toLowerCase() === 'production'
+        ? 'production'
+        : 'sandbox'
+
+    const callbackUrl =
+      dbConfig?.callback_url ||
+      this.options_.callbackUrl ||
+      process.env.PESEPAY_CALLBACK_URL ||
+      'http://localhost:8000/zw/payment-callback'
+
+    const webhookSecret =
+      dbConfig?.webhook_secret ||
+      this.options_.webhookSecret ||
+      process.env.PESEPAY_WEBHOOK_SECRET ||
+      ''
+
+    const baseUrl =
+      this.options_.baseUrl ||
+      (environment === 'production'
+        ? 'https://api.pesepay.com/api/payments-engine/v1'
+        : 'https://api.test.sandbox.pesepay.com/payments-engine/v1')
+
+    return {
+      integrationKey,
+      encryptionKey,
+      baseUrl: baseUrl.replace(/\/+$/, ''),
+      environment,
+      callbackUrl,
+      webhookSecret,
     }
   }
 
-  protected getBaseUrl(): string {
-    if (this.options_.baseUrl) {
-      return this.options_.baseUrl.replace(/\/+$/, '')
-    }
-
-    const environment = this.options_.environment || 'sandbox'
-
-    if (environment === 'production') {
-      return 'https://api.pesepay.com/api/payments-engine/v1'
-    }
-
-    return 'https://api.test.sandbox.pesepay.com/payments-engine/v1'
-  }
-
-  protected getEncryptionKey(): string {
-    if (!this.options_.encryptionKey) {
+  protected encryptPayload(
+    payload: Record<string, unknown>,
+    encryptionKey: string
+  ): string {
+    if (!encryptionKey) {
       throw new Error('Pesepay encryptionKey is not configured.')
     }
-
-    return this.options_.encryptionKey
-  }
-
-  protected encryptPayload(payload: Record<string, unknown>): string {
-    const key = this.getEncryptionKey()
+    const key = encryptionKey
     const iv = key.slice(0, 16)
     const cipher = createCipheriv(
       'aes-256-cbc',
@@ -115,8 +177,14 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     return encrypted.toString('base64')
   }
 
-  protected decryptPayload(payload: string): Record<string, unknown> {
-    const key = this.getEncryptionKey()
+  protected decryptPayload(
+    payload: string,
+    encryptionKey: string
+  ): Record<string, unknown> {
+    if (!encryptionKey) {
+      throw new Error('Pesepay encryptionKey is not configured.')
+    }
+    const key = encryptionKey
     const iv = key.slice(0, 16)
     const decipher = createDecipheriv(
       'aes-256-cbc',
@@ -195,7 +263,8 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     body?: Record<string, unknown>,
     query?: Record<string, string>
   ): Promise<T> {
-    const url = new URL(`${this.getBaseUrl()}${path}`)
+    const config = await this.getActiveConfig()
+    const url = new URL(`${config.baseUrl}${path}`)
 
     if (query) {
       for (const [key, value] of Object.entries(query)) {
@@ -205,14 +274,19 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
 
     const requestBody =
       body !== undefined
-        ? JSON.stringify({ payload: this.encryptPayload(body) })
+        ? JSON.stringify({ payload: this.encryptPayload(body, config.encryptionKey) })
         : undefined
 
-    const response = await this.httpRequest(url, method, {
-      Authorization: this.options_.integrationKey ?? "",
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    }, requestBody)
+    const response = await this.httpRequest(
+      url,
+      method,
+      {
+        Authorization: config.integrationKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      requestBody
+    )
 
     const text = await response.text()
 
@@ -226,14 +300,15 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
 
     try {
       const parsed = JSON.parse(text) as PesepayEncryptedEnvelope | Record<string, unknown>
-      const payload = parsed && typeof parsed === 'object' && 'payload' in parsed
-        ? String((parsed as PesepayEncryptedEnvelope).payload)
-        : typeof parsed === 'string'
+      const payload =
+        parsed && typeof parsed === 'object' && 'payload' in parsed
+          ? String((parsed as PesepayEncryptedEnvelope).payload)
+          : typeof parsed === 'string'
           ? parsed
           : JSON.stringify(parsed)
 
       if (typeof payload === 'string' && payload.length > 0) {
-        const decrypted = this.decryptPayload(payload)
+        const decrypted = this.decryptPayload(payload, config.encryptionKey)
         return decrypted as T
       }
 
@@ -266,6 +341,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
   async initiatePayment(
     input: InitiatePaymentInput
   ): Promise<InitiatePaymentOutput> {
+    const config = await this.getActiveConfig()
     const amount = this.normalizeAmount(
       input.amount as string | number | bigint
     )
@@ -278,7 +354,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
 
     let callbackUrl = String(
       input.data?.callback_url ||
-      this.options_.callbackUrl ||
+      config.callbackUrl ||
       'http://localhost:8000/zw/payment-callback'
     )
 

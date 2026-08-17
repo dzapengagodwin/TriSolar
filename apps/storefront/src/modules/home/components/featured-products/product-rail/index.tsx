@@ -3,25 +3,35 @@ import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 
 export default async function ProductRail({
-  collection,
+  collectionId,
+  categoryId,
   region,
   title,
 }: {
-  collection?: HttpTypes.StoreCollection
+  collectionId?: string
+  categoryId?: string
   region: HttpTypes.StoreRegion
-  title?: string
-  sectionIndex?: number
+  title: string
 }) {
   let pricedProducts: HttpTypes.StoreProduct[] = []
 
-  // 1. Query products by collection if collection exists
-  if (collection?.id) {
+  const queryParams: any = {
+    limit: 10,
+    fields: "*variants.calculated_price,*categories",
+  }
+
+  // Only filter if we have a valid filter ID
+  if (categoryId) {
+    queryParams.category_id = [categoryId]
+  } else if (collectionId) {
+    queryParams.collection_id = [collectionId]
+  }
+
+  // If no filter is present, don't query and return null (removes fallback)
+  if (categoryId || collectionId) {
     const res = await listProducts({
       regionId: region.id,
-      queryParams: {
-        collection_id: collection.id,
-        fields: "*variants.calculated_price",
-      },
+      queryParams,
     }).catch(() => null)
 
     if (res?.response?.products?.length) {
@@ -29,41 +39,25 @@ export default async function ProductRail({
     }
   }
 
-  // 2. Query products for region if collection query yielded 0 products
-  if (!pricedProducts || pricedProducts.length === 0) {
-    const res = await listProducts({
-      regionId: region.id,
-      queryParams: {
-        limit: 10,
-        fields: "*variants.calculated_price",
-      },
-    }).catch(() => null)
-
-    if (res?.response?.products?.length) {
-      pricedProducts = res.response.products
-    }
-  }
-
-  if (!pricedProducts || pricedProducts.length === 0) {
+  // If no products matched the filter, don't show the rail (removes fallback)
+  if (pricedProducts.length === 0) {
     return null
   }
-
-  const sectionTitle = title || collection?.title || "Featured Products"
 
   return (
     <div className="content-container py-8">
       {/* Centered Section Title */}
       <div className="text-center mb-8">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 font-sans tracking-tight">
-          {sectionTitle}
+          {title}
         </h2>
       </div>
 
       {/* 5 Columns Product Grid */}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
         {pricedProducts.map((product) => (
           <li key={product.id}>
-            <ProductPreview product={product} region={region} isFeatured />
+            <ProductPreview product={product} region={region} />
           </li>
         ))}
       </ul>

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       status: 200,
       headers,
     })
-  } catch (error) {
-    return NextResponse.redirect(imageUrl)
+  } catch (_error) {
+    return NextResponse.json({ error: "Failed to fetch image" }, { status: 500 })
   }
 }

@@ -63,10 +63,10 @@ const EditAddress: React.FC<EditAddressProps> = ({
     <>
       <div
         className={clx(
-          "border rounded-rounded p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-colors",
-          {
-            "border-gray-900": isActive,
-          }
+          "border rounded-2xl p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-all duration-200 shadow-xs",
+          isActive
+            ? "border-black bg-white"
+            : "border-gray-100 bg-gray-50/50 hover:bg-gray-50 hover:border-gray-300"
         )}
         data-testid="address-container"
       >
@@ -99,22 +99,22 @@ const EditAddress: React.FC<EditAddressProps> = ({
             </span>
           </Text>
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-3 pt-3 border-t border-gray-100/50 mt-4 text-[10px] font-extrabold uppercase tracking-wider">
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            className="text-gray-500 hover:text-black flex items-center gap-x-1.5 transition-colors cursor-pointer"
             onClick={open}
             data-testid="address-edit-button"
           >
-            <Edit />
-            Edit
+            <Edit className="w-3.5 h-3.5" />
+            <span>Edit</span>
           </button>
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            className="text-gray-400 hover:text-red-600 flex items-center gap-x-1.5 transition-colors cursor-pointer"
             onClick={removeAddress}
             data-testid="address-delete-button"
           >
-            {removing ? <Spinner /> : <Trash />}
-            Remove
+            {removing ? <Spinner className="w-3.5 h-3.5" /> : <Trash className="w-3.5 h-3.5" />}
+            <span>Remove</span>
           </button>
         </div>
       </div>

@@ -11,10 +11,11 @@ import {
   createPriceListsWorkflow,
   createSalesChannelsWorkflow,
 } from "@medusajs/medusa/core-flows"
-import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import { WooCommerceClient } from "../modules/woocommerce-migrator/services/woocommerce-client"
 import { WooCommerceTransformer } from "../modules/woocommerce-migrator/services/woocommerce-transformer"
 import type { WooVariation } from "../modules/woocommerce-migrator/services/woocommerce-client"
+import { BRAND_MODULE } from "../modules/brand"
 
 export type ImportWooCommerceInput = {
   wooUrl: string
@@ -47,6 +48,7 @@ export type ImportResult = {
   failedProducts: number
   importedCategories: number
   importedCollections: number
+  importedBrands: number
   errors: string[]
   importedProductDetails: ImportedProductDetail[]
 }
@@ -111,13 +113,29 @@ export const importWooCommerceStep = createStep(
       failedProducts: 0,
       importedCategories: 0,
       importedCollections: 0,
+      importedBrands: 0,
       errors: [],
       importedProductDetails: [],
     }
 
     const categoryMap = new Map<number, string>()
     const collectionMap = new Map<number, string>()
+    const brandMap = new Map<string, string>()
     const importedVariantsPrices: { variantId: string; amount: number; currencyCode: string }[] = []
+
+    let brandModuleService: any = null
+    try {
+      brandModuleService = container.resolve(BRAND_MODULE)
+      const existingBrands = await brandModuleService.listBrands(
+        {},
+        { select: ["id", "name", "handle"] }
+      )
+      for (const b of existingBrands || []) {
+        brandMap.set(b.handle, b.id)
+      }
+    } catch (err: any) {
+      logger.warn(`Brand module service lookup note: ${err.message}`)
+    }
 
     // Resolve or create "Web Sales Channel"
     let webSalesChannelId: string | undefined
@@ -188,48 +206,80 @@ export const importWooCommerceStep = createStep(
       logger.warn(`Failed to fetch existing categories: ${err.message}`)
     }
 
-    // Import categories
+    // Import categories hierarchically
     if (input.importCategories && wooCategories.length > 0) {
-      logger.info(`Importing ${wooCategories.length} categories`)
+      logger.info(`Importing ${wooCategories.length} categories with hierarchy`)
       try {
-        const transformedCategories = transformer.transformCategories(wooCategories)
+        const validCategories = wooCategories.filter(
+          (cat) => cat.name && cat.name.toLowerCase() !== "uncategorized"
+        )
 
-        // Filter out categories that already exist in Medusa
-        const categoriesToCreate = transformedCategories.filter((newCat) => {
+        // 1. Check existing categories in Medusa
+        const remainingToProcess: any[] = []
+        for (const wcCat of validCategories) {
           const matched = existingCategories.find(
-            (ec) => ec.handle === newCat.handle || ec.name.toLowerCase() === newCat.name.toLowerCase()
+            (ec) =>
+              ec.handle === wcCat.slug ||
+              ec.name.toLowerCase() === wcCat.name.toLowerCase()
           )
           if (matched) {
-            // Map the WooCommerce category to the existing Medusa category ID
-            const wcCat = wooCategories.find(
-              (wc) => wc.slug === newCat.handle || wc.name.toLowerCase() === newCat.name.toLowerCase()
-            )
-            if (wcCat) {
-              categoryMap.set(wcCat.id, matched.id)
-            }
-            return false
-          }
-          return true
-        })
-
-        if (categoriesToCreate.length > 0) {
-          const categoriesResult = await createProductCategoriesWorkflow(container).run({
-            input: {
-              product_categories: categoriesToCreate,
-            },
-          })
-
-          result.importedCategories = categoriesResult.result.length
-
-          for (const wcCategory of wooCategories) {
-            const medusaCategory = categoriesResult.result.find(
-              (c: any) => c.handle === wcCategory.slug || c.name === wcCategory.name
-            )
-            if (medusaCategory) {
-              categoryMap.set(wcCategory.id, medusaCategory.id)
-            }
+            categoryMap.set(wcCat.id, matched.id)
+          } else {
+            remainingToProcess.push(wcCat)
           }
         }
+
+        // 2. Process remaining categories level-by-level (parents first, then children)
+        let iterations = 0
+        while (remainingToProcess.length > 0 && iterations < 6) {
+          iterations++
+          const readyToCreate: any[] = []
+          const stillWaiting: any[] = []
+
+          for (const cat of remainingToProcess) {
+            // Ready if top-level root (parent 0/unset) OR if parent is already created and in categoryMap
+            if (!cat.parent || cat.parent === 0 || categoryMap.has(cat.parent)) {
+              readyToCreate.push(cat)
+            } else {
+              stillWaiting.push(cat)
+            }
+          }
+
+          // Fallback if there are orphan categories with nonexistent parent IDs
+          const batch = readyToCreate.length > 0 ? readyToCreate : stillWaiting
+          const transformedBatch = transformer.transformCategories(batch, categoryMap)
+
+          if (transformedBatch.length > 0) {
+            const categoriesResult = await createProductCategoriesWorkflow(container).run({
+              input: {
+                product_categories: transformedBatch.map((c) => ({
+                  name: c.name,
+                  handle: c.handle,
+                  is_active: c.is_active,
+                  parent_category_id: c.parent_category_id || undefined,
+                })),
+              },
+            })
+
+            const createdCategories = categoriesResult.result
+            result.importedCategories += createdCategories.length
+
+            for (let idx = 0; idx < batch.length; idx++) {
+              if (createdCategories[idx]) {
+                categoryMap.set(batch[idx].id, createdCategories[idx].id)
+              }
+            }
+          }
+
+          if (readyToCreate.length > 0) {
+            remainingToProcess.length = 0
+            remainingToProcess.push(...stillWaiting)
+          } else {
+            break
+          }
+        }
+
+        logger.info(`Successfully mapped ${categoryMap.size} categories with parent-child hierarchy`)
       } catch (error: any) {
         logger.error(`Failed to import categories: ${error.message}`)
         result.errors.push(`Category import error: ${error.message}`)
@@ -257,12 +307,15 @@ export const importWooCommerceStep = createStep(
         // Filter out collections that already exist in Medusa
         const collectionsToCreate = transformedCollections.filter((newColl) => {
           const matched = existingCollections.find(
-            (ec) => ec.handle === newColl.handle || ec.title.toLowerCase() === newColl.title.toLowerCase()
+            (ec) =>
+              ec.handle === newColl.handle ||
+              ec.title.toLowerCase() === newColl.title.toLowerCase()
           )
           if (matched) {
-            // Map the WooCommerce tag to the existing Medusa collection ID
             const wcTag = wooTags.find(
-              (wt) => wt.slug === newColl.handle || wt.name.toLowerCase() === newColl.title.toLowerCase()
+              (wt) =>
+                transformer.sanitizeHandle(wt.slug || wt.name) === newColl.handle ||
+                wt.name.toLowerCase() === newColl.title.toLowerCase()
             )
             if (wcTag) {
               collectionMap.set(wcTag.id, matched.id)
@@ -279,12 +332,14 @@ export const importWooCommerceStep = createStep(
             },
           })
 
-          result.importedCollections = collectionsResult.result.length
+          const createdCollections = collectionsResult.result
+          result.importedCollections = createdCollections.length
 
           for (const wcTag of wooTags) {
-            const medusaCollection = collectionsResult.result.find(
-              (c: any) => c.handle === wcTag.slug || c.title === wcTag.name
-            )
+            const sanitizedTagHandle = transformer.sanitizeHandle(wcTag.slug || wcTag.name)
+            const medusaCollection =
+              createdCollections.find((c: any) => c.handle === sanitizedTagHandle) ||
+              existingCollections.find((ec: any) => ec.handle === sanitizedTagHandle)
             if (medusaCollection) {
               collectionMap.set(wcTag.id, medusaCollection.id)
             }
@@ -292,7 +347,7 @@ export const importWooCommerceStep = createStep(
         }
       } catch (error: any) {
         logger.error(`Failed to import collections: ${error.message}`)
-        result.errors.push(`Collection import error: ${error.message}`)
+        result.errors.push(`Category import error: ${error.message}`)
       }
     }
 
@@ -324,7 +379,9 @@ export const importWooCommerceStep = createStep(
 
       for (const wcProduct of batch) {
         const transformedHandle =
-          wcProduct.slug || wcProduct.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+          transformer.sanitizeHandle(wcProduct.slug) ||
+          transformer.sanitizeHandle(wcProduct.name) ||
+          `product-${wcProduct.id}`
 
         // Check if product already exists by WooCommerce ID in metadata or matching handle
         const matchedProduct = existingProducts.find(
@@ -364,6 +421,37 @@ export const importWooCommerceStep = createStep(
         )
       })
 
+      // Ensure handles are unique within the batch and not colliding with existing products
+      for (const p of productsPayload) {
+        let baseHandle = p.handle
+        let handleCounter = 1
+        while (existingProducts.some((ep) => ep.handle === p.handle)) {
+          handleCounter++
+          p.handle = `${baseHandle}-${handleCounter}`
+        }
+        existingProducts.push({ handle: p.handle })
+      }
+
+      // Create any missing brands for this batch
+      if (brandModuleService) {
+        for (const p of productsPayload) {
+          if (p.brand && !brandMap.has(p.brand.handle)) {
+            try {
+              const createdBrand = await brandModuleService.createBrands({
+                name: p.brand.name,
+                handle: p.brand.handle,
+                is_active: true,
+              })
+              brandMap.set(p.brand.handle, createdBrand.id)
+              result.importedBrands++
+              logger.info(`Created brand: ${p.brand.name} (${p.brand.handle})`)
+            } catch (brandErr: any) {
+              logger.warn(`Could not create brand ${p.brand.name}: ${brandErr.message}`)
+            }
+          }
+        }
+      }
+
       // Override status if publishProducts is set
       if (input.publishProducts) {
         for (const p of productsPayload) {
@@ -384,6 +472,37 @@ export const importWooCommerceStep = createStep(
         })
 
         const createdProducts = productsResult.result
+
+        // Link created products to their brands
+        const linksToCreate: any[] = []
+        for (let j = 0; j < productsToTransform.length; j++) {
+          const medusaProduct = createdProducts[j]
+          const payloadBrand = productsPayload[j]?.brand
+
+          if (medusaProduct && payloadBrand) {
+            const brandId = brandMap.get(payloadBrand.handle)
+            if (brandId) {
+              linksToCreate.push({
+                [Modules.PRODUCT]: {
+                  product_id: medusaProduct.id,
+                },
+                [BRAND_MODULE]: {
+                  brand_id: brandId,
+                },
+              })
+            }
+          }
+        }
+
+        if (linksToCreate.length > 0) {
+          try {
+            const link = container.resolve(ContainerRegistrationKeys.LINK)
+            await link.create(linksToCreate)
+            logger.info(`Linked ${linksToCreate.length} products to brands in batch ${batchNum}`)
+          } catch (linkErr: any) {
+            logger.warn(`Failed to link products to brands: ${linkErr.message}`)
+          }
+        }
 
         for (let j = 0; j < productsToTransform.length; j++) {
           const wcProduct = productsToTransform[j]
