@@ -281,13 +281,16 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
-      .catch((err) => {
-        setErrorMessage(err.message)
-      })
-      .finally(() => {
-        setSubmitting(false)
-      })
+    try {
+      const res = await placeOrder()
+      if (res && "error" in res && res.error) {
+        setErrorMessage(res.error)
+      }
+    } catch (err: any) {
+      setErrorMessage(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handlePayment = () => {

@@ -429,21 +429,25 @@ export async function placeOrder(cartId?: string) {
   const id = cartId || (await getCartId())
 
   if (!id) {
-    throw new Error("No existing cart found when placing an order")
+    return { error: "No existing cart found when placing an order" }
   }
 
   const headers = {
     ...(await getAuthHeaders()),
   }
 
-  const cartRes = await sdk.store.cart
-    .complete(id, {}, headers)
-    .then(async (cartRes) => {
-      const cartCacheTag = await getCacheTag("carts")
-      revalidateTag(cartCacheTag)
-      return cartRes
-    })
-    .catch(medusaError)
+  let cartRes
+  try {
+    cartRes = await sdk.store.cart.complete(id, {}, headers)
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+  } catch (err: any) {
+    const message =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Unable to complete order. Please try again."
+    return { error: message }
+  }
 
   if (cartRes?.type === "order") {
     const countryCode =
@@ -459,13 +463,14 @@ export async function placeOrder(cartId?: string) {
   }
 
   if (cartRes?.type === "cart") {
-    throw new Error(
-      (cartRes as any).error?.message ||
-        "Payment could not be completed. Please check your details and try again."
-    )
+    return {
+      error:
+        (cartRes as any).error?.message ||
+        "Payment could not be completed. Please check your shipping and payment selections.",
+    }
   }
 
-  throw new Error("Unable to complete order. Please try again.")
+  return { error: "Unable to complete order. Please try again." }
 }
 
 /**
