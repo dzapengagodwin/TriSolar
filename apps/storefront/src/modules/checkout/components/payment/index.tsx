@@ -72,6 +72,7 @@ const Payment = ({
 
   const handleSubmit = async () => {
     setIsLoading(true)
+    setError(null)
     try {
       const shouldInputCard =
         isStripeLike(selectedPaymentMethod) && !activeSession
@@ -80,9 +81,15 @@ const Payment = ({
         activeSession?.provider_id === selectedPaymentMethod
 
       if (!checkActiveSession) {
-        await initiatePaymentSession(cart, {
+        const res = await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
+
+        if (res && "error" in res && res.error) {
+          setError(res.error)
+          setIsLoading(false)
+          return
+        }
       }
 
       if (!shouldInputCard) {
