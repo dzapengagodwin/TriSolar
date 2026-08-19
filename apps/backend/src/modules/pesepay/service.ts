@@ -363,20 +363,26 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       callbackUrl = `${callbackUrl}${sep}cart_id=${encodeURIComponent(cartId)}`
     }
 
-    const response = await this.request<PesepayTransaction>('/payments/initiate', 'POST', {
-      amountDetails: {
-        amount,
-        currencyCode: input.currency_code || 'USD',
-      },
-      reasonForPayment:
-        (input.data?.reasonForPayment as string) ?? 'Medusa order payment',
-      resultUrl: callbackUrl,
-      returnUrl: callbackUrl,
-      paymentMetadata: {
-        source: 'medusa',
-        cart_id: cartId,
-      },
-    })
+    let response: PesepayTransaction
+    try {
+      response = await this.request<PesepayTransaction>('/payments/initiate', 'POST', {
+        amountDetails: {
+          amount,
+          currencyCode: input.currency_code || 'USD',
+        },
+        reasonForPayment:
+          (input.data?.reasonForPayment as string) ?? 'Medusa order payment',
+        resultUrl: callbackUrl,
+        returnUrl: callbackUrl,
+        paymentMetadata: {
+          source: 'medusa',
+          cart_id: cartId,
+        },
+      })
+    } catch (err: any) {
+      console.error(`Pesepay initiatePayment failed: ${err.message || err}`)
+      throw new Error(`Pesepay error: ${err.message || err}`)
+    }
 
     const referenceNumber =
       response.referenceNumber ??

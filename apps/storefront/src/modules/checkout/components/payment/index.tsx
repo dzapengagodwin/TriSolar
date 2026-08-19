@@ -93,6 +93,7 @@ const Payment = ({
       }
 
       if (!shouldInputCard) {
+        router.refresh()
         return router.push(
           pathname + "?" + createQueryString("step", "review"),
           {

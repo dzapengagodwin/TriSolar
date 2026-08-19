@@ -265,9 +265,12 @@ export async function initiatePaymentSession(
     ...(await getAuthHeaders()),
   }
 
+  // Retrieve the latest cart state to ensure the existing payment_collection is present
+  const freshCart = (await retrieveCart(cart.id)) || cart
+
   try {
     const resp = await sdk.store.payment.initiatePaymentSession(
-      cart,
+      freshCart,
       data,
       {},
       headers
