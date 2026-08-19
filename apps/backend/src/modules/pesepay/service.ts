@@ -85,8 +85,12 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     try {
       if (this.container_) {
         const pesepayConfigService =
-          this.container_.pesepayConfigModuleService ||
-          this.container_.pesepayConfig
+          (typeof this.container_.resolve === 'function'
+            ? this.container_.resolve('pesepayConfig', { allowUnregistered: true })
+            : null) ||
+          this.container_.pesepayConfig ||
+          this.container_.pesepayConfigModuleService
+
         if (
           pesepayConfigService &&
           typeof pesepayConfigService.listPesepayConfigs === 'function'
@@ -100,8 +104,8 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
           }
         }
       }
-    } catch {
-      // Fallback if DB is not available
+    } catch (err: any) {
+      console.warn("Pesepay getActiveConfig DB lookup notice:", err?.message || err)
     }
 
     const integrationKey =
@@ -143,6 +147,12 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       (environment === 'production'
         ? 'https://api.pesepay.com/api/payments-engine/v1'
         : 'https://api.test.sandbox.pesepay.com/payments-engine/v1')
+
+    console.log(
+      `[Pesepay] Using config from: ${dbConfig ? 'Admin Database' : '.env file'} | Env: ${environment} | Key: ${
+        integrationKey ? integrationKey.slice(0, 8) + '...' : 'MISSING'
+      } | BaseUrl: ${baseUrl}`
+    )
 
     return {
       integrationKey,

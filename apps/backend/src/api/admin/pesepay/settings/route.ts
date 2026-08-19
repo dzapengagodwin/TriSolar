@@ -1,4 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { MedusaError } from "@medusajs/framework/utils"
 import { PESEPAY_CONFIG_MODULE } from "../../../../modules/pesepay-config"
 import PesepayConfigModuleService from "../../../../modules/pesepay-config/service"
 import { setPesepayConfigWorkflow } from "../../../../workflows/set-pesepay-config"
@@ -69,7 +70,10 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       req.scope.resolve<PesepayConfigModuleService>(PESEPAY_CONFIG_MODULE)
 
     if (!pesepayConfigService) {
-      throw new Error("Pesepay configuration service is not available")
+      throw new MedusaError(
+        MedusaError.Types.NOT_FOUND,
+        "Pesepay configuration service is not available"
+      )
     }
 
     // Retrieve existing active configuration
