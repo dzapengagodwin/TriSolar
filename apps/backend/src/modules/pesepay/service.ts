@@ -83,29 +83,35 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
   }> {
     let dbConfig: any = null
     try {
-      if (this.container_) {
-        const pesepayConfigService =
-          (typeof this.container_.resolve === 'function'
-            ? this.container_.resolve('pesepayConfig', { allowUnregistered: true })
-            : null) ||
-          this.container_.pesepayConfig ||
-          this.container_.pesepayConfigModuleService
+      // Payment providers run in an isolated module container that cannot
+      // resolve other custom modules (like pesepayConfig). Instead, use
+      // the shared PostgreSQL connection (__pg_connection__), a Knex
+      // instance available in every Medusa v2 module container.
+      const pgConnection =
+        this.container_?.__pg_connection__ ||
+        (typeof this.container_?.resolve === 'function'
+          ? this.container_.resolve('__pg_connection__')
+          : null)
 
-        if (
-          pesepayConfigService &&
-          typeof pesepayConfigService.listPesepayConfigs === 'function'
-        ) {
-          const configs = await pesepayConfigService.listPesepayConfigs(
-            { is_active: true },
-            { take: 1, order: { created_at: 'DESC' } }
-          )
-          if (configs && configs.length > 0) {
-            dbConfig = configs[0]
-          }
+      if (pgConnection) {
+        const rows = await pgConnection
+          .select('*')
+          .from('pesepay_config')
+          .where('is_active', true)
+          .orderBy('created_at', 'desc')
+          .limit(1)
+
+        if (rows && rows.length > 0) {
+          dbConfig = rows[0]
+          console.log('[Pesepay] DB config found, id:', dbConfig.id)
+        } else {
+          console.log('[Pesepay] No active config row in pesepay_config table')
         }
+      } else {
+        console.warn('[Pesepay] __pg_connection__ not available in container')
       }
     } catch (err: any) {
-      console.warn("Pesepay getActiveConfig DB lookup notice:", err?.message || err)
+      console.warn('[Pesepay] DB lookup failed:', err?.message || err)
     }
 
     const integrationKey =
