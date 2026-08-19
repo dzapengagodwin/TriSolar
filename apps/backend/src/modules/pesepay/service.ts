@@ -1,7 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'node:crypto'
 import https from 'node:https'
 import http from 'node:http'
-import { AbstractPaymentProvider, PaymentActions } from '@medusajs/framework/utils'
+import { AbstractPaymentProvider, PaymentActions, MedusaError } from '@medusajs/framework/utils'
 import {
   AuthorizePaymentInput,
   AuthorizePaymentOutput,
@@ -159,7 +159,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     encryptionKey: string
   ): string {
     if (!encryptionKey) {
-      throw new Error('Pesepay encryptionKey is not configured.')
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Pesepay encryptionKey is not configured. Please set PESEPAY_ENCRYPTION_KEY in your backend .env file.'
+      )
     }
     const key = encryptionKey
     const iv = key.slice(0, 16)
@@ -182,7 +185,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     encryptionKey: string
   ): Record<string, unknown> {
     if (!encryptionKey) {
-      throw new Error('Pesepay encryptionKey is not configured.')
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Pesepay encryptionKey is not configured. Please set PESEPAY_ENCRYPTION_KEY in your backend .env file.'
+      )
     }
     const key = encryptionKey
     const iv = key.slice(0, 16)
@@ -277,6 +283,13 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
         ? JSON.stringify({ payload: this.encryptPayload(body, config.encryptionKey) })
         : undefined
 
+    if (!config.integrationKey) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Pesepay integrationKey is not configured. Please set PESEPAY_INTEGRATION_KEY in your backend .env file.'
+      )
+    }
+
     const response = await this.httpRequest(
       url,
       method,
@@ -291,7 +304,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     const text = await response.text()
 
     if (!response.ok) {
-      throw new Error(text || `Pesepay request failed with status ${response.status}`)
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
+        text || `Pesepay request failed with status ${response.status}`
+      )
     }
 
     if (!text) {
@@ -368,7 +384,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       response = await this.request<PesepayTransaction>('/payments/initiate', 'POST', {
         amountDetails: {
           amount,
-          currencyCode: input.currency_code || 'USD',
+          currencyCode: (input.currency_code || 'USD').toUpperCase(),
         },
         reasonForPayment:
           (input.data?.reasonForPayment as string) ?? 'Medusa order payment',
@@ -381,7 +397,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       })
     } catch (err: any) {
       console.error(`Pesepay initiatePayment failed: ${err.message || err}`)
-      throw new Error(`Pesepay error: ${err.message || err}`)
+      throw new MedusaError(
+        MedusaError.Types.UNEXPECTED_STATE,
+        `Pesepay error: ${err.message || err}`
+      )
     }
 
     const referenceNumber =
