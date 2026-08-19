@@ -1,6 +1,5 @@
 import { getOrSetCart, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
@@ -34,9 +33,7 @@ export default async function Checkout(props: {
           <div className="w-full h-96 bg-gray-50 rounded-2xl animate-pulse" />
         }
       >
-        <PaymentWrapper cart={cart}>
-          <CheckoutForm cart={cart} customer={customer} />
-        </PaymentWrapper>
+        <CheckoutForm cart={cart} customer={customer} />
       </Suspense>
       <CheckoutSummary cart={cart} />
     </div>
