@@ -71,7 +71,6 @@ const BillingAddress = ({ cart }: { cart: HttpTypes.StoreCart | null }) => {
           autoComplete="postal-code"
           value={formData["billing_address.postal_code"]}
           onChange={handleChange}
-          required
           data-testid="billing-postal-input"
         />
         <Input

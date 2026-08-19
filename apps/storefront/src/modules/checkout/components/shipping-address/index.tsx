@@ -154,7 +154,6 @@ const ShippingAddress = ({
           autoComplete="postal-code"
           value={formData["shipping_address.postal_code"]}
           onChange={handleChange}
-          required
           data-testid="shipping-postal-code-input"
         />
         <Input

@@ -150,7 +150,6 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
               label="Postal code"
               name="postal_code"
               defaultValue={billingAddress?.postal_code || undefined}
-              required
               data-testid="billing-postcal-code-input"
             />
             <Input

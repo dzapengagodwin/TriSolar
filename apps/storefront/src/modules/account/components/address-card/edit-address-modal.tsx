@@ -171,7 +171,6 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 <Input
                   label="Postal code"
                   name="postal_code"
-                  required
                   autoComplete="postal-code"
                   defaultValue={address.postal_code || undefined}
                   data-testid="postal-code-input"

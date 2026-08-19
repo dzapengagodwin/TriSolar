@@ -100,7 +100,6 @@ const AddAddress = ({
                 <Input
                   label="Postal code"
                   name="postal_code"
-                  required
                   autoComplete="postal-code"
                   data-testid="postal-code-input"
                 />
