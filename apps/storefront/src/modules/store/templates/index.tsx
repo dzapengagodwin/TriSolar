@@ -28,7 +28,9 @@ const StoreTemplate = ({
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
-      <RefinementList sortBy={sort} />
+      <Suspense fallback={<div className="w-full small:w-1/4 h-32 bg-gray-50 animate-pulse rounded-2xl" />}>
+        <RefinementList sortBy={sort} />
+      </Suspense>
       <div className="w-full">
         <div className="mb-6">
           <h1 className="text-2xl font-black text-black tracking-tight" data-testid="store-page-title">

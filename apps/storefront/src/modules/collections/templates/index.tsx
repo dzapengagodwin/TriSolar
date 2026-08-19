@@ -25,7 +25,9 @@ export default function CollectionTemplate({
 
   return (
     <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
-      <RefinementList sortBy={sort} hideOptionsPicker />
+      <Suspense fallback={<div className="w-full small:w-1/4 h-32 bg-gray-50 animate-pulse rounded-2xl" />}>
+        <RefinementList sortBy={sort} hideOptionsPicker />
+      </Suspense>
       <div className="w-full">
         <div className="mb-8 text-2xl-semi">
           <h1>{collection.title}</h1>

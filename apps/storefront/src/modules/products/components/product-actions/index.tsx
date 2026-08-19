@@ -1,6 +1,7 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
+import { addToWishlist } from "@lib/data/wishlist"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@modules/common/components/ui"
@@ -12,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
+import { Heart } from "@medusajs/icons"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -38,6 +40,7 @@ export default function ProductActions({
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -135,6 +138,26 @@ export default function ProductActions({
     setIsAdding(false)
   }
 
+  // add the selected variant to the wishlist
+  const handleAddToWishlist = async () => {
+    if (!selectedVariant?.id) return null
+
+    setIsAddingToWishlist(true)
+    try {
+      const res = await addToWishlist(selectedVariant.id, countryCode)
+      if (res.success) {
+        alert("Saved to Wishlist ❤️")
+      } else {
+        alert(res.error || "Could not add item to wishlist")
+      }
+    } catch (err: any) {
+      console.error(err)
+      alert(err.message || "Failed to add to wishlist")
+    } finally {
+      setIsAddingToWishlist(false)
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col gap-y-2" ref={actionsRef}>
@@ -150,7 +173,7 @@ export default function ProductActions({
                       updateOption={setOptionValue}
                       title={option.title ?? ""}
                       data-testid="product-options"
-                      disabled={!!disabled || isAdding}
+                      disabled={!!disabled || isAdding || isAddingToWishlist}
                     />
                   </div>
                 )
@@ -169,6 +192,7 @@ export default function ProductActions({
             !selectedVariant ||
             !!disabled ||
             isAdding ||
+            isAddingToWishlist ||
             !isValidVariant
           }
           variant="primary"
@@ -182,6 +206,20 @@ export default function ProductActions({
             ? "Out of stock"
             : "Add to cart"}
         </Button>
+
+        <button
+          onClick={handleAddToWishlist}
+          disabled={
+            !selectedVariant ||
+            !!disabled ||
+            isAdding ||
+            isAddingToWishlist
+          }
+          className="w-full h-10 mt-1 flex items-center justify-center gap-2 border border-gray-200 bg-white text-black hover:bg-gray-50 disabled:opacity-50 font-bold rounded-lg text-xs transition-all shadow-sm"
+        >
+          <Heart className="w-4 h-4 text-gray-800" />
+          <span>{isAddingToWishlist ? "Saving..." : "Save to Wishlist"}</span>
+        </button>
         <MobileActions
           product={product}
           variant={selectedVariant}
@@ -190,8 +228,8 @@ export default function ProductActions({
           inStock={inStock}
           handleAddToCart={handleAddToCart}
           isAdding={isAdding}
-          show={!inView}
-          optionsDisabled={!!disabled || isAdding}
+          show={true}
+          optionsDisabled={!!disabled || isAdding || isAddingToWishlist}
         />
       </div>
     </>

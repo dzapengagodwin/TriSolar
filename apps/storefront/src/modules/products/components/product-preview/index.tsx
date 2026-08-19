@@ -83,13 +83,13 @@ export default function ProductPreview({
         </div>
 
         {/* Price & Add to Cart Button */}
-        <div className="pt-2 border-t border-gray-50 space-y-2">
-          <div className="flex items-center justify-between gap-2">
+        <div className="pt-2 border-t border-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
             {priceInfo && <PreviewPrice price={priceInfo} />}
 
             <LocalizedClientLink
               href={`/products/${product.handle}`}
-              className="bg-black hover:bg-gray-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
+              className="bg-black hover:bg-gray-800 text-white text-[10px] font-bold py-2 px-4 rounded-full transition-colors uppercase tracking-wider text-center w-full sm:w-auto shrink-0"
             >
               Add to Cart
             </LocalizedClientLink>

@@ -7,6 +7,17 @@ const hasPesepayConfig =
   !!process.env.PESEPAY_ENCRYPTION_KEY
 
 export default defineConfig({
+  plugins: [
+    {
+      resolve: "@alphabite/medusa-wishlist",
+      options: {
+        includeWishlistItems: true,
+        includeWishlistItemsTake: 5,
+        allowGuestWishlist: true,
+      },
+    },
+  ],
+
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     http: {

@@ -24,19 +24,21 @@ export const PRODUCT_LIMIT = 12
 export async function generateStaticParams() {
   const { collections } = await listCollections({
     fields: "*products",
-  })
+  }).catch(() => ({ collections: [] }))
 
-  if (!collections) {
+  if (!collections || collections.length === 0) {
     return []
   }
 
-  const countryCodes = await listRegions().then(
-    (regions: StoreRegion[]) =>
-      regions
-        ?.map((r) => r.countries?.map((c) => c.iso_2))
-        .flat()
-        .filter(Boolean) as string[]
-  )
+  const countryCodes = await listRegions()
+    .then(
+      (regions: StoreRegion[]) =>
+        regions
+          ?.map((r) => r.countries?.map((c) => c.iso_2))
+          .flat()
+          .filter(Boolean) as string[]
+    )
+    .catch(() => [])
 
   const collectionHandles = collections.map(
     (collection: StoreCollection) => collection.handle
