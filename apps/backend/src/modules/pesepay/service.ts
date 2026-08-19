@@ -1,7 +1,7 @@
 import { createCipheriv, createDecipheriv } from 'node:crypto'
 import https from 'node:https'
 import http from 'node:http'
-import { AbstractPaymentProvider, PaymentActions, MedusaError } from '@medusajs/framework/utils'
+import { AbstractPaymentProvider, PaymentActions, MedusaError, ContainerRegistrationKeys } from '@medusajs/framework/utils'
 import {
   AuthorizePaymentInput,
   AuthorizePaymentOutput,
@@ -88,9 +88,9 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       // the shared PostgreSQL connection (__pg_connection__), a Knex
       // instance available in every Medusa v2 module container.
       const pgConnection =
-        this.container_?.__pg_connection__ ||
+        this.container_?.[ContainerRegistrationKeys.PG_CONNECTION] ||
         (typeof this.container_?.resolve === 'function'
-          ? this.container_.resolve('__pg_connection__')
+          ? this.container_.resolve(ContainerRegistrationKeys.PG_CONNECTION)
           : null)
 
       if (pgConnection) {
@@ -446,6 +446,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
         ''
     ).trim()
 
+    console.log(
+      `[Pesepay] authorizePayment called | ref: ${referenceNumber || 'NONE'} | webhookConfirmed: ${!!input.data?.webhookConfirmed} | session data keys: ${Object.keys(input.data ?? {}).join(', ')}`
+    )
+
     // If webhook already confirmed, authorize immediately
     if (input.data?.webhookConfirmed) {
       return {
@@ -460,6 +464,10 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
         const statusResult = await this.getPaymentStatus({
           data: input.data ?? {},
         } as GetPaymentStatusInput)
+
+        console.log(
+          `[Pesepay] authorizePayment status check result | ref: ${referenceNumber} | status: ${statusResult.status} | transactionStatus: ${(statusResult.data as any)?.transactionStatus ?? 'N/A'}`
+        )
 
         if (
           statusResult.status === 'captured' ||
@@ -483,9 +491,19 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
             },
           }
         }
-      } catch {
-        // Fallback
+
+        // Status was 'error' or 'canceled' from getPaymentStatus
+        console.warn(
+          `[Pesepay] authorizePayment: unexpected status "${statusResult.status}" for ref ${referenceNumber}`
+        )
+      } catch (err: any) {
+        console.error(
+          `[Pesepay] authorizePayment status check failed for ref ${referenceNumber}:`,
+          err?.message || err
+        )
       }
+    } else {
+      console.warn('[Pesepay] authorizePayment: no reference number found in session data')
     }
 
     return {
