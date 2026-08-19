@@ -306,7 +306,7 @@ const Shipping: React.FC<ShippingProps> = ({
               className="mt-4 w-full bg-black hover:bg-gray-800 text-white font-bold py-3.5 rounded-full transition-colors"
               onClick={handleSubmit}
               isLoading={isLoading}
-              disabled={!cart.shipping_methods?.[0]}
+              disabled={!cart.shipping_methods?.[0] && !shippingMethodId}
               data-testid="submit-delivery-option-button"
             >
               Continue to payment

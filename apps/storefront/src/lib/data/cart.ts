@@ -359,7 +359,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -401,9 +401,11 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     return e instanceof Error ? e.message : "Failed to update addresses"
   }
 
-  redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
-  )
+  const countryCode =
+    formData.get("shipping_address.country_code")?.toString().toLowerCase() ||
+    "zw"
+
+  redirect(`/${countryCode}/checkout?step=delivery`)
 }
 
 /**
@@ -433,7 +435,9 @@ export async function placeOrder(cartId?: string) {
 
   if (cartRes?.type === "order") {
     const countryCode =
-      cartRes.order.shipping_address?.country_code?.toLowerCase()
+      cartRes.order.shipping_address?.country_code?.toLowerCase() ||
+      cartRes.order.billing_address?.country_code?.toLowerCase() ||
+      "zw"
 
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
@@ -442,7 +446,14 @@ export async function placeOrder(cartId?: string) {
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 
-  return cartRes.cart
+  if (cartRes?.type === "cart") {
+    throw new Error(
+      (cartRes as any).error?.message ||
+        "Payment could not be completed. Please check your details and try again."
+    )
+  }
+
+  throw new Error("Unable to complete order. Please try again.")
 }
 
 /**

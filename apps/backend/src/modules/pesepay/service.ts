@@ -408,7 +408,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
     // If webhook already confirmed, authorize immediately
     if (input.data?.webhookConfirmed) {
       return {
-        status: PaymentActions.AUTHORIZED,
+        status: 'authorized',
         data: input.data ?? {},
       }
     }
@@ -425,7 +425,17 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
           statusResult.status === 'authorized'
         ) {
           return {
-            status: PaymentActions.AUTHORIZED,
+            status: 'authorized',
+            data: {
+              ...(input.data ?? {}),
+              ...(statusResult.data ?? {}),
+            },
+          }
+        }
+
+        if (statusResult.status === 'pending') {
+          return {
+            status: 'pending',
             data: {
               ...(input.data ?? {}),
               ...(statusResult.data ?? {}),
@@ -433,12 +443,12 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
           }
         }
       } catch {
-        // Fallback to pending
+        // Fallback
       }
     }
 
     return {
-      status: PaymentActions.AUTHORIZED,
+      status: 'error',
       data: input.data ?? {},
     }
   }

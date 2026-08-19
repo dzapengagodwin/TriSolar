@@ -24,7 +24,10 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const paymentSession =
+    cart.payment_collection?.payment_sessions?.find(
+      (s) => s.status === "pending"
+    ) || cart.payment_collection?.payment_sessions?.[0]
 
   switch (true) {
     case isStripeLike(paymentSession?.provider_id):
@@ -185,7 +188,14 @@ const PesepayPaymentButton = ({
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const paymentSession =
+    cart.payment_collection?.payment_sessions?.find(
+      (s) => s.status === "pending" && isPesepay(s.provider_id)
+    ) ||
+    cart.payment_collection?.payment_sessions?.find(
+      (s) => s.status === "pending"
+    ) ||
+    cart.payment_collection?.payment_sessions?.[0]
   const sessionData = paymentSession?.data as Record<string, unknown> | undefined
   const redirectUrl =
     (sessionData?.redirectUrl as string | undefined) ??
