@@ -352,6 +352,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
 
   protected mapStatus(status?: string): GetPaymentStatusOutput['status'] {
     switch (status?.toLowerCase()) {
+      case 'success':
       case 'successful':
       case 'captured':
       case 'completed':
