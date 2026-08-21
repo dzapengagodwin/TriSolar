@@ -21,6 +21,8 @@ import {
   ArrowsPointingOut,
 } from "@medusajs/icons"
 
+import MegaMenuNav from "@modules/layout/components/mega-menu-nav"
+
 export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null }) {
   const [regions, locales, currentLocale, categories, wishlist] = await Promise.all([
     listRegions()
@@ -110,30 +112,20 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
         </div>
       </header>
 
-      {/* Row 3: Sub-Navigation Bar */}
-      <nav className="bg-white border-b border-gray-200 hidden small:block">
-        <div className="content-container flex items-center justify-between text-xs font-bold py-2.5">
-          
-          <div className="flex items-center gap-x-8">
-            {/* Browse Categories Accordion Dropdown Button */}
+      {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
+      <nav className="bg-primary border-b border-orange-300 hidden small:block text-white">
+        <div className="content-container flex items-center justify-between text-xs font-bold py-1">
+          <div className="flex items-center gap-x-2">
+            {/* Browse All Categories Button */}
             <CategoryDropdown categories={categories} />
 
-            {/* Links */}
-            <LocalizedClientLink href="/store" className="text-gray-800 hover:text-black transition-colors">
-              Store Catalog
-            </LocalizedClientLink>
-
-            {categories && categories.slice(0, 4).map((c) => (
-              <LocalizedClientLink
-                key={c.id}
-                href={`/categories/${c.handle}`}
-                className="text-gray-800 hover:text-black transition-colors"
-              >
-                {c.name}
-              </LocalizedClientLink>
-            ))}
+            {/* Top Navigation Items with Mega Menu Dropdown */}
+            <MegaMenuNav categories={categories} />
           </div>
 
+          <div className="hidden lg:flex items-center gap-2 text-xs font-black text-gray-900 pr-2">
+            <span>Free Delivery Over $50</span>
+          </div>
         </div>
       </nav>
     </div>

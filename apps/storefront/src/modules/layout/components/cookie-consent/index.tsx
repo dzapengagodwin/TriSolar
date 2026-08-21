@@ -32,7 +32,7 @@ export default function CookieConsent() {
           <span>🍪</span> Cookie Settings
         </h3>
         <p className="text-xs text-gray-500 leading-relaxed font-medium">
-          We use cookies to enhance your shopping experience, analyze site usage, and serve personalized offers. By clicking "Accept", you consent to our use of cookies.
+          We use cookies to enhance your shopping experience, analyze site usage, and serve personalized offers. By clicking &quot;Accept&quot;, you consent to our use of cookies.
         </p>
       </div>
 

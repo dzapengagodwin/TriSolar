@@ -9,16 +9,42 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { Trash, ShoppingBag } from "@medusajs/icons"
 import { convertToLocale } from "@lib/util/money"
 
+type WishlistItem = {
+  id: string
+  variant_id: string
+  product_variant?: {
+    id: string
+    title?: string
+    calculated_price?: {
+      calculated_amount?: number
+      currency_code?: string
+    }
+    prices?: {
+      amount?: number
+      currency_code?: string
+    }[]
+    product?: {
+      id: string
+      title?: string
+      handle?: string
+      thumbnail?: string
+    }
+  }
+}
+
 type WishlistTemplateProps = {
-  wishlist: any
+  wishlist?: {
+    id?: string
+    items?: WishlistItem[]
+  } | null
 }
 
 export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
-  const [items, setItems] = useState<any[]>(wishlist?.items || [])
+  const [items, setItems] = useState<WishlistItem[]>(wishlist?.items || [])
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set())
   const [addingToCartIds, setAddingToCartIds] = useState<Set<string>>(new Set())
   const params = useParams()
-  const countryCode = (params.countryCode as string) || "zw"
+  const countryCode = (params?.countryCode as string) || "zw"
 
   const handleRemove = async (itemId: string) => {
     const nextRemoving = new Set(removingIds)
@@ -51,9 +77,10 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
         countryCode,
       })
       alert("Added to Cart successfully!")
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error adding to cart", err)
-      alert(err.message || "Failed to add to cart")
+      const message = err instanceof Error ? err.message : "Failed to add to cart"
+      alert(message)
     } finally {
       const nextAdding = new Set(addingToCartIds)
       nextAdding.delete(itemId)
@@ -61,7 +88,7 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
     }
   }
 
-  const getPriceString = (item: any) => {
+  const getPriceString = (item: WishlistItem) => {
     const calc = item.product_variant?.calculated_price
     if (calc && calc.calculated_amount !== undefined) {
       return convertToLocale({

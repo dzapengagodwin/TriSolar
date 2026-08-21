@@ -1,12 +1,16 @@
 import { Metadata } from "next"
 
 import Hero from "@modules/home/components/hero"
+import TopCategories from "@modules/home/components/top-categories"
 import MonthlyDeals from "@modules/home/components/monthly-deals"
+import GamingSection from "@modules/home/components/gaming-section"
+import TopBrands from "@modules/home/components/top-brands"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
 import { listCollections } from "@lib/data/collections"
 import { listCategories } from "@lib/data/categories"
+import { listBrands } from "@lib/data/brands"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
@@ -24,9 +28,10 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [collectionsRes, categories, productsRes] = await Promise.all([
+  const [collectionsRes, categories, brands, productsRes] = await Promise.all([
     listCollections({ fields: "id, handle, title" }).catch(() => ({ collections: [] })),
     listCategories().catch(() => []),
+    listBrands({ limit: 50 }).catch(() => []),
     region
       ? listProducts({
           regionId: region.id,
@@ -47,27 +52,29 @@ export default async function Home(props: {
       {/* 1. Hero Grid (Black Theme Banners) */}
       <Hero />
 
-      {/* 2. 5 Vertical Deal Cards Row (Catalogue, RedStar Clearance, Flash Sale, Galaxy Z8, Smart Air) */}
-      {/* <PromoCardsRow /> */}
+      {/* 2. Top Categories Slider */}
+      <TopCategories categories={categories} />
 
       {/* 3. Monthly Best Deals (Sleek Black Background Section) */}
-   <MonthlyDeals
+      <MonthlyDeals
         products={products}
         region={region}
       />
 
-      {/* 4. Deep Deals by Category (Avatars + Coupon Banner) */}
-      {/* {categories.length > 0 && <CategoryAvatars categories={categories} />} */}
+      {/* 4. Gaming Categories Section */}
+      <GamingSection categories={categories} />
 
-      {/* 5. Popular Products Grid */}
-      <div className="space-y-4">
-        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={0} />
-        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={1} />
-        <FeaturedProducts collections={collections} categories={categories} region={region} sectionIndex={2} />
-      </div>
-    
+      {/* 5. Featured Products Rails */}
+      <FeaturedProducts
+        collections={collections}
+        categories={categories}
+        region={region}
+      />
 
-      {/* 8. 3-Pillar Guarantee Strip */}
+      {/* 6. Top Brands Slider */}
+      <TopBrands brands={brands} />
+
+      {/* 7. 3-Pillar Guarantee Strip */}
       <TrustBar />
     </div>
   )

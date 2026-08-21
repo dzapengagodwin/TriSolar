@@ -137,7 +137,8 @@ export class WooCommerceTransformer {
     product: WooProduct,
     variations: WooVariation[],
     currencyCode: string,
-    categoryMap: Map<number, string>
+    categoryMap: Map<number, string>,
+    brandImageMap: Map<string, string> = new Map()
   ): MedusaProductPayload {
     const status = product.status === "publish" ? ProductStatus.PUBLISHED : ProductStatus.DRAFT
 
@@ -235,11 +236,32 @@ export class WooCommerceTransformer {
       })
     }
 
+    // Resolve brand logo: look up the brand attribute option value in the
+    // brandImageMap (keyed by slug and lowercased name) fetched from WooCommerce
+    // attribute terms. This is the actual brand logo, not the product image.
+    const BRAND_ATTR_NAMES = ["brand", "brands", "manufacturer", "make"]
+    let brandLogoFromAttr: string | null = null
+    for (const attr of product.attributes || []) {
+      if (BRAND_ATTR_NAMES.includes(attr.name.toLowerCase().trim())) {
+        for (const option of attr.options || []) {
+          const key = option.toLowerCase()
+          const slugKey = key.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+          const logo = brandImageMap.get(key) || brandImageMap.get(slugKey) || null
+          if (logo) {
+            brandLogoFromAttr = logo
+            break
+          }
+        }
+        if (brandLogoFromAttr) break
+      }
+    }
+
     const brand = extractBrandFromProduct({
       title: product.name,
       attributes: product.attributes,
       categories: product.categories,
       tags: product.tags,
+      logo: brandLogoFromAttr,
     })
 
     const handle =
@@ -275,11 +297,13 @@ export class WooCommerceTransformer {
     products: WooProduct[],
     variationsMap: Map<number, WooVariation[]>,
     currencyCode: string,
-    categoryMap: Map<number, string>
+    categoryMap: Map<number, string>,
+    brandImageMap: Map<string, string> = new Map()
   ): MedusaProductPayload[] {
     return products.map((product) => {
       const variations = variationsMap.get(product.id) || []
-      return this.transformProduct(product, variations, currencyCode, categoryMap)
+      return this.transformProduct(product, variations, currencyCode, categoryMap, brandImageMap)
     })
   }
 }
+

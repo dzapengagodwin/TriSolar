@@ -1,6 +1,7 @@
 export type NormalizedBrand = {
   name: string
   handle: string
+  logo?: string | null
 }
 
 // Canonical dictionary of major computer, laptop, electronics & tech hardware brands
@@ -292,14 +293,16 @@ export function normalizeBrand(rawInput?: string | null): NormalizedBrand | null
 
 /**
  * Extracts a brand from a product's title, attributes, categories, and tags.
+ * Pass `logo` (e.g. the product thumbnail URL) to attach an image to the brand.
  */
 export function extractBrandFromProduct(params: {
   title: string
   attributes?: { name: string; options: string[] }[]
   categories?: { name: string; slug: string }[]
   tags?: { name: string; slug: string }[]
+  logo?: string | null
 }): NormalizedBrand | null {
-  const { title, attributes = [], categories = [], tags = [] } = params
+  const { title, attributes = [], categories = [], tags = [], logo } = params
 
   // 1. Check WooCommerce Attributes (highest priority: Brand, Make, Manufacturer)
   for (const attr of attributes) {
@@ -312,7 +315,7 @@ export function extractBrandFromProduct(params: {
     ) {
       for (const opt of attr.options || []) {
         const normalized = normalizeBrand(opt)
-        if (normalized) return normalized
+        if (normalized) return { ...normalized, logo: logo || null }
       }
     }
   }
@@ -322,7 +325,7 @@ export function extractBrandFromProduct(params: {
   for (const token of titleTokens) {
     const tokenNormalized = normalizeBrand(token)
     if (tokenNormalized && KNOWN_BRANDS[tokenNormalized.handle]) {
-      return tokenNormalized
+      return { ...tokenNormalized, logo: logo || null }
     }
   }
 
@@ -332,7 +335,7 @@ export function extractBrandFromProduct(params: {
     for (const alias of brandInfo.aliases) {
       const aliasRegex = new RegExp(`\\b${alias}\\b`, "i")
       if (aliasRegex.test(titleLower)) {
-        return { name: brandInfo.name, handle: brandInfo.handle }
+        return { name: brandInfo.name, handle: brandInfo.handle, logo: logo || null }
       }
     }
   }
@@ -341,7 +344,7 @@ export function extractBrandFromProduct(params: {
   for (const cat of categories) {
     const normalized = normalizeBrand(cat.name)
     if (normalized && KNOWN_BRANDS[normalized.handle]) {
-      return normalized
+      return { ...normalized, logo: logo || null }
     }
   }
 
@@ -349,7 +352,7 @@ export function extractBrandFromProduct(params: {
   for (const tag of tags) {
     const normalized = normalizeBrand(tag.name)
     if (normalized && KNOWN_BRANDS[normalized.handle]) {
-      return normalized
+      return { ...normalized, logo: logo || null }
     }
   }
 

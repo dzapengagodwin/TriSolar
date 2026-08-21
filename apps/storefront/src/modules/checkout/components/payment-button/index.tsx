@@ -286,7 +286,7 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
       if (res && "error" in res && res.error) {
         setErrorMessage(res.error)
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setErrorMessage(err instanceof Error ? err.message : String(err))
     } finally {
       setSubmitting(false)

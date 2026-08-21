@@ -18,6 +18,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       "is_active",
       "metadata",
       "products.id",
+      "products.thumbnail",
     ],
     filters: {
       is_active: true,
@@ -28,12 +29,23 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     },
   })
 
-  // Format brand response with product count
+  // Format brand response with product count and logo/image fallback
   const formattedBrands = brands.map((b: any) => ({
     id: b.id,
     name: b.name,
     handle: b.handle,
-    logo: b.logo,
+    logo:
+      b.logo ||
+      b.metadata?.logo ||
+      b.metadata?.image ||
+      b.metadata?.thumbnail ||
+      b.products?.[0]?.thumbnail ||
+      null,
+    image:
+      b.metadata?.image ||
+      b.logo ||
+      b.products?.[0]?.thumbnail ||
+      null,
     description: b.description,
     website: b.website,
     products_count: b.products?.length || 0,

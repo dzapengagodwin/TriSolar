@@ -62,6 +62,7 @@ export const importWooCommerceStep = createStep(
     let wooCategories: any[] = []
     let wooTags: any[] = []
     const variationsMap = new Map<number, WooVariation[]>()
+    let brandImageMap = new Map<string, string>()
 
     if (input.jsonData) {
       logger.info("Using provided JSON data for import")
@@ -91,6 +92,11 @@ export const importWooCommerceStep = createStep(
         logger.info("Fetching tags from WooCommerce API")
         wooTags = await client.fetchAllTags()
       }
+
+      // Fetch brand attribute term images (slug/name → logo URL)
+      logger.info("Fetching brand attribute term images from WooCommerce")
+      brandImageMap = await client.fetchBrandTermImages()
+      logger.info(`Loaded ${brandImageMap.size} brand logo entries from attribute terms`)
 
       for (const product of wooProducts) {
         if (product.type === "variable" && product.variations?.length > 0) {
@@ -123,14 +129,17 @@ export const importWooCommerceStep = createStep(
     const importedVariantsPrices: { variantId: string; amount: number; currencyCode: string }[] = []
 
     let brandModuleService: any = null
+    // brandLogoMap tracks which existing brands already have a logo set
+    const brandLogoMap = new Map<string, string | null>()
     try {
       brandModuleService = container.resolve(BRAND_MODULE)
       const existingBrands = await brandModuleService.listBrands(
         {},
-        { select: ["id", "name", "handle"] }
+        { select: ["id", "name", "handle", "logo"] }
       )
       for (const b of existingBrands || []) {
         brandMap.set(b.handle, b.id)
+        brandLogoMap.set(b.handle, b.logo || null)
       }
     } catch (err: any) {
       logger.warn(`Brand module service lookup note: ${err.message}`)
@@ -351,7 +360,8 @@ export const importWooCommerceStep = createStep(
           wcProduct,
           variations,
           input.currencyCode,
-          categoryMap
+          categoryMap,
+          brandImageMap
         )
       })
 
@@ -366,21 +376,41 @@ export const importWooCommerceStep = createStep(
         existingProducts.push({ handle: p.handle })
       }
 
-      // Create any missing brands for this batch
+      // Create any missing brands for this batch; back-fill logo on existing brands that lack one
       if (brandModuleService) {
         for (const p of productsPayload) {
-          if (p.brand && !brandMap.has(p.brand.handle)) {
+          if (!p.brand) continue
+
+          if (!brandMap.has(p.brand.handle)) {
+            // New brand — create with logo
             try {
               const createdBrand = await brandModuleService.createBrands({
                 name: p.brand.name,
                 handle: p.brand.handle,
+                logo: p.brand.logo || null,
                 is_active: true,
               })
               brandMap.set(p.brand.handle, createdBrand.id)
+              brandLogoMap.set(p.brand.handle, p.brand.logo || null)
               result.importedBrands++
-              logger.info(`Created brand: ${p.brand.name} (${p.brand.handle})`)
+              logger.info(`Created brand: ${p.brand.name} (${p.brand.handle})${p.brand.logo ? " with logo" : ""}`)
             } catch (brandErr: any) {
               logger.warn(`Could not create brand ${p.brand.name}: ${brandErr.message}`)
+            }
+          } else if (p.brand.logo && !brandLogoMap.get(p.brand.handle)) {
+            // Existing brand has no logo yet — update it
+            const existingBrandId = brandMap.get(p.brand.handle)
+            if (existingBrandId) {
+              try {
+                await brandModuleService.updateBrands({
+                  id: existingBrandId,
+                  logo: p.brand.logo,
+                })
+                brandLogoMap.set(p.brand.handle, p.brand.logo)
+                logger.info(`Updated logo for brand: ${p.brand.name}`)
+              } catch (updateErr: any) {
+                logger.warn(`Could not update logo for brand ${p.brand.name}: ${updateErr.message}`)
+              }
             }
           }
         }

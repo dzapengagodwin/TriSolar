@@ -78,6 +78,32 @@ export interface WooProduct {
   variations: number[]
 }
 
+/** A global product attribute registered in WooCommerce (e.g. "Brand", "Color") */
+export interface WooGlobalAttribute {
+  id: number
+  name: string
+  slug: string
+  type: string
+  order_by: string
+  has_archives: boolean
+}
+
+/** A single term of a global product attribute, which may carry a logo image */
+export interface WooAttributeTerm {
+  id: number
+  name: string
+  slug: string
+  description: string
+  menu_order: number
+  count: number
+  image?: {
+    id: number
+    src: string
+    name: string
+    alt: string
+  } | null
+}
+
 export class WooCommerceClient {
   private baseUrl: string
   private consumerKey: string
@@ -198,4 +224,58 @@ export class WooCommerceClient {
   async fetchProductVariations(productId: number): Promise<WooVariation[]> {
     return this.fetchAll<WooVariation>(`products/${productId}/variations`)
   }
+
+  /**
+   * Fetches all global product attributes registered in WooCommerce.
+   * Used to locate the brand/manufacturer attribute by name.
+   */
+  async fetchAllGlobalAttributes(): Promise<WooGlobalAttribute[]> {
+    return this.fetchAll<WooGlobalAttribute>("products/attributes")
+  }
+
+  /**
+   * Fetches all terms for a specific attribute (e.g. all brands with their logos).
+   */
+  async fetchAttributeTerms(attributeId: number): Promise<WooAttributeTerm[]> {
+    return this.fetchAll<WooAttributeTerm>(`products/attributes/${attributeId}/terms`)
+  }
+
+  /**
+   * Finds the brand attribute in WooCommerce and returns a map of
+   * brand slug → logo image URL for every term that has an image set.
+   * Returns an empty map if the brand attribute does not exist or has no images.
+   */
+  async fetchBrandTermImages(): Promise<Map<string, string>> {
+    const brandImageMap = new Map<string, string>()
+
+    try {
+      const attributes = await this.fetchAllGlobalAttributes()
+
+      // Match the brand attribute by common names / slugs
+      const BRAND_ATTR_NAMES = ["brand", "brands", "manufacturer", "make", "pa_brand", "pa_brands", "pa_manufacturer"]
+      const brandAttr = attributes.find((a) =>
+        BRAND_ATTR_NAMES.includes(a.name.toLowerCase().trim()) ||
+        BRAND_ATTR_NAMES.includes(a.slug.toLowerCase().trim())
+      )
+
+      if (!brandAttr) {
+        return brandImageMap
+      }
+
+      const terms = await this.fetchAttributeTerms(brandAttr.id)
+
+      for (const term of terms) {
+        if (term.image?.src) {
+          // Index by both slug and lowercased name so lookups are flexible
+          brandImageMap.set(term.slug, term.image.src)
+          brandImageMap.set(term.name.toLowerCase(), term.image.src)
+        }
+      }
+    } catch {
+      // Non-fatal — brand images are best-effort
+    }
+
+    return brandImageMap
+  }
 }
+

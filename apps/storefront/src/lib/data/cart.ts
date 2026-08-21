@@ -278,10 +278,11 @@ export async function initiatePaymentSession(
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
     return { success: true, ...resp }
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { response?: { data?: { message?: string } }; message?: string }
     const message =
-      err?.response?.data?.message ||
-      err?.message ||
+      errorObj?.response?.data?.message ||
+      errorObj?.message ||
       "Could not initiate payment session with the selected provider"
     return { error: message }
   }
@@ -441,10 +442,11 @@ export async function placeOrder(cartId?: string) {
     cartRes = await sdk.store.cart.complete(id, {}, headers)
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const errorObj = err as { response?: { data?: { message?: string } }; message?: string }
     const message =
-      err?.response?.data?.message ||
-      err?.message ||
+      errorObj?.response?.data?.message ||
+      errorObj?.message ||
       "Unable to complete order. Please try again."
     return { error: message }
   }
@@ -463,9 +465,10 @@ export async function placeOrder(cartId?: string) {
   }
 
   if (cartRes?.type === "cart") {
+    const cartError = (cartRes as { error?: { message?: string } }).error
     return {
       error:
-        (cartRes as any).error?.message ||
+        cartError?.message ||
         "Payment could not be completed. Please check your shipping and payment selections.",
     }
   }

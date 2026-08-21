@@ -1,141 +1,241 @@
 "use client"
 
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
+import { deleteLineItem, updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import DeleteButton from "@modules/common/components/delete-button"
-import LineItemOptions from "@modules/common/components/line-item-options"
-import LineItemPrice from "@modules/common/components/line-item-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
-import { Fragment, useEffect, useRef, useState } from "react"
-import { ShoppingBag } from "@medusajs/icons"
+import { useEffect, useRef, useState, useTransition } from "react"
+import { ShoppingBag, Trash, Spinner } from "@medusajs/icons"
+import Image from "next/image"
 
-const CartDropdown = ({
-  cart: cartState,
-}: {
+type CartDropdownProps = {
   cart?: HttpTypes.StoreCart | null
-}) => {
-  const [activeTimer, setActiveTimer] = useState<NodeJS.Timer | undefined>(
-    undefined
-  )
-  const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
+}
 
-  const open = () => setCartDropdownOpen(true)
-  const close = () => setCartDropdownOpen(false)
+const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
+  const [, startTransition] = useTransition()
+
+  const pathname = usePathname()
+
+  const open = () => setIsOpen(true)
+  const close = () => setIsOpen(false)
 
   const totalItems =
-    cartState?.items?.reduce((acc, item) => {
-      return acc + item.quantity
-    }, 0) || 0
+    cartState?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
 
   const subtotal = cartState?.subtotal ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
-  const timedOpen = () => {
-    open()
-
-    const timer = setTimeout(close, 5000)
-
-    setActiveTimer(timer)
-  }
-
-  const openAndCancel = () => {
-    if (activeTimer) {
-      clearTimeout(activeTimer)
-    }
-
-    open()
-  }
-
-  // Clean up the timer when the component unmounts
+  // Auto-open drawer when modifying cart items, unless on cart/checkout pages
   useEffect(() => {
+    if (
+      itemRef.current !== totalItems &&
+      !pathname.includes("/cart") &&
+      !pathname.includes("/checkout")
+    ) {
+      open()
+    }
+    itemRef.current = totalItems
+  }, [totalItems, pathname])
+
+  // Close on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close()
+    }
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+      window.addEventListener("keydown", handleKeyDown)
+    } else {
+      document.body.style.overflow = "unset"
+    }
     return () => {
-      if (activeTimer) {
-        clearTimeout(activeTimer)
+      document.body.style.overflow = "unset"
+      window.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [isOpen])
+
+  const handleUpdateQuantity = (lineId: string, currentQty: number, delta: number) => {
+    const newQty = currentQty + delta
+    if (newQty < 1) {
+      handleDelete(lineId)
+      return
+    }
+
+    setUpdatingLineId(lineId)
+    startTransition(async () => {
+      try {
+        await updateLineItem({ lineId, quantity: newQty })
+      } finally {
+        setUpdatingLineId(null)
       }
-    }
-  }, [activeTimer])
+    })
+  }
 
-  const pathname = usePathname()
-
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
-  useEffect(() => {
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
-      timedOpen()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  const handleDelete = (lineId: string) => {
+    setUpdatingLineId(lineId)
+    startTransition(async () => {
+      try {
+        await deleteLineItem(lineId)
+      } finally {
+        setUpdatingLineId(null)
+      }
+    })
+  }
 
   return (
-    <div
-      className="h-full z-50"
-      onMouseEnter={openAndCancel}
-      onMouseLeave={close}
-    >
-      <Popover className="relative h-full">
-        <PopoverButton className="h-full flex items-center">
-          <LocalizedClientLink
-            className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm"
-            href="/cart"
-            data-testid="nav-cart-link"
+    <>
+      {/* Trigger Button in Nav */}
+      <button
+        onClick={open}
+        className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm"
+        data-testid="nav-cart-link"
+        aria-label="Open Shopping Cart"
+      >
+        <span>
+          {convertToLocale({
+            amount: subtotal,
+            currency_code: cartState?.currency_code || "usd",
+          })}
+        </span>
+        <div className="relative">
+          <ShoppingBag className="w-4 h-4 text-white" />
+          <span className="absolute -top-2 -right-2 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+            {totalItems}
+          </span>
+        </div>
+      </button>
+
+      {/* Backdrop Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 transition-opacity backdrop-blur-[2px]"
+          onClick={close}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Slide-out Cart Drawer */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-[420px] bg-white shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-in-out ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Your Cart"
+      >
+        {/* Drawer Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+            Your Cart
+          </h2>
+          <button
+            onClick={close}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            aria-label="Close cart"
           >
-            <span>
-              {convertToLocale({
-                amount: subtotal,
-                currency_code: cartState?.currency_code || "usd",
-              })}
-            </span>
-            <div className="relative">
-              <ShoppingBag className="w-4 h-4 text-white" />
-              <span className="absolute -top-2 -right-2 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                {totalItems}
-              </span>
-            </div>
-          </LocalizedClientLink>
-        </PopoverButton>
-        <Transition
-          show={cartDropdownOpen}
-          as={Fragment}
-          enter="transition ease-out duration-200"
-          enterFrom="opacity-0 translate-y-1"
-          enterTo="opacity-100 translate-y-0"
-          leave="transition ease-in duration-150"
-          leaveFrom="opacity-100 translate-y-0"
-          leaveTo="opacity-0 translate-y-1"
-        >
-          <PopoverPanel
-            static
-            className="hidden small:block absolute top-[calc(100%+1px)] right-0 bg-white border border-gray-100 rounded-2xl shadow-2xl w-[420px] text-ui-fg-base z-50 overflow-hidden mt-2"
-            data-testid="nav-cart-dropdown"
-          >
-            <div className="p-4 flex items-center justify-center border-b border-gray-100">
-              <h3 className="text-sm font-bold text-black">Shopping Cart</h3>
-            </div>
-            {cartState && cartState.items?.length ? (
-              <>
-                <div className="overflow-y-scroll max-h-[402px] px-4 grid grid-cols-1 gap-y-6 no-scrollbar py-4">
-                  {cartState.items
-                    .sort((a, b) => {
-                      return (a.created_at ?? "") > (b.created_at ?? "")
-                        ? -1
-                        : 1
-                    })
-                    .map((item) => (
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Scrollable Items Area */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+          {cartState && cartState.items?.length ? (
+            <>
+              {/* Item List */}
+              <div className="divide-y divide-gray-100">
+                {cartState.items
+                  .sort((a, b) =>
+                    (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
+                  )
+                  .map((item) => {
+                    const isUpdating = updatingLineId === item.id
+
+                    return (
                       <div
-                        className="grid grid-cols-[100px_1fr] gap-x-4"
                         key={item.id}
+                        className="py-4 first:pt-0 last:pb-0 flex items-start justify-between gap-3"
                         data-testid="cart-item"
                       >
+                        {/* Trash Remove Button on Far Left */}
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          disabled={isUpdating}
+                          className="text-gray-400 hover:text-red-500 pt-1 transition-colors shrink-0"
+                          title="Remove item"
+                          aria-label={`Remove ${item.title}`}
+                        >
+                          {isUpdating ? (
+                            <Spinner className="w-4 h-4 animate-spin text-gray-400" />
+                          ) : (
+                            <Trash className="w-4 h-4" />
+                          )}
+                        </button>
+
+                        {/* Title, Price & Quantity Selector in Center */}
+                        <div className="flex-1 min-w-0 pr-2">
+                          <LocalizedClientLink
+                            href={`/products/${item.product_handle}`}
+                            onClick={close}
+                            className="text-xs sm:text-sm font-semibold text-gray-900 hover:text-primary transition-colors line-clamp-2 leading-snug"
+                          >
+                            {item.title}
+                          </LocalizedClientLink>
+
+                          {item.variant_title && (
+                            <p className="text-[11px] text-gray-400 mt-0.5">
+                              {item.variant_title}
+                            </p>
+                          )}
+
+                          <div className="text-sm font-bold text-gray-900 mt-1.5">
+                            {convertToLocale({
+                              amount: (item.unit_price ?? 0) * item.quantity,
+                              currency_code: cartState.currency_code,
+                            })}
+                          </div>
+
+                          {/* Stepper Pill: [ -  qty  + ] */}
+                          <div className="inline-flex items-center border border-gray-200 rounded-lg mt-2 bg-white shadow-2xs">
+                            <button
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)}
+                              disabled={isUpdating}
+                              className="px-2.5 py-1 text-gray-500 hover:text-black hover:bg-gray-50 disabled:opacity-40 transition-colors text-xs font-bold rounded-l-lg"
+                              aria-label="Decrease quantity"
+                            >
+                              -
+                            </button>
+                            <span className="px-2.5 py-1 text-xs font-bold text-gray-800 min-w-[24px] text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)}
+                              disabled={isUpdating}
+                              className="px-2.5 py-1 text-gray-500 hover:text-black hover:bg-gray-50 disabled:opacity-40 transition-colors text-xs font-bold rounded-r-lg"
+                              aria-label="Increase quantity"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Thumbnail on Far Right */}
                         <LocalizedClientLink
                           href={`/products/${item.product_handle}`}
-                          className="w-20"
+                          onClick={close}
+                          className="w-16 h-16 rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
                         >
                           <Thumbnail
                             thumbnail={item.thumbnail}
@@ -143,102 +243,143 @@ const CartDropdown = ({
                             size="square"
                           />
                         </LocalizedClientLink>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
-                                <h3 className="text-xs font-bold text-gray-800 overflow-hidden text-ellipsis">
-                                  <LocalizedClientLink
-                                    href={`/products/${item.product_handle}`}
-                                    data-testid="product-link"
-                                  >
-                                    {item.title}
-                                  </LocalizedClientLink>
-                                </h3>
-                                <LineItemOptions
-                                  variant={item.variant}
-                                  data-testid="cart-item-variant"
-                                  data-value={item.variant}
-                                />
-                                <span
-                                  className="text-[11px] text-gray-500 mt-0.5"
-                                  data-testid="cart-item-quantity"
-                                  data-value={item.quantity}
-                                >
-                                  Qty: {item.quantity}
-                                </span>
-                              </div>
-                              <div className="flex justify-end">
-                                <LineItemPrice
-                                  item={item}
-                                  style="tight"
-                                  currencyCode={cartState.currency_code}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                          <DeleteButton
-                            id={item.id}
-                            className="mt-1 text-xs text-red-500"
-                            data-testid="cart-item-remove-button"
-                          >
-                            Remove
-                          </DeleteButton>
-                        </div>
                       </div>
-                    ))}
-                </div>
-                <div className="p-4 flex flex-col gap-y-4 text-xs border-t border-gray-100 bg-gray-50/50">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-700 font-bold">
-                      Subtotal{" "}
-                      <span className="font-normal text-gray-500">(excl. shipping & taxes)</span>
-                    </span>
-                    <span
-                      className="text-sm font-black text-black"
-                      data-testid="cart-subtotal"
-                      data-value={subtotal}
+                    )
+                  })}
+              </div>
+
+              {/* "Before you go" Upsell Section */}
+              <div className="pt-2">
+                <h3 className="text-sm font-bold text-gray-900 mb-2.5">
+                  Before you go
+                </h3>
+
+                <div className="border border-gray-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 bg-white hover:border-gray-300 transition-all shadow-2xs">
+                  {/* Accessory Image */}
+                  <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 p-1">
+                    <svg
+                      className="w-7 h-7 text-red-500"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      {convertToLocale({
-                        amount: subtotal,
-                        currency_code: cartState.currency_code,
-                      })}
-                    </span>
+                      <rect x="5" y="2" width="14" height="20" rx="7" />
+                      <line x1="12" y1="6" x2="12" y2="10" />
+                    </svg>
                   </div>
-                  <LocalizedClientLink href="/cart" passHref>
-                    <button
-                      className="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 rounded-full text-xs transition-colors shadow-sm"
-                      data-testid="go-to-cart-button"
-                    >
-                      Go to cart
-                    </button>
+
+                  {/* Accessory Details */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-gray-900 truncate">
+                      Logitech M171 Wireless Mouse
+                    </p>
+                    <p className="text-xs font-bold text-amber-600 mt-0.5">
+                      $ 17.39
+                    </p>
+                  </div>
+
+                  {/* Click to add CTA */}
+                  <LocalizedClientLink
+                    href="/store"
+                    onClick={close}
+                    className="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shadow-2xs"
+                  >
+                    Click to add
                   </LocalizedClientLink>
                 </div>
-              </>
-            ) : (
-              <div>
-                <div className="flex py-12 flex-col gap-y-3 items-center justify-center">
-                  <div className="bg-gray-100 text-xs flex items-center justify-center w-8 h-8 rounded-full text-gray-500 font-bold">
-                    0
-                  </div>
-                  <span className="text-xs text-gray-500 font-medium">Your shopping bag is empty.</span>
-                  <div>
-                    <LocalizedClientLink href="/store">
-                      <>
-                        <span className="sr-only">Go to all products page</span>
-                        <button onClick={close} className="bg-black text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-gray-800 transition-colors">
-                          Explore products
-                        </button>
-                      </>
-                    </LocalizedClientLink>
-                  </div>
-                </div>
               </div>
-            )}
-          </PopoverPanel>
-        </Transition>
-      </Popover>
-    </div>
+            </>
+          ) : (
+            /* Empty Cart View */
+            <div className="py-16 flex flex-col items-center justify-center text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                <ShoppingBag className="w-8 h-8" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-gray-900">Your cart is empty</h3>
+                <p className="text-xs text-gray-500 mt-1 max-w-xs">
+                  Looks like you haven&apos;t added anything to your cart yet.
+                </p>
+              </div>
+              <LocalizedClientLink
+                href="/store"
+                onClick={close}
+                className="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors shadow-sm"
+              >
+                Start Shopping
+              </LocalizedClientLink>
+            </div>
+          )}
+        </div>
+
+        {/* Drawer Footer with Subtotal & Actions */}
+        {cartState && cartState.items?.length ? (
+          <div className="border-t border-gray-200 px-6 py-5 bg-white space-y-3.5">
+            {/* Subtotal Row */}
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-bold text-gray-900">Subtotal:</span>
+              <span
+                className="font-bold text-base text-gray-900"
+                data-testid="cart-subtotal"
+                data-value={subtotal}
+              >
+                {convertToLocale({
+                  amount: subtotal,
+                  currency_code: cartState.currency_code,
+                })}
+              </span>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-2.5 pt-1">
+              <LocalizedClientLink
+                href="/cart"
+                onClick={close}
+                className="w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-4 rounded-xl border border-gray-200 text-sm flex items-center justify-center transition-colors shadow-2xs"
+                data-testid="go-to-cart-button"
+              >
+                View basket
+              </LocalizedClientLink>
+
+              <LocalizedClientLink
+                href="/checkout?step=address"
+                onClick={close}
+                className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2.2}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                  />
+                </svg>
+                <span>Checkout</span>
+              </LocalizedClientLink>
+            </div>
+
+            {/* Payment Method Badges Row */}
+            <div className="pt-2 flex items-center justify-center">
+              <Image
+                src="/payment-methods.png"
+                alt="Accepted Payment Methods - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
+                width={260}
+                height={28}
+                className="h-5 w-auto object-contain"
+              />
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </>
   )
 }
 

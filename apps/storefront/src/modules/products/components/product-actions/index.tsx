@@ -150,9 +150,10 @@ export default function ProductActions({
       } else {
         alert(res.error || "Could not add item to wishlist")
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      alert(err.message || "Failed to add to wishlist")
+      const message = err instanceof Error ? err.message : "Failed to add to wishlist"
+      alert(message)
     } finally {
       setIsAddingToWishlist(false)
     }
@@ -228,7 +229,7 @@ export default function ProductActions({
           inStock={inStock}
           handleAddToCart={handleAddToCart}
           isAdding={isAdding}
-          show={true}
+          show={!inView}
           optionsDisabled={!!disabled || isAdding || isAddingToWishlist}
         />
       </div>

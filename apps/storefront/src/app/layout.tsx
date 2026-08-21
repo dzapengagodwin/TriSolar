@@ -4,6 +4,14 @@ import "styles/globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
+  icons: {
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    apple: { url: "/favicon.png", type: "image/png" },
+    shortcut: "/favicon.png",
+  },
 }
 
 export default function RootLayout(props: { children: React.ReactNode }) {

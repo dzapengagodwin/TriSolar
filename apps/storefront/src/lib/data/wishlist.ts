@@ -2,149 +2,208 @@
 
 import { sdk } from "@lib/config"
 import { cookies as nextCookies } from "next/headers"
-import { getAuthHeaders } from "./cookies"
 import { revalidateTag } from "next/cache"
-import { getOrSetCart } from "./cart"
+import { getAuthHeaders } from "./cookies"
+import { HttpTypes } from "@medusajs/types"
 
-// 1. Get wishlist ID from cookie
-export async function getWishlistIdCookie() {
-  const cookies = await nextCookies()
-  return cookies.get("_medusa_wishlist_id")?.value || null
+type WishlistItemRecord = {
+  id: string
+  variant_id: string
+  product_id?: string
+  created_at: string
 }
 
-// 2. Set wishlist ID in cookie
-export async function setWishlistIdCookie(id: string) {
-  const cookies = await nextCookies()
-  cookies.set("_medusa_wishlist_id", id, {
-    maxAge: 60 * 60 * 24 * 365, // 1 year
-    path: "/",
-  })
+const WISHLIST_COOKIE_KEY = "_medusa_wishlist_data"
+
+// Read wishlist items from cookie
+async function getStoredWishlistItems(): Promise<WishlistItemRecord[]> {
+  try {
+    const cookies = await nextCookies()
+    const raw = cookies.get(WISHLIST_COOKIE_KEY)?.value
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
 }
 
-// 3. Delete wishlist ID cookie
-export async function deleteWishlistIdCookie() {
-  const cookies = await nextCookies()
-  cookies.delete("_medusa_wishlist_id")
-}
-
-// 4. Retrieve current customer's wishlist
-export async function getWishlist() {
-  const authHeaders = await getAuthHeaders()
-  
-  // If user is authenticated, retrieve wishlist from backend
-  if (authHeaders.authorization) {
-    const res = await sdk.client.fetch<any>("/store/wishlists", {
-      headers: authHeaders,
-      cache: "no-store",
+// Write wishlist items to cookie
+async function setStoredWishlistItems(items: WishlistItemRecord[]) {
+  try {
+    const cookies = await nextCookies()
+    cookies.set(WISHLIST_COOKIE_KEY, JSON.stringify(items), {
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+      path: "/",
+      sameSite: "lax",
     })
-    if (res.wishlists && res.wishlists.length > 0) {
-      return res.wishlists[0]
+  } catch (e) {
+    console.error("Failed to write wishlist cookie:", e)
+  }
+}
+
+// Retrieve hydrated wishlist
+export async function getWishlist() {
+  const records = await getStoredWishlistItems()
+  if (!records.length) {
+    return {
+      id: "wishlist_default",
+      items: [],
     }
-    return null
   }
 
-  // If user is guest, try retrieving guest wishlist from cookie
-  const guestWishlistId = await getWishlistIdCookie()
-  if (guestWishlistId) {
-    try {
-      const res = await sdk.client.fetch<any>(`/store/wishlists/${guestWishlistId}`, {
+  try {
+    const authHeaders = await getAuthHeaders()
+
+    // Fetch product details for stored wishlist items
+    const productIds = Array.from(
+      new Set(records.map((r) => r.product_id).filter(Boolean))
+    ) as string[]
+
+    const query: Record<string, string | number | string[]> = {
+      limit: 50,
+      fields:
+        "*variants.calculated_price,*variants.prices,*variants.images,*images,*categories",
+    }
+
+    if (productIds.length > 0) {
+      query.id = productIds
+    }
+
+    const { products } = await sdk.client
+      .fetch<{ products: HttpTypes.StoreProduct[] }>("/store/products", {
+        query,
+        headers: authHeaders,
         cache: "no-store",
       })
-      return res.wishlist || null
-    } catch (err: any) {
-      console.error("Error fetching guest wishlist:", err)
-      await deleteWishlistIdCookie()
-      throw new Error(`Failed to fetch guest wishlist (${guestWishlistId}): ${err.message || err}`)
+      .catch(() => ({ products: [] }))
+
+    // Hydrate items with variant and product information
+    const hydratedItems = records
+      .map((record) => {
+        let foundProduct: HttpTypes.StoreProduct | undefined
+        let foundVariant: HttpTypes.StoreProductVariant | undefined
+
+        for (const p of products) {
+          const v = p.variants?.find((v) => v.id === record.variant_id)
+          if (v) {
+            foundProduct = p
+            foundVariant = v
+            break
+          }
+        }
+
+        if (!foundProduct || !foundVariant) {
+          // If not in matched products, check if product_id matched directly
+          foundProduct = products.find((p) => p.id === record.product_id)
+          foundVariant = foundProduct?.variants?.[0]
+        }
+
+        if (!foundProduct || !foundVariant) return null
+
+        return {
+          id: record.id,
+          variant_id: record.variant_id,
+          product_variant: {
+            ...foundVariant,
+            product: foundProduct,
+          },
+          created_at: record.created_at,
+        }
+      })
+      .filter(Boolean)
+
+    return {
+      id: "wishlist_default",
+      items: hydratedItems,
+    }
+  } catch (err) {
+    console.error("Error hydrating wishlist:", err)
+    return {
+      id: "wishlist_default",
+      items: [],
     }
   }
-
-  return null
 }
 
-// 5. Create a new wishlist
-export async function createWishlist(countryCode?: string) {
-  const authHeaders = await getAuthHeaders()
-
-  let salesChannelId: string | undefined = undefined
-  if (countryCode) {
-    try {
-      const cart = await getOrSetCart(countryCode)
-      salesChannelId = cart?.sales_channel_id
-    } catch (e) {
-      console.error("Failed to retrieve cart for sales channel:", e)
-    }
+// Add item to wishlist
+export async function addToWishlist(variantId: string, _countryCode?: string) {
+  if (!variantId) {
+    return { success: false, error: "Variant ID is required" }
   }
-
-  const res = await sdk.client.fetch<any>("/store/wishlists", {
-    method: "POST",
-    headers: authHeaders,
-    body: salesChannelId ? { sales_channel_id: salesChannelId } : {},
-    cache: "no-store",
-  })
-
-  const wishlist = res.wishlist
-  if (wishlist && !authHeaders.authorization) {
-    await setWishlistIdCookie(wishlist.id)
-  }
-  
-  return wishlist
-}
-
-// 6. Add item to wishlist
-export async function addToWishlist(variantId: string, countryCode?: string) {
-  let wishlist = null
-  try {
-    wishlist = await getWishlist()
-    if (!wishlist) {
-      wishlist = await createWishlist(countryCode)
-    }
-  } catch (err: any) {
-    console.error("Failed to retrieve or create wishlist:", err)
-    return { success: false, error: `Wishlist setup failed: ${err.message || err}` }
-  }
-
-  if (!wishlist) {
-    return { success: false, error: "Could not retrieve or create wishlist (empty response)" }
-  }
-
-  const authHeaders = await getAuthHeaders()
 
   try {
-    const res = await sdk.client.fetch<any>(`/store/wishlists/${wishlist.id}/add-item`, {
-      method: "POST",
-      headers: authHeaders,
-      body: { variant_id: variantId },
-      cache: "no-store",
-    })
-    
+    const existing = await getStoredWishlistItems()
+
+    // Check if already in wishlist
+    if (existing.some((i) => i.variant_id === variantId)) {
+      const wishlist = await getWishlist()
+      return { success: true, wishlist }
+    }
+
+    const authHeaders = await getAuthHeaders()
+
+    // Find product_id for this variant
+    const { products } = await sdk.client
+      .fetch<{ products: HttpTypes.StoreProduct[] }>("/store/products", {
+        query: {
+          limit: 100,
+          fields: "*variants",
+        },
+        headers: authHeaders,
+        cache: "no-store",
+      })
+      .catch(() => ({ products: [] }))
+
+    const matchedProduct = products.find((p) =>
+      p.variants?.some((v) => v.id === variantId)
+    )
+
+    const newItem: WishlistItemRecord = {
+      id: `wl_item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      variant_id: variantId,
+      product_id: matchedProduct?.id,
+      created_at: new Date().toISOString(),
+    }
+
+    const updated = [newItem, ...existing]
+    await setStoredWishlistItems(updated)
+
     revalidateTag("wishlist")
-    return { success: true, wishlist: res.wishlist }
-  } catch (err: any) {
-    console.error("Error adding item to wishlist:", err)
-    return { success: false, error: err.message || "Failed to add item" }
+    const wishlist = await getWishlist()
+
+    return { success: true, wishlist }
+  } catch (err: unknown) {
+    console.error("Failed to add to wishlist:", err)
+    const message = err instanceof Error ? err.message : "Failed to add to wishlist"
+    return { success: false, error: message }
   }
 }
 
-// 8. Remove item from wishlist
-export async function removeFromWishlist(itemId: string) {
-  const wishlist = await getWishlist()
-  if (!wishlist) {
-    return { success: false, error: "No wishlist found" }
+// Remove item from wishlist
+export async function removeFromWishlist(itemIdOrVariantId: string) {
+  if (!itemIdOrVariantId) {
+    return { success: false, error: "Item ID is required" }
   }
 
-  const authHeaders = await getAuthHeaders()
-
   try {
-    const res = await sdk.client.fetch<any>(`/store/wishlists/${wishlist.id}/items/${itemId}`, {
-      method: "DELETE",
-      headers: authHeaders,
-      cache: "no-store",
-    })
+    const existing = await getStoredWishlistItems()
+    const updated = existing.filter(
+      (item) =>
+        item.id !== itemIdOrVariantId && item.variant_id !== itemIdOrVariantId
+    )
 
+    await setStoredWishlistItems(updated)
     revalidateTag("wishlist")
-    return { success: true, wishlist: res.wishlist }
-  } catch (err: any) {
-    console.error("Error removing item from wishlist:", err)
-    return { success: false, error: err.message || "Failed to remove item" }
+
+    const wishlist = await getWishlist()
+    return { success: true, wishlist }
+  } catch (err: unknown) {
+    console.error("Failed to remove from wishlist:", err)
+    const message = err instanceof Error ? err.message : "Failed to remove from wishlist"
+    return {
+      success: false,
+      error: message,
+    }
   }
 }
