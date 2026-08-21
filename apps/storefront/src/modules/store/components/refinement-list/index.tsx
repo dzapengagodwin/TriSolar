@@ -6,6 +6,7 @@ import { useCallback, useMemo } from "react"
 import {
   OPTION_VALUE_QUERY_KEY,
   parseOptionValueIds,
+  ScopedProductOption,
 } from "@lib/util/product-option-filters"
 import OptionsPicker from "./options-picker"
 import SortProducts, { SortOptions } from "./sort-products"
@@ -14,12 +15,14 @@ type RefinementListProps = {
   sortBy: SortOptions
   search?: boolean
   hideOptionsPicker?: boolean
+  options?: ScopedProductOption[]
   "data-testid"?: string
 }
 
 const RefinementList = ({
   sortBy,
   hideOptionsPicker = false,
+  options = [],
   "data-testid": dataTestId,
 }: RefinementListProps) => {
   const router = useRouter()
@@ -72,6 +75,7 @@ const RefinementList = ({
       />
       {!hideOptionsPicker && (
         <OptionsPicker
+          options={options}
           selectedValueIds={selectedOptionValueIds}
           setOptionValueIds={setOptionValueIds}
         />

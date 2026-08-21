@@ -70,7 +70,7 @@ export const listProducts = async ({
           offset,
           region_id: region?.id,
           fields:
-            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,*variants.options,+metadata,+tags,*categories,",
+            "*variants.calculated_price,+variants.inventory_quantity,*variants.images,*variants.options,+metadata,+tags,*categories,*options,*options.values,",
           ...queryParams,
         },
         headers,
@@ -93,8 +93,8 @@ export const listProducts = async ({
 }
 
 /**
- * This will fetch 100 products to the Next.js cache and sort them based on the sortBy parameter.
- * It will then return the paginated products based on the page and limit parameters.
+ * This will fetch products for the given category/collection/query and sort and filter them based on
+ * dynamic scoped product options.
  */
 export const listProductsWithSort = async ({
   page = 0,
@@ -118,23 +118,38 @@ export const listProductsWithSort = async ({
     new Set((optionValueIds || []).filter(Boolean))
   )
 
+  // Fetch candidate products without passing option_value_id directly to backend,
+  // so we have the full product set for accurate multi-facet filtering and scoped options extraction.
   const {
-    response: { products },
+    response: { products: allProducts },
   } = await listProducts({
     pageParam: 0,
     queryParams: {
       ...queryParams,
-      ...(optionFilters.length ? { option_value_id: optionFilters } : {}),
       limit: 100,
     },
     countryCode,
   })
 
-  const sortedProducts = sortProducts(products, sortBy)
+  // Apply scoped faceted filtering if option filters are active
+  let filteredProducts = allProducts
+  if (optionFilters.length > 0) {
+    const { extractScopedProductOptions, filterProductsByOptionValues } = await import(
+      "@lib/util/product-option-filters"
+    )
+    const scopedOptions = extractScopedProductOptions(allProducts)
+    filteredProducts = filterProductsByOptionValues(
+      allProducts,
+      optionFilters,
+      scopedOptions
+    )
+  }
+
+  const sortedProducts = sortProducts(filteredProducts, sortBy)
 
   const pageParam = (page - 1) * limit
 
-  const filteredCount = products.length
+  const filteredCount = filteredProducts.length
 
   const nextPage = filteredCount > pageParam + limit ? pageParam + limit : null
 

@@ -8,9 +8,13 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
-import { OptionValueIds } from "@lib/util/product-option-filters"
+import {
+  OptionValueIds,
+  extractScopedProductOptions,
+} from "@lib/util/product-option-filters"
+import { listProducts } from "@lib/data/products"
 
-export default function CategoryTemplate({
+export default async function CategoryTemplate({
   category,
   sortBy,
   page,
@@ -27,6 +31,19 @@ export default function CategoryTemplate({
   const sort = sortBy || "created_at"
 
   if (!category || !countryCode) notFound()
+
+  // Fetch candidate products in this specific category to dynamically extract only its native options
+  const {
+    response: { products: scopedProducts },
+  } = await listProducts({
+    queryParams: {
+      category_id: [category.id],
+      limit: 100,
+    },
+    countryCode,
+  }).catch(() => ({ response: { products: [], count: 0 } }))
+
+  const scopedOptions = extractScopedProductOptions(scopedProducts)
 
   const parents = [] as HttpTypes.StoreProductCategory[]
 
@@ -48,7 +65,7 @@ export default function CategoryTemplate({
         <RefinementList
           sortBy={sort}
           data-testid="sort-by-container"
-          hideOptionsPicker
+          options={scopedOptions}
         />
       </Suspense>
       <div className="w-full">
