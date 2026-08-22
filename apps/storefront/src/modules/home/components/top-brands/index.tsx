@@ -5,22 +5,80 @@ import Image from "next/image"
 import { useRef } from "react"
 import { StoreBrand } from "@lib/data/brands"
 
-export default function TopBrands({ brands }: { brands?: StoreBrand[] }) {
+type FixedBrand = {
+  id: string
+  name: string
+  href: string
+  logo?: string
+}
+
+const FIXED_TOP_BRANDS: FixedBrand[] = [
+  {
+    id: "apple",
+    name: "Apple",
+    href: "/store?q=apple",
+    logo: "/top-brands/apple.png",
+  },
+  {
+    id: "asus",
+    name: "ASUS",
+    href: "/store?q=asus",
+    logo: "/top-brands/asus.png",
+  },
+  {
+    id: "hp",
+    name: "HP",
+    href: "/store?q=hp",
+  },
+  {
+    id: "lenovo",
+    name: "Lenovo",
+    href: "/store?q=lenovo",
+  },
+  {
+    id: "amd",
+    name: "AMD",
+    href: "/store?q=amd",
+    logo: "/top-brands/amd.png",
+  },
+  {
+    id: "logitech",
+    name: "Logitech",
+    href: "/store?q=logitech",
+    logo: "/top-brands/logitech.png",
+  },
+  {
+    id: "razer",
+    name: "Razer",
+    href: "/store?q=razer",
+    logo: "/top-brands/razer.png",
+  },
+  {
+    id: "ubiquiti",
+    name: "Ubiquiti",
+    href: "/store?q=ubiquiti",
+    logo: "/top-brands/ubiquiti.png",
+  },
+  {
+    id: "lg",
+    name: "LG",
+    href: "/store?q=lg",
+    logo: "/top-brands/lg.png",
+  },
+]
+
+export default function TopBrands({}: { brands?: StoreBrand[] }) {
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = direction === "left" ? -240 : 240
+      const scrollAmount = direction === "left" ? -300 : 300
       scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" })
     }
   }
 
-  if (!brands || brands.length === 0) {
-    return null
-  }
-
   return (
-    <section className="py-6 sm:py-8" aria-label="Top Brands">
+    <section className="py-6 sm:py-8 bg-white" aria-label="Top Brands">
       <div className="content-container">
         {/* Section Header with Left/Right Slider Controls */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -32,7 +90,7 @@ export default function TopBrands({ brands }: { brands?: StoreBrand[] }) {
             <button
               onClick={() => scroll("left")}
               aria-label="Previous brands"
-              className="w-8 h-8 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 hover:text-black transition-colors shadow-2xs cursor-pointer"
+              className="w-8 h-8 border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 hover:text-black transition-colors shadow-2xs cursor-pointer"
             >
               <svg
                 className="w-4 h-4"
@@ -51,7 +109,7 @@ export default function TopBrands({ brands }: { brands?: StoreBrand[] }) {
             <button
               onClick={() => scroll("right")}
               aria-label="Next brands"
-              className="w-8 h-8 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 hover:text-black transition-colors shadow-2xs cursor-pointer"
+              className="w-8 h-8 border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-600 hover:text-black transition-colors shadow-2xs cursor-pointer"
             >
               <svg
                 className="w-4 h-4"
@@ -70,44 +128,34 @@ export default function TopBrands({ brands }: { brands?: StoreBrand[] }) {
           </div>
         </div>
 
-        {/* Brand Logos Row */}
+        {/* 9 Fixed Brands Carousel Track */}
         <div
           ref={scrollRef}
-          className="grid grid-flow-col auto-cols-[calc(50%-6px)] sm:auto-cols-[calc(33.333%-10px)] md:auto-cols-[calc(25%-12px)] lg:grid-cols-7 lg:auto-cols-auto gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-1"
+          className="grid grid-flow-col auto-cols-[calc(50%-6px)] sm:auto-cols-[calc(33.333%-10px)] md:auto-cols-[calc(20%-12px)] lg:auto-cols-[calc(11.111%-12px)] gap-3 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth pb-1"
         >
-          {brands.map((brand) => {
-            const logo =
-              brand.logo ||
-              brand.image ||
-              (brand.metadata?.image as string) ||
-              (brand.metadata?.logo as string) ||
-              (brand.metadata?.thumbnail as string) ||
-              null
-
-            return (
-              <LocalizedClientLink
-                key={brand.id}
-                href={`/store?q=${encodeURIComponent(brand.name)}`}
-                className="group bg-white hover:bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 flex items-center justify-center border border-gray-200/80 hover:border-gray-300 shadow-2xs hover:shadow-md transition-all duration-300 h-20 sm:h-24"
-              >
-                {logo ? (
-                  <div className="relative w-full h-10 sm:h-12 flex items-center justify-center">
-                    <Image
-                      src={logo}
-                      alt={`${brand.name} logo`}
-                      fill
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 150px"
-                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                ) : (
-                  <span className="font-extrabold text-sm sm:text-base text-gray-800 tracking-wider group-hover:text-primary transition-colors text-center line-clamp-1">
-                    {brand.name}
-                  </span>
-                )}
-              </LocalizedClientLink>
-            )
-          })}
+          {FIXED_TOP_BRANDS.map((brand) => (
+            <LocalizedClientLink
+              key={brand.id}
+              href={brand.href}
+              className="group bg-white hover:bg-gray-50 p-4 sm:p-5 flex items-center justify-center border border-gray-200 hover:border-gray-400 shadow-2xs hover:shadow-md transition-all duration-300 h-20 sm:h-24"
+            >
+              {brand.logo ? (
+                <div className="relative w-full h-10 sm:h-12 flex items-center justify-center">
+                  <Image
+                    src={brand.logo}
+                    alt={`${brand.name} logo`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 20vw, 140px"
+                    className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              ) : (
+                <span className="font-black text-sm sm:text-base text-gray-900 tracking-wider group-hover:text-primary transition-colors text-center line-clamp-1 uppercase">
+                  {brand.name}
+                </span>
+              )}
+            </LocalizedClientLink>
+          ))}
         </div>
       </div>
     </section>

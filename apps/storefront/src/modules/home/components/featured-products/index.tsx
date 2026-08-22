@@ -18,13 +18,13 @@ export const FEATURED_SECTIONS: FeaturedSectionConfig[] = [
   },
   {
     title: "POPULAR GAMING PCS",
-    keywords: ["gaming-pcs", "gaming pc", "gaming desktop", "desktop", "gaming", "pc"],
+    keywords: ["gaming-pcs", "gaming pc", "gaming desktop", "gaming"],
     searchQuery: "gaming pc",
     viewAllHref: "/store?q=gaming+pc",
   },
   {
     title: "TOP MONITORS",
-    keywords: ["monitor", "monitors", "display", "screen", "displays"],
+    keywords: ["monitor", "monitors", "display", "screen" ],
     searchQuery: "monitor",
     viewAllHref: "/store?q=monitors",
   },

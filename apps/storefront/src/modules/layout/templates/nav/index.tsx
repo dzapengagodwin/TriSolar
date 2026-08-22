@@ -39,21 +39,21 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
   return (
     <div className="relative w-full" suppressHydrationWarning>
       {/* Row 1: Top Announcement Bar (Scrolls away on scroll) */}
-      <div className="bg-white text-gray-700 text-[11px] py-1.5 border-b border-gray-200" suppressHydrationWarning>
-        <div className="content-container flex flex-col sm:flex-row justify-between items-center gap-2 font-normal text-[#333333]" suppressHydrationWarning>
+      <div className="bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
+        <div className="content-container flex flex-wrap sm:flex-row justify-center sm:justify-between items-center gap-x-4 gap-y-0.5 font-normal text-[#333333] text-center" suppressHydrationWarning>
           {/* Left: Call Us */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-500">Call us :</span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="text-gray-500">Call us:</span>
             <a href="tel:+2638612600600" className="text-[#0066cc] hover:underline font-medium">
               +263 8612 600 600
             </a>
           </div>
 
-          {/* Center: Free Nationwide Delivery */}
-          <div className="flex items-center gap-1.5 text-center font-medium">
+          {/* Center: Free Nationwide Delivery (Tablet & Desktop) */}
+          <div className="hidden md:flex items-center gap-1.5 text-center font-medium shrink-0">
             <span>Free Nationwide Delivery</span>
             <svg
-              className="w-4 h-4 text-primary inline-block shrink-0"
+              className="w-3.5 h-3.5 text-primary inline-block shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.8}
@@ -69,8 +69,8 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
           </div>
 
           {/* Right: Chat on WhatsApp */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-gray-500">Chat on WhatsApp</span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span className="text-gray-500">WhatsApp:</span>
             <a
               href="https://wa.me/263772953946"
               target="_blank"
@@ -86,32 +86,34 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
       {/* Sticky Navigation Container (Row 2 & Row 3 remain sticky on scroll) */}
       <div className="sticky top-0 inset-x-0 z-50 bg-white" suppressHydrationWarning>
         {/* Row 2: Main White Search Header */}
-        <header className="bg-white py-3.5 border-b border-gray-100 shadow-sm">
-          <div className="content-container flex items-center justify-between gap-x-6">
+        <header className="bg-white py-2.5 sm:py-3.5 border-b border-gray-100 shadow-sm">
+          <div className="content-container flex items-center justify-between gap-x-2 sm:gap-x-6">
             
-            {/* Brand Logo */}
-            <div className="flex items-center gap-x-3">
-              <div className="small:hidden">
+            {/* Left: Brand Logo & Mobile Menu */}
+            <div className="flex items-center gap-x-1 sm:gap-x-3 shrink-0">
+              <div className="small:hidden flex items-center">
                 <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
               </div>
 
-              <Logo size="md" />
+              <div className="max-w-[105px] sm:max-w-none">
+                <Logo size="md" />
+              </div>
             </div>
 
-            {/* Search Box with Interactive Autocomplete & Filter */}
+            {/* Search Box with Interactive Autocomplete & Filter (Desktop / Tablet) */}
             <div className="flex-1 max-w-2xl mx-4 hidden small:flex items-center">
               <Suspense fallback={<div className="w-full h-10 bg-gray-50 rounded-full animate-pulse" />}>
                 <SearchBar categories={categories} />
               </Suspense>
             </div>
 
-            {/* Right Action Icons: Wishlist, Compare, Cart Dropdown */}
-            <div className="flex items-center gap-x-5 text-xs text-gray-700 font-semibold">
+            {/* Right Action Icons: Wishlist, Account, Cart Dropdown */}
+            <div className="flex items-center gap-x-2.5 sm:gap-x-4 text-xs text-gray-700 font-semibold shrink-0">
               
               {/* Wishlist Icon */}
-              <LocalizedClientLink href="/wishlist" className="flex items-center gap-1.5 hover:text-black transition-colors relative" aria-label="Wishlist">
+              <LocalizedClientLink href="/wishlist" className="p-1 hover:text-black transition-colors relative" aria-label="Wishlist">
                 <div className="relative">
-                  <Heart className="w-6 h-6 text-gray-800" />
+                  <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-gray-800" />
                   <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                     {wishlistCount}
                   </span>
@@ -119,21 +121,20 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
               </LocalizedClientLink>
 
               {/* User Account Link */}
-              <LocalizedClientLink href="/account" className="flex items-center gap-1.5 hover:text-black transition-colors" aria-label="User Account">
-                <User size="24" className="text-gray-800" />
+              <LocalizedClientLink href="/account" className="p-1 hover:text-black transition-colors" aria-label="User Account">
+                <User size="22" className="text-gray-800" />
               </LocalizedClientLink>
 
-              {/* Compare Icon */}
-              <LocalizedClientLink href="/store" className="flex items-center gap-1.5 hover:text-black transition-colors hidden sm:flex" aria-label="Compare products">
-                <ArrowsPointingOut className="w-6 h-6 text-gray-800" />
+              {/* Compare Icon (Desktop only) */}
+              <LocalizedClientLink href="/store" className="p-1 hover:text-black transition-colors hidden md:flex" aria-label="Compare products">
+                <ArrowsPointingOut className="w-5 h-5 sm:w-6 sm:h-6 text-gray-800" />
               </LocalizedClientLink>
 
               {/* Cart Dropdown */}
               <div className="flex items-center">
                 <Suspense
                   fallback={
-                    <LocalizedClientLink href="/cart" className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full font-bold text-xs transition-colors">
-                      <span>{convertToLocale({ amount: 0, currency_code: "usd" })}</span>
+                    <LocalizedClientLink href="/cart" className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-2.5 sm:px-4 py-2 rounded-full font-bold text-xs transition-colors">
                       <ShoppingBag className="w-4 h-4 text-white" />
                     </LocalizedClientLink>
                   }
@@ -144,6 +145,13 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
 
             </div>
 
+          </div>
+
+          {/* Mobile Search Bar Row */}
+          <div className="content-container mt-2.5 small:hidden">
+            <Suspense fallback={<div className="w-full h-9 bg-gray-50 rounded-full animate-pulse" />}>
+              <SearchBar categories={categories} />
+            </Suspense>
           </div>
         </header>
 

@@ -6,22 +6,22 @@ type LogoProps = {
   size?: "sm" | "md" | "lg"
 }
 
-export default function Logo({ size = "md" }: LogoProps) {
-  const height = size === "sm" ? 32 : size === "lg" ? 48 : 40
+export default function Logo({ size = "md", className }: LogoProps) {
+  const height = size === "sm" ? 28 : size === "lg" ? 48 : 36
 
   return (
     <LocalizedClientLink
       href="/"
-      className="flex items-center gap-x-2.5 group shrink-0"
+      className={`flex items-center gap-x-2 group shrink-0 ${className || ""}`}
       data-testid="store-logo-link"
     >
       <div className="relative flex items-center justify-center">
         <Image
           src="/logo.png"
           alt="Laptop Zone Logo"
-          width={height * 3}
+          width={height * 3.5}
           height={height}
-          className="object-contain h-auto w-auto max-h-12"
+          className="object-contain h-auto w-auto max-h-7 sm:max-h-9 md:max-h-11"
           priority
         />
       </div>

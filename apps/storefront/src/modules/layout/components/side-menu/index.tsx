@@ -2,7 +2,7 @@
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
 import useToggleState from "@lib/hooks/use-toggle-state"
-import { ArrowRightMini, XMark } from "@medusajs/icons"
+import { ArrowRightMini, XMark, BarsThree } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Text, clx } from "@modules/common/components/ui"
@@ -35,12 +35,13 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
         <Popover className="h-full flex">
           {({ open, close }) => (
             <>
-              <div className="relative flex h-full">
+              <div className="relative flex h-full items-center">
                 <Popover.Button
                   data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
+                  className="relative flex items-center p-1.5 text-gray-800 hover:text-black focus:outline-none transition-colors"
+                  aria-label="Open Navigation Menu"
                 >
-                  Menu
+                  <BarsThree className="w-6 h-6 text-gray-900" />
                 </Popover.Button>
               </div>
 

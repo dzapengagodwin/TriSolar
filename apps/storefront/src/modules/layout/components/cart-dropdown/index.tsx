@@ -92,11 +92,11 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
       {/* Trigger Button in Nav */}
       <button
         onClick={open}
-        className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm"
+        className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-2.5 sm:px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm shrink-0"
         data-testid="nav-cart-link"
         aria-label="Open Shopping Cart"
       >
-        <span>
+        <span className="hidden sm:inline">
           {convertToLocale({
             amount: subtotal,
             currency_code: cartState?.currency_code || "usd",
