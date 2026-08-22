@@ -10,6 +10,7 @@ import {
   extractScopedProductOptions,
 } from "@lib/util/product-option-filters"
 import { listProducts } from "@lib/data/products"
+import { listCategories } from "@lib/data/categories"
 
 export default async function CollectionTemplate({
   sortBy,
@@ -17,38 +18,50 @@ export default async function CollectionTemplate({
   page,
   countryCode,
   optionValueIds,
+  minPrice,
+  maxPrice,
+  viewMode = "grid",
 }: {
   sortBy?: SortOptions
   collection: HttpTypes.StoreCollection
   page?: string
   countryCode: string
   optionValueIds?: OptionValueIds
+  minPrice?: number
+  maxPrice?: number
+  viewMode?: "grid" | "list"
 }) {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
 
-  // Fetch candidate products in this collection to dynamically extract only its native options
-  const {
-    response: { products: scopedProducts },
-  } = await listProducts({
-    queryParams: {
-      collection_id: [collection.id],
-      limit: 100,
-    },
-    countryCode,
-  }).catch(() => ({ response: { products: [], count: 0 } }))
+  // Fetch candidate products in this collection and categories in parallel
+  const [{ response: { products: scopedProducts } }, categories] = await Promise.all([
+    listProducts({
+      queryParams: {
+        collection_id: [collection.id],
+        limit: 100,
+      },
+      countryCode,
+    }).catch(() => ({ response: { products: [], count: 0 } })),
+    listCategories({ limit: 50 }).catch(() => []),
+  ])
 
   const scopedOptions = extractScopedProductOptions(scopedProducts)
 
+  const breadcrumbs = [{ name: collection.title }]
+
   return (
-    <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
-      <Suspense fallback={<div className="w-full small:w-1/4 h-32 bg-gray-50 animate-pulse rounded-2xl" />}>
-        <RefinementList sortBy={sort} options={scopedOptions} />
+    <div className="flex flex-col small:flex-row small:items-start py-6 content-container gap-x-6">
+      <Suspense fallback={<div className="w-full small:w-[240px] h-64 bg-gray-50 animate-pulse rounded-2xl" />}>
+        <RefinementList
+          sortBy={sort}
+          options={scopedOptions}
+          categories={categories}
+          scopedProducts={scopedProducts}
+        />
       </Suspense>
-      <div className="w-full">
-        <div className="mb-8 text-2xl-semi">
-          <h1>{collection.title}</h1>
-        </div>
+
+      <div className="w-full flex-1 min-w-0">
         <Suspense
           fallback={
             <SkeletonProductGrid
@@ -62,6 +75,11 @@ export default async function CollectionTemplate({
             collectionId={collection.id}
             countryCode={countryCode}
             optionValueIds={optionValueIds}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            viewMode={viewMode}
+            title={collection.title}
+            breadcrumbs={breadcrumbs}
           />
         </Suspense>
       </div>

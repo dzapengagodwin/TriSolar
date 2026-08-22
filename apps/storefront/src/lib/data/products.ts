@@ -102,12 +102,16 @@ export const listProductsWithSort = async ({
   sortBy = "created_at",
   countryCode,
   optionValueIds,
+  minPrice,
+  maxPrice,
 }: {
   page?: number
   queryParams?: ProductListQueryParams
   sortBy?: SortOptions
   countryCode: string
   optionValueIds?: OptionValueIds
+  minPrice?: number
+  maxPrice?: number
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
@@ -143,6 +147,22 @@ export const listProductsWithSort = async ({
       optionFilters,
       scopedOptions
     )
+  }
+
+  // Apply price range filtering
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    const { getPricesForVariant } = await import("@lib/util/get-product-price")
+    filteredProducts = filteredProducts.filter((product) => {
+      if (!product.variants || product.variants.length === 0) return true
+      return product.variants.some((v) => {
+        const price = getPricesForVariant(v)
+        if (!price) return false
+        const amount = price.calculated_price_number
+        if (minPrice !== undefined && amount < minPrice) return false
+        if (maxPrice !== undefined && amount > maxPrice) return false
+        return true
+      })
+    })
   }
 
   const sortedProducts = sortProducts(filteredProducts, sortBy)

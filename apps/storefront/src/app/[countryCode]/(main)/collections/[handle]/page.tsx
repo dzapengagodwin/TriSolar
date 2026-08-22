@@ -15,6 +15,9 @@ type Props = {
       page?: string
       sortBy?: SortOptions
       optionValueIds?: string | string[]
+      minPrice?: string
+      maxPrice?: string
+      view?: "grid" | "list"
     }
   >
 }
@@ -65,7 +68,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   }
 
   const metadata = {
-    title: `${collection.title} | Medusa Store`,
+    title: `${collection.title} | Laptop Zone`,
     description: `${collection.title} collection`,
   } as Metadata
 
@@ -75,11 +78,11 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function CollectionPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  const { sortBy, page, minPrice, maxPrice, view } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
   const collection = await getCollectionByHandle(params.handle).then(
-    (collection) => collection
+    (col) => col
   )
 
   if (!collection) {
@@ -93,6 +96,9 @@ export default async function CollectionPage(props: Props) {
       sortBy={sortBy}
       countryCode={params.countryCode}
       optionValueIds={optionValueIds}
+      minPrice={minPrice ? Number(minPrice) : undefined}
+      maxPrice={maxPrice ? Number(maxPrice) : undefined}
+      viewMode={view === "list" ? "list" : "grid"}
     />
   )
 }

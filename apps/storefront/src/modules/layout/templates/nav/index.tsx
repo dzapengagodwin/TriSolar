@@ -5,7 +5,6 @@ import { listRegions } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
 import { getWishlist } from "@lib/data/wishlist"
 import { StoreRegion, HttpTypes } from "@medusajs/types"
-import { convertToLocale } from "@lib/util/money"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
@@ -14,10 +13,8 @@ import CategoryDropdown from "@modules/layout/components/category-dropdown"
 import Logo from "@modules/common/components/logo"
 import User from "@modules/common/icons/user"
 import {
-  Sparkles,
   Heart,
   ShoppingBag,
-  ArrowRight,
   ArrowsPointingOut,
 } from "@medusajs/icons"
 

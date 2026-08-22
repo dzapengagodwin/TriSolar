@@ -15,6 +15,9 @@ type Props = {
       sortBy?: SortOptions
       page?: string
       optionValueIds?: string | string[]
+      minPrice?: string
+      maxPrice?: string
+      view?: "grid" | "list"
     }
   >
 }
@@ -53,12 +56,12 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   try {
     const productCategory = await getCategoryByHandle(params.category)
 
-    const title = productCategory.name + " | Medusa Store"
+    const title = productCategory.name + " | Laptop Zone"
 
     const description = productCategory.description ?? `${title} category.`
 
     return {
-      title: `${title} | Medusa Store`,
+      title: `${title} | Laptop Zone`,
       description,
       alternates: {
         canonical: `${params.category.join("/")}`,
@@ -72,7 +75,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 export default async function CategoryPage(props: Props) {
   const searchParams = await props.searchParams
   const params = await props.params
-  const { sortBy, page } = searchParams
+  const { sortBy, page, minPrice, maxPrice, view } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
   const productCategory = await getCategoryByHandle(params.category)
@@ -88,6 +91,9 @@ export default async function CategoryPage(props: Props) {
       page={page}
       countryCode={params.countryCode}
       optionValueIds={optionValueIds}
+      minPrice={minPrice ? Number(minPrice) : undefined}
+      maxPrice={maxPrice ? Number(maxPrice) : undefined}
+      viewMode={view === "list" ? "list" : "grid"}
     />
   )
 }

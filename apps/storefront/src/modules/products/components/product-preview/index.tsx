@@ -7,10 +7,12 @@ import PreviewPrice from "./price"
 export default function ProductPreview({
   product,
   isFeatured,
+  viewMode = "grid",
   region: _region,
 }: {
   product: HttpTypes.StoreProduct
   isFeatured?: boolean
+  viewMode?: "grid" | "list"
   region: HttpTypes.StoreRegion
 }) {
   const { cheapestPrice } = getProductPrice({
@@ -40,6 +42,86 @@ export default function ProductPreview({
       ? `-${priceInfo.percentage_diff}%`
       : "Sale!"
 
+  // Horizontal List View Mode
+  if (viewMode === "list") {
+    return (
+      <div
+        data-testid="product-wrapper"
+        className="group bg-white p-4 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative hover:border-black transition-all shadow-xs w-full"
+      >
+        {/* Left: Thumbnail & Badges */}
+        <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
+          {isSale && (
+            <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
+              {discountText}
+            </span>
+          )}
+          <LocalizedClientLink href={`/products/${product.handle}`} className="block w-full">
+            <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
+              <Thumbnail
+                thumbnail={product.thumbnail}
+                images={product.images}
+                size="full"
+                isFeatured={isFeatured}
+                className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+                objectFit="contain"
+              />
+            </div>
+          </LocalizedClientLink>
+        </div>
+
+        {/* Center: Info, Category, Title, Short Description */}
+        <div className="flex-1 space-y-2 min-w-0">
+          <div className="text-[10px] font-semibold text-gray-400">
+            {categoriesString}
+          </div>
+
+          <LocalizedClientLink href={`/products/${product.handle}`}>
+            <h3
+              className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              data-testid="product-title"
+            >
+              {product.title}
+            </h3>
+          </LocalizedClientLink>
+
+          {product.description && (
+            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-normal">
+              {product.description}
+            </p>
+          )}
+
+          {/* Options tags preview if available */}
+          {product.options && product.options.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {product.options.slice(0, 3).map((opt) => (
+                <span
+                  key={opt.id}
+                  className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
+                >
+                  {opt.title}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right: Price & Add to Cart */}
+        <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
+          {priceInfo && <PreviewPrice price={priceInfo} />}
+
+          <LocalizedClientLink
+            href={`/products/${product.handle}`}
+            className="w-full bg-black hover:bg-gray-800 text-white text-xs font-bold py-2.5 px-4 transition-colors uppercase tracking-wider text-center shadow-xs inline-block"
+          >
+            Add to Cart
+          </LocalizedClientLink>
+        </div>
+      </div>
+    )
+  }
+
+  // Standard Multi-column Grid View Mode
   return (
     <div
       data-testid="product-wrapper"

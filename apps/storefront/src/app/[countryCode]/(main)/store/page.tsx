@@ -5,7 +5,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import StoreTemplate from "@modules/store/templates"
 
 export const metadata: Metadata = {
-  title: "Store | NexCart",
+  title: "Store | Laptop Zone",
   description: "Explore all of our products.",
 }
 
@@ -14,6 +14,9 @@ type StorePageSearchParams = Record<string, string | string[] | undefined> & {
   page?: string
   q?: string
   optionValueIds?: string | string[]
+  minPrice?: string
+  maxPrice?: string
+  view?: "grid" | "list"
 }
 
 type Params = {
@@ -26,7 +29,7 @@ type Params = {
 export default async function StorePage(props: Params) {
   const params = await props.params
   const searchParams = await props.searchParams
-  const { sortBy, page, q } = searchParams
+  const { sortBy, page, q, minPrice, maxPrice, view } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
   return (
@@ -36,6 +39,9 @@ export default async function StorePage(props: Params) {
       q={typeof q === "string" ? q : undefined}
       countryCode={params.countryCode}
       optionValueIds={optionValueIds}
+      minPrice={minPrice ? Number(minPrice) : undefined}
+      maxPrice={maxPrice ? Number(maxPrice) : undefined}
+      viewMode={view === "list" ? "list" : "grid"}
     />
   )
 }

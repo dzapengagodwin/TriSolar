@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useMemo } from "react"
+import { HttpTypes } from "@medusajs/types"
 
 import {
   OPTION_VALUE_QUERY_KEY,
@@ -9,21 +10,31 @@ import {
   ScopedProductOption,
 } from "@lib/util/product-option-filters"
 import OptionsPicker from "./options-picker"
-import SortProducts, { SortOptions } from "./sort-products"
+import PriceFilterSlider from "./price-filter-slider"
+import CategoryTreeNav from "./category-tree-nav"
+import { SortOptions } from "./sort-products"
 
 type RefinementListProps = {
-  sortBy: SortOptions
+  sortBy?: SortOptions
   search?: boolean
   hideOptionsPicker?: boolean
+  hidePriceFilter?: boolean
+  hideCategoryTree?: boolean
   options?: ScopedProductOption[]
+  categories?: HttpTypes.StoreProductCategory[]
+  activeCategoryHandle?: string
+  scopedProducts?: HttpTypes.StoreProduct[]
   "data-testid"?: string
 }
 
 const RefinementList = ({
-  sortBy,
   hideOptionsPicker = false,
+  hidePriceFilter = false,
+  hideCategoryTree = false,
   options = [],
-  "data-testid": dataTestId,
+  categories = [],
+  activeCategoryHandle,
+  scopedProducts,
 }: RefinementListProps) => {
   const router = useRouter()
   const pathname = usePathname()
@@ -50,9 +61,6 @@ const RefinementList = ({
     [pathname, router, searchParams]
   )
 
-  const setQueryParams = (name: string, value: string) =>
-    updateQueryParams((params) => params.set(name, value))
-
   const selectedOptionValueIds = useMemo(
     () => parseOptionValueIds(searchParams),
     [searchParams]
@@ -67,20 +75,36 @@ const RefinementList = ({
     })
 
   return (
-    <div className="flex flex-col gap-12 py-4 mb-8 small:px-0 pl-6 small:min-w-[250px] small:ml-[1.675rem]">
-      <SortProducts
-        sortBy={sortBy}
-        setQueryParams={setQueryParams}
-        data-testid={dataTestId}
-      />
-      {!hideOptionsPicker && (
-        <OptionsPicker
-          options={options}
-          selectedValueIds={selectedOptionValueIds}
-          setOptionValueIds={setOptionValueIds}
-        />
+    <aside className="flex flex-col gap-y-6 py-2 mb-8 w-full small:w-[240px] medium:w-[260px] shrink-0 small:pr-6">
+      {/* Category Tree Navigation with counts */}
+      {!hideCategoryTree && categories.length > 0 && (
+        <div className="border-b border-gray-100 pb-5">
+          <CategoryTreeNav
+            categories={categories}
+            activeCategoryHandle={activeCategoryHandle}
+            scopedProducts={scopedProducts}
+          />
+        </div>
       )}
-    </div>
+
+      {/* Interactive Price Filter Slider */}
+      {!hidePriceFilter && (
+        <div className="border-b border-gray-100 pb-5">
+          <PriceFilterSlider />
+        </div>
+      )}
+
+      {/* Dynamic Scoped Product Options (RAM, Storage, Size, etc.) */}
+      {!hideOptionsPicker && options.length > 0 && (
+        <div>
+          <OptionsPicker
+            options={options}
+            selectedValueIds={selectedOptionValueIds}
+            setOptionValueIds={setOptionValueIds}
+          />
+        </div>
+      )}
+    </aside>
   )
 }
 

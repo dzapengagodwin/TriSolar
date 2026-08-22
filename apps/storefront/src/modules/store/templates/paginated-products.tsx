@@ -4,6 +4,8 @@ import { OptionValueIds } from "@lib/util/product-option-filters"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import CatalogToolbar from "@modules/store/components/catalog-toolbar"
+import clsx from "clsx"
 
 const PRODUCT_LIMIT = 12
 
@@ -25,6 +27,11 @@ export default async function PaginatedProducts({
   productsIds,
   countryCode,
   optionValueIds,
+  minPrice,
+  maxPrice,
+  viewMode = "grid",
+  title,
+  breadcrumbs,
 }: {
   sortBy?: SortOptions
   page: number
@@ -34,6 +41,11 @@ export default async function PaginatedProducts({
   productsIds?: string[]
   countryCode: string
   optionValueIds?: OptionValueIds
+  minPrice?: number
+  maxPrice?: number
+  viewMode?: "grid" | "list"
+  title?: string
+  breadcrumbs?: { name: string; href?: string }[]
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: 12,
@@ -73,44 +85,67 @@ export default async function PaginatedProducts({
     sortBy,
     countryCode,
     optionValueIds,
+    minPrice,
+    maxPrice,
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
-  if (products.length === 0) {
-    return (
-      <div className="py-12 text-center bg-white rounded-2xl border border-gray-100 p-8">
-        <p className="text-base font-bold text-gray-800">
-          No products found {q ? `matching "${q}"` : ""}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          Try adjusting your search terms or browse all categories.
-        </p>
-      </div>
-    )
-  }
-
   return (
-    <>
-      <ul
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
-        data-testid="products-list"
-      >
-        {products.map((p) => {
-          return (
-            <li key={p.id}>
-              <ProductPreview product={p} region={region} />
-            </li>
-          )
-        })}
-      </ul>
-      {totalPages > 1 && (
-        <Pagination
-          data-testid="product-pagination"
-          page={page}
-          totalPages={totalPages}
-        />
+    <div className="w-full">
+      {/* Top Catalog Status & Control Toolbar */}
+      <CatalogToolbar
+        totalCount={count}
+        currentPage={page}
+        pageSize={PRODUCT_LIMIT}
+        sortBy={sortBy}
+        viewMode={viewMode}
+        title={title}
+        breadcrumbs={breadcrumbs}
+      />
+
+      {products.length === 0 ? (
+        <div className="py-12 text-center bg-white border border-gray-200 p-8 my-4">
+          <p className="text-base font-bold text-gray-800">
+            No products found {q ? `matching "${q}"` : ""}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            Try adjusting your search terms, price filters, or options.
+          </p>
+        </div>
+      ) : (
+        <>
+          {/* Products List: Grid or List Layout */}
+          <ul
+            className={clsx("w-full mb-8", {
+              "grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-4 sm:gap-x-6 gap-y-6 sm:gap-y-8":
+                viewMode === "grid",
+              "flex flex-col gap-4": viewMode === "list",
+            })}
+            data-testid="products-list"
+          >
+            {products.map((p) => {
+              return (
+                <li key={p.id} className={viewMode === "list" ? "w-full" : ""}>
+                  <ProductPreview
+                    product={p}
+                    region={region}
+                    viewMode={viewMode}
+                  />
+                </li>
+              )
+            })}
+          </ul>
+
+          {totalPages > 1 && (
+            <Pagination
+              data-testid="product-pagination"
+              page={page}
+              totalPages={totalPages}
+            />
+          )}
+        </>
       )}
-    </>
+    </div>
   )
 }
