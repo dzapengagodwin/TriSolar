@@ -17,12 +17,15 @@ export default function ProductPreview({
     product,
   })
 
-  const priceInfo = cheapestPrice || (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
+  const priceInfo =
+    cheapestPrice ||
+    (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
 
   // Format category breadcrumb / tags string
-  const categoriesString = product.categories && product.categories.length > 0
-    ? product.categories.map((c: HttpTypes.StoreProductCategory) => c.name).join(", ")
-    : "General Category"
+  const categoriesString =
+    product.categories && product.categories.length > 0
+      ? product.categories.map((c: HttpTypes.StoreProductCategory) => c.name).join(", ")
+      : "General Category"
 
   const isSale = Boolean(
     priceInfo &&
@@ -40,41 +43,41 @@ export default function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="group bg-white rounded-2xl p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-black transition-colors shadow-xs"
+      className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-black transition-colors shadow-xs"
     >
       {/* Product Image & Sale Badge */}
-      <div className="relative mb-3">
+      <div className="relative mb-3 flex items-center justify-center">
         {isSale && (
-          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
             {discountText}
           </span>
         )}
 
-        <LocalizedClientLink href={`/products/${product.handle}`} className="block">
-          <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-44 rounded-xl">
+        <LocalizedClientLink href={`/products/${product.handle}`} className="block w-full">
+          <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
             <Thumbnail
               thumbnail={product.thumbnail}
               images={product.images}
               size="full"
               isFeatured={isFeatured}
-              className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto"
-              objectFit="cover"
+              className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+              objectFit="contain"
             />
           </div>
         </LocalizedClientLink>
       </div>
 
-      {/* Category Subtitle */}
-      <div className="space-y-1.5 flex-1 flex flex-col justify-between">
-        <div>
+      {/* Content Body */}
+      <div className="flex-1 flex flex-col justify-between">
+        {/* Category Subtitle & Product Title */}
+        <div className="space-y-1">
           <div className="text-[10px] font-semibold text-gray-400 line-clamp-1">
             {categoriesString}
           </div>
 
-          {/* Product Title */}
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-snug mt-1"
+              className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}
@@ -82,20 +85,19 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        {/* Price & Add to Cart Button */}
-        <div className="pt-2 border-t border-gray-50">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
-            {priceInfo && <PreviewPrice price={priceInfo} />}
+        {/* Bottom Bar: Price & Add to Cart (Only visible on hover) */}
+        <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
+          {priceInfo && <PreviewPrice price={priceInfo} />}
 
+          <div className="opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200">
             <LocalizedClientLink
               href={`/products/${product.handle}`}
-              className="bg-black hover:bg-gray-800 text-white text-[10px] font-bold py-2 px-4 rounded-full transition-colors uppercase tracking-wider text-center w-full sm:w-auto shrink-0"
+              className="w-full block bg-black hover:bg-gray-800 text-white text-[11px] font-bold py-2 px-3 transition-colors uppercase tracking-wider text-center shadow-xs"
             >
               Add to Cart
             </LocalizedClientLink>
           </div>
         </div>
-
       </div>
     </div>
   )

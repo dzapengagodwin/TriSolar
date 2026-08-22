@@ -1,146 +1,256 @@
+"use client"
+
+import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
+type Slide = {
+  id: string
+  badge: string
+  badgeBg: string
+  title: string
+  subtitle: string
+  ctaText: string
+  ctaHref: string
+  imageSrc: string
+  imageAlt: string
+  bgClass: string
+}
+
+const SLIDES: Slide[] = [
+  {
+    id: "gaming-laptops",
+    badge: "GAMING & PERFORMANCE SALE",
+    badgeBg: "bg-primary text-white",
+    title: "Serious Gaming Power. Smart Prices.",
+    subtitle:
+      "Handle massive 3D models, complex engineering simulations, and ultra-high-FPS gaming on one machine.",
+    ctaText: "Shop Gaming Laptops",
+    ctaHref: "/store?q=laptop",
+    imageSrc: "/hero-laptops.png",
+    imageAlt: "Gaming Laptops Showcase - ASUS ROG, HP OMEN, Lenovo Legion",
+    bgClass: "from-black via-zinc-950 to-neutral-900",
+  },
+  {
+    id: "workstations",
+    badge: "SUPER SALE UP TO 30% OFF",
+    badgeBg: "bg-[#fed700] text-black",
+    title: "High Performance Laptops For Work & Play",
+    subtitle:
+      "Equipped with Intel Core & NVIDIA RTX GPUs. 100% authentic devices with manufacturer warranty.",
+    ctaText: "Explore Workstations",
+    ctaHref: "/store?q=workstation",
+    imageSrc: "/omen-laptop.png",
+    imageAlt: "HP OMEN 16 High Performance Laptop",
+    bgClass: "from-[#0f172a] via-[#1e1b4b] to-[#020617]",
+  },
+  {
+    id: "curved-monitors",
+    badge: "DISPLAYS & WORKSPACES",
+    badgeBg: "bg-white/20 text-white backdrop-blur-xs",
+    title: "Ultra-Wide Curved Displays & 4K Monitors",
+    subtitle:
+      "Stunning color accuracy, ultra-fast refresh rates, and immersive workspace ergonomics.",
+    ctaText: "Shop Monitors",
+    ctaHref: "/store?q=monitors",
+    imageSrc: "/hero-monitor.png",
+    imageAlt: "Curved 4K Gaming & Office Monitor",
+    bgClass: "from-zinc-950 via-neutral-900 to-stone-950",
+  },
+  {
+    id: "flagship-smartphones",
+    badge: "NEW FLAGSHIP ARRIVALS",
+    badgeBg: "bg-primary text-white",
+    title: "Brand New Mobile Phones & Tablets",
+    subtitle:
+      "Experience next-gen titanium builds, pro cameras, and all-day battery life.",
+    ctaText: "Shop Mobile Devices",
+    ctaHref: "/store?q=phone",
+    imageSrc: "/hero-phone.png",
+    imageAlt: "Flagship Smartphones and Tablets",
+    bgClass: "from-[#1c1917] via-[#0c0a09] to-black",
+  },
+]
+
 export default function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const touchStartX = useRef<number | null>(null)
+  const touchEndX = useRef<number | null>(null)
+
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % SLIDES.length)
+  }, [])
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev - 1 + SLIDES.length) % SLIDES.length)
+  }, [])
+
+  // Auto advance every 5.5 seconds unless paused
+  useEffect(() => {
+    if (isPaused) return
+    const timer = setInterval(() => {
+      nextSlide()
+    }, 5500)
+    return () => clearInterval(timer)
+  }, [isPaused, nextSlide])
+
+  // Touch swipe support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return
+    const diff = touchStartX.current - touchEndX.current
+    if (diff > 50) nextSlide()
+    if (diff < -50) prevSlide()
+    touchStartX.current = null
+    touchEndX.current = null
+  }
+
   return (
-    <div className="py-8 bg-[#F9FAFB]">
+    <div
+      className="py-6 bg-white"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div className="content-container">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left Column (8 cols): Top Large Card + Bottom 2 Cards */}
-          <div className="lg:col-span-8 flex flex-col gap-6">
-            
-            {/* 1. Top Large Card: Premium Black Card with Gaming Laptops Showcase */}
-            <div className="bg-black rounded-3xl p-8 sm:p-12 relative overflow-hidden flex flex-col justify-between min-h-[320px] sm:min-h-[360px] border border-gray-800 shadow-xl">
-              <div className="max-w-xs sm:max-w-sm space-y-4 z-10">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-black bg-primary px-3 py-1 rounded-full inline-block">
-                  GAMING & PERFORMANCE SALE
-                </span>
+        <div
+          className="relative overflow-hidden bg-black text-white shadow-xl min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Slides Carousel */}
+          {SLIDES.map((slide, index) => {
+            const isActive = index === currentSlide
+            return (
+              <div
+                key={slide.id}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out bg-gradient-to-r ${
+                  slide.bgClass
+                } ${
+                  isActive
+                    ? "opacity-100 z-10 pointer-events-auto"
+                    : "opacity-0 z-0 pointer-events-none"
+                }`}
+              >
+                <div className="content-container h-full flex flex-col justify-center py-10 sm:py-14 relative z-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center h-full">
+                    {/* Left: Text & CTA */}
+                    <div className="lg:col-span-7 space-y-4 max-w-xl pr-0 lg:pr-6">
+                      <span
+                        className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1 inline-block shadow-xs ${slide.badgeBg}`}
+                      >
+                        {slide.badge}
+                      </span>
 
-                <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight font-sans tracking-tight">
-                  Serious Gaming Power. Smart Prices
-                </h1>
+                      <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+                        {slide.title}
+                      </h1>
 
-                <p className="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed">
-                  Handle Massive Models, Complex Simulations, and Ultra-High-FPS Gaming — All on One Laptop.
-                </p>
+                      <p className="text-xs sm:text-sm text-gray-300 font-medium leading-relaxed max-w-lg">
+                        {slide.subtitle}
+                      </p>
 
-                <div className="pt-2">
-                  <LocalizedClientLink
-                    href="/store"
-                    className="inline-block bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md"
-                  >
-                    Shop Laptops
-                  </LocalizedClientLink>
+                      <div className="pt-2 sm:pt-4">
+                        <LocalizedClientLink
+                          href={slide.ctaHref}
+                          className="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white font-bold text-xs sm:text-sm px-6 sm:px-8 py-3 transition-colors uppercase tracking-wider shadow-lg"
+                        >
+                          <span>{slide.ctaText}</span>
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={2.5}
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                            />
+                          </svg>
+                        </LocalizedClientLink>
+                      </div>
+                    </div>
+
+                    {/* Right: High-Res Image Display */}
+                    <div className="lg:col-span-5 relative flex items-center justify-center h-52 sm:h-72 lg:h-96">
+                      <div className="relative w-full h-full max-h-[360px]">
+                        <Image
+                          src={slide.imageSrc}
+                          alt={slide.imageAlt}
+                          fill
+                          className="object-contain drop-shadow-2xl"
+                          sizes="(max-width: 768px) 100vw, 550px"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            )
+          })}
 
-              {/* Right Hero Image Showcase */}
-              <div className="absolute right-0 bottom-0 top-0 w-full sm:w-1/2 flex items-center justify-end p-4 pointer-events-none">
-                <div className="relative w-full h-full max-h-[300px] flex items-center justify-end">
-                  <Image
-                    src="/hero-laptops.png"
-                    alt="Gaming Laptops Showcase - ROG Strix, Victus, OMEN, Intel Core, NVIDIA RTX"
-                    fill
-                    className="object-contain object-right drop-shadow-2xl opacity-95"
-                    sizes="(max-width: 768px) 100vw, 500px"
-                    priority
-                  />
-                </div>
-              </div>
-            </div>
+          {/* Left / Right Arrow Navigation */}
+          <button
+            type="button"
+            onClick={prevSlide}
+            aria-label="Previous Slide"
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/40 hover:bg-black/80 text-white flex items-center justify-center transition-all border border-white/10 backdrop-blur-xs"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
 
-            {/* Bottom Row: 2 Split Cards with High-Res Product Images */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              
-              {/* Card 3: Curved HD Monitors */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 relative overflow-hidden min-h-[200px] flex flex-col justify-between border border-gray-200 shadow-sm">
-                <div className="space-y-2 z-10 max-w-[170px]">
-                  <span className="text-[10px] font-bold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-full inline-block">
-                    HD MONITORS SALE 50%
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900 leading-snug">
-                    Curved Displays & Monitors
-                  </h3>
-                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-primary">
-                    Shop Monitors
-                  </LocalizedClientLink>
-                </div>
-                <div className="absolute right-1 bottom-1 w-32 h-32 sm:w-36 sm:h-36 flex items-center justify-end">
-                  <Image
-                    src="/hero-monitor.png"
-                    alt="Curved HD Monitor Display"
-                    fill
-                    className="object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
-                    sizes="160px"
-                  />
-                </div>
-              </div>
+          <button
+            type="button"
+            onClick={nextSlide}
+            aria-label="Next Slide"
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/40 hover:bg-black/80 text-white flex items-center justify-center transition-all border border-white/10 backdrop-blur-xs"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2.5}
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
 
-              {/* Card 4: Flagship Smartphones */}
-              <div className="bg-[#FCF0EB] rounded-3xl p-6 sm:p-8 relative overflow-hidden min-h-[200px] flex flex-col justify-between border border-orange-100 shadow-sm">
-                <div className="space-y-2 z-10 max-w-[170px]">
-                  <span className="text-[10px] font-bold text-amber-800 bg-white/80 px-2.5 py-0.5 rounded-full inline-block">
-                    SAVE UP TO 30%
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900 leading-snug">
-                    Flagship Smartphones & Devices
-                  </h3>
-                  <LocalizedClientLink href="/store" className="text-xs font-bold text-black underline block pt-1 hover:text-primary">
-                    Shop Phones
-                  </LocalizedClientLink>
-                </div>
-                <div className="absolute right-2 bottom-0 w-28 h-36 sm:w-32 sm:h-40 flex items-center justify-end">
-                  <Image
-                    src="/hero-phone.png"
-                    alt="Desert Titanium Flagship Smartphone"
-                    fill
-                    className="object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
-                    sizes="160px"
-                  />
-                </div>
-              </div>
-
-            </div>
-
+          {/* Pagination Indicators (Dots / Bars) */}
+          <div className="absolute bottom-4 sm:bottom-6 inset-x-0 z-20 flex justify-center items-center gap-2">
+            {SLIDES.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setCurrentSlide(index)}
+                aria-label={`Go to slide ${index + 1}`}
+                className={`transition-all duration-300 ${
+                  index === currentSlide
+                    ? "w-8 h-2 bg-primary"
+                    : "w-2.5 h-2 bg-white/40 hover:bg-white/70"
+                }`}
+              />
+            ))}
           </div>
-
-          {/* Right Column (4 cols): Tall Card with HP OMEN Laptop Image */}
-          <div className="lg:col-span-4">
-            <div className="bg-gray-100 rounded-3xl p-8 sm:p-10 relative overflow-hidden h-full min-h-[420px] flex flex-col justify-between border border-gray-200 shadow-sm">
-              <div className="space-y-3 z-10">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-black bg-white px-3 py-1 rounded-full inline-block shadow-xs">
-                  SUPER SALE 30%
-                </span>
-
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-snug font-sans">
-                  High Performance Laptops For Work & Play
-                </h2>
-
-                <div className="pt-2">
-                  <LocalizedClientLink
-                    href="/store"
-                    className="inline-block bg-black hover:bg-gray-800 text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors uppercase tracking-wider shadow-md"
-                  >
-                    Shop Catalog
-                  </LocalizedClientLink>
-                </div>
-              </div>
-
-              {/* High Resolution HP OMEN 16 Laptop Image */}
-              <div className="relative mt-6 flex justify-center items-center w-full h-56 sm:h-64">
-                <Image
-                  src="/omen-laptop.png"
-                  alt="HP OMEN 16 High Performance Gaming Laptop"
-                  fill
-                  className="object-contain drop-shadow-xl transform hover:scale-105 transition-transform duration-300"
-                  sizes="(max-width: 768px) 100vw, 350px"
-                  priority
-                />
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>

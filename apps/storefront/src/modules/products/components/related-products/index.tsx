@@ -18,8 +18,9 @@ export default async function RelatedProducts({
     return null
   }
 
-  // edit this function to define your related products logic
-  const queryParams: HttpTypes.StoreProductListParams = {}
+  const queryParams: HttpTypes.StoreProductListParams = {
+    limit: 10,
+  }
   if (region?.id) {
     queryParams.region_id = region.id
   }
@@ -42,25 +43,28 @@ export default async function RelatedProducts({
     )
   })
 
-  if (!products.length) {
+  // Limit to single row (max 4 products)
+  const singleRowProducts = products.slice(0, 4)
+
+  if (!singleRowProducts.length) {
     return null
   }
 
   return (
-    <div className="product-page-constraint">
-      <div className="flex flex-col items-center text-center mb-16">
-        <span className="text-base-regular text-gray-600 mb-6">
-          Related products
+    <div className="product-page-constraint py-12">
+      <div className="flex flex-col items-center text-center mb-8">
+        <span className="text-xs font-bold uppercase tracking-wider text-primary mb-2">
+          Related Products
         </span>
-        <p className="text-2xl-regular text-ui-fg-base max-w-lg">
-          You might also want to check out these products.
-        </p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+          You might also want to check out these products
+        </h2>
       </div>
 
-      <ul className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8">
-        {products.map((product) => (
-          <li key={product.id}>
-            <Product region={region} product={product} />
+      <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        {singleRowProducts.map((p) => (
+          <li key={p.id}>
+            <Product region={region} product={p} />
           </li>
         ))}
       </ul>
