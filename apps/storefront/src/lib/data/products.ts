@@ -215,7 +215,6 @@ export async function getProductRecommendations({
         query: {
           type,
           limit,
-          fallback: "true",
         },
         headers,
         next,
@@ -230,81 +229,36 @@ export async function getProductRecommendations({
  * Retrieve accessory recommendations for products currently in the cart
  */
 export async function getCartAccessoryRecommendations(
-  productIds: string[],
-  countryCode: string = "zw"
+  productIds: string[]
 ): Promise<HttpTypes.StoreProduct[]> {
   const seenIds = new Set<string>(productIds || [])
   const accessories: HttpTypes.StoreProduct[] = []
 
-  if (productIds && productIds.length > 0) {
-    for (const productId of productIds) {
-      if (!productId) continue
-      try {
-        const recs = await getProductRecommendations({
-          productId,
-          type: "accessory",
-          limit: 3,
-        })
-
-        for (const item of recs) {
-          if (item && !seenIds.has(item.id)) {
-            seenIds.add(item.id)
-            accessories.push(item)
-            if (accessories.length >= 2) {
-              return accessories
-            }
-          }
-        }
-      } catch {
-        // continue
-      }
-    }
+  if (!productIds || productIds.length === 0) {
+    return []
   }
 
-  // Catalog fallback if no direct recommendation configured in database
-  try {
-    const { response } = await listProducts({
-      queryParams: {
-        limit: 8,
-      },
-      countryCode,
-    })
+  for (const productId of productIds) {
+    if (!productId) continue
+    try {
+      const recs = await getProductRecommendations({
+        productId,
+        type: "accessory",
+        limit: 3,
+      })
 
-    const fallbackList = response?.products || []
-    const ACCESSORY_KEYWORDS = [
-      "mouse",
-      "keyboard",
-      "headset",
-      "earbuds",
-      "bag",
-      "backpack",
-      "case",
-      "cover",
-      "charger",
-      "cable",
-      "stand",
-      "hub",
-      "adapter",
-      "mousepad",
-      "accessory",
-    ]
-
-    // 1. Try matching accessory keywords
-    const matching = fallbackList.filter((p) => {
-      if (seenIds.has(p.id)) return false
-      const text = `${p.title || ""} ${p.handle || ""}`.toLowerCase()
-      return ACCESSORY_KEYWORDS.some((kw) => text.includes(kw))
-    })
-
-    if (matching.length > 0) {
-      return matching.slice(0, 2)
+      for (const item of recs) {
+        if (item && !seenIds.has(item.id)) {
+          seenIds.add(item.id)
+          accessories.push(item)
+          if (accessories.length >= 3) {
+            return accessories
+          }
+        }
+      }
+    } catch {
+      // continue
     }
-
-    // 2. Return other products from catalog
-    const other = fallbackList.filter((p) => !seenIds.has(p.id))
-    return other.slice(0, 1)
-  } catch {
-    // ignore
   }
 
   return accessories

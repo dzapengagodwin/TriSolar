@@ -36,14 +36,11 @@ export default async function Footer() {
             className="lg:col-span-5 space-y-6 pr-0 lg:pr-6"
             suppressHydrationWarning
           >
-            {/* Logo */}
-            <div className="flex items-center">
-              <Logo size="lg" />
-            </div>
+           
 
             {/* Hotline Box with Headphone Icon */}
             <div className="flex items-center gap-4 pt-2">
-              <div className="text-[#fed700] shrink-0">
+              <div className="text-primary shrink-0">
                 <svg
                   className="w-12 h-12"
                   viewBox="0 0 64 64"

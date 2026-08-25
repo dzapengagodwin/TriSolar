@@ -2,7 +2,7 @@
 
 import { convertToLocale } from "@lib/util/money"
 import { deleteLineItem, updateLineItem, addToCart } from "@lib/data/cart"
-import { getCartAccessoryRecommendations } from "@lib/data/products"
+import { getCartAccessoryRecommendations } from "@lib/data/recommendations"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -20,7 +20,6 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
   const [accessories, setAccessories] = useState<HttpTypes.StoreProduct[]>([])
-  const [loadingAccessories, setLoadingAccessories] = useState(true)
   const [addingAccessoryId, setAddingAccessoryId] = useState<string | null>(null)
   const [, startTransition] = useTransition()
 
@@ -37,34 +36,35 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
     const fetchAccessories = async () => {
       if (!cartState?.items || cartState.items.length === 0) {
         setAccessories([])
-        setLoadingAccessories(false)
         return
       }
 
-      setLoadingAccessories(true)
-
       const productIds = cartState.items
-        .map(
-          (item) =>
-            (item as any).product_id ||
-            (item as any).variant?.product_id ||
-            (item as any).product?.id ||
-            (item as any).variant?.product?.id
-        )
+        .map((item) => {
+          const itemRecord = item as unknown as Record<string, unknown>
+          const variantRecord = item.variant as unknown as Record<string, unknown> | undefined
+          const productRecord = item.product as unknown as Record<string, unknown> | undefined
+          return (
+            (itemRecord?.product_id as string | undefined) ||
+            (variantRecord?.product_id as string | undefined) ||
+            (productRecord?.id as string | undefined) ||
+            (item.variant?.product?.id as string | undefined)
+          )
+        })
         .filter(Boolean) as string[]
 
+      if (productIds.length === 0) {
+        setAccessories([])
+        return
+      }
+
       try {
-        const recs = await getCartAccessoryRecommendations(
-          productIds,
-          countryCode
-        )
+        const recs = await getCartAccessoryRecommendations(productIds)
         if (isMounted) {
           setAccessories(recs || [])
         }
       } catch {
         if (isMounted) setAccessories([])
-      } finally {
-        if (isMounted) setLoadingAccessories(false)
       }
     }
 
@@ -73,7 +73,7 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
     return () => {
       isMounted = false
     }
-  }, [cartState?.items, countryCode])
+  }, [cartState?.items])
 
   const handleAddAccessory = (accessory: HttpTypes.StoreProduct) => {
     const variantId = accessory.variants?.[0]?.id
@@ -318,89 +318,78 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
               </div>
 
               {/* "Before you go" Dynamic Accessory Recommendations from Backend */}
-              {(accessories.length > 0 || loadingAccessories) && (
+              {accessories.length > 0 && (
                 <div className="pt-2 space-y-2.5">
                   <h3 className="text-sm font-bold text-gray-900 mb-1">
                     Before you go
                   </h3>
 
-                  {loadingAccessories && accessories.length === 0 ? (
-                    <div className="border border-gray-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 bg-white animate-pulse shadow-2xs">
-                      <div className="w-12 h-12 rounded-xl bg-gray-100 shrink-0" />
-                      <div className="flex-1 space-y-1.5 min-w-0">
-                        <div className="h-3.5 bg-gray-100 rounded w-3/4" />
-                        <div className="h-3 bg-gray-100 rounded w-1/4" />
-                      </div>
-                      <div className="h-7 w-20 bg-gray-100 rounded-lg shrink-0" />
-                    </div>
-                  ) : (
-                    accessories.map((accessory) => {
-                      const price = getPricesForVariant(accessory.variants?.[0])
-                      const formattedPrice =
-                        price?.calculated_price ||
-                        (accessory.variants?.[0]?.calculated_price
-                          ? convertToLocale({
-                              amount:
-                                (accessory.variants[0].calculated_price as any)
-                                  .calculated_amount ??
-                                (accessory.variants[0].calculated_price as any)
-                                  .amount ??
-                                0,
-                              currency_code: cartState?.currency_code || "usd",
-                            })
-                          : "$ 17.39")
-                      const isAdding = addingAccessoryId === accessory.id
+                  {accessories.map((accessory) => {
+                    const variant = accessory.variants?.[0]
+                    const price = getPricesForVariant(variant)
+                    const variantCalc = variant?.calculated_price as Record<string, unknown> | undefined
+                    const formattedPrice =
+                      price?.calculated_price ||
+                      (variantCalc
+                        ? convertToLocale({
+                            amount:
+                              (variantCalc.calculated_amount as number) ??
+                              (variantCalc.amount as number) ??
+                              0,
+                            currency_code: cartState?.currency_code || "usd",
+                          })
+                        : "$ 17.39")
+                    const isAdding = addingAccessoryId === accessory.id
 
-                      return (
-                        <div
-                          key={accessory.id}
-                          className="border border-gray-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 bg-white hover:border-gray-300 transition-all shadow-2xs"
-                        >
-                          {/* Accessory Image */}
-                          <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
-                            {accessory.thumbnail ? (
-                              <img
-                                src={accessory.thumbnail}
-                                alt={accessory.title || "Accessory"}
-                                className="w-full h-full object-contain"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400">
-                                P
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Accessory Details */}
-                          <div className="flex-1 min-w-0">
-                            <LocalizedClientLink
-                              href={`/products/${accessory.handle}`}
-                              onClick={close}
-                              className="text-xs font-semibold text-gray-900 hover:text-primary transition-colors truncate block"
-                            >
-                              {accessory.title}
-                            </LocalizedClientLink>
-                            <p className="text-xs font-bold text-amber-600 mt-0.5">
-                              {formattedPrice}
-                            </p>
-                          </div>
-
-                          {/* Click to add CTA */}
-                          <button
-                            type="button"
-                            onClick={() => handleAddAccessory(accessory)}
-                            disabled={isAdding || !accessory.variants?.length}
-                            className="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shadow-2xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
-                          >
-                            {isAdding && (
-                              <Spinner className="w-3 h-3 animate-spin text-gray-500" />
-                            )}
-                            <span>Click to add</span>
-                          </button>
+                    return (
+                      <div
+                        key={accessory.id}
+                        className="border border-gray-200 rounded-2xl p-3.5 flex items-center justify-between gap-3 bg-white hover:border-gray-300 transition-all shadow-2xs"
+                      >
+                        {/* Accessory Image */}
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
+                          {accessory.thumbnail ? (
+                            <img
+                              src={accessory.thumbnail}
+                              alt={accessory.title || "Accessory"}
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs font-bold text-gray-400">
+                              P
+                            </div>
+                          )}
                         </div>
-                      )
-                    })
-                  )}
+
+                        {/* Accessory Details */}
+                        <div className="flex-1 min-w-0">
+                          <LocalizedClientLink
+                            href={`/products/${accessory.handle}`}
+                            onClick={close}
+                            className="text-xs font-semibold text-gray-900 hover:text-primary transition-colors truncate block"
+                          >
+                            {accessory.title}
+                          </LocalizedClientLink>
+                          <p className="text-xs font-bold text-amber-600 mt-0.5">
+                            {formattedPrice}
+                          </p>
+                        </div>
+
+                        {/* Click to add CTA */}
+                        <button
+                          type="button"
+                          onClick={() => handleAddAccessory(accessory)}
+                          disabled={isAdding || !accessory.variants?.length}
+                          className="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-800 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap shadow-2xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer"
+                        >
+                          {isAdding && (
+                            <Spinner className="w-3 h-3 animate-spin text-gray-500" />
+                          )}
+                          <span>Click to add</span>
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </>

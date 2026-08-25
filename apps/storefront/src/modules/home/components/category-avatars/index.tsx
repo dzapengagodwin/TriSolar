@@ -37,7 +37,7 @@ export default function CategoryAvatars({
           {displayCategories.map((cat, idx) => {
             const bgClass = bgColors[idx % bgColors.length]
             const firstLetter = cat.name ? cat.name.charAt(0).toUpperCase() : "C"
-            const imageUrl = (cat.metadata as Record<string, any> | undefined)?.image_url
+            const imageUrl = (cat.metadata as Record<string, unknown> | undefined)?.image_url as string | undefined
 
             return (
               <LocalizedClientLink

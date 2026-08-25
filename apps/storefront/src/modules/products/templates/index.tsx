@@ -3,7 +3,7 @@ import React, { Suspense } from "react"
 import ImageGallery from "@modules/products/components/image-gallery"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductOnboardingCta from "@modules/products/components/product-onboarding-cta"
-import ProductTabs from "@modules/products/components/product-tabs"
+import ProductDetailsTabs from "@modules/products/components/product-details-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
@@ -68,22 +68,17 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               <ProductActionsWrapper id={product.id} region={region} />
             </Suspense>
 
-            <ProductTabs product={product} />
+            {/* In sidebar, keep Buy actions clean */}
           </div>
 
         </div>
 
-        {product.description && (
-          <div className="mt-0 sm:mt-16 pt-6 sm:pt-10 border-t border-gray-100 max-w-4xl w-full">
-            <h3 className="text-[10px] sm:text-[11px] font-extrabold text-gray-400 uppercase tracking-widest mb-3 sm:mb-4 flex items-center gap-2">
-              <span className="inline-block w-1.5 h-3 sm:h-3.5 bg-primary rounded-full animate-pulse" />
-              Description
-            </h3>
-            <p className="text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed font-normal whitespace-pre-line">
-              {product.description}
-            </p>
-          </div>
-        )}
+        {/* Product Details Tabs (Accessories | Description | Specification | Reviews) */}
+        <ProductDetailsTabs
+          product={product}
+          region={region}
+          countryCode={countryCode}
+        />
       </div>
 
       <div

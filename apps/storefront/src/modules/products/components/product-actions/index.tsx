@@ -4,7 +4,6 @@ import { addToCart } from "@lib/data/cart"
 import { addToWishlist } from "@lib/data/wishlist"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@modules/common/components/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import { isEqual } from "lodash"
@@ -14,6 +13,7 @@ import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
 import { Heart } from "@medusajs/icons"
+import Spinner from "@modules/common/icons/spinner"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -39,6 +39,7 @@ export default function ProductActions({
   const searchParams = useSearchParams()
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
+  const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
   const countryCode = useParams().countryCode as string
@@ -131,7 +132,7 @@ export default function ProductActions({
 
     await addToCart({
       variantId: selectedVariant.id,
-      quantity: 1,
+      quantity,
       countryCode,
     })
 
@@ -161,7 +162,7 @@ export default function ProductActions({
 
   return (
     <>
-      <div className="flex flex-col gap-y-2" ref={actionsRef}>
+      <div className="flex flex-col gap-y-3" ref={actionsRef}>
         <div>
           {(product.variants?.length ?? 0) > 1 && (
             <div className="flex flex-col gap-y-4">
@@ -186,41 +187,92 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            isAddingToWishlist ||
-            !isValidVariant
-          }
-          variant="primary"
-          className="w-full h-10"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !options
-            ? "Select variant"
-            : !inStock || !isValidVariant
-            ? "Out of stock"
-            : "Add to cart"}
-        </Button>
+        {/* 3-Element Horizontal Buy Actions Row matching reference image */}
+        <div className="flex items-center gap-3 pt-2">
+          {/* 1. Quantity Selector Pill */}
+          <div className="flex items-center justify-between bg-gray-50 border border-gray-200/90 rounded-full p-1 h-12 w-28 sm:w-32 shrink-0 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+              disabled={quantity <= 1 || isAdding}
+              className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              aria-label="Decrease quantity"
+            >
+              –
+            </button>
+            <span className="text-sm sm:text-base font-bold text-gray-900 select-none">
+              {quantity}
+            </span>
+            <button
+              type="button"
+              onClick={() => setQuantity((prev) => prev + 1)}
+              disabled={isAdding}
+              className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
 
-        <button
-          onClick={handleAddToWishlist}
-          disabled={
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            isAddingToWishlist
-          }
-          className="w-full h-10 mt-1 flex items-center justify-center gap-2 border border-gray-200 bg-white text-black hover:bg-gray-50 disabled:opacity-50 font-bold rounded-lg text-xs transition-all shadow-sm"
-        >
-          <Heart className="w-4 h-4 text-gray-800" />
-          <span>{isAddingToWishlist ? "Saving..." : "Save to Wishlist"}</span>
-        </button>
+          {/* 2. Main Add to Cart Pill Button (Green) */}
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              isAddingToWishlist ||
+              !isValidVariant
+            }
+            className="flex-1 h-12 rounded-full bg-primary hover:bg-orange-400 active:scale-[0.99] text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            data-testid="add-product-button"
+          >
+            {isAdding ? (
+              <Spinner className="w-4 h-4 animate-spin text-white" />
+            ) : (
+              <>
+                <span>
+                  {!selectedVariant && !options
+                    ? "Select variant"
+                    : !inStock || !isValidVariant
+                    ? "Out of stock"
+                    : "Add to Cart"}
+                </span>
+                <svg
+                  className="w-4 h-4 text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+              </>
+            )}
+          </button>
+
+          {/* 3. Circular Wishlist Button */}
+          <button
+            type="button"
+            onClick={handleAddToWishlist}
+            disabled={
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              isAddingToWishlist
+            }
+            aria-label="Save to Wishlist"
+            className="w-12 h-12 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
+          >
+            <Heart className="w-5 h-5 text-gray-700 hover:text-red-500" />
+          </button>
+        </div>
         <MobileActions
           product={product}
           variant={selectedVariant}
