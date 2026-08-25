@@ -331,13 +331,13 @@ export default async function Footer() {
 
           {/* Payment Method Badges */}
           <div className="flex items-center gap-3">
-            <div className="bg-white/5 border border-white/10 px-3 py-1 rounded-md flex items-center justify-center">
+            <div className="px-3 py-1 flex items-center justify-center">
               <Image
                 src="/payment-methods.png"
                 alt="Accepted Payment Methods - Visa, Mastercard, PayPal, EcoCash, Pesepay"
                 width={280}
                 height={32}
-                className="h-5 w-auto object-contain"
+                className="h-9 w-auto object-contain"
               />
             </div>
           </div>

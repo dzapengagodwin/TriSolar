@@ -41,7 +41,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
           {/* Left: Call Us */}
           <div className="flex items-center gap-1 shrink-0">
             <span className="text-gray-500">Call us:</span>
-            <a href="tel:+2638612600600" className="text-[#0066cc] hover:underline font-medium">
+            <a href="tel:+2638612600600" className="hover:underline font-medium">
               +263 8612 600 600
             </a>
           </div>
@@ -72,7 +72,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
               href="https://wa.me/263772953946"
               target="_blank"
               rel="noreferrer"
-              className="text-[#0066cc] hover:underline font-medium"
+              className="hover:underline font-medium"
             >
               +263772953946
             </a>
