@@ -61,15 +61,15 @@ export default async function Home(props: {
         region={region}
       />
 
-      {/* 4. Gaming Categories Section */}
-      <GamingSection categories={categories} />
-
-      {/* 5. Featured Products Rails */}
+      {/* 4. Featured Products Rails */}
       <FeaturedProducts
         collections={collections}
         categories={categories}
         region={region}
       />
+
+      {/* 5. Gaming Categories Section */}
+      <GamingSection categories={categories} />
 
       {/* 6. Top Brands Slider */}
       <TopBrands brands={brands} />

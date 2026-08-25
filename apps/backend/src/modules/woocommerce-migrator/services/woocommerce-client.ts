@@ -27,6 +27,9 @@ export interface WooCategory {
   name: string
   slug: string
   parent?: number
+  description?: string
+  image?: WooImage | null
+  count?: number
 }
 
 export interface WooTag {

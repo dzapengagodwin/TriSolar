@@ -40,6 +40,9 @@ export default defineConfig({
       resolve: "./src/modules/pesepay-config",
     },
     {
+      resolve: "./src/modules/product-recommendation",
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [

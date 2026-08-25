@@ -37,6 +37,8 @@ export default function CategoryAvatars({
           {displayCategories.map((cat, idx) => {
             const bgClass = bgColors[idx % bgColors.length]
             const firstLetter = cat.name ? cat.name.charAt(0).toUpperCase() : "C"
+            const imageUrl = (cat.metadata as Record<string, any> | undefined)?.image_url
+
             return (
               <LocalizedClientLink
                 key={cat.id || idx}
@@ -44,9 +46,17 @@ export default function CategoryAvatars({
                 className="group flex flex-col items-center gap-3"
               >
                 <div
-                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-black text-gray-900 shadow-sm group-hover:scale-105 transition-transform border border-gray-100`}
+                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-black text-gray-900 shadow-sm group-hover:scale-105 transition-transform border border-gray-100 overflow-hidden relative`}
                 >
-                  {firstLetter}
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt={cat.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    firstLetter
+                  )}
                 </div>
                 <span className="text-xs font-bold text-gray-800 group-hover:text-black transition-colors line-clamp-1">
                   {cat.name}

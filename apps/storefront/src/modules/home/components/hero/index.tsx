@@ -115,11 +115,11 @@ export default function Hero() {
 
   return (
     <div
-      className="py-6 bg-white"
+      className="pb-6 bg-white"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      <div className="content-container">
+      <div className="">
         <div
           className="relative overflow-hidden bg-black text-white shadow-xl min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center"
           onTouchStart={handleTouchStart}

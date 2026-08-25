@@ -153,7 +153,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
         </header>
 
         {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
-        <nav className="bg-black border-b border-black-300 hidden small:block text-white">
+        <nav className="bg-black  border-black-300 hidden small:block text-white">
           <div className="content-container flex items-center justify-between text-xs font-bold py-1 relative">
             <div className="flex items-center gap-x-2">
               {/* Browse All Categories Button */}

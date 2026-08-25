@@ -265,6 +265,8 @@ export const importWooCommerceStep = createStep(
                   handle: c.handle,
                   is_active: c.is_active,
                   parent_category_id: c.parent_category_id || undefined,
+                  description: c.description || undefined,
+                  metadata: c.metadata || undefined,
                 })),
               },
             })

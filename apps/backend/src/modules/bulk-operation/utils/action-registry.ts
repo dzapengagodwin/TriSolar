@@ -1,5 +1,6 @@
 import { ContainerRegistrationKeys, Modules, MedusaError } from "@medusajs/framework/utils"
 import { BRAND_MODULE } from "../../brand"
+import { PRODUCT_RECOMMENDATION_MODULE } from "../../product-recommendation"
 import { deleteProductsWorkflow } from "@medusajs/medusa/core-flows"
 
 export interface BulkActionHandler {
@@ -305,6 +306,89 @@ export const BULK_ACTIONS: Record<string, BulkActionHandler> = {
         success: true,
         previousValue: { exists: true },
         newValue: { exists: false },
+      }
+    },
+  },
+
+  "product:assign_recommendations": {
+    validate(payload) {
+      if (
+        !payload ||
+        !Array.isArray(payload.recommended_product_ids) ||
+        payload.recommended_product_ids.length === 0
+      ) {
+        return "Payload must contain a non-empty recommended_product_ids array"
+      }
+      return true
+    },
+    async executeItem(id, payload, container) {
+      const recService = container.resolve(PRODUCT_RECOMMENDATION_MODULE)
+      const targetType = payload.type || "related"
+      const targetProductIds: string[] = payload.recommended_product_ids.filter(
+        (targetId: string) => targetId !== id
+      )
+
+      if (targetProductIds.length === 0) {
+        return {
+          success: true,
+          previousValue: {},
+          newValue: {},
+        }
+      }
+
+      if (payload.replace_existing) {
+        const existing = await recService.listProductRecommendations({
+          product_id: id,
+          type: targetType,
+        })
+        if (existing.length > 0) {
+          await recService.deleteProductRecommendations(
+            existing.map((e: any) => e.id)
+          )
+        }
+      }
+
+      const items = targetProductIds.map((recId, idx) => ({
+        recommended_product_id: recId,
+        type: targetType,
+        position: idx,
+        priority: payload.priority || 0,
+        is_active: payload.is_active !== undefined ? payload.is_active : true,
+        source: "manual" as const,
+      }))
+
+      const results = await recService.batchAssignRecommendations(id, items)
+
+      return {
+        success: true,
+        previousValue: { count: payload.replace_existing ? 0 : undefined },
+        newValue: { assigned_count: results.length, type: targetType },
+      }
+    },
+  },
+
+  "product:clear_recommendations": {
+    validate(_payload) {
+      return true
+    },
+    async executeItem(id, payload, container) {
+      const recService = container.resolve(PRODUCT_RECOMMENDATION_MODULE)
+      const filter: any = { product_id: id }
+      if (payload?.type) {
+        filter.type = payload.type
+      }
+
+      const existing = await recService.listProductRecommendations(filter)
+      if (existing.length > 0) {
+        await recService.deleteProductRecommendations(
+          existing.map((e: any) => e.id)
+        )
+      }
+
+      return {
+        success: true,
+        previousValue: { count: existing.length },
+        newValue: { cleared_count: existing.length },
       }
     },
   },

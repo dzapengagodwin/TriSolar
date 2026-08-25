@@ -10,6 +10,8 @@ export interface MedusaCategoryPayload {
   is_active: boolean
   handle?: string
   parent_category_id?: string | null
+  description?: string
+  metadata?: Record<string, any>
   wc_id?: number
   wc_parent_id?: number
 }
@@ -112,18 +114,31 @@ export class WooCommerceTransformer {
     categoryMap: Map<number, string> = new Map()
   ): MedusaCategoryPayload[] {
     return wooCategories
-      .filter((cat) => cat.name.toLowerCase() !== "uncategorized")
-      .map((cat) => ({
-        name: cat.name,
-        is_active: true,
-        handle: this.sanitizeHandle(cat.slug || cat.name) || `cat-${cat.id}`,
-        parent_category_id:
-          cat.parent && cat.parent > 0
-            ? categoryMap.get(cat.parent) || null
-            : null,
-        wc_id: cat.id,
-        wc_parent_id: cat.parent || 0,
-      }))
+      .filter((cat) => cat.name && cat.name.toLowerCase() !== "uncategorized")
+      .map((cat) => {
+        const imageUrl = cat.image?.src || null
+        const cleanDesc = this.cleanHtml(cat.description || "")
+
+        return {
+          name: cat.name,
+          is_active: true,
+          handle: this.sanitizeHandle(cat.slug || cat.name) || `cat-${cat.id}`,
+          parent_category_id:
+            cat.parent && cat.parent > 0
+              ? categoryMap.get(cat.parent) || null
+              : null,
+          description: cleanDesc || undefined,
+          metadata: {
+            woo_category_id: cat.id,
+            woo_parent_id: cat.parent || 0,
+            image_url: imageUrl,
+            image_alt: cat.image?.alt || cat.name || "",
+            image_name: cat.image?.name || "",
+          },
+          wc_id: cat.id,
+          wc_parent_id: cat.parent || 0,
+        }
+      })
   }
 
   transformTags(wooTags: WooTag[]): MedusaCollectionPayload[] {
