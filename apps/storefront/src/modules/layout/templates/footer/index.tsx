@@ -1,5 +1,4 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import Logo from "@modules/common/components/logo"
 import Image from "next/image"
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"

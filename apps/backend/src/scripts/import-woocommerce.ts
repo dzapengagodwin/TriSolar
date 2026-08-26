@@ -12,20 +12,27 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
   let publish = false
   let importCategories = true
   let importTags = false
+  let skipVariants = true
+  let createdAfter = ""
+  let createdBefore = ""
 
   for (const arg of args) {
     if (arg.startsWith("--url=")) url = arg.split("=").slice(1).join("=")
     if (arg.startsWith("--key=")) key = arg.split("=").slice(1).join("=")
     if (arg.startsWith("--secret=")) secret = arg.split("=").slice(1).join("=")
     if (arg.startsWith("--currency=")) currency = arg.split("=").slice(1).join("=")
+    if (arg.startsWith("--after=")) createdAfter = arg.split("=").slice(1).join("=")
+    if (arg.startsWith("--before=")) createdBefore = arg.split("=").slice(1).join("=")
     if (arg === "--publish") publish = true
     if (arg === "--no-categories") importCategories = false
     if (arg === "--no-tags") importTags = false
+    if (arg === "--include-variants") skipVariants = false
+    if (arg === "--skip-variants") skipVariants = true
   }
 
   if (!url || !key || !secret) {
     logger.error("Missing required arguments.")
-    logger.error("Usage: npx medusa exec ./src/scripts/import-woocommerce.ts --url=<wc-url> --key=<ck_...> --secret=<cs_...> [--currency=usd] [--publish] [--no-categories] [--no-tags]")
+    logger.error("Usage: npx medusa exec ./src/scripts/import-woocommerce.ts --url=<wc-url> --key=<ck_...> --secret=<cs_...> [--currency=usd] [--after=YYYY-MM-DD] [--before=YYYY-MM-DD] [--include-variants] [--publish] [--no-categories] [--no-tags]")
     return
   }
 
@@ -35,6 +42,8 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
   logger.info(`  Publish:    ${publish}`)
   logger.info(`  Categories: ${importCategories}`)
   logger.info(`  Tags:       ${importTags}`)
+  if (createdAfter) logger.info(`  After:      ${createdAfter}`)
+  if (createdBefore) logger.info(`  Before:     ${createdBefore}`)
 
   try {
     const { result } = await importWooCommerceProductsWorkflow(container).run({
@@ -46,6 +55,9 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
         importCategories,
         importTags,
         publishProducts: publish,
+        skipVariants,
+        createdAfter: createdAfter || undefined,
+        createdBefore: createdBefore || undefined,
       },
     })
 

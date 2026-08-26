@@ -13,6 +13,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       importTags = false,
       publishProducts = false,
       createPriceList = false,
+      skipVariants = true,
+      createdAfter,
+      createdBefore,
       jsonData,
     } = req.body as any
 
@@ -26,6 +29,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
         importTags,
         publishProducts,
         createPriceList,
+        skipVariants,
+        createdAfter,
+        createdBefore,
         jsonData,
       },
     })

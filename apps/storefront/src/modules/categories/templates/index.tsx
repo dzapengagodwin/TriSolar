@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -97,13 +97,13 @@ export default async function CategoryTemplate({
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {category.category_children.map((c) => (
-                <InteractiveLink
+                <LocalizedClientLink
                   key={c.id}
                   href={`/categories/${c.handle}`}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full transition-colors"
                 >
                   {c.name}
-                </InteractiveLink>
+                </LocalizedClientLink>
               ))}
             </div>
           </div>

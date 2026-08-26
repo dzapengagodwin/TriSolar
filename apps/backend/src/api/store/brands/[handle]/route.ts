@@ -64,6 +64,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       description: brandData.description,
       website: brandData.website,
       products: paginatedProducts,
+      product_ids: publishedProducts.map((p: any) => p.id),
       count: paginatedProducts.length,
       total_products: publishedProducts.length,
       limit,

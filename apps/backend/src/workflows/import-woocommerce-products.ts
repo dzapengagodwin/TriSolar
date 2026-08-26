@@ -25,6 +25,9 @@ export type ImportWooCommerceInput = {
   importTags: boolean
   publishProducts: boolean
   createPriceList?: boolean
+  skipVariants?: boolean
+  createdAfter?: string
+  createdBefore?: string
   jsonData?: {
     products?: any[]
     categories?: any[]
@@ -73,6 +76,36 @@ export const importWooCommerceStep = createStep(
         wooCategories = input.jsonData.categories || []
         wooTags = input.jsonData.tags || []
       }
+
+      // Filter JSON products by created date if date filters specified
+      if (input.createdAfter) {
+        const afterDate = new Date(input.createdAfter)
+        if (!isNaN(afterDate.getTime())) {
+          logger.info(`Filtering products created after: ${input.createdAfter}`)
+          wooProducts = wooProducts.filter((p: any) => {
+            const rawDate = p.date_created || p.date_created_gmt || p.date_modified
+            if (!rawDate) return true
+            const d = new Date(rawDate)
+            return !isNaN(d.getTime()) && d >= afterDate
+          })
+        }
+      }
+
+      if (input.createdBefore) {
+        const beforeIso = input.createdBefore.includes("T")
+          ? input.createdBefore
+          : `${input.createdBefore}T23:59:59`
+        const beforeDate = new Date(beforeIso)
+        if (!isNaN(beforeDate.getTime())) {
+          logger.info(`Filtering products created before: ${input.createdBefore}`)
+          wooProducts = wooProducts.filter((p: any) => {
+            const rawDate = p.date_created || p.date_created_gmt || p.date_modified
+            if (!rawDate) return true
+            const d = new Date(rawDate)
+            return !isNaN(d.getTime()) && d <= beforeDate
+          })
+        }
+      }
     } else {
       const client = new WooCommerceClient(
         input.wooUrl,
@@ -80,33 +113,75 @@ export const importWooCommerceStep = createStep(
         input.consumerSecret
       )
 
-      logger.info("Fetching products from WooCommerce API")
-      wooProducts = await client.fetchAllProducts()
+      const startTime = Date.now()
+      logger.info(
+        `Fetching products from WooCommerce API${
+          input.createdAfter ? ` (after: ${input.createdAfter})` : ""
+        }${input.createdBefore ? ` (before: ${input.createdBefore})` : ""}`
+      )
+      wooProducts = await client.fetchAllProducts({
+        after: input.createdAfter,
+        before: input.createdBefore,
+      })
+      logger.info(`Fetched ${wooProducts.length} products in ${((Date.now() - startTime) / 1000).toFixed(1)}s`)
 
-      if (input.importCategories) {
-        logger.info("Fetching categories from WooCommerce API")
-        wooCategories = await client.fetchAllCategories()
-      }
+      // Fetch categories, tags, and brand term logos in parallel
+      const metadataStart = Date.now()
+      const [catRes, tagRes, brandRes] = await Promise.all([
+        input.importCategories
+          ? client.fetchAllCategories().catch((e: any) => {
+              logger.warn(`Failed to fetch categories: ${e.message}`)
+              return []
+            })
+          : Promise.resolve([]),
+        input.importTags
+          ? client.fetchAllTags().catch((e: any) => {
+              logger.warn(`Failed to fetch tags: ${e.message}`)
+              return []
+            })
+          : Promise.resolve([]),
+        client.fetchBrandTermImages().catch((e: any) => {
+          logger.warn(`Failed to fetch brand terms: ${e.message}`)
+          return new Map<string, string>()
+        }),
+      ])
+      wooCategories = catRes
+      wooTags = tagRes
+      brandImageMap = brandRes
+      logger.info(`Loaded categories (${wooCategories.length}), tags (${wooTags.length}), and brand logos in ${((Date.now() - metadataStart) / 1000).toFixed(1)}s`)
 
-      if (input.importTags) {
-        logger.info("Fetching tags from WooCommerce API")
-        wooTags = await client.fetchAllTags()
-      }
+      // Fetch variations for all variable products unless skipVariants is enabled
+      if (input.skipVariants) {
+        logger.info("Skipping product variations fetch (fast import mode enabled)")
+      } else {
+        const variableProducts = wooProducts.filter(
+          (p: any) => p.type === "variable" && p.variations?.length > 0
+        )
 
-      // Fetch brand attribute term images (slug/name → logo URL)
-      logger.info("Fetching brand attribute term images from WooCommerce")
-      brandImageMap = await client.fetchBrandTermImages()
-      logger.info(`Loaded ${brandImageMap.size} brand logo entries from attribute terms`)
-
-      for (const product of wooProducts) {
-        if (product.type === "variable" && product.variations?.length > 0) {
-          logger.info(`Fetching variations for product: ${product.name}`)
-          try {
-            const variations = await client.fetchProductVariations(product.id)
-            variationsMap.set(product.id, variations)
-          } catch (err: any) {
-            logger.warn(`Failed to fetch variations for product ${product.name}: ${err.message}`)
+        if (variableProducts.length > 0) {
+          logger.info(
+            `Fetching variations for ${variableProducts.length} variable products (parallelized)...`
+          )
+          const variationsStart = Date.now()
+          const CONCURRENCY = 8
+          for (let i = 0; i < variableProducts.length; i += CONCURRENCY) {
+            const chunk = variableProducts.slice(i, i + CONCURRENCY)
+            await Promise.all(
+              chunk.map(async (product: any) => {
+                try {
+                  const variations = await client.fetchProductVariations(product.id)
+                  variationsMap.set(product.id, variations)
+                } catch (err: any) {
+                  logger.warn(
+                    `Failed to fetch variations for product ${product.name}: ${err.message}`
+                  )
+                }
+              })
+            )
           }
+          logger.info(
+            `Loaded variations for ${variationsMap.size} products in ${((Date.now() - variationsStart) / 1000).toFixed(1)}s`
+          )
         }
       }
     }
@@ -399,19 +474,34 @@ export const importWooCommerceStep = createStep(
             } catch (brandErr: any) {
               logger.warn(`Could not create brand ${p.brand.name}: ${brandErr.message}`)
             }
-          } else if (p.brand.logo && !brandLogoMap.get(p.brand.handle)) {
-            // Existing brand has no logo yet — update it
+          } else {
             const existingBrandId = brandMap.get(p.brand.handle)
-            if (existingBrandId) {
+            const currentLogo = brandLogoMap.get(p.brand.handle)
+            const newLogo = p.brand.logo || null
+
+            // If a valid brand logo was fetched from WooCommerce and differs from current DB
+            if (newLogo && newLogo !== currentLogo && existingBrandId) {
               try {
                 await brandModuleService.updateBrands({
                   id: existingBrandId,
-                  logo: p.brand.logo,
+                  logo: newLogo,
                 })
-                brandLogoMap.set(p.brand.handle, p.brand.logo)
-                logger.info(`Updated logo for brand: ${p.brand.name}`)
+                brandLogoMap.set(p.brand.handle, newLogo)
+                logger.info(`Updated actual brand logo for: ${p.brand.name}`)
               } catch (updateErr: any) {
                 logger.warn(`Could not update logo for brand ${p.brand.name}: ${updateErr.message}`)
+              }
+            } else if (!newLogo && currentLogo && currentLogo.includes("/wp-content/uploads/") && existingBrandId) {
+              // Clear stale product photo attached from previous import runs
+              try {
+                await brandModuleService.updateBrands({
+                  id: existingBrandId,
+                  logo: null,
+                })
+                brandLogoMap.set(p.brand.handle, null)
+                logger.info(`Cleared stale product photo from brand: ${p.brand.name}`)
+              } catch {
+                // ignore
               }
             }
           }

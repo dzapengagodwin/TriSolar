@@ -53,6 +53,10 @@ const WooCommerceMigratorPage = () => {
   const [importTags, setImportTags] = useState(false)
   const [publishProducts, setPublishProducts] = useState(false)
   const [createPriceList, setCreatePriceList] = useState(false)
+  const [skipVariants, setSkipVariants] = useState(true)
+  const [createdAfter, setCreatedAfter] = useState("")
+  const [createdBefore, setCreatedBefore] = useState("")
+  const [datePreset, setDatePreset] = useState("all")
 
   // JSON upload state
   const [useJsonUpload, setUseJsonUpload] = useState(false)
@@ -130,6 +134,31 @@ const WooCommerceMigratorPage = () => {
     []
   )
 
+  const handleDatePresetChange = useCallback((val: string) => {
+    setDatePreset(val)
+    const now = new Date()
+    if (val === "all") {
+      setCreatedAfter("")
+      setCreatedBefore("")
+    } else if (val === "30d") {
+      const d = new Date()
+      d.setDate(now.getDate() - 30)
+      setCreatedAfter(d.toISOString().split("T")[0])
+      setCreatedBefore("")
+    } else if (val === "90d") {
+      const d = new Date()
+      d.setDate(now.getDate() - 90)
+      setCreatedAfter(d.toISOString().split("T")[0])
+      setCreatedBefore("")
+    } else if (val === "this_year") {
+      setCreatedAfter(`${now.getFullYear()}-01-01`)
+      setCreatedBefore("")
+    } else if (val === "last_year") {
+      setCreatedAfter(`${now.getFullYear() - 1}-01-01`)
+      setCreatedBefore(`${now.getFullYear() - 1}-12-31`)
+    }
+  }, [])
+
   const handleStartImport = useCallback(async () => {
     setImportStatus("importing")
     setImportError("")
@@ -141,6 +170,9 @@ const WooCommerceMigratorPage = () => {
       importTags,
       publishProducts,
       createPriceList,
+      skipVariants,
+      createdAfter: createdAfter || undefined,
+      createdBefore: createdBefore || undefined,
     }
 
     if (useJsonUpload && jsonData) {
@@ -184,6 +216,9 @@ const WooCommerceMigratorPage = () => {
     importTags,
     publishProducts,
     createPriceList,
+    skipVariants,
+    createdAfter,
+    createdBefore,
     useJsonUpload,
     jsonData,
   ])
@@ -435,6 +470,99 @@ const WooCommerceMigratorPage = () => {
                 onCheckedChange={setCreatePriceList}
               />
               <Label>Create Price List on import</Label>
+            </div>
+            <div className="flex items-center gap-x-3">
+              <Switch
+                checked={skipVariants}
+                onCheckedChange={setSkipVariants}
+              />
+              <div>
+                <Label>Skip product variations (Fast Import)</Label>
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Bypasses downloading separate variation records; imports each product with its main price, SKU & specs.
+                </Text>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Created At Date Filter */}
+        <div className="mt-6 pt-5 border-t border-ui-border-base">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <Text size="small" weight="plus" className="text-ui-fg-base">
+                Product Created Date Filter
+              </Text>
+              <Text size="small" className="text-ui-fg-subtle">
+                Only import products created within a specific date window in WooCommerce.
+              </Text>
+            </div>
+            {(createdAfter || createdBefore) && (
+              <Button
+                variant="transparent"
+                size="small"
+                onClick={() => {
+                  setCreatedAfter("")
+                  setCreatedBefore("")
+                  setDatePreset("all")
+                }}
+                className="text-ui-fg-interactive hover:underline text-xs"
+              >
+                Clear date filters
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div>
+              <Label htmlFor="date-preset" className="text-ui-fg-muted mb-1 block">
+                Quick Preset
+              </Label>
+              <Select value={datePreset} onValueChange={handleDatePresetChange}>
+                <Select.Trigger id="date-preset">
+                  <Select.Value placeholder="Select date range" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">All Time (No date filter)</Select.Item>
+                  <Select.Item value="30d">Last 30 Days</Select.Item>
+                  <Select.Item value="90d">Last 90 Days</Select.Item>
+                  <Select.Item value="this_year">This Year (Jan 1 to today)</Select.Item>
+                  <Select.Item value="last_year">Last Year</Select.Item>
+                  <Select.Item value="custom">Custom Date Range</Select.Item>
+                </Select.Content>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="created-after" className="text-ui-fg-muted mb-1 block">
+                Created After / Start Date
+              </Label>
+              <Input
+                id="created-after"
+                type="date"
+                value={createdAfter}
+                onChange={(e) => {
+                  setCreatedAfter(e.target.value)
+                  setDatePreset("custom")
+                }}
+                placeholder="YYYY-MM-DD"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="created-before" className="text-ui-fg-muted mb-1 block">
+                Created Before / End Date
+              </Label>
+              <Input
+                id="created-before"
+                type="date"
+                value={createdBefore}
+                onChange={(e) => {
+                  setCreatedBefore(e.target.value)
+                  setDatePreset("custom")
+                }}
+                placeholder="YYYY-MM-DD"
+              />
             </div>
           </div>
         </div>

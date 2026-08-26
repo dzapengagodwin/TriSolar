@@ -1,6 +1,13 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
+import { Inter } from "next/font/google"
 import "styles/globals.css"
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
@@ -16,8 +23,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-mode="light" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html lang="en" data-mode="light" className={inter.variable} suppressHydrationWarning>
+      <body className={`${inter.className} font-sans antialiased`} suppressHydrationWarning>
         <main className="relative">{props.children}</main>
       </body>
     </html>

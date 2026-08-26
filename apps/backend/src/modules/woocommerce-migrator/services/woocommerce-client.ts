@@ -79,6 +79,9 @@ export interface WooProduct {
   stock_status: "instock" | "outofstock" | "onbackorder"
   manage_stock: boolean
   variations: number[]
+  date_created?: string
+  date_created_gmt?: string
+  date_modified?: string
 }
 
 /** A global product attribute registered in WooCommerce (e.g. "Brand", "Color") */
@@ -139,7 +142,10 @@ export class WooCommerceClient {
     }
   }
 
-  private async fetchAll<T>(endpoint: string): Promise<T[]> {
+  private async fetchAll<T>(
+    endpoint: string,
+    params?: Record<string, string | undefined>
+  ): Promise<T[]> {
     let page = 1
     const allData: T[] = []
 
@@ -147,34 +153,57 @@ export class WooCommerceClient {
       const url = new URL(`${this.baseUrl}/wp-json/wc/v3/${endpoint}`)
       url.searchParams.append("per_page", "100")
       url.searchParams.append("page", page.toString())
+      if (params) {
+        for (const [key, value] of Object.entries(params)) {
+          if (value !== undefined && value !== "") {
+            url.searchParams.append(key, value)
+          }
+        }
+      }
       this.appendAuthQueryParams(url)
 
-      const response = await fetch(url.toString(), {
-        headers: this.getHeaders(),
-      })
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 20000)
 
-      if (!response.ok) {
-        const text = await response.text()
-        if (response.status === 403 || text.includes("Just a moment") || text.includes("Cloudflare")) {
+      try {
+        const response = await fetch(url.toString(), {
+          headers: this.getHeaders(),
+          signal: controller.signal,
+        })
+
+        if (!response.ok) {
+          const text = await response.text()
+          if (response.status === 403 || text.includes("Just a moment") || text.includes("Cloudflare")) {
+            throw new MedusaError(
+              MedusaError.Types.INVALID_DATA,
+              "Cloudflare / WAF security protection is blocking REST API requests. Allow /wp-json/ in Cloudflare WAF or toggle 'Use JSON file upload'."
+            )
+          }
+
           throw new MedusaError(
             MedusaError.Types.INVALID_DATA,
-            "Cloudflare / WAF security protection is blocking REST API requests. Allow /wp-json/ in Cloudflare WAF or toggle 'Use JSON file upload'."
+            `Failed to fetch ${endpoint} (${response.status} ${response.statusText})`
           )
         }
 
-        throw new MedusaError(
-          MedusaError.Types.INVALID_DATA,
-          `Failed to fetch ${endpoint} (${response.status} ${response.statusText})`
-        )
-      }
+        const data = (await response.json()) as T[]
+        if (!data || data.length === 0) {
+          break
+        }
 
-      const data = (await response.json()) as T[]
-      if (!data || data.length === 0) {
-        break
+        allData.push(...data)
+        page++
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          throw new MedusaError(
+            MedusaError.Types.INVALID_DATA,
+            `Request timed out while fetching ${endpoint} (page ${page})`
+          )
+        }
+        throw err
+      } finally {
+        clearTimeout(timeoutId)
       }
-
-      allData.push(...data)
-      page++
     }
 
     return allData
@@ -212,8 +241,22 @@ export class WooCommerceClient {
     }
   }
 
-  async fetchAllProducts(): Promise<WooProduct[]> {
-    return this.fetchAll<WooProduct>("products")
+  async fetchAllProducts(options?: {
+    after?: string
+    before?: string
+  }): Promise<WooProduct[]> {
+    const params: Record<string, string | undefined> = {}
+    if (options?.after) {
+      params.after = options.after.includes("T")
+        ? options.after
+        : `${options.after}T00:00:00`
+    }
+    if (options?.before) {
+      params.before = options.before.includes("T")
+        ? options.before
+        : `${options.before}T23:59:59`
+    }
+    return this.fetchAll<WooProduct>("products", params)
   }
 
   async fetchAllCategories(): Promise<WooCategory[]> {
@@ -244,38 +287,67 @@ export class WooCommerceClient {
   }
 
   /**
-   * Finds the brand attribute in WooCommerce and returns a map of
-   * brand slug → logo image URL for every term that has an image set.
-   * Returns an empty map if the brand attribute does not exist or has no images.
+   * Finds brand images in WooCommerce from global attributes or the brands taxonomy,
+   * returning a map of brand slug / name → logo image URL.
    */
   async fetchBrandTermImages(): Promise<Map<string, string>> {
     const brandImageMap = new Map<string, string>()
 
+    // 1. Try global product attribute terms (e.g. pa_brand / Brand)
     try {
       const attributes = await this.fetchAllGlobalAttributes()
 
-      // Match the brand attribute by common names / slugs
-      const BRAND_ATTR_NAMES = ["brand", "brands", "manufacturer", "make", "pa_brand", "pa_brands", "pa_manufacturer"]
-      const brandAttr = attributes.find((a) =>
-        BRAND_ATTR_NAMES.includes(a.name.toLowerCase().trim()) ||
-        BRAND_ATTR_NAMES.includes(a.slug.toLowerCase().trim())
+      const BRAND_ATTR_NAMES = [
+        "brand",
+        "brands",
+        "manufacturer",
+        "make",
+        "pa_brand",
+        "pa_brands",
+        "pa_manufacturer",
+      ]
+      const brandAttr = attributes.find(
+        (a) =>
+          BRAND_ATTR_NAMES.includes(a.name.toLowerCase().trim()) ||
+          BRAND_ATTR_NAMES.includes(a.slug.toLowerCase().trim())
       )
 
-      if (!brandAttr) {
-        return brandImageMap
-      }
-
-      const terms = await this.fetchAttributeTerms(brandAttr.id)
-
-      for (const term of terms) {
-        if (term.image?.src) {
-          // Index by both slug and lowercased name so lookups are flexible
-          brandImageMap.set(term.slug, term.image.src)
-          brandImageMap.set(term.name.toLowerCase(), term.image.src)
+      if (brandAttr) {
+        const terms = await this.fetchAttributeTerms(brandAttr.id)
+        for (const term of terms) {
+          const imgSrc = term.image?.src || (term as any).thumbnail || (term as any).image_url
+          if (imgSrc) {
+            brandImageMap.set(term.slug, imgSrc)
+            brandImageMap.set(term.name.toLowerCase(), imgSrc)
+          }
         }
       }
     } catch {
-      // Non-fatal — brand images are best-effort
+      // Non-fatal — continue to check standalone brands endpoint
+    }
+
+    // 2. Try standalone WooCommerce Brands taxonomy endpoint (e.g. /wp-json/wc/v3/brands)
+    if (brandImageMap.size === 0) {
+      try {
+        const brandsData = await this.fetchAll<any>("brands")
+        for (const b of brandsData) {
+          const imgSrc =
+            b.image?.src ||
+            b.image ||
+            b.thumbnail ||
+            b.logo ||
+            null
+          if (imgSrc && typeof imgSrc === "string") {
+            brandImageMap.set(b.slug, imgSrc)
+            brandImageMap.set(b.name.toLowerCase(), imgSrc)
+          } else if (b.image?.src) {
+            brandImageMap.set(b.slug, b.image.src)
+            brandImageMap.set(b.name.toLowerCase(), b.image.src)
+          }
+        }
+      } catch {
+        // Non-fatal
+      }
     }
 
     return brandImageMap

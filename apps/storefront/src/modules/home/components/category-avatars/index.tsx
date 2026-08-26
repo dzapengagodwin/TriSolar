@@ -4,7 +4,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export default function CategoryAvatars({
   categories,
 }: {
-  categories?: HttpTypes.StoreCategory[]
+  categories?: HttpTypes.StoreProductCategory[]
 }) {
   const bgColors = ["bg-amber-100", "bg-pink-100", "bg-blue-100", "bg-rose-100", "bg-gray-200", "bg-orange-100"]
 

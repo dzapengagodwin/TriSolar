@@ -10,6 +10,9 @@ export type StoreBrand = {
   description?: string | null
   website?: string | null
   products_count?: number
+  total_products?: number
+  product_ids?: string[]
+  products?: any[]
   metadata?: Record<string, unknown> | null
 }
 
