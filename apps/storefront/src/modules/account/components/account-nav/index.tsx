@@ -183,7 +183,8 @@ const AccountNavLink = ({
   children,
   "data-testid": dataTestId,
 }: AccountNavLinkProps) => {
-  const { countryCode } = useParams() as { countryCode: string }
+  const params = useParams()
+  const countryCode = (params?.countryCode as string) || "zw"
   const active = route === `/${countryCode}${href}`
   return (
     <LocalizedClientLink

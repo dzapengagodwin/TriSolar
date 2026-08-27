@@ -238,7 +238,7 @@ export default function MonthlyDeals({
         else catMap.set(cat.id, { id: cat.id, name: cat.name, count: 1 })
       }
     }
-    return [...catMap.values()]
+    return Array.from(catMap.values())
       .sort((a, b) => b.count - a.count)
       .slice(0, 6)
   }, [promoProducts])

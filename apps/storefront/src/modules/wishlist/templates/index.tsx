@@ -14,20 +14,20 @@ type WishlistItem = {
   variant_id: string
   product_variant?: {
     id: string
-    title?: string
+    title?: string | null
     calculated_price?: {
-      calculated_amount?: number
-      currency_code?: string
+      calculated_amount?: number | null
+      currency_code?: string | null
     }
     prices?: {
-      amount?: number
-      currency_code?: string
+      amount?: number | null
+      currency_code?: string | null
     }[]
     product?: {
       id: string
-      title?: string
-      handle?: string
-      thumbnail?: string
+      title?: string | null
+      handle?: string | null
+      thumbnail?: string | null
     }
   }
 }
@@ -90,14 +90,14 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
 
   const getPriceString = (item: WishlistItem) => {
     const calc = item.product_variant?.calculated_price
-    if (calc && calc.calculated_amount !== undefined) {
+    if (calc && typeof calc.calculated_amount === "number") {
       return convertToLocale({
         amount: calc.calculated_amount,
         currency_code: calc.currency_code || "usd",
       })
     }
     const price = item.product_variant?.prices?.[0]
-    if (price && price.amount !== undefined) {
+    if (price && typeof price.amount === "number") {
       return convertToLocale({
         amount: price.amount,
         currency_code: price.currency_code || "usd",

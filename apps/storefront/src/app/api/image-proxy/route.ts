@@ -26,14 +26,13 @@ export async function GET(request: NextRequest) {
 
     const contentType = response.headers.get("content-type") || "image/jpeg"
     const arrayBuffer = await response.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
 
     const headers = new Headers()
     headers.set("Content-Type", contentType)
     headers.set("Access-Control-Allow-Origin", "*")
     headers.set("Cache-Control", "public, max-age=86400")
 
-    return new NextResponse(buffer, {
+    return new NextResponse(arrayBuffer, {
       status: 200,
       headers,
     })

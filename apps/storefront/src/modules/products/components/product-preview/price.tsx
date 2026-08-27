@@ -17,41 +17,59 @@ export default function PreviewPrice({ price }: PreviewPriceProps) {
     displayPrice = price
   } else if (typeof price === "number") {
     displayPrice = convertToLocale({ amount: price, currency_code: "usd" })
-  } else if (typeof price.calculated_price === "string") {
-    displayPrice = price.calculated_price
-    if (typeof price.original_price === "string" && price.original_price !== price.calculated_price) {
-      originalPrice = price.original_price
-      isSale = price.price_type === "sale" || (price.percentage_diff && price.percentage_diff > 0)
-    }
-  } else if (typeof price.calculated_price_number === "number") {
-    displayPrice = convertToLocale({
-      amount: price.calculated_price_number,
-      currency_code: price.currency_code || "usd",
-    })
-    if (typeof price.original_price_number === "number" && price.original_price_number > price.calculated_price_number) {
-      originalPrice = convertToLocale({
-        amount: price.original_price_number,
-        currency_code: price.currency_code || "usd",
+  } else if (typeof price === "object") {
+    const p = price as Record<string, unknown>
+    if (typeof p.calculated_price === "string") {
+      displayPrice = p.calculated_price
+      if (
+        typeof p.original_price === "string" &&
+        p.original_price !== p.calculated_price
+      ) {
+        originalPrice = p.original_price
+        const diff = Number(p.percentage_diff) || 0
+        isSale = p.price_type === "sale" || diff > 0
+      }
+    } else if (typeof p.calculated_price_number === "number") {
+      const curr = (p.currency_code as string) || "usd"
+      displayPrice = convertToLocale({
+        amount: p.calculated_price_number,
+        currency_code: curr,
       })
-      isSale = true
-    }
-  } else if (typeof price.calculated_amount === "number") {
-    displayPrice = convertToLocale({
-      amount: price.calculated_amount,
-      currency_code: price.currency_code || "usd",
-    })
-    if (typeof price.original_amount === "number" && price.original_amount > price.calculated_amount) {
-      originalPrice = convertToLocale({
-        amount: price.original_amount,
-        currency_code: price.currency_code || "usd",
+      if (
+        typeof p.original_price_number === "number" &&
+        p.original_price_number > p.calculated_price_number
+      ) {
+        originalPrice = convertToLocale({
+          amount: p.original_price_number,
+          currency_code: curr,
+        })
+        isSale = true
+      }
+    } else if (typeof p.calculated_amount === "number") {
+      const curr = (p.currency_code as string) || "usd"
+      displayPrice = convertToLocale({
+        amount: p.calculated_amount,
+        currency_code: curr,
       })
-      isSale = true
+      if (
+        typeof p.original_amount === "number" &&
+        p.original_amount > p.calculated_amount
+      ) {
+        originalPrice = convertToLocale({
+          amount: p.original_amount,
+          currency_code: curr,
+        })
+        isSale = true
+      }
+    } else if (typeof p.amount === "number") {
+      const curr = (p.currency_code as string) || "usd"
+      displayPrice = convertToLocale({
+        amount: p.amount,
+        currency_code: curr,
+      })
+    } else {
+      displayPrice = "$0.00"
     }
-  } else if (typeof price.amount === "number") {
-    displayPrice = convertToLocale({
-      amount: price.amount,
-      currency_code: price.currency_code || "usd",
-    })
   } else {
     displayPrice = "$0.00"
   }

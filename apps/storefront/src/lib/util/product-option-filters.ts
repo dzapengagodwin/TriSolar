@@ -148,11 +148,11 @@ export const extractScopedProductOptions = (
 
   const result: ScopedProductOption[] = []
 
-  for (const [key, group] of optionGroups.entries()) {
+  for (const [key, group] of Array.from(optionGroups.entries())) {
     const values: ScopedOptionValue[] = []
 
-    for (const [, entry] of group.valuesMap.entries()) {
-      const valueIdsArray = Array.from(entry.valueIds)
+    for (const [, entry] of Array.from(group.valuesMap.entries())) {
+      const valueIdsArray: string[] = Array.from(entry.valueIds)
       if (valueIdsArray.length === 0) continue
 
       values.push({
@@ -242,7 +242,9 @@ export const filterProductsByOptionValues = (
       return false
     }
 
-    for (const [groupId, allowedValueIds] of activeGroups.entries()) {
+    for (const [groupId, allowedValueIds] of Array.from(
+      activeGroups.entries()
+    )) {
       const productOption = product.options.find(
         (opt) => (opt.title || "").trim().toLowerCase() === groupId
       )

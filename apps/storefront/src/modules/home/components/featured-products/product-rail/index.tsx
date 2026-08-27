@@ -22,7 +22,7 @@ export default async function ProductRail({
 }) {
   let pricedProducts: HttpTypes.StoreProduct[] = []
 
-  const queryParams: HttpTypes.StoreProductParams = {
+  const queryParams: HttpTypes.StoreProductListParams = {
     limit: 10,
     fields: "*variants.calculated_price,*categories",
   }

@@ -172,13 +172,13 @@ export default async function OrderCompletedTemplate({
                   })}
                 </span>
               </div>
-              {!!order.discount_subtotal && (
+              {!!order.discount_total && (
                 <div className="flex justify-between text-emerald-600">
                   <span>Discount</span>
                   <span className="font-medium" data-testid="cart-discount">
                     -{" "}
                     {convertToLocale({
-                      amount: order.discount_subtotal ?? 0,
+                      amount: order.discount_total ?? 0,
                       currency_code: order.currency_code,
                     })}
                   </span>

@@ -1,6 +1,12 @@
 import { retrieveCustomer } from "@lib/data/customer"
-// TODO: Re-add Toaster component when needed
 import AccountLayout from "@modules/account/templates/account-layout"
+import { createNoIndexMetadata } from "@lib/seo/metadata"
+import { Metadata } from "next"
+
+export const metadata: Metadata = createNoIndexMetadata(
+  "Account",
+  "Manage your LaptopZone customer account, orders, and profile."
+)
 
 export default async function AccountPageLayout({
   dashboard,
@@ -14,7 +20,6 @@ export default async function AccountPageLayout({
   return (
     <AccountLayout customer={customer}>
       {customer ? dashboard : login}
-      {/* TODO: Re-add Toaster component when needed */}
     </AccountLayout>
   )
 }

@@ -54,7 +54,7 @@ export async function retrieveCart(cartId?: string, fields?: string) {
   if (
     cart &&
     (cart.completed_at ||
-      (cart as Record<string, unknown>).status === "completed")
+      (cart as unknown as Record<string, unknown>).status === "completed")
   ) {
     await removeCartId()
     return null
@@ -79,7 +79,7 @@ export async function getOrSetCart(countryCode: string) {
   if (
     !cart ||
     cart.completed_at ||
-    (cart as Record<string, unknown>).status === "completed"
+    (cart as unknown as Record<string, unknown>).status === "completed"
   ) {
     await removeCartId()
     const locale = await getLocale()

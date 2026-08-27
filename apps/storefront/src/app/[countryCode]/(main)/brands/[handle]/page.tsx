@@ -3,8 +3,11 @@ import { getBrandByHandle, listBrands, StoreBrand } from "@lib/data/brands"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import BrandTemplate from "@modules/brands/templates"
+import BreadcrumbJsonLd from "@modules/common/components/breadcrumb-json-ld"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { parseOptionValueIds } from "@lib/util/product-option-filters"
+import { generateBrandMetadata } from "@lib/seo/brand"
+import { getCanonicalUrl, getBrandCanonicalUrl } from "@lib/seo/canonical"
 
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>
@@ -66,23 +69,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     id: `brand_${params.handle}`,
     name: formatBrandName(params.handle),
     handle: params.handle,
-    description: `Browse authentic products from ${formatBrandName(params.handle)} at Laptop Zone.`,
+    description: `Browse authentic products from ${formatBrandName(params.handle)} at LaptopZone.`,
   }
 
-  const metadata: Metadata = {
-    title: `${brand.name} | Laptop Zone`,
-    description:
-      brand.description ||
-      `Browse authentic ${brand.name} products at Laptop Zone`,
-    openGraph: {
-      title: `${brand.name} | Laptop Zone`,
-      description:
-        brand.description || `Browse authentic ${brand.name} products`,
-      images: brand.logo ? [{ url: brand.logo }] : [],
-    },
-  }
-
-  return metadata
+  return generateBrandMetadata(brand, params.countryCode)
 }
 
 export default async function BrandPage(props: Props) {
@@ -103,16 +93,34 @@ export default async function BrandPage(props: Props) {
     product_ids: [],
   }
 
+  const breadcrumbItems = [
+    {
+      name: "Home",
+      url: getCanonicalUrl("", params.countryCode),
+    },
+    {
+      name: "Brands",
+      url: getCanonicalUrl("/brands", params.countryCode),
+    },
+    {
+      name: brand.name,
+      url: getBrandCanonicalUrl(brand.handle, params.countryCode),
+    },
+  ]
+
   return (
-    <BrandTemplate
-      brand={brand}
-      page={page}
-      sortBy={sortBy}
-      countryCode={params.countryCode}
-      optionValueIds={optionValueIds}
-      minPrice={minPrice ? Number(minPrice) : undefined}
-      maxPrice={maxPrice ? Number(maxPrice) : undefined}
-      viewMode={view === "list" ? "list" : "grid"}
-    />
+    <>
+      <BreadcrumbJsonLd items={breadcrumbItems} />
+      <BrandTemplate
+        brand={brand}
+        page={page}
+        sortBy={sortBy}
+        countryCode={params.countryCode}
+        optionValueIds={optionValueIds}
+        minPrice={minPrice ? Number(minPrice) : undefined}
+        maxPrice={maxPrice ? Number(maxPrice) : undefined}
+        viewMode={view === "list" ? "list" : "grid"}
+      />
+    </>
   )
 }

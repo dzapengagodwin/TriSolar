@@ -66,28 +66,7 @@ export default async function BrandTemplate({
     { name: brand.name },
   ]
 
-  const handleKey = brand.handle.toLowerCase().trim()
-  const LOCAL_BRAND_LOGOS: Record<string, string> = {
-    apple: "/top-brands/apple.png",
-    asus: "/top-brands/asus.png",
-    hp: "/top-brands/hp.png",
-    lenovo: "/top-brands/lenovo.png",
-    dell: "/top-brands/dell.png",
-    canon: "/top-brands/canon.png",
-    brother: "/top-brands/brother.png",
-    amd: "/top-brands/amd.png",
-    logitech: "/top-brands/logitech.png",
-    ubiquiti: "/top-brands/ubiquiti.png",
-  }
-
-  const rawLogo = brand.logo || brand.image
-  const isProductPhoto =
-    rawLogo &&
-    (rawLogo.includes("/wp-content/uploads/") ||
-      rawLogo.includes("/products/") ||
-      rawLogo.includes("laptopzone.co.zw/wp-content"))
-
-  const brandLogo = LOCAL_BRAND_LOGOS[handleKey] || (!isProductPhoto ? rawLogo : null) || null
+  const brandLogo = brand.logo || brand.image || null
 
   return (
     <div className="py-6 content-container space-y-6">
@@ -95,7 +74,7 @@ export default async function BrandTemplate({
       <div className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            {brandLogo ? (
+            {brandLogo && (
               <div className="relative w-20 h-20 sm:w-24 sm:h-24 bg-gray-50/80 border border-gray-100 rounded-2xl p-3 flex items-center justify-center shrink-0 overflow-hidden">
                 <Image
                   src={brandLogo}
@@ -104,10 +83,6 @@ export default async function BrandTemplate({
                   sizes="96px"
                   className="object-contain p-2"
                 />
-              </div>
-            ) : (
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-laptopzone-orange/10 border border-laptopzone-orange/20 rounded-2xl flex items-center justify-center shrink-0 text-2xl sm:text-3xl font-black text-laptopzone-orange">
-                {brand.name.charAt(0).toUpperCase()}
               </div>
             )}
 

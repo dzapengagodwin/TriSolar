@@ -34,7 +34,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     images && images.length > 0
       ? images
       : product.thumbnail
-      ? [{ id: "thumb", url: product.thumbnail }]
+      ? [{ id: "thumb", url: product.thumbnail, rank: 0 } as HttpTypes.StoreProductImage]
       : []
 
   return (

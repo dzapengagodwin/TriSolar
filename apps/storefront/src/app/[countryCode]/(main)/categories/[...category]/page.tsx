@@ -5,8 +5,11 @@ import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { HttpTypes, StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
+import BreadcrumbJsonLd from "@modules/common/components/breadcrumb-json-ld"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { parseOptionValueIds } from "@lib/util/product-option-filters"
+import { generateCategoryMetadata } from "@lib/seo/category"
+import { getCanonicalUrl, getCategoryCanonicalUrl } from "@lib/seo/canonical"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -55,18 +58,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   try {
     const productCategory = await getCategoryByHandle(params.category)
-
-    const title = productCategory.name + " | Laptop Zone"
-
-    const description = productCategory.description ?? `${title} category.`
-
-    return {
-      title: `${title} | Laptop Zone`,
-      description,
-      alternates: {
-        canonical: `${params.category.join("/")}`,
-      },
-    }
+    return generateCategoryMetadata(productCategory, params.countryCode)
   } catch {
     notFound()
   }
@@ -84,16 +76,34 @@ export default async function CategoryPage(props: Props) {
     notFound()
   }
 
+  const breadcrumbItems = [
+    {
+      name: "Home",
+      url: getCanonicalUrl("", params.countryCode),
+    },
+    {
+      name: "Categories",
+      url: getCanonicalUrl("/store", params.countryCode),
+    },
+    {
+      name: productCategory.name,
+      url: getCategoryCanonicalUrl(productCategory.handle, params.countryCode),
+    },
+  ]
+
   return (
-    <CategoryTemplate
-      category={productCategory}
-      sortBy={sortBy}
-      page={page}
-      countryCode={params.countryCode}
-      optionValueIds={optionValueIds}
-      minPrice={minPrice ? Number(minPrice) : undefined}
-      maxPrice={maxPrice ? Number(maxPrice) : undefined}
-      viewMode={view === "list" ? "list" : "grid"}
-    />
+    <>
+      <BreadcrumbJsonLd items={breadcrumbItems} />
+      <CategoryTemplate
+        category={productCategory}
+        sortBy={sortBy}
+        page={page}
+        countryCode={params.countryCode}
+        optionValueIds={optionValueIds}
+        minPrice={minPrice ? Number(minPrice) : undefined}
+        maxPrice={maxPrice ? Number(maxPrice) : undefined}
+        viewMode={view === "list" ? "list" : "grid"}
+      />
+    </>
   )
 }

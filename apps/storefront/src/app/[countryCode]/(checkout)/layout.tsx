@@ -8,6 +8,13 @@ import {
   ShieldCheck,
   TruckFast,
 } from "@medusajs/icons"
+import { createNoIndexMetadata } from "@lib/seo/metadata"
+import { Metadata } from "next"
+
+export const metadata: Metadata = createNoIndexMetadata(
+  "Secure Checkout",
+  "Complete your secure order on LaptopZone."
+)
 
 export default function CheckoutLayout({
   children,
