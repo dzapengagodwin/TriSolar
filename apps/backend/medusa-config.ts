@@ -43,6 +43,9 @@ export default defineConfig({
       resolve: "./src/modules/product-recommendation",
     },
     {
+      resolve: "./src/modules/seo",
+    },
+    {
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [

@@ -1,11 +1,13 @@
 import { HttpTypes } from "@medusajs/types"
 import { getProductCanonicalUrl } from "@lib/seo/canonical"
 import { SITE_NAME, DEFAULT_CURRENCY_CODE } from "@lib/seo/constants"
+import { SeoMetadataDTO } from "@lib/data/seo"
 
 type ProductJsonLdProps = {
   product: HttpTypes.StoreProduct
   countryCode?: string
   currencyCode?: string
+  seo?: Partial<SeoMetadataDTO> | null
 }
 
 type ExtendedVariant = HttpTypes.StoreProductVariant & {
@@ -42,15 +44,25 @@ export default function ProductJsonLd({
   product,
   countryCode = "zw",
   currencyCode = DEFAULT_CURRENCY_CODE,
+  seo,
 }: ProductJsonLdProps) {
   if (!product || !product.id) return null
 
-  const canonicalUrl = getProductCanonicalUrl(product.handle, countryCode)
+  const canonicalUrl =
+    seo?.canonical_url && seo.canonical_url.trim()
+      ? seo.canonical_url.trim()
+      : getProductCanonicalUrl(product.handle, countryCode)
+
   const currencyUpper = currencyCode.toUpperCase()
 
   // Collect image URLs
   const images: string[] = []
-  if (product.thumbnail) images.push(product.thumbnail)
+  if (seo?.og_image && seo.og_image.trim()) {
+    images.push(seo.og_image.trim())
+  }
+  if (product.thumbnail && !images.includes(product.thumbnail)) {
+    images.push(product.thumbnail)
+  }
   if (product.images && product.images.length > 0) {
     for (const img of product.images) {
       if (img.url && !images.includes(img.url)) {
@@ -150,7 +162,9 @@ export default function ProductJsonLd({
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.title,
-    description: stripHtml(product.description || product.subtitle || product.title),
+    description: stripHtml(
+      seo?.meta_description || product.description || product.subtitle || product.title
+    ),
     url: canonicalUrl,
   }
 

@@ -1,0 +1,167 @@
+import { MedusaService } from "@medusajs/framework/utils"
+import SeoMetadata from "./models/seo-metadata"
+import {
+  ProductSeoAnalysisInput,
+  SeoAnalysisResult,
+  SeoMetadataDTO,
+  UpsertSeoMetadataInput,
+} from "./types"
+import { analyzeProductSeo } from "./utils/analyzer"
+
+class SeoModuleService extends MedusaService({
+  SeoMetadata,
+}) {
+  /**
+   * Retrieve SEO metadata record for a given entity (product, category, brand, etc.)
+   */
+  async retrieveForEntity(
+    entityType: string,
+    entityId: string
+  ): Promise<SeoMetadataDTO | null> {
+    if (!entityType || !entityId) return null
+
+    const records = await this.listSeoMetadata({
+      entity_type: entityType,
+      entity_id: entityId,
+    })
+
+    return (records?.[0] as unknown as SeoMetadataDTO) || null
+  }
+
+  /**
+   * Upsert SEO metadata for a given entity safely without creating duplicate records
+   */
+  async upsertForEntity(
+    entityType: string,
+    entityId: string,
+    data: UpsertSeoMetadataInput
+  ): Promise<SeoMetadataDTO> {
+    const existing = await this.retrieveForEntity(entityType, entityId)
+
+    if (existing) {
+      const updated = await (this as any).updateSeoMetadata([
+        {
+          id: existing.id,
+          meta_title: data.meta_title !== undefined ? data.meta_title : existing.meta_title,
+          meta_description:
+            data.meta_description !== undefined
+              ? data.meta_description
+              : existing.meta_description,
+          focus_keyphrase:
+            data.focus_keyphrase !== undefined
+              ? data.focus_keyphrase
+              : existing.focus_keyphrase,
+          canonical_url:
+            data.canonical_url !== undefined
+              ? data.canonical_url
+              : existing.canonical_url,
+          og_title: data.og_title !== undefined ? data.og_title : existing.og_title,
+          og_description:
+            data.og_description !== undefined
+              ? data.og_description
+              : existing.og_description,
+          og_image: data.og_image !== undefined ? data.og_image : existing.og_image,
+          robots_index:
+            data.robots_index !== undefined
+              ? data.robots_index
+              : existing.robots_index,
+          robots_follow:
+            data.robots_follow !== undefined
+              ? data.robots_follow
+              : existing.robots_follow,
+          metadata:
+            data.metadata !== undefined ? data.metadata : existing.metadata,
+        },
+      ])
+      return updated[0] as unknown as SeoMetadataDTO
+    }
+
+    const created = await (this as any).createSeoMetadata({
+      entity_type: entityType,
+      entity_id: entityId,
+      meta_title: data.meta_title || null,
+      meta_description: data.meta_description || null,
+      focus_keyphrase: data.focus_keyphrase || null,
+      canonical_url: data.canonical_url || null,
+      og_title: data.og_title || null,
+      og_description: data.og_description || null,
+      og_image: data.og_image || null,
+      robots_index: data.robots_index !== undefined ? data.robots_index : true,
+      robots_follow: data.robots_follow !== undefined ? data.robots_follow : true,
+      metadata: data.metadata || null,
+    })
+
+    return created as unknown as SeoMetadataDTO
+  }
+
+  /**
+   * Delete SEO metadata for a given entity
+   */
+  async deleteForEntity(entityType: string, entityId: string): Promise<boolean> {
+    const existing = await this.retrieveForEntity(entityType, entityId)
+    if (!existing) return false
+
+    await (this as any).deleteSeoMetadata([existing.id])
+    return true
+  }
+
+  /**
+   * Run SEO analysis against an entity and its SEO metadata
+   */
+  async analyze(input: ProductSeoAnalysisInput): Promise<SeoAnalysisResult> {
+    return analyzeProductSeo(input)
+  }
+
+  /**
+   * Get sensible default metadata fallback values for an entity (pure calculation)
+   */
+  async getDefaults(
+    entityType: string,
+    entity: any,
+    options: { storefrontUrl?: string; countryCode?: string } = {}
+  ): Promise<Partial<UpsertSeoMetadataInput>> {
+    const storefrontUrl = (options.storefrontUrl || "https://laptopzone.co.zw").replace(
+      /\/+$/,
+      ""
+    )
+    const countryCode = (options.countryCode || "zw").toLowerCase()
+
+    if (entityType === "product") {
+      const title = entity.title ? `${entity.title} | LaptopZone` : "LaptopZone"
+      const rawDesc = entity.description || entity.subtitle || ""
+      const cleanDesc = rawDesc
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+      const desc =
+        cleanDesc.length > 155 ? `${cleanDesc.slice(0, 152)}...` : cleanDesc
+
+      const canonicalUrl = entity.handle
+        ? `${storefrontUrl}/${countryCode}/products/${entity.handle}`
+        : null
+
+      const image = entity.thumbnail || entity.images?.[0]?.url || null
+
+      return {
+        meta_title: title,
+        meta_description: desc,
+        focus_keyphrase: entity.title || null,
+        canonical_url: canonicalUrl,
+        og_title: title,
+        og_description: desc,
+        og_image: image,
+        robots_index: true,
+        robots_follow: true,
+      }
+    }
+
+    return {
+      meta_title: entity.name || entity.title || "LaptopZone",
+      meta_description: entity.description || null,
+      robots_index: true,
+      robots_follow: true,
+    }
+  }
+}
+
+export default SeoModuleService

@@ -3,6 +3,7 @@ import { HttpTypes } from "@medusajs/types"
 import { buildBaseMetadata } from "./metadata"
 import { getProductCanonicalUrl } from "./canonical"
 import { SITE_NAME } from "./constants"
+import { SeoMetadataDTO } from "@lib/data/seo"
 
 /**
  * Strips HTML tags and collapses whitespace to create a clean meta description
@@ -18,34 +19,63 @@ function cleanMetaDescription(raw?: string | null, fallback?: string): string {
 }
 
 /**
- * Generates Google-compliant Next.js Metadata for Product Detail Pages allowing full indexing and crawling
+ * Generates Google-compliant Next.js Metadata for Product Detail Pages
+ * Priority: 1. Custom SEO metadata -> 2. Product fields -> 3. Safe fallback
  */
 export function generateProductMetadata(
   product: HttpTypes.StoreProduct,
-  countryCode: string = "zw"
+  countryCode: string = "zw",
+  seo?: Partial<SeoMetadataDTO> | null
 ): Metadata {
-  const title = `${product.title} | ${SITE_NAME}`
+  // 1. Title Priority: Custom SEO title -> Product title + Brand -> Fallback
+  const title =
+    seo?.meta_title && seo.meta_title.trim()
+      ? seo.meta_title.trim()
+      : product.title
+      ? `${product.title} | ${SITE_NAME}`
+      : SITE_NAME
+
+  // 2. Description Priority: Custom SEO desc -> Product desc/subtitle -> Fallback
+  const rawDescription =
+    seo?.meta_description && seo.meta_description.trim()
+      ? seo.meta_description.trim()
+      : product.description || product.subtitle
+
   const description = cleanMetaDescription(
-    product.description || product.subtitle,
+    rawDescription,
     `Buy ${product.title} online at ${SITE_NAME}. Authentic tech with warranty and fast delivery across Zimbabwe.`
   )
 
-  const canonicalUrl = getProductCanonicalUrl(product.handle, countryCode)
-  const imageUrl = product.thumbnail || product.images?.[0]?.url || null
+  // 3. Canonical URL: Custom canonical override -> Standard canonical product URL
+  const canonicalUrl =
+    seo?.canonical_url && seo.canonical_url.trim()
+      ? seo.canonical_url.trim()
+      : getProductCanonicalUrl(product.handle, countryCode)
 
-  // Only noindex if explicitly marked as hidden in metadata or not published
-  const isExplicitlyHidden =
-    (typeof (product as any).status === "string" &&
-      (product as any).status !== "published") ||
-    product.metadata?.noindex === true ||
-    product.metadata?.seo_index === false
+  // 4. Primary Image: Custom OG image -> Product thumbnail -> First gallery image
+  const imageUrl =
+    seo?.og_image && seo.og_image.trim()
+      ? seo.og_image.trim()
+      : product.thumbnail || product.images?.[0]?.url || null
+
+  // 5. Robots: SEO record override -> Product status/metadata check
+  let isNoIndex = false
+  if (seo && typeof seo.robots_index === "boolean") {
+    isNoIndex = !seo.robots_index
+  } else {
+    isNoIndex =
+      (typeof (product as any).status === "string" &&
+        (product as any).status !== "published") ||
+      product.metadata?.noindex === true ||
+      product.metadata?.seo_index === false
+  }
 
   return buildBaseMetadata({
     title,
     description,
     canonicalUrl,
     imageUrl,
-    noIndex: isExplicitlyHidden,
+    noIndex: isNoIndex,
     type: "website",
   })
 }

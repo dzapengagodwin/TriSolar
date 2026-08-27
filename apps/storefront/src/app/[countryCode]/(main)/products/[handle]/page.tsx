@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
+import { getProductSeo } from "@lib/data/seo"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import ProductJsonLd from "@modules/products/components/product-json-ld"
@@ -95,7 +96,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     notFound()
   }
 
-  return generateProductMetadata(product, countryCode)
+  const seo = await getProductSeo(product.id || handle)
+
+  return generateProductMetadata(product, countryCode, seo)
 }
 
 export default async function ProductPage(props: Props) {
@@ -110,10 +113,13 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  const pricedProduct = await listProducts({
-    countryCode,
-    queryParams: { handle },
-  }).then(({ response }) => response.products[0])
+  const [pricedProduct, seo] = await Promise.all([
+    listProducts({
+      countryCode,
+      queryParams: { handle },
+    }).then(({ response }) => response.products[0]),
+    getProductSeo(handle),
+  ])
 
   if (!pricedProduct) {
     notFound()
@@ -148,6 +154,7 @@ export default async function ProductPage(props: Props) {
         product={pricedProduct}
         countryCode={countryCode}
         currencyCode={region.currency_code}
+        seo={seo}
       />
       <BreadcrumbJsonLd items={breadcrumbItems} />
       <ProductTemplate
