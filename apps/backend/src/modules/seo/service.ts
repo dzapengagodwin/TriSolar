@@ -1,4 +1,4 @@
-import { MedusaService } from "@medusajs/framework/utils"
+import { MedusaService, MedusaError } from "@medusajs/framework/utils"
 import SeoMetadata from "./models/seo-metadata"
 import {
   ProductSeoAnalysisInput,
@@ -12,6 +12,55 @@ class SeoModuleService extends MedusaService({
   SeoMetadata,
 }) {
   /**
+   * Safe getter for list method handling irregular pluralization ('metadata' vs 'metadatas')
+   */
+  private async listRecords(filters: Record<string, unknown>, config?: Record<string, unknown>): Promise<any[]> {
+    const fn = (this as any).listSeoMetadata || (this as any).listSeoMetadatas
+    if (typeof fn === "function") {
+      return fn.call(this, filters, config)
+    }
+    return []
+  }
+
+  /**
+   * Safe getter for create method
+   */
+  private async createRecords(data: Record<string, unknown> | Record<string, unknown>[]): Promise<any> {
+    const fn = (this as any).createSeoMetadata || (this as any).createSeoMetadatas
+    if (typeof fn === "function") {
+      return fn.call(this, data)
+    }
+    throw new MedusaError(
+      MedusaError.Types.UNEXPECTED_STATE,
+      "Unable to resolve create method on SeoModuleService"
+    )
+  }
+
+  /**
+   * Safe getter for update method
+   */
+  private async updateRecords(data: Record<string, unknown>[]): Promise<any[]> {
+    const fn = (this as any).updateSeoMetadata || (this as any).updateSeoMetadatas
+    if (typeof fn === "function") {
+      return fn.call(this, data)
+    }
+    throw new MedusaError(
+      MedusaError.Types.UNEXPECTED_STATE,
+      "Unable to resolve update method on SeoModuleService"
+    )
+  }
+
+  /**
+   * Safe getter for delete method
+   */
+  private async deleteRecords(ids: string[]): Promise<void> {
+    const fn = (this as any).deleteSeoMetadata || (this as any).deleteSeoMetadatas
+    if (typeof fn === "function") {
+      return fn.call(this, ids)
+    }
+  }
+
+  /**
    * Retrieve SEO metadata record for a given entity (product, category, brand, etc.)
    */
   async retrieveForEntity(
@@ -20,7 +69,7 @@ class SeoModuleService extends MedusaService({
   ): Promise<SeoMetadataDTO | null> {
     if (!entityType || !entityId) return null
 
-    const records = await this.listSeoMetadata({
+    const records = await this.listRecords({
       entity_type: entityType,
       entity_id: entityId,
     })
@@ -39,7 +88,7 @@ class SeoModuleService extends MedusaService({
     const existing = await this.retrieveForEntity(entityType, entityId)
 
     if (existing) {
-      const updated = await (this as any).updateSeoMetadata([
+      const updated = await this.updateRecords([
         {
           id: existing.id,
           meta_title: data.meta_title !== undefined ? data.meta_title : existing.meta_title,
@@ -73,10 +122,11 @@ class SeoModuleService extends MedusaService({
             data.metadata !== undefined ? data.metadata : existing.metadata,
         },
       ])
-      return updated[0] as unknown as SeoMetadataDTO
+      const result = Array.isArray(updated) ? updated[0] : updated
+      return result as unknown as SeoMetadataDTO
     }
 
-    const created = await (this as any).createSeoMetadata({
+    const created = await this.createRecords({
       entity_type: entityType,
       entity_id: entityId,
       meta_title: data.meta_title || null,
@@ -91,7 +141,8 @@ class SeoModuleService extends MedusaService({
       metadata: data.metadata || null,
     })
 
-    return created as unknown as SeoMetadataDTO
+    const result = Array.isArray(created) ? created[0] : created
+    return result as unknown as SeoMetadataDTO
   }
 
   /**
@@ -101,7 +152,7 @@ class SeoModuleService extends MedusaService({
     const existing = await this.retrieveForEntity(entityType, entityId)
     if (!existing) return false
 
-    await (this as any).deleteSeoMetadata([existing.id])
+    await this.deleteRecords([existing.id])
     return true
   }
 
