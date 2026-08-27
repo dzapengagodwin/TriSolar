@@ -18,7 +18,7 @@ function cleanMetaDescription(raw?: string | null, fallback?: string): string {
 }
 
 /**
- * Generates Google-compliant Next.js Metadata for Product Detail Pages
+ * Generates Google-compliant Next.js Metadata for Product Detail Pages allowing full indexing and crawling
  */
 export function generateProductMetadata(
   product: HttpTypes.StoreProduct,
@@ -33,8 +33,10 @@ export function generateProductMetadata(
   const canonicalUrl = getProductCanonicalUrl(product.handle, countryCode)
   const imageUrl = product.thumbnail || product.images?.[0]?.url || null
 
-  const isDiscontinuedOrHidden =
-    product.status !== "published" ||
+  // Only noindex if explicitly marked as hidden in metadata or not published
+  const isExplicitlyHidden =
+    (typeof (product as any).status === "string" &&
+      (product as any).status !== "published") ||
     product.metadata?.noindex === true ||
     product.metadata?.seo_index === false
 
@@ -43,7 +45,7 @@ export function generateProductMetadata(
     description,
     canonicalUrl,
     imageUrl,
-    noIndex: isDiscontinuedOrHidden,
+    noIndex: isExplicitlyHidden,
     type: "website",
   })
 }
