@@ -30,7 +30,7 @@ function StarRow({ rating, max = 5 }: { rating: number; max?: number }) {
   return (
     <span className="flex items-center gap-0.5 text-amber-400" aria-label={`${rating} out of ${max} stars`}>
       {Array.from({ length: max }, (_, i) => (
-        <span key={i}>{i < Math.round(rating) ? "â˜…" : "â˜†"}</span>
+        <span key={i}>{i < Math.round(rating) ? "★" : "☆"}</span>
       ))}
     </span>
   )
@@ -54,7 +54,7 @@ function RatingSummary({
       {/* Average score */}
       <div className="flex items-center gap-4 shrink-0">
         <div className="text-5xl font-black text-gray-900">
-          {averageRating > 0 ? averageRating.toFixed(1) : "â€”"}
+          {averageRating > 0 ? averageRating.toFixed(1) : "\u2014"}
         </div>
         <div className="space-y-1">
           <StarRow rating={averageRating} />
@@ -70,7 +70,7 @@ function RatingSummary({
           {counts.map(({ star, count }) => (
             <div key={star} className="flex items-center gap-2 text-xs text-gray-600">
               <span className="w-2 text-right font-semibold">{star}</span>
-              <span className="text-amber-400 text-[10px]">â˜…</span>
+              <span className="text-amber-400 text-[10px]">{"\u2605"}</span>
               <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-amber-400 h-full rounded-full"
