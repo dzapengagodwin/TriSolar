@@ -4,16 +4,20 @@ import { useState, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { XMark, ChevronLeft, ChevronRight, ArrowsPointingOut } from "@medusajs/icons"
+import { getProductImageAlt } from "@lib/seo"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
+  productTitle?: string
+  brand?: string
 }
 
-const ImageGallery = ({ images }: ImageGalleryProps) => {
+const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   const galleryImages = images && images.length > 0 ? images : []
+  const totalCount = galleryImages.length
 
   const activeImage = galleryImages[selectedIndex] || galleryImages[0]
 
@@ -40,30 +44,39 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
         
         {/* Left Column: Vertical Thumbnails Stack */}
         <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto max-h-[500px] w-full sm:w-24 shrink-0 pb-2 sm:pb-0 scrollbar-none">
-          {galleryImages.map((img, idx) => (
-            <button
-              key={img.id || idx}
-              onClick={() => setSelectedIndex(idx)}
-              onMouseEnter={() => setSelectedIndex(idx)}
-              className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl border-2 overflow-hidden bg-white p-1.5 transition-all flex items-center justify-center shrink-0 ${
-                selectedIndex === idx
-                  ? "border-black shadow-md ring-2 ring-black/20"
-                  : "border-gray-200 hover:border-gray-400 opacity-75 hover:opacity-100"
-              }`}
-            >
-              {img.url ? (
-                <Image
-                  src={img.url}
-                  alt={`Product thumbnail ${idx + 1}`}
-                  fill
-                  className="object-contain p-1"
-                  sizes="80px"
-                />
-              ) : (
-                <span className="text-xs text-gray-400 font-mono">No Image</span>
-              )}
-            </button>
-          ))}
+          {galleryImages.map((img, idx) => {
+            const thumbnailAlt = getProductImageAlt({
+              title: productTitle,
+              brand,
+              index: idx,
+              totalImages: totalCount,
+            })
+
+            return (
+              <button
+                key={img.id || idx}
+                onClick={() => setSelectedIndex(idx)}
+                onMouseEnter={() => setSelectedIndex(idx)}
+                className={`relative w-20 h-20 sm:w-22 sm:h-22 rounded-xl border-2 overflow-hidden bg-white p-1.5 transition-all flex items-center justify-center shrink-0 ${
+                  selectedIndex === idx
+                    ? "border-black shadow-md ring-2 ring-black/20"
+                    : "border-gray-200 hover:border-gray-400 opacity-75 hover:opacity-100"
+                }`}
+              >
+                {img.url ? (
+                  <Image
+                    src={img.url}
+                    alt={thumbnailAlt}
+                    fill
+                    className="object-contain p-1"
+                    sizes="80px"
+                  />
+                ) : (
+                  <span className="text-xs text-gray-400 font-mono">No Image</span>
+                )}
+              </button>
+            )
+          })}
         </div>
 
         {/* Right Main Image Viewport */}
@@ -76,7 +89,12 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
             {activeImage?.url && (
               <Image
                 src={activeImage.url}
-                alt="Product main view"
+                alt={getProductImageAlt({
+                  title: productTitle,
+                  brand,
+                  index: selectedIndex,
+                  totalImages: totalCount,
+                })}
                 fill
                 priority
                 className="object-contain transition-all duration-300 group-hover:scale-105"
@@ -135,7 +153,12 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
               {activeImage?.url && (
                 <Image
                   src={activeImage.url}
-                  alt="Expanded Product view"
+                  alt={getProductImageAlt({
+                    title: productTitle,
+                    brand,
+                    index: selectedIndex,
+                    totalImages: totalCount,
+                  })}
                   fill
                   className="object-contain"
                   sizes="100vw"
@@ -158,27 +181,36 @@ const ImageGallery = ({ images }: ImageGalleryProps) => {
 
           {/* Modal Bottom Thumbnail Strip */}
           <div className="flex justify-center items-center gap-3 max-w-4xl mx-auto overflow-x-auto py-2">
-            {galleryImages.map((img, idx) => (
-              <button
-                key={img.id || idx}
-                onClick={() => setSelectedIndex(idx)}
-                className={`relative w-16 h-16 rounded-xl border-2 overflow-hidden bg-white p-1 transition-all shrink-0 ${
-                  selectedIndex === idx
-                    ? "border-primary ring-2 ring-primary/50 scale-105"
-                    : "border-transparent opacity-60 hover:opacity-100"
-                }`}
-              >
-                {img.url && (
-                  <Image
-                    src={img.url}
-                    alt={`Modal thumbnail ${idx + 1}`}
-                    fill
-                    className="object-contain p-0.5"
-                    sizes="64px"
-                  />
-                )}
-              </button>
-            ))}
+            {galleryImages.map((img, idx) => {
+              const modalThumbAlt = getProductImageAlt({
+                title: productTitle,
+                brand,
+                index: idx,
+                totalImages: totalCount,
+              })
+
+              return (
+                <button
+                  key={img.id || idx}
+                  onClick={() => setSelectedIndex(idx)}
+                  className={`relative w-16 h-16 rounded-xl border-2 overflow-hidden bg-white p-1 transition-all shrink-0 ${
+                    selectedIndex === idx
+                      ? "border-primary ring-2 ring-primary/50 scale-105"
+                      : "border-transparent opacity-60 hover:opacity-100"
+                  }`}
+                >
+                  {img.url && (
+                    <Image
+                      src={img.url}
+                      alt={modalThumbAlt}
+                      fill
+                      className="object-contain p-0.5"
+                      sizes="64px"
+                    />
+                  )}
+                </button>
+              )
+            })}
           </div>
 
         </div>

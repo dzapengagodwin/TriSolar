@@ -446,7 +446,22 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
               </label>
             </div>
 
-            {/* 5. Open Graph / Social Sharing Accordion */}
+            {/* 5. Image SEO & Media Readiness */}
+            <div className="p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
+                  <span>🖼️</span> Image SEO & Media Discovery
+                </span>
+                <span className="text-[11px] font-semibold text-blue-700">
+                  {data.thumbnail ? "✓ Primary Image Active" : "⚠ Missing Thumbnail"}
+                </span>
+              </div>
+              <p className="text-[11px] text-blue-800 leading-relaxed">
+                Descriptive alt text, Schema.org image arrays, and Google Image Sitemap (<code className="font-mono text-[10px] bg-white px-1 py-0.5 rounded border border-blue-200">/image-sitemap.xml</code>) are generated dynamically for search crawlers.
+              </p>
+            </div>
+
+            {/* 6. Open Graph / Social Sharing Accordion */}
             <div className="pt-2">
               <Button
                 variant="transparent"

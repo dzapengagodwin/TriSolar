@@ -47,7 +47,14 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           
           {/* Left Side (7 columns): Product Image Gallery with Vertical Thumbnails & Modal */}
           <div className="lg:col-span-7 w-full">
-            <ImageGallery images={galleryImages} />
+            <ImageGallery
+              images={galleryImages}
+              productTitle={product.title}
+              brand={
+                (product as any).brand?.name ||
+                (product.metadata?.brand as string)
+              }
+            />
           </div>
 
           {/* Right Side (5 columns): Product Info, Options & Buy Actions */}

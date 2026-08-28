@@ -1,6 +1,7 @@
 import { getProductPrice, getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getProductImageAlt } from "@lib/seo"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 
@@ -63,6 +64,12 @@ export default function ProductPreview({
                 images={product.images}
                 size="full"
                 isFeatured={isFeatured}
+                alt={getProductImageAlt({
+                  title: product.title,
+                  brand:
+                    (product as any).brand?.name ||
+                    (product.metadata?.brand as string),
+                })}
                 className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
                 objectFit="contain"
               />
@@ -142,6 +149,12 @@ export default function ProductPreview({
               images={product.images}
               size="full"
               isFeatured={isFeatured}
+              alt={getProductImageAlt({
+                title: product.title,
+                brand:
+                  (product as any).brand?.name ||
+                  (product.metadata?.brand as string),
+              })}
               className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
               objectFit="contain"
             />

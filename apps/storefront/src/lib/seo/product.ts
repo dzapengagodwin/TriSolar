@@ -64,8 +64,8 @@ export function generateProductMetadata(
     isNoIndex = !seo.robots_index
   } else {
     isNoIndex =
-      (typeof (product as any).status === "string" &&
-        (product as any).status !== "published") ||
+      (typeof (product as unknown as Record<string, unknown>).status === "string" &&
+        (product as unknown as Record<string, unknown>).status !== "published") ||
       product.metadata?.noindex === true ||
       product.metadata?.seo_index === false
   }

@@ -63,7 +63,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
 
     productEntries = (response?.products || [])
-      .filter((product) => product.handle && product.status === "published")
+      .filter(
+        (product) =>
+          product.handle &&
+          (product as any).status !== "draft" &&
+          (product as any).status !== "archived" &&
+          product.metadata?.noindex !== true &&
+          product.metadata?.seo_index !== false
+      )
       .map((product) => ({
         url: getProductCanonicalUrl(product.handle, countryCode),
         lastModified: product.updated_at ? new Date(product.updated_at) : now,

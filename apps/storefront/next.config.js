@@ -51,6 +51,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "*.laptopzone.co.zw",
       },
+      {
+        protocol: "https",
+        hostname: "*.r2.cloudflarestorage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.r2.dev",
+      },
       ...(S3_HOSTNAME && S3_PATHNAME
         ? [
             {

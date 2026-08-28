@@ -47,7 +47,7 @@ export async function getProductSeo(
     )
 
     return res.seo || null
-  } catch (error) {
+  } catch (_error) {
     // Return null silently so standard product fallback metadata is used
     return null
   }
