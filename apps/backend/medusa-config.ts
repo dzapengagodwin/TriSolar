@@ -87,5 +87,25 @@ export default defineConfig({
         ],
       },
     },
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/sendgrid",
+            id: "sendgrid",
+            options: {
+              channels: ["email"],
+              api_key: process.env.SENDGRID_API_KEY,
+              from: process.env.SENDGRID_FROM_EMAIL,
+              from_name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
+              sandbox: process.env.SENDGRID_SANDBOX === "true",
+              storefront_url: process.env.STOREFRONT_URL || "http://localhost:8000",
+              admin_url: process.env.ADMIN_URL || "http://localhost:9000/app",
+            },
+          },
+        ],
+      },
+    },
   ],
 })

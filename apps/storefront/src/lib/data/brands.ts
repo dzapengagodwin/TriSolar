@@ -1,6 +1,3 @@
-import { sdk } from "@lib/config"
-import { getCacheOptions } from "./cookies"
-
 export type StoreBrand = {
   id: string
   name: string
@@ -16,37 +13,62 @@ export type StoreBrand = {
   metadata?: Record<string, unknown> | null
 }
 
-export const listBrands = async (query?: { limit?: number; offset?: number }): Promise<StoreBrand[]> => {
-  const next = {
-    ...(await getCacheOptions("brands")),
-  }
+export const STATIC_BRANDS: StoreBrand[] = [
+  {
+    id: "brand_apple",
+    name: "Apple",
+    handle: "apple",
+    logo: "/top-brands/apple.png",
+    description: "MacBook, iMac, iPad, and genuine Apple accessories.",
+    website: "https://www.apple.com",
+  },
+  {
+    id: "brand_hp",
+    name: "HP",
+    handle: "hp",
+    logo: "/top-brands/hp.png",
+    description: "High-performance HP Spectre, Omen, Envy, and Pavilion laptops.",
+    website: "https://www.hp.com",
+  },
+  {
+    id: "brand_dell",
+    name: "Dell",
+    handle: "dell",
+    logo: "/top-brands/dell.png",
+    description: "Dell XPS, Inspiron, Latitude, and Alienware computing power.",
+    website: "https://www.dell.com",
+  },
+  {
+    id: "brand_lenovo",
+    name: "Lenovo",
+    handle: "lenovo",
+    logo: "/top-brands/lenovo.png",
+    description: "ThinkPad, Legion, and IdeaPad devices engineered for endurance.",
+    website: "https://www.lenovo.com",
+  },
+  {
+    id: "brand_asus",
+    name: "ASUS",
+    handle: "asus",
+    logo: "/top-brands/asus.png",
+    description: "ROG Strix, TUF Gaming, and ZenBook cutting-edge laptops.",
+    website: "https://www.asus.com",
+  },
+  {
+    id: "brand_canon",
+    name: "Canon",
+    handle: "canon",
+    logo: "/top-brands/canon.png",
+    description: "Canon cameras, printers, and imaging solutions.",
+    website: "https://www.canon.com",
+  },
+]
 
-  const limit = query?.limit || 50
-  const offset = query?.offset || 0
-
-  return sdk.client
-    .fetch<{ brands: StoreBrand[]; count: number }>("/store/brands", {
-      query: {
-        limit,
-        offset,
-      },
-      next,
-      cache: "no-store",
-    })
-    .then(({ brands }) => brands || [])
-    .catch(() => [])
+export const listBrands = async (_query?: { limit?: number; offset?: number }): Promise<StoreBrand[]> => {
+  return STATIC_BRANDS
 }
 
 export const getBrandByHandle = async (handle: string): Promise<StoreBrand | null> => {
-  const next = {
-    ...(await getCacheOptions("brands")),
-  }
-
-  return sdk.client
-    .fetch<{ brand: StoreBrand }>(`/store/brands/${handle}`, {
-      next,
-      cache: "no-store",
-    })
-    .then(({ brand }) => brand || null)
-    .catch(() => null)
+  const found = STATIC_BRANDS.find((b) => b.handle.toLowerCase() === handle.toLowerCase())
+  return found || null
 }

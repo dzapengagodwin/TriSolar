@@ -9,8 +9,8 @@ import FeaturedProducts from "@modules/home/components/featured-products"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
 import { listCollections } from "@lib/data/collections"
-import { listCategories } from "@lib/data/categories"
-import { listBrands } from "@lib/data/brands"
+import { STATIC_BRANDS } from "@lib/data/brands"
+import { STATIC_CATEGORIES } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
@@ -28,10 +28,8 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [collectionsRes, categories, brands, productsRes] = await Promise.all([
+  const [collectionsRes, productsRes] = await Promise.all([
     listCollections({ fields: "id, handle, title" }).catch(() => ({ collections: [] })),
-    listCategories().catch(() => []),
-    listBrands({ limit: 50 }).catch(() => []),
     region
       ? listProducts({
           regionId: region.id,
@@ -42,6 +40,8 @@ export default async function Home(props: {
 
   const collections = collectionsRes.collections || []
   const products = productsRes.response?.products || []
+  const brands = STATIC_BRANDS
+  const categories = STATIC_CATEGORIES
 
   if (!region) {
     return null

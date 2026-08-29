@@ -11,17 +11,15 @@ type SearchBarProps = {
   categories?: HttpTypes.StoreProductCategory[]
 }
 
-export default function SearchBar({ categories }: SearchBarProps) {
+export default function SearchBar({ categories: _categories }: SearchBarProps) {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
 
   const countryCode = (params?.countryCode as string) || "zw"
   const initialQuery = searchParams.get("q") || ""
-  const initialCategory = searchParams.get("category") || ""
 
   const [query, setQuery] = useState(initialQuery)
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory)
   const [results, setResults] = useState<HttpTypes.StoreProduct[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -31,7 +29,6 @@ export default function SearchBar({ categories }: SearchBarProps) {
   // Sync state with URL params
   useEffect(() => {
     setQuery(searchParams.get("q") || "")
-    setSelectedCategory(searchParams.get("category") || "")
   }, [searchParams])
 
   // Click outside listener to close autocomplete popup
@@ -78,24 +75,14 @@ export default function SearchBar({ categories }: SearchBarProps) {
     e.preventDefault()
     setIsOpen(false)
 
-    if (!query.trim() && !selectedCategory) {
+    if (!query.trim()) {
       router.push(`/${countryCode}/store`)
       return
     }
 
     const searchUrlParams = new URLSearchParams()
-    if (query.trim()) {
-      searchUrlParams.set("q", query.trim())
-    }
-    if (selectedCategory) {
-      searchUrlParams.set("category", selectedCategory)
-    }
-
-    if (selectedCategory && !query.trim()) {
-      router.push(`/${countryCode}/categories/${selectedCategory}`)
-    } else {
-      router.push(`/${countryCode}/store?${searchUrlParams.toString()}`)
-    }
+    searchUrlParams.set("q", query.trim())
+    router.push(`/${countryCode}/store?${searchUrlParams.toString()}`)
   }
 
   return (
@@ -104,22 +91,6 @@ export default function SearchBar({ categories }: SearchBarProps) {
         onSubmit={handleSearchSubmit}
         className="w-full relative flex items-center border-2 border-gray-200 rounded-full overflow-hidden bg-gray-50 focus-within:border-black focus-within:bg-white transition-all shadow-xs"
       >
-        {/* Category Selector */}
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="bg-transparent text-xs text-gray-700 font-bold px-4 py-2.5 outline-none border-r border-gray-200 cursor-pointer max-w-[150px] truncate"
-          suppressHydrationWarning
-        >
-          <option value="">All Categories</option>
-          {categories &&
-            categories.map((cat) => (
-              <option key={cat.id} value={cat.handle}>
-                {cat.name}
-              </option>
-            ))}
-        </select>
-
         {/* Text Input with Search Icon */}
         <div className="relative flex-1 flex items-center">
           <input
@@ -130,7 +101,7 @@ export default function SearchBar({ categories }: SearchBarProps) {
               if (results.length > 0) setIsOpen(true)
             }}
             placeholder="Search products, brands and categories..."
-            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-xs px-4 py-2.5 focus:outline-none"
+            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-xs px-4 sm:px-5 py-2.5 focus:outline-none"
           />
 
           {/* Clear Button with XMark Icon */}
@@ -142,7 +113,7 @@ export default function SearchBar({ categories }: SearchBarProps) {
                 setResults([])
                 setIsOpen(false)
               }}
-              className="text-gray-400 hover:text-gray-600 px-2 flex items-center"
+              className="text-gray-400 hover:text-gray-600 px-2 flex items-center cursor-pointer"
               aria-label="Clear search"
             >
               <XMark className="w-4 h-4" />
@@ -153,7 +124,7 @@ export default function SearchBar({ categories }: SearchBarProps) {
         {/* Submit Button with MagnifyingGlass Icon */}
         <button
           type="submit"
-          className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0"
+          className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
           <MagnifyingGlass className="w-4 h-4" />
           <span>Search</span>
@@ -210,7 +181,7 @@ export default function SearchBar({ categories }: SearchBarProps) {
               })}
               <button
                 onClick={handleSearchSubmit}
-                className="w-full text-center py-2.5 text-xs font-bold text-black hover:bg-gray-100 transition-colors border-t border-gray-100 flex items-center justify-center gap-1"
+                className="w-full text-center py-2.5 text-xs font-bold text-black hover:bg-gray-100 transition-colors border-t border-gray-100 flex items-center justify-center gap-1 cursor-pointer"
               >
                 <span>View all results for &quot;{query}&quot;</span>
                 <ArrowRight className="w-3.5 h-3.5" />

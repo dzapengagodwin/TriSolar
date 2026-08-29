@@ -66,8 +66,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter(
         (product) =>
           product.handle &&
-          (product as any).status !== "draft" &&
-          (product as any).status !== "archived" &&
+          (product as unknown as { status?: string }).status !== "draft" &&
+          (product as unknown as { status?: string }).status !== "archived" &&
           product.metadata?.noindex !== true &&
           product.metadata?.seo_index !== false
       )

@@ -47,8 +47,8 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     batch_size?: number
   }
 
-  // 1. Authenticated check
-  const createdBy = (req as any).auth_user?.app_metadata?.user_id
+  // 1. Authenticated check — actor_id is the user ID in Medusa v2
+  const createdBy = req.auth_context?.actor_id
   if (!createdBy) {
     throw new MedusaError(
       MedusaError.Types.NOT_ALLOWED,

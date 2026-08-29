@@ -52,12 +52,12 @@ export async function GET() {
         // Exclude draft, archived, or noindex products
         if (
           prod.handle &&
-          (prod as any).status !== "draft" &&
-          (prod as any).status !== "archived" &&
+          (prod as unknown as { status?: string }).status !== "draft" &&
+          (prod as unknown as { status?: string }).status !== "archived" &&
           prod.metadata?.noindex !== true &&
           prod.metadata?.seo_index !== false
         ) {
-          allProducts.push(prod as any)
+          allProducts.push(prod as HttpTypes.StoreProduct)
         }
       }
 
