@@ -1,4 +1,4 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { PRODUCT_REVIEW_MODULE } from "../../../../../modules/product-review"
 import ProductReviewModuleService from "../../../../../modules/product-review/service"
@@ -10,7 +10,7 @@ export const AUTHENTICATE = false
 // Authenticated customers get a full check; guests get { canReview: false, reason: "unauthenticated" }.
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const { id: productId } = req.params
-  const customerId = req.auth_context?.actor_id
+  const customerId = (req as AuthenticatedMedusaRequest).auth_context?.actor_id
 
   if (!customerId) {
     return res.json({ canReview: false, reason: "unauthenticated" })
@@ -41,7 +41,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   // Check purchase history
   const { data: orders } = await query.graph({
     entity: "order",
-    filters: { customer_id: customerId, status: ["completed", "delivered"] },
+    filters: { customer_id: customerId, status: ["completed"] },
     fields: ["id", "items.*", "items.product_id"],
   })
 

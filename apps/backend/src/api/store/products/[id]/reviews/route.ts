@@ -1,4 +1,4 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/utils"
 import { PRODUCT_REVIEW_MODULE } from "../../../../../modules/product-review"
 import ProductReviewModuleService from "../../../../../modules/product-review/service"
@@ -23,7 +23,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 }
 
 // POST /store/products/:id/reviews — requires auth + verified purchase
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const { id: productId } = req.params
   const customerId = req.auth_context?.actor_id
 
@@ -76,7 +76,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   // Verify the customer has a completed order containing this product
   const { data: orders } = await query.graph({
     entity: "order",
-    filters: { customer_id: customerId, status: ["completed", "delivered"] },
+    filters: { customer_id: customerId, status: ["completed"] },
     fields: ["id", "items.*", "items.product_id"],
   })
 

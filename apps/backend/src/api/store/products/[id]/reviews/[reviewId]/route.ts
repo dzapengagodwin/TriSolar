@@ -1,11 +1,11 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { MedusaError } from "@medusajs/framework/utils"
 import { PRODUCT_REVIEW_MODULE } from "../../../../../../modules/product-review"
 import ProductReviewModuleService from "../../../../../../modules/product-review/service"
 import { deleteProductReviewWorkflow } from "../../../../../../workflows/delete-product-review"
 
 // DELETE /store/products/:id/reviews/:reviewId — customer deletes their own review
-export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
+export const DELETE = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const { reviewId } = req.params
   const customerId = req.auth_context?.actor_id
 

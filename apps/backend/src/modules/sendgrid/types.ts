@@ -19,14 +19,14 @@ export type OrderConfirmationItem = {
 }
 
 export type OrderConfirmationAddress = {
-  first_name?: string
-  last_name?: string
-  address_1?: string
-  address_2?: string
-  city?: string
-  postal_code?: string
-  country_code?: string
-  phone?: string
+  first_name?: string | null
+  last_name?: string | null
+  address_1?: string | null
+  address_2?: string | null
+  city?: string | null
+  postal_code?: string | null
+  country_code?: string | null
+  phone?: string | null
 }
 
 export type OrderConfirmationData = {
@@ -42,7 +42,7 @@ export type OrderConfirmationData = {
   shipping_total: number | string
   tax_total?: number | string
   total: number | string
-  shipping_address?: OrderConfirmationAddress
+  shipping_address?: OrderConfirmationAddress | null
   view_order_url?: string
 }
 

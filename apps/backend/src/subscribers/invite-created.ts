@@ -13,7 +13,7 @@ export default async function inviteCreatedHandler({
   try {
     const { data: invites } = await query.graph({
       entity: "invite",
-      fields: ["id", "email", "token", "role"],
+      fields: ["id", "email", "token"],
       filters: {
         id: data.id,
       },
@@ -31,7 +31,7 @@ export default async function inviteCreatedHandler({
       email: invite.email,
       token: invite.token,
       invite_url: inviteUrl,
-      role: invite.role || "staff member",
+      role: (invite as any).role || "staff member",
     }
 
     const accountFromEmail =

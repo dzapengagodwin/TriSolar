@@ -1,4 +1,4 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/utils"
 import { BULK_OPERATION_MODULE } from "../../../modules/bulk-operation"
 import { BULK_ACTIONS } from "../../../modules/bulk-operation/utils/action-registry"
@@ -31,7 +31,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 }
 
 // POST /admin/bulk-operations - Start a new bulk operation
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   const bulkModule = req.scope.resolve(BULK_OPERATION_MODULE)
   const logger = req.scope.resolve(ContainerRegistrationKeys.LOGGER)
 
