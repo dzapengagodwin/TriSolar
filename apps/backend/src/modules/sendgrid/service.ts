@@ -64,7 +64,27 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
       return {}
     }
 
-    const fromEmail = notification.from || this.options_.from
+    const normalizedTemplate = notification.template.toLowerCase().trim()
+    const isOrderEmail = [
+      "order-confirmation",
+      "order-placed",
+      "order.placed",
+      "order.created",
+      "payment-confirmation",
+      "payment-captured",
+      "order.payment_captured",
+      "payment.captured",
+      "shipment-confirmation",
+      "order-shipped",
+      "order.fulfillment_created",
+      "shipment.created",
+    ].includes(normalizedTemplate)
+
+    const defaultFrom = isOrderEmail
+      ? this.options_.order_from_email || this.options_.from
+      : this.options_.account_from_email || "noreply@laptopzone.co.zw"
+
+    const fromEmail = notification.from || defaultFrom || this.options_.from
     if (!fromEmail && !this.options_.sandbox) {
       this.logger_.error(
         `[SendGrid] Cannot send notification to ${to}: missing sender email ('from' address).`

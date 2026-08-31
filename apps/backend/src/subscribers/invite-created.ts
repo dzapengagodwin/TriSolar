@@ -34,8 +34,14 @@ export default async function inviteCreatedHandler({
       role: invite.role || "staff member",
     }
 
+    const accountFromEmail =
+      process.env.SENDGRID_ACCOUNT_FROM_EMAIL ||
+      process.env.SENDGRID_NOREPLY_FROM_EMAIL ||
+      "noreply@laptopzone.co.zw"
+
     await notificationModuleService.createNotifications({
       to: invite.email,
+      from: accountFromEmail,
       channel: "email",
       template: "invite",
       data: payload as Record<string, unknown>,

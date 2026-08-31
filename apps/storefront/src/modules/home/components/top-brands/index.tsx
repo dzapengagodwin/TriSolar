@@ -1,8 +1,6 @@
-"use client"
-
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
-import { StoreBrand, STATIC_BRANDS } from "@lib/data/brands"
+import { StoreBrand, STATIC_BRANDS } from "@lib/constants/brands"
 
 export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBrand[] }) {
   const displayBrands = (brands && brands.length > 0 ? brands : STATIC_BRANDS).slice(0, 6)
@@ -32,15 +30,15 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
           </LocalizedClientLink>
         </div>
 
-        {/* 6 Static Brands Grid */}
+        {/* 6 Static Brands Grid with Larger Logos */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 sm:gap-4">
           {displayBrands.map((brand) => (
             <LocalizedClientLink
               key={brand.id || brand.handle}
               href={`/brands/${brand.handle}`}
-              className="group bg-white hover:bg-gray-50 p-4 sm:p-5 flex items-center justify-center  hover:border-black rounded-2xl shadow-2xs hover:shadow-md transition-all duration-300 h-20 sm:h-24"
+              className="group bg-white hover:bg-gray-50 p-3 sm:p-4 flex items-center justify-center border border-gray-200 hover:border-black rounded-2xl shadow-2xs hover:shadow-md transition-all duration-300 h-28 sm:h-32 md:h-36"
             >
-              <div className="relative w-full h-10 sm:h-12 flex items-center justify-center">
+              <div className="relative w-full h-16 sm:h-20 md:h-24 flex items-center justify-center">
                 <Image
                   src={brand.logo as string}
                   alt={`${brand.name} logo`}

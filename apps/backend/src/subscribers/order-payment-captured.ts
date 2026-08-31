@@ -67,8 +67,14 @@ export default async function orderPaymentCapturedHandler({
       view_order_url: viewOrderUrl,
     }
 
+    const orderFromEmail =
+      process.env.SENDGRID_ORDER_FROM_EMAIL ||
+      process.env.SENDGRID_FROM_EMAIL ||
+      "orders@laptopzone.co.zw"
+
     await notificationModuleService.createNotifications({
       to: recipientEmail,
+      from: orderFromEmail,
       channel: "email",
       template: "payment-confirmation",
       data: payload as Record<string, unknown>,

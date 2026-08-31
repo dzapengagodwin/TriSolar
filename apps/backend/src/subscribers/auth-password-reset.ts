@@ -37,8 +37,14 @@ export default async function authPasswordResetHandler({
       expires_in_hours: 24,
     }
 
+    const accountFromEmail =
+      process.env.SENDGRID_ACCOUNT_FROM_EMAIL ||
+      process.env.SENDGRID_NOREPLY_FROM_EMAIL ||
+      "noreply@laptopzone.co.zw"
+
     await notificationModuleService.createNotifications({
       to: email,
+      from: accountFromEmail,
       channel: "email",
       template: "password-reset",
       data: payload as Record<string, unknown>,

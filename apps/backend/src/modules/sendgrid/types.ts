@@ -1,6 +1,8 @@
 export type SendgridOptions = {
   api_key?: string
   from: string
+  order_from_email?: string
+  account_from_email?: string
   from_name?: string
   sandbox?: boolean
   storefront_url?: string

@@ -2,58 +2,65 @@
 
 import { useState, useRef, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
 
 type MegaMenuNavProps = {
   categories?: HttpTypes.StoreProductCategory[]
 }
 
-const COMPUTERS_BRANDS = [
-  { name: "ASUS", href: "/brands/asus" },
-  { name: "MSI", href: "/brands/msi" },
-  { name: "Intel", href: "/brands/intel" },
-  { name: "AMD", href: "/brands/amd" },
-  { name: "Razer", href: "/brands/razer" },
-  { name: "Corsair", href: "/brands/corsair" },
-  { name: "BenQ", href: "/brands/benq" },
-  { name: "HP", href: "/brands/hp" },
-  { name: "Lenovo", href: "/brands/lenovo" },
+type MegaMenuBrand = {
+  name: string
+  href: string
+  logo: string
+}
+
+const COMPUTERS_BRANDS: MegaMenuBrand[] = [
+  { name: "ASUS", href: "/brands/asus", logo: "/brands/asus.svg" },
+  { name: "MSI", href: "/brands/msi", logo: "/brands/msi.svg" },
+  { name: "Intel", href: "/brands/intel", logo: "/brands/intel.svg" },
+  { name: "AMD", href: "/brands/amd", logo: "/brands/amd.svg" },
+  { name: "Razer", href: "/brands/razer", logo: "/brands/razer.svg" },
+  { name: "Corsair", href: "/brands/corsair", logo: "/brands/corsair.svg" },
+  { name: "BenQ", href: "/brands/benq", logo: "/brands/benq.svg" },
+  { name: "HP", href: "/brands/hp", logo: "/top-brands/hp.png" },
+  { name: "Lenovo", href: "/brands/lenovo", logo: "/top-brands/lenovo.png" },
 ]
 
-const OFFICE_BRANDS = [
-  { name: "HP", href: "/brands/hp" },
-  { name: "Epson", href: "/brands/epson" },
-  { name: "Canon", href: "/brands/canon" },
-  { name: "ASUS", href: "/brands/asus" },
-  { name: "Honeywell", href: "/brands/honeywell" },
-  { name: "TP-Link", href: "/brands/tp-link" },
-  { name: "D-Link", href: "/brands/d-link" },
-  { name: "Linksys", href: "/brands/linksys" },
-  { name: "Samsung", href: "/brands/samsung" },
+const OFFICE_BRANDS: MegaMenuBrand[] = [
+  { name: "HP", href: "/brands/hp", logo: "/top-brands/hp.png" },
+  { name: "Canon", href: "/brands/canon", logo: "/top-brands/canon.png" },
+  { name: "Brother", href: "/brands/brother", logo: "/top-brands/brother.png" },
+  { name: "Epson", href: "/brands/epson", logo: "/brands/epson.svg" },
+  { name: "ASUS", href: "/brands/asus", logo: "/brands/asus.svg" },
+  { name: "Dell", href: "/brands/dell", logo: "/top-brands/dell.png" },
+  { name: "Lenovo", href: "/brands/lenovo", logo: "/top-brands/lenovo.png" },
+  { name: "Acer", href: "/brands/acer", logo: "/brands/acer.svg" },
+  { name: "Samsung", href: "/brands/samsung", logo: "/brands/samsung.svg" },
 ]
 
-const MOBILES_BRANDS = [
-  { name: "Apple", href: "/brands/apple" },
-  { name: "Samsung", href: "/brands/samsung" },
-  { name: "Xiaomi", href: "/brands/xiaomi" },
-  { name: "Huawei", href: "/brands/huawei" },
-  { name: "Nokia", href: "/brands/nokia" },
-  { name: "Microsoft", href: "/brands/microsoft" },
-  { name: "Oppo", href: "/brands/oppo" },
-  { name: "JBL", href: "/brands/jbl" },
-  { name: "Sony", href: "/brands/sony" },
+const MOBILES_BRANDS: MegaMenuBrand[] = [
+  { name: "Apple", href: "/brands/apple", logo: "/top-brands/apple.png" },
+  { name: "Samsung", href: "/brands/samsung", logo: "/brands/samsung.svg" },
+  { name: "Xiaomi", href: "/brands/xiaomi", logo: "/brands/xiaomi.svg" },
+  { name: "Huawei", href: "/brands/huawei", logo: "/brands/huawei.svg" },
+  { name: "Sony", href: "/brands/sony", logo: "/brands/sony.svg" },
+  { name: "JBL", href: "/brands/jbl", logo: "/brands/jbl.svg" },
+  { name: "Lenovo", href: "/brands/lenovo", logo: "/top-brands/lenovo.png" },
+  { name: "ASUS", href: "/brands/asus", logo: "/brands/asus.svg" },
+  { name: "HP", href: "/brands/hp", logo: "/top-brands/hp.png" },
 ]
 
-const ELECTRONICS_BRANDS = [
-  { name: "ViewSonic", href: "/brands/viewsonic" },
-  { name: "BenQ", href: "/brands/benq" },
-  { name: "Sony", href: "/brands/sony" },
-  { name: "JBL", href: "/brands/jbl" },
-  { name: "Nintendo", href: "/brands/nintendo" },
-  { name: "Samsung", href: "/brands/samsung" },
-  { name: "Oculus", href: "/brands/oculus" },
-  { name: "Apple", href: "/brands/apple" },
-  { name: "Pioneer", href: "/brands/pioneer" },
+const ELECTRONICS_BRANDS: MegaMenuBrand[] = [
+  { name: "Sony", href: "/brands/sony", logo: "/brands/sony.svg" },
+  { name: "JBL", href: "/brands/jbl", logo: "/brands/jbl.svg" },
+  { name: "Samsung", href: "/brands/samsung", logo: "/brands/samsung.svg" },
+  { name: "Apple", href: "/brands/apple", logo: "/top-brands/apple.png" },
+  { name: "BenQ", href: "/brands/benq", logo: "/brands/benq.svg" },
+  { name: "Dell", href: "/brands/dell", logo: "/top-brands/dell.png" },
+  { name: "HP", href: "/brands/hp", logo: "/top-brands/hp.png" },
+  { name: "ASUS", href: "/brands/asus", logo: "/brands/asus.svg" },
+  { name: "Xiaomi", href: "/brands/xiaomi", logo: "/brands/xiaomi.svg" },
 ]
 
 export default function MegaMenuNav({}: MegaMenuNavProps) {
@@ -387,10 +394,24 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
               </div>
 
               {/* Bottom Brands */}
-              <div className="pt-4 flex items-center justify-between gap-4 text-xs font-black text-gray-500">
+              <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3">
                 {COMPUTERS_BRANDS.map((brand) => (
-                  <LocalizedClientLink key={brand.name} href={brand.href} onClick={() => setActiveMenu(null)} className="hover:text-black transition-colors tracking-wider font-extrabold uppercase px-2 py-1 hover:bg-gray-50 rounded">
-                    {brand.name}
+                  <LocalizedClientLink
+                    key={brand.name}
+                    href={brand.href}
+                    onClick={() => setActiveMenu(null)}
+                    title={brand.name}
+                    className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200"
+                  >
+                    <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
+                      <Image
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        fill
+                        sizes="80px"
+                        className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
+                      />
+                    </div>
                   </LocalizedClientLink>
                 ))}
               </div>
@@ -571,10 +592,24 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
               </div>
 
               {/* Bottom Brands */}
-              <div className="pt-4 flex items-center justify-between gap-4 text-xs font-black text-gray-500">
+              <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3">
                 {OFFICE_BRANDS.map((brand) => (
-                  <LocalizedClientLink key={brand.name} href={brand.href} onClick={() => setActiveMenu(null)} className="hover:text-black transition-colors tracking-wider font-extrabold uppercase px-2 py-1 hover:bg-gray-50 rounded">
-                    {brand.name}
+                  <LocalizedClientLink
+                    key={brand.name}
+                    href={brand.href}
+                    onClick={() => setActiveMenu(null)}
+                    title={brand.name}
+                    className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200"
+                  >
+                    <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
+                      <Image
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        fill
+                        sizes="80px"
+                        className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
+                      />
+                    </div>
                   </LocalizedClientLink>
                 ))}
               </div>
@@ -770,10 +805,24 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
               </div>
 
               {/* Bottom Brands */}
-              <div className="pt-4 flex items-center justify-between gap-4 text-xs font-black text-gray-500">
+              <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3">
                 {MOBILES_BRANDS.map((brand) => (
-                  <LocalizedClientLink key={brand.name} href={brand.href} onClick={() => setActiveMenu(null)} className="hover:text-black transition-colors tracking-wider font-extrabold uppercase px-2 py-1 hover:bg-gray-50 rounded">
-                    {brand.name}
+                  <LocalizedClientLink
+                    key={brand.name}
+                    href={brand.href}
+                    onClick={() => setActiveMenu(null)}
+                    title={brand.name}
+                    className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200"
+                  >
+                    <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
+                      <Image
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        fill
+                        sizes="80px"
+                        className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
+                      />
+                    </div>
                   </LocalizedClientLink>
                 ))}
               </div>
@@ -959,10 +1008,24 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
               </div>
 
               {/* Bottom Brands */}
-              <div className="pt-4 flex items-center justify-between gap-4 text-xs font-black text-gray-500">
+              <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3">
                 {ELECTRONICS_BRANDS.map((brand) => (
-                  <LocalizedClientLink key={brand.name} href={brand.href} onClick={() => setActiveMenu(null)} className="hover:text-black transition-colors tracking-wider font-extrabold uppercase px-2 py-1 hover:bg-gray-50 rounded">
-                    {brand.name}
+                  <LocalizedClientLink
+                    key={brand.name}
+                    href={brand.href}
+                    onClick={() => setActiveMenu(null)}
+                    title={brand.name}
+                    className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200"
+                  >
+                    <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
+                      <Image
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        fill
+                        sizes="80px"
+                        className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
+                      />
+                    </div>
                   </LocalizedClientLink>
                 ))}
               </div>

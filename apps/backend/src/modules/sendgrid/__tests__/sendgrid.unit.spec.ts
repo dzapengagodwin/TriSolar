@@ -406,4 +406,109 @@ describe("SendgridNotificationService", () => {
       )
     })
   })
+
+  describe("Sender Email Routing", () => {
+    it("routes order templates to order_from_email (orders@laptopzone.co.zw)", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_from_email: "orders@laptopzone.co.zw",
+          account_from_email: "noreply@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "order-confirmation",
+        data: {
+          order_id: "123",
+          display_id: 101,
+          date: "Aug 31, 2026",
+          customer_name: "Customer",
+          customer_email: "customer@example.com",
+          currency_code: "USD",
+          items: [],
+          subtotal: 100,
+          shipping_total: 0,
+          total: 100,
+        },
+      })
+
+      expect(sendgrid.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: expect.objectContaining({
+            email: "orders@laptopzone.co.zw",
+          }),
+        })
+      )
+    })
+
+    it("routes account templates to account_from_email (noreply@laptopzone.co.zw)", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_from_email: "orders@laptopzone.co.zw",
+          account_from_email: "noreply@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "password-reset",
+        data: {
+          email: "customer@example.com",
+          token: "reset123",
+          reset_url: "http://localhost:8000/reset",
+        },
+      })
+
+      expect(sendgrid.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: expect.objectContaining({
+            email: "noreply@laptopzone.co.zw",
+          }),
+        })
+      )
+    })
+
+    it("allows explicit from address on notification to override defaults", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_from_email: "orders@laptopzone.co.zw",
+          account_from_email: "noreply@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        from: "support@laptopzone.co.zw",
+        channel: "email",
+        template: "welcome",
+        data: {
+          customer_name: "Customer",
+          email: "customer@example.com",
+        },
+      })
+
+      expect(sendgrid.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: expect.objectContaining({
+            email: "support@laptopzone.co.zw",
+          }),
+        })
+      )
+    })
+  })
 })

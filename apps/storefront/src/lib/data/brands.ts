@@ -1,74 +1,98 @@
-export type StoreBrand = {
-  id: string
-  name: string
+import { sdk } from "@lib/config"
+import { getCacheOptions } from "./cookies"
+import { StoreBrand, STATIC_BRANDS } from "@lib/constants/brands"
+
+export type { StoreBrand }
+export { STATIC_BRANDS }
+
+const LOCAL_BRAND_LOGOS: Record<string, string> = {
+  apple: "/top-brands/apple.png",
+  hp: "/top-brands/hp.png",
+  dell: "/top-brands/dell.png",
+  lenovo: "/top-brands/lenovo.png",
+  asus: "/brands/asus.svg",
+  amd: "/brands/amd.svg",
+  intel: "/brands/intel.svg",
+  msi: "/brands/msi.svg",
+  razer: "/brands/razer.svg",
+  corsair: "/brands/corsair.svg",
+  benq: "/brands/benq.svg",
+  samsung: "/brands/samsung.svg",
+  acer: "/brands/acer.svg",
+  xiaomi: "/brands/xiaomi.svg",
+  huawei: "/brands/huawei.svg",
+  jbl: "/brands/jbl.svg",
+  epson: "/brands/epson.svg",
+  canon: "/top-brands/canon.png",
+  brother: "/top-brands/brother.png",
+  sony: "/brands/sony.svg",
+}
+
+function enhanceBrandLogo(brand: StoreBrand): StoreBrand {
+  const localLogo = LOCAL_BRAND_LOGOS[brand.handle?.toLowerCase()]
+  return {
+    ...brand,
+    logo: localLogo || brand.logo || brand.image || null,
+  }
+}
+
+export const listBrands = async (query?: {
+  limit?: number
+  offset?: number
+}): Promise<StoreBrand[]> => {
+  const next = {
+    ...(await getCacheOptions("brands")),
+  }
+
+  const limit = query?.limit || 100
+  const offset = query?.offset || 0
+
+  return sdk.client
+    .fetch<{ brands: StoreBrand[]; count: number }>("/store/brands", {
+      query: {
+        limit,
+        offset,
+      },
+      next,
+      cache: "no-store",
+    })
+    .then(({ brands }) => {
+      if (!brands || brands.length === 0) {
+        return STATIC_BRANDS
+      }
+      return brands.map(enhanceBrandLogo)
+    })
+    .catch((err) => {
+      console.warn("Failed to fetch brands from backend, falling back to static:", err)
+      return STATIC_BRANDS
+    })
+}
+
+export const getBrandByHandle = async (
   handle: string
-  logo?: string | null
-  image?: string | null
-  description?: string | null
-  website?: string | null
-  products_count?: number
-  total_products?: number
-  product_ids?: string[]
-  products?: unknown[]
-  metadata?: Record<string, unknown> | null
-}
+): Promise<StoreBrand | null> => {
+  const next = {
+    ...(await getCacheOptions("brands")),
+  }
 
-export const STATIC_BRANDS: StoreBrand[] = [
-  {
-    id: "brand_apple",
-    name: "Apple",
-    handle: "apple",
-    logo: "/top-brands/apple.png",
-    description: "MacBook, iMac, iPad, and genuine Apple accessories.",
-    website: "https://www.apple.com",
-  },
-  {
-    id: "brand_hp",
-    name: "HP",
-    handle: "hp",
-    logo: "/top-brands/hp.png",
-    description: "High-performance HP Spectre, Omen, Envy, and Pavilion laptops.",
-    website: "https://www.hp.com",
-  },
-  {
-    id: "brand_dell",
-    name: "Dell",
-    handle: "dell",
-    logo: "/top-brands/dell.png",
-    description: "Dell XPS, Inspiron, Latitude, and Alienware computing power.",
-    website: "https://www.dell.com",
-  },
-  {
-    id: "brand_lenovo",
-    name: "Lenovo",
-    handle: "lenovo",
-    logo: "/top-brands/lenovo.png",
-    description: "ThinkPad, Legion, and IdeaPad devices engineered for endurance.",
-    website: "https://www.lenovo.com",
-  },
-  {
-    id: "brand_asus",
-    name: "ASUS",
-    handle: "asus",
-    logo: "/top-brands/asus.png",
-    description: "ROG Strix, TUF Gaming, and ZenBook cutting-edge laptops.",
-    website: "https://www.asus.com",
-  },
-  {
-    id: "brand_canon",
-    name: "Canon",
-    handle: "canon",
-    logo: "/top-brands/canon.png",
-    description: "Canon cameras, printers, and imaging solutions.",
-    website: "https://www.canon.com",
-  },
-]
-
-export const listBrands = async (_query?: { limit?: number; offset?: number }): Promise<StoreBrand[]> => {
-  return STATIC_BRANDS
-}
-
-export const getBrandByHandle = async (handle: string): Promise<StoreBrand | null> => {
-  const found = STATIC_BRANDS.find((b) => b.handle.toLowerCase() === handle.toLowerCase())
-  return found || null
+  return sdk.client
+    .fetch<{ brand: StoreBrand }>(`/store/brands/${handle}`, {
+      next,
+      cache: "no-store",
+    })
+    .then(({ brand }) => {
+      if (!brand) {
+        const fallback = STATIC_BRANDS.find(
+          (b) => b.handle.toLowerCase() === handle.toLowerCase()
+        )
+        return fallback || null
+      }
+      return enhanceBrandLogo(brand)
+    })
+    .catch(() => {
+      const fallback = STATIC_BRANDS.find(
+        (b) => b.handle.toLowerCase() === handle.toLowerCase()
+      )
+      return fallback || null
+    })
 }

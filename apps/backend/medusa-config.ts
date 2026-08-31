@@ -97,7 +97,9 @@ export default defineConfig({
             options: {
               channels: ["email"],
               api_key: process.env.SENDGRID_API_KEY,
-              from: process.env.SENDGRID_FROM_EMAIL,
+              from: process.env.SENDGRID_FROM_EMAIL || "orders@laptopzone.co.zw",
+              order_from_email: process.env.SENDGRID_ORDER_FROM_EMAIL || "orders@laptopzone.co.zw",
+              account_from_email: process.env.SENDGRID_ACCOUNT_FROM_EMAIL || "noreply@laptopzone.co.zw",
               from_name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
               sandbox: process.env.SENDGRID_SANDBOX === "true",
               storefront_url: process.env.STOREFRONT_URL || "http://localhost:8000",

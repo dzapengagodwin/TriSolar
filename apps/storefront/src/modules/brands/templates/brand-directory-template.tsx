@@ -36,7 +36,7 @@ export default function BrandDirectoryTemplate({
               >
                 <div className="w-full flex-1 flex items-center justify-center p-2">
                   {brand.logo ? (
-                    <div className="relative w-full h-16 sm:h-20 flex items-center justify-center">
+                    <div className="relative w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
                       <Image
                         src={brand.logo}
                         alt={`${brand.name} logo`}
@@ -46,7 +46,9 @@ export default function BrandDirectoryTemplate({
                       />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center" />
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-700 font-black text-sm">
+                      {brand.name.substring(0, 2).toUpperCase()}
+                    </div>
                   )}
                 </div>
 
@@ -55,7 +57,7 @@ export default function BrandDirectoryTemplate({
                     {brand.name}
                   </span>
                   <span className="text-[10px] font-bold text-gray-400 block">
-                    {count} {count === 1 ? "Product" : "Products"}
+                    {count > 0 ? `${count} ${count === 1 ? "Product" : "Products"}` : "Official Brand"}
                   </span>
                 </div>
               </LocalizedClientLink>

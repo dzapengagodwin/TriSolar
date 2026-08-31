@@ -36,8 +36,14 @@ export default async function customerCreatedHandler({
       storefront_url: `${storefrontUrl}/zw`,
     }
 
+    const accountFromEmail =
+      process.env.SENDGRID_ACCOUNT_FROM_EMAIL ||
+      process.env.SENDGRID_NOREPLY_FROM_EMAIL ||
+      "noreply@laptopzone.co.zw"
+
     await notificationModuleService.createNotifications({
       to: customer.email,
+      from: accountFromEmail,
       channel: "email",
       template: "welcome",
       data: payload as Record<string, unknown>,

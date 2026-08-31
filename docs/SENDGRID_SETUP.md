@@ -58,9 +58,11 @@ To ensure high deliverability and prevent emails from landing in spam:
 In `apps/backend/.env`:
 
 ```env
-# SendGrid Credentials
+# SendGrid Credentials & Sender Addresses
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 SENDGRID_FROM_EMAIL=orders@laptopzone.co.zw
+SENDGRID_ORDER_FROM_EMAIL=orders@laptopzone.co.zw
+SENDGRID_ACCOUNT_FROM_EMAIL=noreply@laptopzone.co.zw
 SENDGRID_FROM_NAME=LaptopZone
 SENDGRID_SANDBOX=false
 
@@ -69,6 +71,11 @@ STOREFRONT_URL=http://localhost:8000
 ADMIN_URL=http://localhost:9000/app
 ```
 
+### Sender Address Routing:
+- **`orders@laptopzone.co.zw`** is used for order confirmations, payment receipts, and shipping notifications.
+- **`noreply@laptopzone.co.zw`** is used for account creation welcomes, password reset tokens, and staff invitations.
+- Both addresses are automatically routed based on the email template, or can be customized via the respective environment variables above.
+
 > [!WARNING]
 > Never commit `SENDGRID_API_KEY` to Git and never prefix it with `NEXT_PUBLIC_` (it must only exist in the Medusa backend environment).
 
@@ -76,14 +83,14 @@ ADMIN_URL=http://localhost:9000/app
 
 ## 4. Supported Transactional Emails
 
-| Email Type | Trigger Event | Description |
-|---|---|---|
-| **Order Confirmation** | `order.placed` | Complete order receipt with items, thumbnails, unit prices, discounts, shipping fee, total, delivery address, and "View Order" CTA. |
-| **Payment Receipt** | `order.payment_captured` | Payment confirmation showing amount paid, currency, payment date, and transaction status. |
-| **Shipment Notification** | `order.fulfillment_created` | Dispatch notification with tracking number, carrier, items in shipment, and tracking link. |
-| **Password Reset** | `auth.password_reset` | Secure password reset email containing a tokenized link with 24-hour expiration. |
-| **Welcome Email** | `customer.created` | Friendly welcome email introducing LaptopZone perks and store link. |
-| **Admin Invite** | `invite.created` / `invite.resent` | Staff invitation email with a secure token to join the admin dashboard. |
+| Email Type | Sender Address | Trigger Event | Description |
+|---|---|---|---|
+| **Order Confirmation** | `orders@laptopzone.co.zw` | `order.placed` | Complete order receipt with items, thumbnails, unit prices, discounts, shipping fee, total, delivery address, and "View Order" CTA. |
+| **Payment Receipt** | `orders@laptopzone.co.zw` | `order.payment_captured` | Payment confirmation showing amount paid, currency, payment date, and transaction status. |
+| **Shipment Notification** | `orders@laptopzone.co.zw` | `order.fulfillment_created` | Dispatch notification with tracking number, carrier, items in shipment, and tracking link. |
+| **Password Reset** | `noreply@laptopzone.co.zw` | `auth.password_reset` | Secure password reset email containing a tokenized link with 24-hour expiration. |
+| **Welcome Email** | `noreply@laptopzone.co.zw` | `customer.created` | Friendly welcome email introducing LaptopZone perks and store link. |
+| **Admin Invite** | `noreply@laptopzone.co.zw` | `invite.created` / `invite.resent` | Staff invitation email with a secure token to join the admin dashboard. |
 
 ---
 

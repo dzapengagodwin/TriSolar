@@ -1,9 +1,7 @@
-"use client"
-
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
-import { STATIC_CATEGORIES } from "@lib/data/categories"
+import { STATIC_CATEGORIES } from "@lib/constants/categories"
 
 export default function TopCategories({
   categories = STATIC_CATEGORIES,
