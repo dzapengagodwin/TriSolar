@@ -116,6 +116,10 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") close()
     }
+    const handleOpenCartEvent = () => open()
+
+    window.addEventListener("open-cart", handleOpenCartEvent)
+
     if (isOpen) {
       document.body.style.overflow = "hidden"
       window.addEventListener("keydown", handleKeyDown)
@@ -125,6 +129,7 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
     return () => {
       document.body.style.overflow = "unset"
       window.removeEventListener("keydown", handleKeyDown)
+      window.removeEventListener("open-cart", handleOpenCartEvent)
     }
   }, [isOpen])
 

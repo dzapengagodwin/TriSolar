@@ -14,6 +14,7 @@ import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
 import { Heart } from "@medusajs/icons"
 import Spinner from "@modules/common/icons/spinner"
+import ProductTrustBadge from "../product-trust-badge"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -273,6 +274,10 @@ export default function ProductActions({
             <Heart className="w-5 h-5 text-gray-700 hover:text-red-500" />
           </button>
         </div>
+
+        {/* Delivery Guarantee & Payment Trust Badge */}
+        <ProductTrustBadge />
+
         <MobileActions
           product={product}
           variant={selectedVariant}

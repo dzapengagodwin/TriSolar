@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "@modules/products/components/thumbnail"
+import QuickAddToCart from "@modules/products/components/quick-add-to-cart"
 
 // -- Helpers ------------------------------------------------------------------
 
@@ -195,13 +196,13 @@ function DealProductCard({
                 )}
               </div>
             )}
-            <LocalizedClientLink
-              href={`/products/${product.handle}`}
-              className="bg-black hover:bg-gray-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-full transition-colors uppercase tracking-wider"
-            >
-              View
-            </LocalizedClientLink>
           </div>
+          <QuickAddToCart
+            product={product}
+            size="sm"
+            viewMode="deals"
+            className="rounded-full"
+          />
         </div>
       </div>
     </div>

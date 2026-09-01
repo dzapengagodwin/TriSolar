@@ -4,6 +4,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { getProductImageAlt } from "@lib/seo"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
+import QuickAddToCart from "../quick-add-to-cart"
 
 export default function ProductPreview({
   product,
@@ -117,12 +118,11 @@ export default function ProductPreview({
         <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
-          <LocalizedClientLink
-            href={`/products/${product.handle}`}
-            className="w-full bg-black hover:bg-gray-800 text-white text-xs font-bold py-2.5 px-4 transition-colors uppercase tracking-wider text-center shadow-xs inline-block"
-          >
-            Add to Cart
-          </LocalizedClientLink>
+          <QuickAddToCart
+            product={product}
+            size="lg"
+            viewMode="list"
+          />
         </div>
       </div>
     )
@@ -180,17 +180,16 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        {/* Bottom Bar: Price & Add to Cart (Only visible on hover) */}
+        {/* Bottom Bar: Price & Add to Cart (Instant on mobile, revealed on hover on desktop) */}
         <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
-          <div className="opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200">
-            <LocalizedClientLink
-              href={`/products/${product.handle}`}
-              className="w-full block bg-black hover:bg-gray-800 text-white text-[11px] font-bold py-2 px-3 transition-colors uppercase tracking-wider text-center shadow-xs"
-            >
-              Add to Cart
-            </LocalizedClientLink>
+          <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+            <QuickAddToCart
+              product={product}
+              size="md"
+              viewMode="grid"
+            />
           </div>
         </div>
       </div>
