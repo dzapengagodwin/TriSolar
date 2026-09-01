@@ -18,6 +18,27 @@ import { renderPasswordReset } from "./templates/password-reset"
 import { renderWelcome } from "./templates/welcome"
 import { renderInvite } from "./templates/invite"
 
+function ensureEnvLoaded() {
+  if (process.env.SENDGRID_API_KEY) return
+  try {
+    const fs = require("fs")
+    const path = require("path")
+    const dotenv = require("dotenv")
+    const possiblePaths = [
+      path.resolve(__dirname, "../../../.env"),
+      path.resolve(__dirname, "../../../../.env"),
+      path.resolve(process.cwd(), "apps/backend/.env"),
+      path.resolve(process.cwd(), ".env"),
+    ]
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        dotenv.config({ path: p })
+        if (process.env.SENDGRID_API_KEY) break
+      }
+    }
+  } catch {}
+}
+
 type InjectedDependencies = {
   logger: Logger
 }
@@ -56,64 +77,67 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
   async send(
     notification: NotificationTypes.ProviderSendNotificationDTO
   ): Promise<NotificationTypes.ProviderSendNotificationResultsDTO> {
-    const to = notification.to
-    if (!to) {
-      this.logger_.error(
-        `[SendGrid] Cannot send notification: missing recipient for template '${notification.template}'`
-      )
-      return {}
-    }
-
-    const normalizedTemplate = notification.template.toLowerCase().trim()
-    const isOrderEmail = [
-      "order-confirmation",
-      "order-placed",
-      "order.placed",
-      "order.created",
-      "payment-confirmation",
-      "payment-captured",
-      "order.payment_captured",
-      "payment.captured",
-      "shipment-confirmation",
-      "order-shipped",
-      "order.fulfillment_created",
-      "shipment.created",
-    ].includes(normalizedTemplate)
-
-    const defaultFrom = isOrderEmail
-      ? this.options_.order_from_email || this.options_.from
-      : this.options_.account_from_email || "noreply@laptopzone.co.zw"
-
-    const fromEmail = notification.from || defaultFrom || this.options_.from
-    if (!fromEmail && !this.options_.sandbox) {
-      this.logger_.error(
-        `[SendGrid] Cannot send notification to ${to}: missing sender email ('from' address).`
-      )
-      return {}
-    }
-
-    const fromName = this.options_.from_name || "LaptopZone"
-    const templateData = (notification.data || {}) as Record<string, any>
-
-    // Render template
-    const rendered = this.renderTemplate(notification.template, templateData, notification.content)
-    if (!rendered) {
-      this.logger_.error(
-        `[SendGrid] Unknown template '${notification.template}' for notification to ${to}.`
-      )
-      return {}
-    }
-
-    // Sandbox / Mock Mode
-    if (this.options_.sandbox || !this.isConfigured_) {
-      this.logger_.info(
-        `[SendGrid Sandbox] Email simulated successfully:\n  To: ${to}\n  From: ${fromName} <${fromEmail}>\n  Template: ${notification.template}\n  Subject: ${rendered.subject}`
-      )
-      return { id: `mock_sendgrid_${Date.now()}` }
-    }
-
-    // Live Send via SendGrid
     try {
+      const to = notification.to
+      if (!to) {
+        this.logger_.error(
+          `[SendGrid] Cannot send notification: missing recipient for template '${notification.template}'`
+        )
+        return {}
+      }
+
+      // Ensure API key is configured even if loaded dynamically from environment
+      if (!this.isConfigured_) {
+        ensureEnvLoaded()
+        const apiKey = this.options_?.api_key || process.env.SENDGRID_API_KEY
+        if (apiKey) {
+          sendgrid.setApiKey(apiKey)
+          this.isConfigured_ = true
+        }
+      }
+
+      const normalizedTemplate = notification.template.toLowerCase().trim()
+      const isOrderEmail = [
+        "order-confirmation",
+        "order-placed",
+        "order.placed",
+        "order.created",
+        "payment-confirmation",
+        "payment-captured",
+        "order.payment_captured",
+        "payment.captured",
+        "shipment-confirmation",
+        "order-shipped",
+        "order.fulfillment_created",
+        "shipment.created",
+      ].includes(normalizedTemplate)
+
+      const defaultFrom = isOrderEmail
+        ? this.options_?.order_from_email || this.options_?.from || process.env.SENDGRID_ORDER_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL || "orders@laptopzone.co.zw"
+        : this.options_?.account_from_email || this.options_?.from || process.env.SENDGRID_ACCOUNT_FROM_EMAIL || "noreply@laptopzone.co.zw"
+
+      const fromEmail = notification.from || defaultFrom || "orders@laptopzone.co.zw"
+      const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "LaptopZone"
+      const templateData = (notification.data || {}) as Record<string, any>
+
+      // Render template
+      const rendered = this.renderTemplate(notification.template, templateData, notification.content)
+      if (!rendered) {
+        this.logger_.error(
+          `[SendGrid] Unknown template '${notification.template}' for notification to ${to}.`
+        )
+        return {}
+      }
+
+      // Sandbox / Mock Mode
+      if (this.options_?.sandbox || !this.isConfigured_) {
+        this.logger_.info(
+          `[SendGrid Sandbox] Email simulated successfully:\n  To: ${to}\n  From: ${fromName} <${fromEmail}>\n  Template: ${notification.template}\n  Subject: ${rendered.subject}`
+        )
+        return { id: `mock_sendgrid_${Date.now()}` }
+      }
+
+      // Live Send via SendGrid
       const msg: sendgrid.MailDataRequired = {
         to,
         from: {
@@ -138,7 +162,6 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
 
       return { id: String(messageId) }
     } catch (error: any) {
-      // Robust error logging with credential redaction
       const statusCode = error.code || error.response?.statusCode || "UNKNOWN"
       const errorMessage =
         error.response?.body?.errors
@@ -148,7 +171,7 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
         "Unknown SendGrid error"
 
       this.logger_.error(
-        `[SendGrid] Failed to send email\n  Recipient: ${to}\n  Template: ${notification.template}\n  Status: ${statusCode}\n  Error: ${errorMessage}`
+        `[SendGrid] Failed to send email\n  Recipient: ${notification?.to}\n  Template: ${notification?.template}\n  Status: ${statusCode}\n  Error: ${errorMessage}`
       )
 
       return {}

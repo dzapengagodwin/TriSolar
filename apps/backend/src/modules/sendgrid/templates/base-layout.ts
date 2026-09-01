@@ -101,13 +101,28 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, "&#039;")
 }
 
-export function formatMoney(amount: number | string, currencyCode: string = "USD"): string {
-  const num = typeof amount === "string" ? parseFloat(amount) : amount
-  if (isNaN(num)) return "0.00"
-  
-  const formatted = (num).toFixed(2)
-  const currencyUpper = currencyCode.toUpperCase()
-  
+export function formatMoney(amount: any, currencyCode: string = "USD"): string {
+  if (amount === null || amount === undefined) {
+    const currencyUpper = (currencyCode || "USD").toUpperCase()
+    return currencyUpper === "USD" ? "$0.00" : `${currencyUpper} 0.00`
+  }
+
+  let num = 0
+  if (typeof amount === "number") {
+    num = amount
+  } else if (typeof amount === "string") {
+    num = parseFloat(amount)
+  } else if (typeof amount === "object") {
+    num = Number(amount?.numeric ?? amount?.value ?? amount?.amount ?? 0)
+  } else {
+    num = Number(amount)
+  }
+
+  if (isNaN(num)) num = 0
+
+  const formatted = num.toFixed(2)
+  const currencyUpper = (currencyCode || "USD").toUpperCase()
+
   if (currencyUpper === "USD") {
     return `$${formatted}`
   }

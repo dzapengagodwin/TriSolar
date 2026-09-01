@@ -1,6 +1,8 @@
 import type { SubscriberArgs, SubscriberConfig } from "@medusajs/framework"
 import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
+import sendgrid from "@sendgrid/mail"
 import { OrderConfirmationData } from "../modules/sendgrid/types"
+import { renderOrderConfirmation } from "../modules/sendgrid/templates/order-confirmation"
 
 export default async function orderPlacedHandler({
   event: { data },
@@ -107,7 +109,7 @@ export default async function orderPlacedHandler({
       process.env.SENDGRID_FROM_EMAIL ||
       "orders@laptopzone.co.zw"
 
-    await notificationModuleService.createNotifications({
+    const createdNotifications = await notificationModuleService.createNotifications({
       to: recipientEmail,
       from: orderFromEmail,
       channel: "email",
@@ -119,7 +121,34 @@ export default async function orderPlacedHandler({
       idempotency_key: `order_placed_${order.id}`,
     })
 
-    logger.info(`[Subscriber: order.placed] Order confirmation queued for order #${order.display_id || order.id} to ${recipientEmail}`)
+    const notifItem = Array.isArray(createdNotifications) ? createdNotifications[0] : createdNotifications
+    const externalId = notifItem?.external_id
+
+    // Fallback: If notification provider returned empty ID or mock ID, send directly via SendGrid
+    if (!externalId || externalId.startsWith("mock_")) {
+      const apiKey = process.env.SENDGRID_API_KEY
+      if (apiKey) {
+        sendgrid.setApiKey(apiKey)
+        const rendered = renderOrderConfirmation(payload)
+        if (rendered) {
+          const msg = {
+            to: recipientEmail,
+            from: {
+              email: orderFromEmail,
+              name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
+            },
+            subject: rendered.subject,
+            html: rendered.html,
+            text: rendered.text,
+          }
+          const [sgRes] = await sendgrid.send(msg)
+          const msgId = sgRes?.headers?.["x-message-id"] || `sg_${Date.now()}`
+          logger.info(`[Subscriber: order.placed] Order #${order.display_id || order.id} confirmation sent via SendGrid (ID: ${msgId})`)
+        }
+      }
+    } else {
+      logger.info(`[Subscriber: order.placed] Order #${order.display_id || order.id} confirmation sent via notification service (ID: ${externalId})`)
+    }
   } catch (error: any) {
     logger.error(`[Subscriber: order.placed] Failed to process notification for order ${data.id}: ${error.message}`)
   }

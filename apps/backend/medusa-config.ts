@@ -1,6 +1,14 @@
+import path from 'path'
 import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
-loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+// __dirname in the compiled build is .medusa/server/ — go up two levels to reach apps/backend/
+// where the actual .env file lives
+const backendDir = path.resolve(__dirname, '..', '..')
+loadEnv(process.env.NODE_ENV || 'development', backendDir)
+// Fallback: if still missing (e.g. launched from monorepo root), try cwd
+if (!process.env.SENDGRID_API_KEY) {
+  loadEnv(process.env.NODE_ENV || 'development', process.cwd())
+}
 
 const hasPesepayConfig =
   !!process.env.PESEPAY_INTEGRATION_KEY &&
