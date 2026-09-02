@@ -51,7 +51,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               images={galleryImages}
               productTitle={product.title}
               brand={
-                ((product as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
+                ((product as unknown as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
                 (product.metadata?.brand as string)
               }
             />

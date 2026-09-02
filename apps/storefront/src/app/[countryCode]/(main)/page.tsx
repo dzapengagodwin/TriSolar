@@ -10,7 +10,8 @@ import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
 import { listCollections } from "@lib/data/collections"
 import { STATIC_BRANDS } from "@lib/data/brands"
-import { STATIC_CATEGORIES } from "@lib/data/categories"
+import { listCategories } from "@lib/data/categories"
+import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [collectionsRes, productsRes] = await Promise.all([
+  const [collectionsRes, productsRes, categories] = await Promise.all([
     listCollections({ fields: "id, handle, title" }).catch(() => ({ collections: [] })),
     region
       ? listProducts({
@@ -36,12 +37,12 @@ export default async function Home(props: {
           queryParams: { limit: 10, fields: "*variants.calculated_price,*categories" },
         }).catch(() => ({ response: { products: [] } }))
       : Promise.resolve({ response: { products: [] } }),
+    listCategories({ limit: 50 }).catch(() => []),
   ])
 
   const collections = collectionsRes.collections || []
   const products = productsRes.response?.products || []
   const brands = STATIC_BRANDS
-  const categories = STATIC_CATEGORIES
 
   if (!region) {
     return null
@@ -52,8 +53,8 @@ export default async function Home(props: {
       {/* 1. Hero Grid (Black Theme Banners) */}
       <Hero />
 
-      {/* 2. Top Categories Slider */}
-      <TopCategories categories={categories} />
+      {/* 2. Top Categories Slider (6 Curated Categories) */}
+      <TopCategories categories={HOMEPAGE_FEATURED_CATEGORIES} />
 
       {/* 3. Monthly Best Deals (Sleek Black Background Section) */}
       <MonthlyDeals

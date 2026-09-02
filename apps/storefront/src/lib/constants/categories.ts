@@ -1,21 +1,25 @@
 import { HttpTypes } from "@medusajs/types"
 
-export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
+/**
+ * 6 Curated Featured Categories specifically for the Homepage Top Categories Carousel/Grid.
+ */
+export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   {
     id: "pcat_01M07CFV5PGYF341ZA9N3CDWFD",
     name: "Laptops & Notebooks",
     handle: "laptops",
     description: "High-performance laptops, ultrabooks, and mobile workstations.",
-    is_active: true,
-    is_internal: false,
     rank: 0,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T08:12:58.476Z",
     updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/laptops.png",
+      product_count: 61,
     },
   },
   {
@@ -23,16 +27,17 @@ export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     name: "Monitors & Displays",
     handle: "monitors",
     description: "Ultra-wide, 4K, and high refresh-rate monitors.",
-    is_active: true,
-    is_internal: false,
     rank: 1,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T08:12:58.476Z",
     updated_at: "2026-08-18T12:04:49.716Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/monitors.png",
+      product_count: 3,
     },
   },
   {
@@ -40,16 +45,17 @@ export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     name: "Keyboards & Typing",
     handle: "keyboard_-mouse",
     description: "Mechanical and ergonomic keyboards.",
-    is_active: true,
-    is_internal: false,
     rank: 2,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T08:12:58.476Z",
     updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/keyboards.png",
+      product_count: 1,
     },
   },
   {
@@ -57,16 +63,17 @@ export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     name: "Computer Mice & Accessories",
     handle: "computer-accessories",
     description: "Precision wireless and ergonomic gaming and office mice.",
-    is_active: true,
-    is_internal: false,
     rank: 3,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T12:22:35.953Z",
     updated_at: "2026-08-18T12:04:49.716Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/computer-mouse.png",
+      product_count: 2,
     },
   },
   {
@@ -74,16 +81,17 @@ export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     name: "Headphones & Audio",
     handle: "headphones_mics",
     description: "Noise-cancelling headsets, audio gear, and studio monitors.",
-    is_active: true,
-    is_internal: false,
     rank: 4,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T08:12:58.476Z",
     updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/headphones.png",
+      product_count: 1,
     },
   },
   {
@@ -91,16 +99,41 @@ export const STATIC_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     name: "Smart Watches & Wearables",
     handle: "smart-watches",
     description: "Fitness trackers, smartwatches, and connected wearable tech.",
-    is_active: true,
-    is_internal: false,
     rank: 5,
+    external_id: null,
     parent_category_id: null,
     parent_category: null,
     category_children: [],
     created_at: "2026-08-17T08:12:58.476Z",
     updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
     metadata: {
       image: "/top-categories/smartwatches.png",
+      product_count: 1,
     },
   },
 ]
+
+// Fallback image map to enrich dynamic categories from the database with icons
+export const CATEGORY_IMAGE_MAP: Record<string, string> = {
+  laptops: "/top-categories/laptops.png",
+  "ai-laptops": "/gaming/gaming-laptops-card.png",
+  "business-laptops": "/top-categories/laptops.png",
+  "apple-laptops": "/top-brands/apple.png",
+  "chromebooks-for-sale": "/top-categories/laptops.png",
+  "gaming-laptops": "/gaming/gaming-laptops-card.png",
+  monitors: "/top-categories/monitors.png",
+  "gaming-monitors": "/gaming/gaming-monitors-card.png",
+  "desktop-pcs": "/gaming/gaming-pcs-card.png",
+  "all-in-one-pc": "/gaming/gaming-pcs.png",
+  desktops: "/gaming/gaming-pcs-card.png",
+  "mac-computers": "/top-brands/apple.png",
+  "keyboard_-mouse": "/top-categories/keyboards.png",
+  "computer-accessories": "/top-categories/computer-mouse.png",
+  headphones_mics: "/top-categories/headphones.png",
+  "smart-watches": "/top-categories/smartwatches.png",
+  networking: "/gaming/gaming-accessories-card.png",
+  software: "/top-categories/keyboards.png",
+}
+
+export const STATIC_CATEGORIES = HOMEPAGE_FEATURED_CATEGORIES

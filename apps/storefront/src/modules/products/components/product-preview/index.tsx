@@ -68,7 +68,7 @@ export default function ProductPreview({
                 alt={getProductImageAlt({
                   title: product.title,
                   brand:
-                    ((product as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
+                    ((product as unknown as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
                     (product.metadata?.brand as string),
                 })}
                 className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
@@ -152,7 +152,7 @@ export default function ProductPreview({
               alt={getProductImageAlt({
                 title: product.title,
                 brand:
-                  ((product as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
+                  ((product as unknown as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
                   (product.metadata?.brand as string),
               })}
               className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"

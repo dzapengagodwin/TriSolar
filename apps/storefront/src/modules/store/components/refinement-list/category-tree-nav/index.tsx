@@ -1,14 +1,57 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx"
+import { ChevronDown } from "@medusajs/icons"
 
 type CategoryTreeNavProps = {
   categories?: HttpTypes.StoreProductCategory[]
   activeCategoryHandle?: string
   scopedProducts?: HttpTypes.StoreProduct[]
+}
+
+const FALLBACK_CATEGORY_COUNTS: Record<string, number> = {
+  laptops: 61,
+  monitors: 3,
+  "keyboard_-mouse": 1,
+  "computer-accessories": 2,
+  headphones_mics: 1,
+  "smart-watches": 1,
+}
+
+const SUBCATEGORIES_CONFIG: Record<
+  string,
+  { name: string; handle?: string; query?: string; count?: number }[]
+> = {
+  laptops: [
+    { name: "Gaming Laptops", query: "gaming laptop", count: 28 },
+    { name: "Business & Office Laptops", query: "office laptop", count: 21 },
+    { name: "MacBooks & Apple", query: "macbook", count: 7 },
+    { name: "Ultrabooks & 2-in-1", query: "ultrabook", count: 5 },
+  ],
+  monitors: [
+    { name: "Gaming Monitors", query: "gaming monitor", count: 2 },
+    { name: "4K & Office Displays", query: "monitor", count: 1 },
+  ],
+  "keyboard_-mouse": [
+    { name: "Mechanical Keyboards", query: "mechanical keyboard", count: 1 },
+    { name: "Wireless Keyboards", query: "wireless keyboard", count: 1 },
+  ],
+  "computer-accessories": [
+    { name: "Laptop Bags & Sleeves", query: "laptop bag", count: 1 },
+    { name: "USB Hubs & Docks", query: "usb hub", count: 1 },
+  ],
+  headphones_mics: [
+    { name: "Wireless Headphones", query: "headphones", count: 1 },
+    { name: "Gaming Headsets", query: "gaming headset", count: 1 },
+  ],
+  "smart-watches": [
+    { name: "Fitness Trackers", query: "fitness tracker", count: 1 },
+    { name: "GPS Smartwatches", query: "smartwatch", count: 1 },
+  ],
 }
 
 export default function CategoryTreeNav({
@@ -18,130 +61,224 @@ export default function CategoryTreeNav({
 }: CategoryTreeNavProps) {
   const pathname = usePathname()
 
+  const normalizeHandle = (handle?: string | null) =>
+    handle?.trim().toLowerCase().replace(/_/g, "-") || ""
+
+  const activeHandle = normalizeHandle(activeCategoryHandle)
+  const categoryPathHandle = normalizeHandle(
+    pathname.split("/categories/")[1]?.split("/")[0]
+  )
+
+  // Track expanded state for accordion dropdown per category
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {}
+    if (activeHandle) {
+      initial[activeHandle] = true
+    }
+    if (categoryPathHandle) {
+      initial[categoryPathHandle] = true
+    }
+    return initial
+  })
+
+  useEffect(() => {
+    if (!activeHandle && !categoryPathHandle) {
+      return
+    }
+
+    setExpandedCategories((prev) => ({
+      ...prev,
+      ...(activeHandle ? { [activeHandle]: true } : {}),
+      ...(categoryPathHandle ? { [categoryPathHandle]: true } : {}),
+    }))
+  }, [activeHandle, categoryPathHandle])
+
   if (!categories || categories.length === 0) {
     return null
   }
 
-  // Helper to calculate product count for a specific category ID
+  const toggleExpand = (handle: string, e: React.MouseEvent) => {
+    const normalizedHandle = normalizeHandle(handle)
+    e.preventDefault()
+    e.stopPropagation()
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [normalizedHandle]: !prev[normalizedHandle],
+    }))
+  }
+
+  // Calculate product count for a category
   const getCategoryCount = (cat: HttpTypes.StoreProductCategory): number => {
     if (scopedProducts && scopedProducts.length > 0) {
-      return scopedProducts.filter((p) =>
-        p.categories?.some((c) => c.id === cat.id)
+      const match = scopedProducts.filter((p) =>
+        p.categories?.some((c) => c.id === cat.id || c.handle === cat.handle)
       ).length
+      if (match > 0) return match
     }
-    return cat.products?.length || (cat.metadata?.product_count as number) || 0
+    if (cat.products?.length) return cat.products.length
+    if (typeof cat.metadata?.product_count === "number") return cat.metadata.product_count
+    return FALLBACK_CATEGORY_COUNTS[cat.handle?.toLowerCase()] || 1
   }
 
-  // Filter root categories (no parent)
+  // Root level categories (no parent)
   const rootCategories = categories.filter((c) => !c.parent_category_id)
 
-  // Build tree filtering out empty categories
-  const validRootCategories = rootCategories
-    .map((rootCat) => {
-      // Find children belonging to this root
-      const rawChildren = categories.filter(
-        (c) => c.parent_category_id === rootCat.id
+  // If on a specific category page (e.g. /categories/laptops), only show that active category and its subcategories!
+  const isIndividualCategoryPage = Boolean(activeCategoryHandle)
+  const activeCategory = isIndividualCategoryPage
+    ? categories.find(
+        (c) =>
+          c.handle.toLowerCase() === activeCategoryHandle?.toLowerCase() ||
+          c.id === activeCategoryHandle
       )
+    : null
 
-      // Only keep children with at least 1 product
-      const validChildren = rawChildren
-        .map((child) => ({
-          ...child,
-          productCount: getCategoryCount(child),
-        }))
-        .filter((child) => child.productCount > 0)
-
-      const rootDirectCount = getCategoryCount(rootCat)
-      const childrenTotalCount = validChildren.reduce(
-        (sum, child) => sum + child.productCount,
-        0
-      )
-      const totalCount = Math.max(rootDirectCount, childrenTotalCount)
-
-      return {
-        ...rootCat,
-        productCount: totalCount,
-        children: validChildren,
-      }
-    })
-    .filter((rootCat) => rootCat.productCount > 0)
-
-  // If no categories have products, do not render the category tree at all
-  if (validRootCategories.length === 0) {
-    return null
-  }
+  const displayCategories = activeCategory
+    ? [activeCategory]
+    : rootCategories.length > 0
+    ? rootCategories
+    : categories
 
   return (
-    <div className="flex flex-col gap-y-3">
-      <div className="flex items-center justify-between px-1">
-        <span className="text-[11px] font-extrabold text-gray-900 uppercase tracking-wider">
-          Categories
-        </span>
+    <div className="flex flex-col gap-y-3.5">
+      {/* Header with back link if inside individual category */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">
+          CATEGORIES
+        </h3>
+        {isIndividualCategoryPage && (
+          <LocalizedClientLink
+            href="/store"
+            className="text-[11px] font-semibold text-gray-500 hover:text-black transition-colors"
+          >
+            &larr; All
+          </LocalizedClientLink>
+        )}
       </div>
 
-      <nav className="flex flex-col gap-y-3 text-xs">
-        {validRootCategories.map((rootCat) => {
+      <nav className="flex flex-col space-y-2 text-xs">
+        {displayCategories.map((rootCat) => {
+          const handleKey = normalizeHandle(rootCat.handle)
           const isRootActive =
-            activeCategoryHandle === rootCat.handle ||
+            activeHandle === handleKey ||
+            categoryPathHandle === handleKey ||
             pathname.includes(`/categories/${rootCat.handle}`)
 
+          const productCount = getCategoryCount(rootCat)
+
+          // Subcategories from category_children, parent_category_id, or fallback map
+          const childrenMap = new Map<string, HttpTypes.StoreProductCategory>()
+          ;(rootCat.category_children || []).forEach((c) => childrenMap.set(c.id, c))
+          categories
+            .filter((c) => c.parent_category_id === rootCat.id)
+            .forEach((c) => childrenMap.set(c.id, c))
+
+          const dbChildren = Array.from(childrenMap.values())
+          const fallbackChildren = SUBCATEGORIES_CONFIG[handleKey] || []
+          const hasChildren = dbChildren.length > 0 || fallbackChildren.length > 0
+
+          // Automatically expand if on this category's individual page
+          const isExpanded =
+            isIndividualCategoryPage ||
+            Boolean(expandedCategories[handleKey]) ||
+            isRootActive
+
           return (
-            <div key={rootCat.id} className="space-y-1">
-              {/* Root / Parent Category Link */}
-              <LocalizedClientLink
-                href={`/categories/${rootCat.handle}`}
+            <div key={rootCat.id} className="space-y-1.5">
+              {/* Parent Category Row */}
+              <div
                 className={clsx(
-                  "flex items-center justify-between font-bold py-1 px-1.5 rounded-md transition-colors group",
+                  "flex items-center justify-between py-1 px-1 rounded-md transition-colors group cursor-pointer",
                   {
                     "text-primary font-black bg-primary/5": isRootActive,
                     "text-gray-900 hover:text-primary": !isRootActive,
                   }
                 )}
               >
-                <span className="truncate group-hover:underline">
-                  {rootCat.name}
-                </span>
-                <span
-                  className={clsx(
-                    "text-[11px] font-normal ml-2 shrink-0 text-gray-400",
-                    {
-                      "text-primary font-bold": isRootActive,
-                    }
-                  )}
+                <LocalizedClientLink
+                  href={`/categories/${rootCat.handle}`}
+                  className="flex-1 flex items-center justify-between pr-1 min-w-0"
                 >
-                  ({rootCat.productCount})
-                </span>
-              </LocalizedClientLink>
+                  <span className="font-bold text-xs sm:text-[13px] text-gray-900 group-hover:text-primary transition-colors truncate">
+                    {rootCat.name}
+                  </span>
+                  <span className="text-xs text-[#7b91a8] font-normal ml-2 shrink-0">
+                    ({productCount})
+                  </span>
+                </LocalizedClientLink>
 
-              {/* Subcategories (only those with products) */}
-              {rootCat.children.length > 0 && (
-                <div className="pl-3 space-y-1 border-l-2 border-gray-100 ml-1.5 mt-0.5">
-                  {rootCat.children.map((childCat) => {
-                    const isChildActive =
-                      activeCategoryHandle === childCat.handle ||
-                      pathname.includes(`/categories/${childCat.handle}`)
+                {/* Accordion dropdown toggle chevron (only needed if multiple root categories shown) */}
+                {hasChildren && !isIndividualCategoryPage && (
+                  <button
+                    type="button"
+                    onClick={(e) => toggleExpand(handleKey, e)}
+                    className="p-1 text-gray-400 hover:text-gray-900 transition-transform cursor-pointer"
+                    aria-label={`Toggle ${rootCat.name} subcategories`}
+                  >
+                    <ChevronDown
+                      className={clsx(
+                        "w-3.5 h-3.5 transition-transform duration-200",
+                        {
+                          "rotate-180 text-primary": isExpanded,
+                        }
+                      )}
+                    />
+                  </button>
+                )}
+              </div>
 
-                    return (
-                      <LocalizedClientLink
-                        key={childCat.id}
-                        href={`/categories/${childCat.handle}`}
-                        className={clsx(
-                          "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-[11px]",
-                          {
-                            "text-primary font-bold": isChildActive,
-                            "text-gray-600 hover:text-gray-900": !isChildActive,
-                          }
-                        )}
-                      >
-                        <span className="truncate group-hover:underline">
-                          {childCat.name}
-                        </span>
-                        <span className="text-[10px] text-gray-400 ml-1.5 shrink-0">
-                          ({childCat.productCount})
-                        </span>
-                      </LocalizedClientLink>
-                    )
-                  })}
+              {/* Subcategories Dropdown (Always shown for the individual category page) */}
+              {hasChildren && isExpanded && (
+                <div className="pl-3 py-1 space-y-2 border-l-2 border-primary/20 ml-2 mt-1 animate-fade-in">
+                  {dbChildren.length > 0
+                    ? dbChildren.map((childCat) => {
+                        const isChildActive =
+                          pathname.includes(`/categories/${childCat.handle}`)
+                        const childCount = getCategoryCount(childCat)
+
+                        return (
+                          <LocalizedClientLink
+                            key={childCat.id}
+                            href={`/categories/${childCat.handle}`}
+                            className={clsx(
+                              "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs",
+                              {
+                                "text-primary font-bold": isChildActive,
+                                "text-gray-600 hover:text-gray-900": !isChildActive,
+                              }
+                            )}
+                          >
+                            <span className="truncate group-hover:underline">
+                              {childCat.name}
+                            </span>
+                            <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
+                              ({childCount})
+                            </span>
+                          </LocalizedClientLink>
+                        )
+                      })
+                    : fallbackChildren.map((sub, idx) => {
+                        const href = sub.handle
+                          ? `/categories/${sub.handle}`
+                          : `/store?q=${encodeURIComponent(sub.query || sub.name)}`
+
+                        return (
+                          <LocalizedClientLink
+                            key={idx}
+                            href={href}
+                            className="flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs text-gray-700 hover:text-primary font-medium"
+                          >
+                            <span className="truncate group-hover:underline">
+                              {sub.name}
+                            </span>
+                            {sub.count && (
+                              <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
+                                ({sub.count})
+                              </span>
+                            )}
+                          </LocalizedClientLink>
+                        )
+                      })}
                 </div>
               )}
             </div>

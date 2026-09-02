@@ -1,14 +1,14 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
-import { STATIC_CATEGORIES } from "@lib/constants/categories"
+import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 
 export default function TopCategories({
-  categories = STATIC_CATEGORIES,
+  categories = HOMEPAGE_FEATURED_CATEGORIES,
 }: {
   categories?: HttpTypes.StoreProductCategory[]
 }) {
-  const displayCategories = (categories && categories.length > 0 ? categories : STATIC_CATEGORIES).slice(0, 6)
+  const displayCategories = (categories && categories.length > 0 ? categories : HOMEPAGE_FEATURED_CATEGORIES).slice(0, 6)
 
   return (
     <section className="py-6 sm:py-8 bg-white" aria-label="Top Categories">

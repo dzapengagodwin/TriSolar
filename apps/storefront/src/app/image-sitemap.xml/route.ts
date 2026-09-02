@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { HttpTypes } from "@medusajs/types"
 import { listProducts } from "@lib/data/products"
 import { getProductCanonicalUrl } from "@lib/seo/canonical"
 import { DEFAULT_COUNTRY_CODE } from "@lib/seo/constants"

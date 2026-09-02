@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -13,6 +12,7 @@ import {
 } from "@lib/util/product-option-filters"
 import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
+import SubcategoryCards from "../components/subcategory-cards"
 
 export default async function CategoryTemplate({
   category,
@@ -38,11 +38,16 @@ export default async function CategoryTemplate({
 
   if (!category || !countryCode) notFound()
 
-  // Fetch candidate products in this category and all categories for navigation in parallel
+  const queryCategoryId = category.id
+  const categoryQuery = (category.metadata?.query as string) || undefined
+
+  // Use the actual category scope instead of the parent category, so child
+  // category pages show their own products instead of the parent collection.
   const [{ response: { products: scopedProducts } }, allCategories] = await Promise.all([
     listProducts({
       queryParams: {
-        category_id: [category.id],
+        category_id: [queryCategoryId],
+        ...(categoryQuery ? { q: categoryQuery } : {}),
         limit: 100,
       },
       countryCode,
@@ -87,25 +92,12 @@ export default async function CategoryTemplate({
       </Suspense>
 
       <div className="w-full flex-1 min-w-0">
+        {/* Microless-style Quick Subcategory Cards */}
+        <SubcategoryCards category={category} />
+
         {category.description && (
           <div className="mb-4 text-xs text-gray-500">
             <p>{category.description}</p>
-          </div>
-        )}
-
-        {category.category_children && category.category_children.length > 0 && (
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
-              {category.category_children.map((c) => (
-                <LocalizedClientLink
-                  key={c.id}
-                  href={`/categories/${c.handle}`}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold px-3 py-1.5 rounded-full transition-colors"
-                >
-                  {c.name}
-                </LocalizedClientLink>
-              ))}
-            </div>
           </div>
         )}
 
@@ -119,7 +111,8 @@ export default async function CategoryTemplate({
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
-            categoryId={category.id}
+            categoryId={queryCategoryId}
+            q={categoryQuery}
             countryCode={countryCode}
             optionValueIds={optionValueIds}
             minPrice={minPrice}
