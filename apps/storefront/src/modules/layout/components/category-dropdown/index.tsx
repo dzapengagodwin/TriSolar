@@ -9,15 +9,6 @@ type CategoryDropdownProps = {
   categories?: HttpTypes.StoreProductCategory[]
 }
 
-// Subcategories fallback map if categories don't have children in DB yet
-const FALLBACK_SUBCATEGORIES: Record<string, string[]> = {
-  laptops: ["Gaming Laptops", "Office Laptops", "MacBooks & iPads", "Refurbished Tech"],
-  desktops: ["Custom Gaming Towers", "All-in-One PCs", "Mini PCs", "Workstation PCs"],
-  printers: ["Laser Printers", "Inkjet Printers", "3D Printers", "Toner & Cartridges"],
-  accessories: ["Keyboards & Mice", "USB Cables & Hubs", "Laptop Backpacks", "External SSDs"],
-  audio: ["Wireless Headphones", "Gaming Headsets", "Bluetooth Speakers", "Studio Mics"],
-}
-
 export default function CategoryDropdown({ categories = [] }: CategoryDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
@@ -145,17 +136,9 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                       </LocalizedClientLink>
                     ))
                   ) : (
-                    /* Fallback subcategories list if DB has no children */
-                    (FALLBACK_SUBCATEGORIES[activeCategory.handle ? activeCategory.handle.toLowerCase() : ""] || []).map((subName, idx) => (
-                      <LocalizedClientLink
-                        key={idx}
-                        href={`/store?q=${encodeURIComponent(subName)}`}
-                        onClick={() => setIsOpen(false)}
-                        className="text-xs font-medium text-gray-600 hover:text-primary transition-colors block"
-                      >
-                        {subName}
-                      </LocalizedClientLink>
-                    ))
+                    <div className="text-xs font-medium text-gray-400">
+                      No subcategories available.
+                    </div>
                   )}
                 </div>
 

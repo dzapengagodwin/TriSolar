@@ -76,17 +76,17 @@ export default function CatalogToolbar({
 
             {breadcrumbs.map((crumb, idx) => (
               <span key={idx} className="flex items-center gap-1.5">
-                <span>:</span>
+                <span>&rsaquo;</span>
                 {crumb.href ? (
                   <LocalizedClientLink
                     href={crumb.href}
                     className="hover:text-black transition-colors"
                   >
-                    &quot;{crumb.name}&quot;
+                    {crumb.name}
                   </LocalizedClientLink>
                 ) : (
                   <span className="text-gray-800 font-bold bg-gray-100 px-1.5 py-0.5 rounded">
-                    &quot;{crumb.name}&quot;
+                    {crumb.name}
                   </span>
                 )}
               </span>

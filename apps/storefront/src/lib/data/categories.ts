@@ -1,13 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { sdk } from "@lib/config"
 import { getCacheOptions } from "@lib/data/cookies"
-import {
-  HOMEPAGE_FEATURED_CATEGORIES,
-  CATEGORY_IMAGE_MAP,
-  STATIC_CATEGORIES,
-} from "@lib/constants/categories"
-
-export { HOMEPAGE_FEATURED_CATEGORIES, STATIC_CATEGORIES }
+import { CATEGORY_IMAGE_MAP } from "@lib/constants/categories"
 
 /**
  * Enriches category with fallback images/metadata if not provided by backend.
@@ -63,13 +57,13 @@ export const listCategories = async (
     )
     .then(({ product_categories }) => {
       if (!product_categories || product_categories.length === 0) {
-        return HOMEPAGE_FEATURED_CATEGORIES
+        return []
       }
       return product_categories.map(enrichCategory)
     })
     .catch((err) => {
       console.error("Failed to fetch categories dynamically from Medusa:", err)
-      return HOMEPAGE_FEATURED_CATEGORIES
+      return []
     })
 }
 
@@ -117,15 +111,5 @@ export const getCategoryByHandle = async (
     console.error(`Failed to fetch category by handle [${lastHandle}]:`, err)
   }
 
-  // 2. Fallback: Search in full category list
-  const allCategories = await listCategories({ limit: 100 })
-  const found = allCategories.find(
-    (c) =>
-      c.handle.toLowerCase() === fullHandle ||
-      c.handle.toLowerCase() === lastHandle ||
-      c.handle.toLowerCase().replace(/_/g, "-") === lastHandle ||
-      c.id.toLowerCase() === lastHandle
-  )
-
-  return found ? enrichCategory(found) : null
+  return null
 }

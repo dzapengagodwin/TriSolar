@@ -13,47 +13,6 @@ type CategoryTreeNavProps = {
   scopedProducts?: HttpTypes.StoreProduct[]
 }
 
-const FALLBACK_CATEGORY_COUNTS: Record<string, number> = {
-  laptops: 61,
-  monitors: 3,
-  "keyboard_-mouse": 1,
-  "computer-accessories": 2,
-  headphones_mics: 1,
-  "smart-watches": 1,
-}
-
-const SUBCATEGORIES_CONFIG: Record<
-  string,
-  { name: string; handle?: string; query?: string; count?: number }[]
-> = {
-  laptops: [
-    { name: "Gaming Laptops", query: "gaming laptop", count: 28 },
-    { name: "Business & Office Laptops", query: "office laptop", count: 21 },
-    { name: "MacBooks & Apple", query: "macbook", count: 7 },
-    { name: "Ultrabooks & 2-in-1", query: "ultrabook", count: 5 },
-  ],
-  monitors: [
-    { name: "Gaming Monitors", query: "gaming monitor", count: 2 },
-    { name: "4K & Office Displays", query: "monitor", count: 1 },
-  ],
-  "keyboard_-mouse": [
-    { name: "Mechanical Keyboards", query: "mechanical keyboard", count: 1 },
-    { name: "Wireless Keyboards", query: "wireless keyboard", count: 1 },
-  ],
-  "computer-accessories": [
-    { name: "Laptop Bags & Sleeves", query: "laptop bag", count: 1 },
-    { name: "USB Hubs & Docks", query: "usb hub", count: 1 },
-  ],
-  headphones_mics: [
-    { name: "Wireless Headphones", query: "headphones", count: 1 },
-    { name: "Gaming Headsets", query: "gaming headset", count: 1 },
-  ],
-  "smart-watches": [
-    { name: "Fitness Trackers", query: "fitness tracker", count: 1 },
-    { name: "GPS Smartwatches", query: "smartwatch", count: 1 },
-  ],
-}
-
 export default function CategoryTreeNav({
   categories = [],
   activeCategoryHandle,
@@ -117,7 +76,7 @@ export default function CategoryTreeNav({
     }
     if (cat.products?.length) return cat.products.length
     if (typeof cat.metadata?.product_count === "number") return cat.metadata.product_count
-    return FALLBACK_CATEGORY_COUNTS[cat.handle?.toLowerCase()] || 1
+    return 0
   }
 
   // Root level categories (no parent)
@@ -173,9 +132,10 @@ export default function CategoryTreeNav({
             .filter((c) => c.parent_category_id === rootCat.id)
             .forEach((c) => childrenMap.set(c.id, c))
 
-          const dbChildren = Array.from(childrenMap.values())
-          const fallbackChildren = SUBCATEGORIES_CONFIG[handleKey] || []
-          const hasChildren = dbChildren.length > 0 || fallbackChildren.length > 0
+          const dbChildren = Array.from(childrenMap.values()).filter(
+            (child) => Boolean(child.handle)
+          )
+          const hasChildren = dbChildren.length > 0
 
           // Automatically expand if on this category's individual page
           const isExpanded =
@@ -230,55 +190,32 @@ export default function CategoryTreeNav({
               {/* Subcategories Dropdown (Always shown for the individual category page) */}
               {hasChildren && isExpanded && (
                 <div className="pl-3 py-1 space-y-2 border-l-2 border-primary/20 ml-2 mt-1 animate-fade-in">
-                  {dbChildren.length > 0
-                    ? dbChildren.map((childCat) => {
-                        const isChildActive =
-                          pathname.includes(`/categories/${childCat.handle}`)
-                        const childCount = getCategoryCount(childCat)
+                  {dbChildren.map((childCat) => {
+                    const isChildActive =
+                      pathname.includes(`/categories/${childCat.handle}`)
+                    const childCount = getCategoryCount(childCat)
 
-                        return (
-                          <LocalizedClientLink
-                            key={childCat.id}
-                            href={`/categories/${childCat.handle}`}
-                            className={clsx(
-                              "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs",
-                              {
-                                "text-primary font-bold": isChildActive,
-                                "text-gray-600 hover:text-gray-900": !isChildActive,
-                              }
-                            )}
-                          >
-                            <span className="truncate group-hover:underline">
-                              {childCat.name}
-                            </span>
-                            <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
-                              ({childCount})
-                            </span>
-                          </LocalizedClientLink>
-                        )
-                      })
-                    : fallbackChildren.map((sub, idx) => {
-                        const href = sub.handle
-                          ? `/categories/${sub.handle}`
-                          : `/store?q=${encodeURIComponent(sub.query || sub.name)}`
-
-                        return (
-                          <LocalizedClientLink
-                            key={idx}
-                            href={href}
-                            className="flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs text-gray-700 hover:text-primary font-medium"
-                          >
-                            <span className="truncate group-hover:underline">
-                              {sub.name}
-                            </span>
-                            {sub.count && (
-                              <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
-                                ({sub.count})
-                              </span>
-                            )}
-                          </LocalizedClientLink>
-                        )
-                      })}
+                    return (
+                      <LocalizedClientLink
+                        key={childCat.id}
+                        href={`/categories/${childCat.handle}`}
+                        className={clsx(
+                          "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs",
+                          {
+                            "text-primary font-bold": isChildActive,
+                            "text-gray-600 hover:text-gray-900": !isChildActive,
+                          }
+                        )}
+                      >
+                        <span className="truncate group-hover:underline">
+                          {childCat.name}
+                        </span>
+                        <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
+                          ({childCount})
+                        </span>
+                      </LocalizedClientLink>
+                    )
+                  })}
                 </div>
               )}
             </div>

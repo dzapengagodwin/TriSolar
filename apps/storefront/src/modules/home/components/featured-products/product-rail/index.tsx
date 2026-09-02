@@ -36,8 +36,8 @@ export default async function ProductRail({
     queryParams.q = searchQuery
   }
 
-  // Execute query if filter is present or fallback is requested
-  if (categoryId || collectionId || searchQuery || fallbackToAll) {
+  // Execute query if filter is present
+  if (categoryId || collectionId || searchQuery) {
     const res = await listProducts({
       regionId: region.id,
       queryParams,
@@ -45,19 +45,6 @@ export default async function ProductRail({
 
     if (res?.response?.products?.length) {
       pricedProducts = res.response.products
-    } else if (fallbackToAll) {
-      // If specific search had no products and fallbackToAll is true, fetch general products
-      const fallbackRes = await listProducts({
-        regionId: region.id,
-        queryParams: {
-          limit: 10,
-          fields: "*variants.calculated_price,*categories",
-        },
-      }).catch(() => null)
-
-      if (fallbackRes?.response?.products?.length) {
-        pricedProducts = fallbackRes.response.products
-      }
     }
   }
 
