@@ -127,7 +127,6 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
           className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
         >
           <MagnifyingGlass className="w-4 h-4" />
-          <span>Search</span>
         </button>
       </form>
 

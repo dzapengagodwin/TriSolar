@@ -126,8 +126,21 @@ export async function getWishlist() {
   }
 }
 
+export async function isVariantInWishlist(variantId: string) {
+  if (!variantId) {
+    return false
+  }
+
+  const items = await getStoredWishlistItems()
+  return items.some((item) => item.variant_id === variantId)
+}
+
 // Add item to wishlist
-export async function addToWishlist(variantId: string, _countryCode?: string) {
+export async function addToWishlist(
+  variantId: string,
+  _countryCode?: string,
+  productId?: string
+) {
   if (!variantId) {
     return { success: false, error: "Variant ID is required" }
   }
@@ -141,28 +154,10 @@ export async function addToWishlist(variantId: string, _countryCode?: string) {
       return { success: true, wishlist }
     }
 
-    const authHeaders = await getAuthHeaders()
-
-    // Find product_id for this variant
-    const { products } = await sdk.client
-      .fetch<{ products: HttpTypes.StoreProduct[] }>("/store/products", {
-        query: {
-          limit: 100,
-          fields: "*variants",
-        },
-        headers: authHeaders,
-        cache: "no-store",
-      })
-      .catch(() => ({ products: [] }))
-
-    const matchedProduct = products.find((p) =>
-      p.variants?.some((v) => v.id === variantId)
-    )
-
     const newItem: WishlistItemRecord = {
       id: `wl_item_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       variant_id: variantId,
-      product_id: matchedProduct?.id,
+      product_id: productId,
       created_at: new Date().toISOString(),
     }
 

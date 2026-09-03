@@ -1,7 +1,11 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
-import { addToWishlist } from "@lib/data/wishlist"
+import {
+  addToWishlist,
+  isVariantInWishlist,
+  removeFromWishlist,
+} from "@lib/data/wishlist"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import Divider from "@modules/common/components/divider"
@@ -43,6 +47,8 @@ export default function ProductActions({
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
+  const [isInWishlist, setIsInWishlist] = useState(false)
+  const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null)
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -63,6 +69,27 @@ export default function ProductActions({
       return isEqual(variantOptions, options)
     })
   }, [product.variants, options])
+
+  useEffect(() => {
+    let isMounted = true
+
+    if (!selectedVariant?.id) {
+      setIsInWishlist(false)
+      return () => {
+        isMounted = false
+      }
+    }
+
+    isVariantInWishlist(selectedVariant.id).then((saved) => {
+      if (isMounted) {
+        setIsInWishlist(saved)
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [selectedVariant?.id])
 
   // update the options when a variant is selected
   const setOptionValue = (optionId: string, value: string) => {
@@ -140,22 +167,29 @@ export default function ProductActions({
     setIsAdding(false)
   }
 
-  // add the selected variant to the wishlist
+  // Toggle the selected variant in the wishlist
   const handleAddToWishlist = async () => {
     if (!selectedVariant?.id) return null
 
     setIsAddingToWishlist(true)
     try {
-      const res = await addToWishlist(selectedVariant.id, countryCode)
+      const res = isInWishlist
+        ? await removeFromWishlist(selectedVariant.id)
+        : await addToWishlist(selectedVariant.id, countryCode, product.id)
       if (res.success) {
-        alert("Saved to Wishlist ❤️")
+        setIsInWishlist(!isInWishlist)
+        setWishlistFeedback(
+          isInWishlist ? "Removed from wishlist" : "Saved to wishlist"
+        )
+        router.refresh()
       } else {
-        alert(res.error || "Could not add item to wishlist")
+        setWishlistFeedback(res.error || "Could not save this item")
       }
     } catch (err: unknown) {
       console.error(err)
-      const message = err instanceof Error ? err.message : "Failed to add to wishlist"
-      alert(message)
+      setWishlistFeedback(
+        err instanceof Error ? err.message : "Could not save this item"
+      )
     } finally {
       setIsAddingToWishlist(false)
     }
@@ -268,12 +302,24 @@ export default function ProductActions({
               isAdding ||
               isAddingToWishlist
             }
-            aria-label="Save to Wishlist"
+            aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
             className="w-12 h-12 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
           >
-            <Heart className="w-5 h-5 text-gray-700 hover:text-red-500" />
+            <Heart
+              className={`w-5 h-5 transition-colors ${
+                isInWishlist
+                  ? "fill-primary text-primary"
+                  : "text-gray-700 hover:text-primary"
+              }`}
+            />
           </button>
         </div>
+
+        {wishlistFeedback && (
+          <p role="status" className="text-xs font-semibold text-gray-700">
+            {wishlistFeedback}
+          </p>
+        )}
 
         {/* Delivery Guarantee & Payment Trust Badge */}
         <ProductTrustBadge />

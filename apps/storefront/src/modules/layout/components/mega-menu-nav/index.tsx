@@ -3,11 +3,6 @@
 import { useState, useRef, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
-import { HttpTypes } from "@medusajs/types"
-
-type MegaMenuNavProps = {
-  categories?: HttpTypes.StoreProductCategory[]
-}
 
 type MegaMenuBrand = {
   name: string
@@ -63,9 +58,10 @@ const ELECTRONICS_BRANDS: MegaMenuBrand[] = [
   { name: "Xiaomi", href: "/brands/xiaomi", logo: "/brands/xiaomi.svg" },
 ]
 
-export default function MegaMenuNav({}: MegaMenuNavProps) {
+export default function MegaMenuNav() {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const navRef = useRef<HTMLDivElement>(null)
+  const menuPanelId = "mega-menu-panel"
 
   // Close on outside click
   useEffect(() => {
@@ -75,13 +71,29 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveMenu(null)
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("keydown", handleKeyDown)
+    }
   }, [])
+
+  const handleFocusOut = (e: React.FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setActiveMenu(null)
+    }
+  }
 
   return (
     <div
       ref={navRef}
       onMouseLeave={() => setActiveMenu(null)}
+      onBlur={handleFocusOut}
       className="flex items-center gap-0.5 font-bold text-xs"
     >
       {/* 1. COMPUTERS & LAPTOPS Tab */}
@@ -91,6 +103,9 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
         onClick={() =>
           setActiveMenu(activeMenu === "computers" ? null : "computers")
         }
+        aria-expanded={activeMenu === "computers"}
+        aria-controls={menuPanelId}
+        aria-haspopup="menu"
         className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black ${
           activeMenu === "computers"
             ? "bg-white text-black border-t-2 border-primary shadow-sm"
@@ -118,6 +133,9 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
         onClick={() =>
           setActiveMenu(activeMenu === "office" ? null : "office")
         }
+        aria-expanded={activeMenu === "office"}
+        aria-controls={menuPanelId}
+        aria-haspopup="menu"
         className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black ${
           activeMenu === "office"
             ? "bg-white text-black border-t-2 border-primary shadow-sm"
@@ -145,6 +163,9 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
         onClick={() =>
           setActiveMenu(activeMenu === "mobiles" ? null : "mobiles")
         }
+        aria-expanded={activeMenu === "mobiles"}
+        aria-controls={menuPanelId}
+        aria-haspopup="menu"
         className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black ${
           activeMenu === "mobiles"
             ? "bg-white text-black border-t-2 border-primary shadow-sm"
@@ -172,6 +193,9 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
         onClick={() =>
           setActiveMenu(activeMenu === "electronics" ? null : "electronics")
         }
+        aria-expanded={activeMenu === "electronics"}
+        aria-controls={menuPanelId}
+        aria-haspopup="menu"
         className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black ${
           activeMenu === "electronics"
             ? "bg-white text-black border-t-2 border-primary shadow-sm"
@@ -204,6 +228,8 @@ export default function MegaMenuNav({}: MegaMenuNavProps) {
       {/* FULL-WIDTH MEGA DROPDOWN (Starts below ALL CATEGORIES and spans full container width) */}
       {activeMenu && (
         <div
+          id={menuPanelId}
+          role="menu"
           className="absolute top-full left-0 right-0 w-full bg-white border border-gray-200 rounded-b-2xl shadow-2xl z-50 p-6 overflow-hidden animate-fade-in text-gray-900"
           style={{ transformOrigin: "top left" }}
         >

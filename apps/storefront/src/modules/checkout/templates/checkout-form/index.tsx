@@ -17,9 +17,13 @@ export default async function CheckoutForm({
     return null
   }
 
-  const shippingMethods = (await listCartShippingMethods(cart.id)) ?? []
-  const paymentMethods =
-    (await listCartPaymentMethods(cart.region?.id ?? "")) ?? []
+  const [shippingMethodsResult, paymentMethodsResult] = await Promise.all([
+    listCartShippingMethods(cart.id),
+    listCartPaymentMethods(cart.region?.id ?? ""),
+  ])
+
+  const shippingMethods = shippingMethodsResult ?? []
+  const paymentMethods = paymentMethodsResult ?? []
 
   return (
     <div className="w-full grid grid-cols-1 gap-y-8">

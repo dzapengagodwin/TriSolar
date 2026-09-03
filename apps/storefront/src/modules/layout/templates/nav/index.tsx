@@ -122,11 +122,6 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
                 <User size="22" className="text-gray-800" />
               </LocalizedClientLink>
 
-              {/* Compare Icon (Desktop only) */}
-              <LocalizedClientLink href="/store" className="p-1 hover:text-black transition-colors hidden md:flex" aria-label="Compare products">
-                <ArrowsPointingOut className="w-5 h-5 sm:w-6 sm:h-6 text-gray-800" />
-              </LocalizedClientLink>
-
               {/* Cart Dropdown */}
               <div className="flex items-center">
                 <Suspense
@@ -160,7 +155,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
               <CategoryDropdown categories={categories} />
 
               {/* Top Navigation Items with Mega Menu Dropdown */}
-              <MegaMenuNav categories={categories} />
+              <MegaMenuNav />
             </div>
 
             <div className="hidden lg:flex items-center gap-2 text-xs font-black text-gray-900 pr-2">

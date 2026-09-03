@@ -1,6 +1,6 @@
 "use client"
 
-import { clx } from "@modules/common/components/ui"
+import { ChevronDown } from "@medusajs/icons"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 export function Pagination({
@@ -22,9 +22,19 @@ export function Pagination({
 
   // Function to handle page changes
   const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages || newPage === page) {
+      return
+    }
+
     const params = new URLSearchParams(searchParams)
-    params.set("page", newPage.toString())
-    router.push(`${pathname}?${params.toString()}`)
+    if (newPage === 1) {
+      params.delete("page")
+    } else {
+      params.set("page", newPage.toString())
+    }
+
+    const query = params.toString()
+    router.push(query ? `${pathname}?${query}` : pathname)
   }
 
   // Function to render a page button
@@ -34,10 +44,15 @@ export function Pagination({
     isCurrent: boolean
   ) => (
     <button
+      type="button"
       key={p}
-      className={clx("txt-xlarge-plus text-ui-fg-muted", {
-        "text-ui-fg-base hover:text-ui-fg-subtle": isCurrent,
-      })}
+      aria-current={isCurrent ? "page" : undefined}
+      aria-label={`Go to page ${p}`}
+      className={`flex h-10 min-w-10 items-center justify-center border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+        isCurrent
+          ? "border-gray-900 bg-gray-900 text-white"
+          : "border-gray-200 bg-white text-gray-600 hover:border-gray-900 hover:text-gray-900"
+      }`}
       disabled={isCurrent}
       onClick={() => handlePageChange(p)}
     >
@@ -49,7 +64,8 @@ export function Pagination({
   const renderEllipsis = (key: string) => (
     <span
       key={key}
-      className="txt-xlarge-plus text-ui-fg-muted items-center cursor-default"
+      aria-hidden="true"
+      className="flex h-10 min-w-6 items-center justify-center px-1 text-sm text-gray-400"
     >
       ...
     </span>
@@ -105,10 +121,42 @@ export function Pagination({
     return buttons
   }
 
-  // Render the component
+  const renderBoundaryButton = (direction: "previous" | "next") => {
+    const isPrevious = direction === "previous"
+    const isDisabled = isPrevious ? page === 1 : page === totalPages
+
+    return (
+      <button
+        type="button"
+        aria-label={isPrevious ? "Go to previous page" : "Go to next page"}
+        disabled={isDisabled}
+        onClick={() => handlePageChange(page + (isPrevious ? -1 : 1))}
+        className="flex h-10 items-center gap-2 border border-gray-200 bg-white px-3 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-900 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {isPrevious && <ChevronDown className="h-4 w-4 rotate-90" />}
+        <span className="hidden sm:inline">
+          {isPrevious ? "Previous" : "Next"}
+        </span>
+        {!isPrevious && <ChevronDown className="h-4 w-4 -rotate-90" />}
+      </button>
+    )
+  }
+
   return (
-    <div className="flex justify-center w-full mt-12">
-      <div className="flex gap-3 items-end" data-testid={dataTestid}>{renderPageButtons()}</div>
-    </div>
+    <nav
+      aria-label="Product pages"
+      className="mt-12 flex w-full justify-center border-t border-gray-100 pt-6"
+    >
+      <div
+        className="flex w-full max-w-2xl items-center justify-between gap-2"
+        data-testid={dataTestid}
+      >
+        {renderBoundaryButton("previous")}
+        <div className="flex items-center gap-1 overflow-x-auto px-1 sm:gap-2">
+          {renderPageButtons()}
+        </div>
+        {renderBoundaryButton("next")}
+      </div>
+    </nav>
   )
 }

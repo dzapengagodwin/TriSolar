@@ -37,13 +37,39 @@ const Payment = ({
 
   const isOpen = searchParams.get("step") === "payment"
 
-  const setPaymentMethod = async (method: string) => {
+  const initializePayment = async (method: string, advanceToReview: boolean) => {
     setError(null)
-    setSelectedPaymentMethod(method)
-    if (isStripeLike(method)) {
-      await initiatePaymentSession(cart, {
+    setIsLoading(true)
+
+    try {
+      const response = await initiatePaymentSession(cart, {
         provider_id: method,
       })
+
+      if (response && "error" in response && response.error) {
+        setError(response.error)
+        return
+      }
+
+      router.refresh()
+      if (advanceToReview) {
+        router.push(pathname + "?" + createQueryString("step", "review"), {
+          scroll: false,
+        })
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const setPaymentMethod = async (method: string) => {
+    setSelectedPaymentMethod(method)
+    if (isStripeLike(method)) {
+      await initializePayment(method, false)
+    } else if (availablePaymentMethods.length === 1) {
+      await initializePayment(method, true)
     }
   }
 
@@ -63,6 +89,26 @@ const Payment = ({
     },
     [searchParams]
   )
+
+  useEffect(() => {
+    if (
+      !isOpen ||
+      paidByGiftcard ||
+      isLoading ||
+      selectedPaymentMethod ||
+      availablePaymentMethods.length !== 1
+    ) {
+      return
+    }
+
+    void setPaymentMethod(availablePaymentMethods[0].id)
+  }, [
+    availablePaymentMethods,
+    isLoading,
+    isOpen,
+    paidByGiftcard,
+    selectedPaymentMethod,
+  ])
 
   const handleEdit = () => {
     router.push(pathname + "?" + createQueryString("step", "payment"), {

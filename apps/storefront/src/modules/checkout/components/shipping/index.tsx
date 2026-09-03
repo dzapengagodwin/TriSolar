@@ -100,13 +100,44 @@ const Shipping: React.FC<ShippingProps> = ({
           setCalculatedPricesMap(pricesMap)
           setIsLoadingPrices(false)
         })
+      } else {
+        setIsLoadingPrices(false)
       }
+    } else {
+      setIsLoadingPrices(false)
     }
 
     if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
       setShowPickupOptions(PICKUP_OPTION_ON)
     }
   }, [availableShippingMethods])
+
+  useEffect(() => {
+    if (!isOpen || isLoading || shippingMethodId || isLoadingPrices) {
+      return
+    }
+
+    const validShippingMethods = _shippingMethods?.filter((method) => {
+      if (method.insufficient_inventory) {
+        return false
+      }
+
+      return (
+        method.price_type === "flat" ||
+        typeof calculatedPricesMap[method.id] === "number"
+      )
+    })
+
+    if (validShippingMethods?.length === 1) {
+      void handleSetShippingMethod(validShippingMethods[0].id, "shipping")
+    }
+  }, [
+    calculatedPricesMap,
+    isLoading,
+    isLoadingPrices,
+    isOpen,
+    shippingMethodId,
+  ])
 
   const handleEdit = () => {
     router.push(pathname + "?step=delivery", { scroll: false })
@@ -135,15 +166,18 @@ const Shipping: React.FC<ShippingProps> = ({
       return id
     })
 
-    await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
-      .catch((err) => {
-        setShippingMethodId(currentId)
+    try {
+      await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
+      if (isOpen) {
+        router.push(pathname + "?step=payment", { scroll: false })
+      }
+    } catch (err) {
+      setShippingMethodId(currentId)
 
-        setError(err.message)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   useEffect(() => {

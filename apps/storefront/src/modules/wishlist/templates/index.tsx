@@ -23,11 +23,15 @@ type WishlistItem = {
       amount?: number | null
       currency_code?: string | null
     }[]
+    manage_inventory?: boolean | null
+    inventory_quantity?: number | null
+    allow_backorder?: boolean | null
     product?: {
       id: string
       title?: string | null
       handle?: string | null
       thumbnail?: string | null
+      images?: { url?: string }[] | null
     }
   }
 }
@@ -43,32 +47,35 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
   const [items, setItems] = useState<WishlistItem[]>(wishlist?.items || [])
   const [removingIds, setRemovingIds] = useState<Set<string>>(new Set())
   const [addingToCartIds, setAddingToCartIds] = useState<Set<string>>(new Set())
+  const [feedback, setFeedback] = useState<string | null>(null)
   const params = useParams()
   const countryCode = (params?.countryCode as string) || "zw"
 
   const handleRemove = async (itemId: string) => {
-    const nextRemoving = new Set(removingIds)
-    nextRemoving.add(itemId)
-    setRemovingIds(nextRemoving)
+    setRemovingIds((current) => new Set(current).add(itemId))
 
     try {
       const res = await removeFromWishlist(itemId)
       if (res.success) {
-        setItems(items.filter((i) => i.id !== itemId))
+        setItems((current) => current.filter((i) => i.id !== itemId))
+        setFeedback("Removed from your wishlist")
+      } else {
+        setFeedback(res.error || "Could not remove this item")
       }
     } catch (err) {
       console.error("Error removing item", err)
+      setFeedback("Could not remove this item")
     } finally {
-      const nextRemoving = new Set(removingIds)
-      nextRemoving.delete(itemId)
-      setRemovingIds(nextRemoving)
+      setRemovingIds((current) => {
+        const next = new Set(current)
+        next.delete(itemId)
+        return next
+      })
     }
   }
 
   const handleAddToCart = async (itemId: string, variantId: string) => {
-    const nextAdding = new Set(addingToCartIds)
-    nextAdding.add(itemId)
-    setAddingToCartIds(nextAdding)
+    setAddingToCartIds((current) => new Set(current).add(itemId))
 
     try {
       await addToCart({
@@ -76,15 +83,16 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
         quantity: 1,
         countryCode,
       })
-      alert("Added to Cart successfully!")
+      setFeedback("Added to cart")
     } catch (err: unknown) {
       console.error("Error adding to cart", err)
-      const message = err instanceof Error ? err.message : "Failed to add to cart"
-      alert(message)
+      setFeedback(err instanceof Error ? err.message : "Failed to add to cart")
     } finally {
-      const nextAdding = new Set(addingToCartIds)
-      nextAdding.delete(itemId)
-      setAddingToCartIds(nextAdding)
+      setAddingToCartIds((current) => {
+        const next = new Set(current)
+        next.delete(itemId)
+        return next
+      })
     }
   }
 
@@ -103,14 +111,14 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
         currency_code: price.currency_code || "usd",
       })
     }
-    return "-"
+    return null
   }
 
   return (
     <div className="content-container py-12">
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-black text-black tracking-tight">Your Wishlist ❤️</h1>
+          <h1 className="text-3xl font-black text-black tracking-tight">Your Wishlist</h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
             Saved items you want to keep an eye on.
           </p>
@@ -118,7 +126,6 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
 
         {items.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center flex flex-col items-center justify-center gap-4">
-            <span className="text-4xl">💔</span>
             <h2 className="text-lg font-bold text-gray-900">Your wishlist is empty</h2>
             <p className="text-xs text-gray-500 max-w-xs leading-relaxed">
               Explore our store to find laptops, computers, printers, and accessories to add to your list.
@@ -140,6 +147,13 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
 
               if (!product || !variant) return null
 
+              const price = getPriceString(item)
+              const isAvailable = Boolean(
+                !variant.manage_inventory ||
+                  variant.allow_backorder ||
+                  (variant.inventory_quantity ?? 0) > 0
+              )
+
               return (
                 <div
                   key={item.id}
@@ -147,7 +161,7 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
                 >
                   <div className="flex gap-4 items-center flex-1">
                     <LocalizedClientLink href={`/products/${product.handle}`} className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
-                      <Thumbnail thumbnail={product.thumbnail} size="square" />
+                      <Thumbnail thumbnail={product.thumbnail} images={product.images} size="square" />
                     </LocalizedClientLink>
                     <div className="flex flex-col gap-0.5">
                       <LocalizedClientLink
@@ -160,14 +174,19 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
                         {variant.title !== "Default Variant" ? variant.title : "Standard"}
                       </span>
                       <span className="text-sm font-extrabold text-primary mt-1">
-                        {getPriceString(item)}
+                        {price || "Price unavailable"}
                       </span>
+                      {!isAvailable && (
+                        <span className="text-[10px] font-bold uppercase text-red-500">
+                          Out of stock
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
-                      disabled={isAdding}
+                      disabled={isAdding || !isAvailable || !price}
                       onClick={() => handleAddToCart(item.id, variant.id)}
                       className="bg-black hover:bg-gray-800 text-white font-bold text-xs p-3 rounded-full transition-colors flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
                       aria-label="Add to cart"
@@ -188,6 +207,11 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
               )
             })}
           </div>
+        )}
+        {feedback && (
+          <p role="status" className="text-sm font-semibold text-gray-700">
+            {feedback}
+          </p>
         )}
       </div>
     </div>
