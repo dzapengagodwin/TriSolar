@@ -36,7 +36,7 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
             <LocalizedClientLink
               key={brand.id || brand.handle}
               href={`/brands/${brand.handle}`}
-              className="group bg-white hover:bg-gray-50 p-3 sm:p-4 flex items-center justify-center border border-gray-200 hover:border-black rounded-2xl shadow-2xs hover:shadow-md transition-all duration-300 h-28 sm:h-32 md:h-36"
+              className="group bg-white hover:bg-gray-50 p-3 sm:p-4 flex items-center justify-center  border-gray-200 hover:border-black rounded-2xl shadow-2xs hover:shadow-md transition-all duration-300 h-28 sm:h-32 md:h-36"
             >
               <div className="relative w-full h-16 sm:h-20 md:h-24 flex items-center justify-center">
                 <Image
