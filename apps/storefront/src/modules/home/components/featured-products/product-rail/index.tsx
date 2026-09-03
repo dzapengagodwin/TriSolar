@@ -1,4 +1,5 @@
 import { listProducts } from "@lib/data/products"
+import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -6,16 +7,14 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export default async function ProductRail({
   collectionId,
   categoryId,
-  searchQuery,
-  fallbackToAll,
+  limit = 10,
   viewAllHref,
   region,
   title,
 }: {
   collectionId?: string
   categoryId?: string
-  searchQuery?: string
-  fallbackToAll?: boolean
+  limit?: number
   viewAllHref?: string
   region: HttpTypes.StoreRegion
   title: string
@@ -23,8 +22,8 @@ export default async function ProductRail({
   let pricedProducts: HttpTypes.StoreProduct[] = []
 
   const queryParams: HttpTypes.StoreProductListParams = {
-    limit: 10,
-    fields: "*variants.calculated_price,*categories",
+    limit: Math.max(limit * 3, 20),
+    fields: "*variants.calculated_price,*categories,*images",
   }
 
   // Determine filter query
@@ -32,12 +31,10 @@ export default async function ProductRail({
     queryParams.category_id = [categoryId]
   } else if (collectionId) {
     queryParams.collection_id = [collectionId]
-  } else if (searchQuery) {
-    queryParams.q = searchQuery
   }
 
   // Execute query if filter is present
-  if (categoryId || collectionId || searchQuery) {
+  if (categoryId || collectionId) {
     const res = await listProducts({
       regionId: region.id,
       queryParams,
@@ -45,6 +42,18 @@ export default async function ProductRail({
 
     if (res?.response?.products?.length) {
       pricedProducts = res.response.products
+        .filter((product) => {
+          const price = getProductPrice({ product }).cheapestPrice
+          const hasPrice = Boolean(
+            price && price.calculated_price_number > 0
+          )
+          const hasImage = Boolean(
+            product.thumbnail || product.images?.some((image) => Boolean(image.url))
+          )
+
+          return hasPrice && hasImage
+        })
+        .slice(0, limit)
     }
   }
 

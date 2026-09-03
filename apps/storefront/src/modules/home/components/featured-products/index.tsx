@@ -3,91 +3,48 @@ import ProductRail from "@modules/home/components/featured-products/product-rail
 
 type FeaturedSectionConfig = {
   title: string
-  keywords: string[]
-  searchQuery?: string
-  fallbackToAll?: boolean
+  categoryHandle: string
   viewAllHref: string
 }
 
 export const FEATURED_SECTIONS: FeaturedSectionConfig[] = [
   {
-    title: "BEST SELLING LAPTOPS",
-    keywords: ["laptop", "notebook", "macbook", "laptops"],
-    searchQuery: "laptop",
-    viewAllHref: "/store?q=laptop",
+    title: "POPULAR LAPTOPS",
+    categoryHandle: "laptops",
+    viewAllHref: "/categories/laptops",
   },
   {
-    title: "POPULAR GAMING PCS",
-    keywords: ["gaming-pcs", "gaming pc", "gaming desktop", "gaming"],
-    searchQuery: "gaming pc",
-    viewAllHref: "/store?q=gaming+pc",
+    title: "POPULAR DESKTOPS",
+    categoryHandle: "desktops",
+    viewAllHref: "/categories/desktops",
   },
   {
-    title: "TOP MONITORS",
-    keywords: ["monitor", "monitors", "display", "screen" ],
-    searchQuery: "monitor",
-    viewAllHref: "/store?q=monitors",
+    title: "PRINTERS FOR SALE",
+    categoryHandle: "printers_for_sale",
+    viewAllHref: "/categories/printers_for_sale",
+  },
+  {
+    title: "MOBILE PHONES",
+    categoryHandle: "mobile-phones-zimbabwe",
+    viewAllHref: "/categories/mobile-phones-zimbabwe",
+  },
+  {
+    title: "POPULAR ACCESSORIES",
+    categoryHandle: "mobile-accessories",
+    viewAllHref: "/categories/mobile-accessories",
   },
   {
     title: "POPULAR NETWORKING DEVICES",
-    keywords: [
-      "networking",
-      "network",
-      "router",
-      "routers",
-      "switch",
-      "switches",
-      "access point",
-      "ubiquiti",
-      "cables",
-    ],
-    searchQuery: "networking",
-    viewAllHref: "/store?q=networking",
-  },
-  {
-    title: "FEATURED MOBILE PHONES",
-    keywords: [
-      "mobile",
-      "phone",
-      "phones",
-      "smartphones",
-      "smartphone",
-      "iphone",
-      "cellular",
-      "galaxy",
-    ],
-    searchQuery: "phone",
-    viewAllHref: "/store?q=phone",
-  },
-  {
-    title: "POPULAR HEADPHONES",
-    keywords: [
-      "headphone",
-      "headphones",
-      "headset",
-      "audio",
-      "earphones",
-      "earbuds",
-    ],
-    searchQuery: "headphones",
-    viewAllHref: "/store?q=headphones",
-  },
-  {
-    title: "ITEMS YOU MAY LIKE",
-    keywords: [],
-    searchQuery: undefined,
-    fallbackToAll: true,
-    viewAllHref: "/store",
+    categoryHandle: "networking",
+    viewAllHref: "/categories/networking",
   },
 ]
 
 export default async function FeaturedProducts({
-  collections,
   categories,
   region,
   sectionIndex,
 }: {
-  collections?: HttpTypes.StoreCollection[]
   categories?: HttpTypes.StoreProductCategory[]
   region: HttpTypes.StoreRegion
   sectionIndex?: number
@@ -98,27 +55,14 @@ export default async function FeaturedProducts({
     if (!config) return null
 
     const targetCategory = categories?.find((c) =>
-      config.keywords.some(
-        (kw) =>
-          c.handle?.toLowerCase().includes(kw) ||
-          c.name?.toLowerCase().includes(kw)
-      )
+      c.handle?.toLowerCase() === config.categoryHandle
     )
 
-    const targetCollection = collections?.find((c) =>
-      config.keywords.some(
-        (kw) =>
-          c.handle?.toLowerCase().includes(kw) ||
-          c.title?.toLowerCase().includes(kw)
-      )
-    )
+    if (!targetCategory) return null
 
     return (
       <ProductRail
-        collectionId={targetCollection?.id}
-        categoryId={targetCategory?.id}
-        searchQuery={!targetCategory && !targetCollection ? config.searchQuery : undefined}
-        fallbackToAll={config.fallbackToAll}
+        categoryId={targetCategory.id}
         viewAllHref={config.viewAllHref}
         region={region}
         title={config.title}
@@ -126,33 +70,20 @@ export default async function FeaturedProducts({
     )
   }
 
-  // Otherwise, render all 7 sections sequentially
+  // Otherwise, render all sections sequentially
   return (
     <div className="space-y-2">
       {FEATURED_SECTIONS.map((config) => {
         const targetCategory = categories?.find((c) =>
-          config.keywords.some(
-            (kw) =>
-              c.handle?.toLowerCase().includes(kw) ||
-              c.name?.toLowerCase().includes(kw)
-          )
+          c.handle?.toLowerCase() === config.categoryHandle
         )
 
-        const targetCollection = collections?.find((c) =>
-          config.keywords.some(
-            (kw) =>
-              c.handle?.toLowerCase().includes(kw) ||
-              c.title?.toLowerCase().includes(kw)
-          )
-        )
+        if (!targetCategory) return null
 
         return (
           <ProductRail
             key={config.title}
-            collectionId={targetCollection?.id}
-            categoryId={targetCategory?.id}
-            searchQuery={!targetCategory && !targetCollection ? config.searchQuery : undefined}
-            fallbackToAll={config.fallbackToAll}
+            categoryId={targetCategory.id}
             viewAllHref={config.viewAllHref}
             region={region}
             title={config.title}

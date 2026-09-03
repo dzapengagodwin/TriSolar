@@ -96,7 +96,10 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
   const totalItems =
     cartState?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
 
-  const subtotal = cartState?.subtotal ?? 0
+  const subtotal = cartState?.item_subtotal ?? 0
+  const shipping = cartState?.shipping_subtotal ?? 0
+  const taxes = cartState?.tax_total ?? 0
+  const total = cartState?.total ?? 0
   const itemRef = useRef<number>(totalItems || 0)
 
   // Auto-open drawer when modifying cart items, unless on cart/checkout pages
@@ -421,19 +424,48 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
           )}
         </div>
 
-        {/* Drawer Footer with Subtotal & Actions */}
+        {/* Drawer Footer with Totals & Actions */}
         {cartState && cartState.items?.length ? (
           <div className="border-t border-gray-200 px-6 py-5 bg-white space-y-3.5">
-            {/* Subtotal Row */}
-            <div className="flex items-center justify-between text-sm">
-              <span className="font-bold text-gray-900">Subtotal:</span>
+            <div className="flex items-center justify-between text-xs text-gray-600">
+              <span>Subtotal (excl. shipping & taxes)</span>
               <span
-                className="font-bold text-base text-gray-900"
+                className="font-bold text-gray-900"
                 data-testid="cart-subtotal"
                 data-value={subtotal}
               >
                 {convertToLocale({
                   amount: subtotal,
+                  currency_code: cartState.currency_code,
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-gray-600">
+              <span>Shipping</span>
+              <span className="font-bold text-gray-900">
+                {convertToLocale({
+                  amount: shipping,
+                  currency_code: cartState.currency_code,
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-gray-600">
+              <span>Taxes</span>
+              <span className="font-bold text-gray-900">
+                {convertToLocale({
+                  amount: taxes,
+                  currency_code: cartState.currency_code,
+                })}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-sm">
+              <span className="font-bold text-gray-900">Total:</span>
+              <span className="font-bold text-base text-gray-900">
+                {convertToLocale({
+                  amount: total,
                   currency_code: cartState.currency_code,
                 })}
               </span>

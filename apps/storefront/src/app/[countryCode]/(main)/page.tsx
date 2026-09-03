@@ -6,9 +6,10 @@ import MonthlyDeals from "@modules/home/components/monthly-deals"
 import GamingSection from "@modules/home/components/gaming-section"
 import TopBrands from "@modules/home/components/top-brands"
 import FeaturedProducts from "@modules/home/components/featured-products"
+import ProductRail from "@modules/home/components/featured-products/product-rail"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
-import { listCollections } from "@lib/data/collections"
+import { getCollectionByHandle, listCollections } from "@lib/data/collections"
 import { STATIC_BRANDS } from "@lib/data/brands"
 import { listCategories } from "@lib/data/categories"
 import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
@@ -29,8 +30,9 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [collectionsRes, productsRes, categories] = await Promise.all([
+  const [collectionsRes, featuredCollection, productsRes, categories] = await Promise.all([
     listCollections({ fields: "id, handle, title" }).catch(() => ({ collections: [] })),
+    getCollectionByHandle("featured").catch(() => null),
     region
       ? listProducts({
           regionId: region.id,
@@ -53,29 +55,39 @@ export default async function Home(props: {
       {/* 1. Hero Grid (Black Theme Banners) */}
       <Hero />
 
-      {/* 2. Top Categories Slider (6 Curated Categories) */}
+      {/* 2. Featured Laptops */}
+      {featuredCollection && (
+        <ProductRail
+          collectionId={featuredCollection.id}
+          limit={6}
+          viewAllHref="/collections/featured"
+          region={region}
+          title="FEATURED LAPTOPS"
+        />
+      )}
+
+      {/* 3. Top Categories Slider (6 Curated Categories) */}
       <TopCategories categories={HOMEPAGE_FEATURED_CATEGORIES} />
 
-      {/* 3. Monthly Best Deals (Sleek Black Background Section) */}
+      {/* 4. Popular Product Rails */}
+      <FeaturedProducts
+        categories={categories}
+        region={region}
+      />
+
+      {/* 5. Monthly Best Deals (Sleek Black Background Section) */}
       <MonthlyDeals
         products={products}
         region={region}
       />
 
-      {/* 4. Featured Products Rails */}
-      <FeaturedProducts
-        collections={collections}
-        categories={categories}
-        region={region}
-      />
+      {/* 6. Gaming Categories Section */}
+      <GamingSection />
 
-      {/* 5. Gaming Categories Section */}
-      <GamingSection categories={categories} />
-
-      {/* 6. Top Brands Slider */}
+      {/* 7. Top Brands Slider */}
       <TopBrands brands={brands} />
 
-      {/* 7. 3-Pillar Guarantee Strip */}
+      {/* 8. 3-Pillar Guarantee Strip */}
       <TrustBar />
     </div>
   )

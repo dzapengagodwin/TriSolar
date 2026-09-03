@@ -78,9 +78,9 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   },
   {
     id: "pcat_01M07CFV5D2EVX2QEA9M2S4CHZ",
-    name: "Headphones & Audio",
-    handle: "headphones_mics",
-    description: "Noise-cancelling headsets, audio gear, and studio monitors.",
+    name: "Printing",
+    handle: "printing",
+    description: "Printers, ink, and related supplies.",
     rank: 4,
     external_id: null,
     parent_category_id: null,
@@ -90,15 +90,15 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/headphones.png",
+      image: "/top-categories/printers.png",
       product_count: 1,
     },
   },
   {
     id: "pcat_01M07CFV6RKMJJFQFY6E6SP2MM",
-    name: "Smart Watches & Wearables",
-    handle: "smart-watches",
-    description: "Fitness trackers, smartwatches, and connected wearable tech.",
+    name: "Gaming",
+    handle: "gaming",
+    description: "Gaming consoles, PC games, and gaming accessories.",
     rank: 5,
     external_id: null,
     parent_category_id: null,
@@ -108,7 +108,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/smartwatches.png",
+      image: "/top-categories/gaming.png",
       product_count: 1,
     },
   },
@@ -117,23 +117,14 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
 // Fallback image map to enrich dynamic categories from the database with icons
 export const CATEGORY_IMAGE_MAP: Record<string, string> = {
   laptops: "/top-categories/laptops.png",
-  "ai-laptops": "/gaming/gaming-laptops-card.png",
-  "business-laptops": "/top-categories/laptops.png",
-  "apple-laptops": "/top-brands/apple.png",
-  "chromebooks-for-sale": "/top-categories/laptops.png",
   "gaming-laptops": "/gaming/gaming-laptops-card.png",
   monitors: "/top-categories/monitors.png",
-  "gaming-monitors": "/gaming/gaming-monitors-card.png",
-  "desktop-pcs": "/gaming/gaming-pcs-card.png",
-  "all-in-one-pc": "/gaming/gaming-pcs.png",
   desktops: "/gaming/gaming-pcs-card.png",
-  "mac-computers": "/top-brands/apple.png",
   "keyboard_-mouse": "/top-categories/keyboards.png",
   "computer-accessories": "/top-categories/computer-mouse.png",
-  headphones_mics: "/top-categories/headphones.png",
-  "smart-watches": "/top-categories/smartwatches.png",
-  networking: "/gaming/gaming-accessories-card.png",
-  software: "/top-categories/keyboards.png",
+  printing: "/top-categories/printers.png",
+  gaming: "/top-categories/gaming.png",
+ 
 }
 
 export const STATIC_CATEGORIES = HOMEPAGE_FEATURED_CATEGORIES
