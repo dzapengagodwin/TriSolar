@@ -18,7 +18,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
             Hello, {customer?.first_name}
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Welcome back to your Laptop Zone dashboard.
+            Welcome back to your Laptopzone dashboard.
           </p>
         </div>
         <div className="text-xs text-gray-500 font-normal">

@@ -39,9 +39,13 @@ export type OrderConfirmationData = {
   items: OrderConfirmationItem[]
   subtotal: number | string
   discount_total?: number | string
+  gift_card_total?: number | string
   shipping_total: number | string
   tax_total?: number | string
   total: number | string
+  payment_method?: string
+  payment_status?: string
+  delivery_method?: string
   shipping_address?: OrderConfirmationAddress | null
   view_order_url?: string
 }

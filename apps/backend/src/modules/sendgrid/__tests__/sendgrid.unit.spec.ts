@@ -73,14 +73,18 @@ describe("SendgridNotificationService", () => {
         },
       ],
       subtotal: 650,
+      gift_card_total: 25,
       shipping_total: 10,
       total: 660,
+      delivery_method: "Harare Same-Day Delivery",
+      payment_method: "Cash on Delivery",
+      payment_status: "Pending",
       shipping_address: {
-        first_name: "John",
-        last_name: "Doe",
+        first_name: "<John>",
+        last_name: "Doe & Co",
         address_1: "123 Samora Machel Ave",
         city: "Harare",
-        country_code: "zw",
+        postal_code: "<0000>",
       },
       view_order_url: "http://localhost:8000/zw/order/confirmed/order_123",
     }
@@ -132,10 +136,17 @@ describe("SendgridNotificationService", () => {
             name: "LaptopZone",
           },
           subject: expect.stringContaining("#1001"),
-          html: expect.stringContaining("HP EliteBook 840 G8"),
           text: expect.stringContaining("HP EliteBook 840 G8"),
         })
       )
+
+      const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
+      expect(message.html).toContain("Gift card")
+      expect(message.html).toContain("Harare Same-Day Delivery")
+      expect(message.html).toContain("Cash on Delivery (Pending)")
+      expect(message.html).toContain("&lt;John&gt;")
+      expect(message.html).not.toContain("<John>")
+      expect(message.html).not.toContain(">Zimbabwe<")
     })
   })
 

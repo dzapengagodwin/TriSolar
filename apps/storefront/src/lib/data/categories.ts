@@ -29,7 +29,7 @@ function enrichCategory(
 }
 
 /**
- * Lists all product categories dynamically from the Medusa v2 backend.
+ * Lists all product categories dynamically from the commerce backend.
  */
 export const listCategories = async (
   query?: Record<string, unknown>
@@ -62,7 +62,7 @@ export const listCategories = async (
       return product_categories.map(enrichCategory)
     })
     .catch((err) => {
-      console.error("Failed to fetch categories dynamically from Medusa:", err)
+      console.error("Failed to fetch product categories:", err)
       return []
     })
 }

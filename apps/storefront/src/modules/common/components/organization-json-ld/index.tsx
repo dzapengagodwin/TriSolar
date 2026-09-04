@@ -1,7 +1,7 @@
 import { ORGANIZATION_INFO } from "@lib/seo/constants"
 
 /**
- * Emits Schema.org OnlineStore JSON-LD Structured Data for LaptopZone
+ * Emits Schema.org OnlineStore JSON-LD Structured Data for Laptopzone
  */
 export default function OrganizationJsonLd() {
   const schema: Record<string, unknown> = {

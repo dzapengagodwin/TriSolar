@@ -7,6 +7,7 @@ export function renderOrderConfirmation(
   const currency = data.currency_code || "USD"
   const orderNumber = data.display_id || data.order_id
   const customerName = data.customer_name || "Valued Customer"
+  const safe = (value: unknown) => escapeHtml(String(value ?? ""))
 
   // Render items rows HTML
   const itemsHtml = (data.items || [])
@@ -24,11 +25,11 @@ export function renderOrderConfirmation(
         </td>
         <td style="padding: 12px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: top;">
           <div style="font-weight: 700; font-size: 14px; color: #0f172a; line-height: 1.4;">
-            ${escapeHtml(item.title)}
+            ${safe(item.title)}
           </div>
           ${
             item.variant_title && item.variant_title !== "Default Variant"
-              ? `<div style="font-size: 12px; color: #64748b; margin-top: 2px;">${escapeHtml(item.variant_title)}</div>`
+              ? `<div style="font-size: 12px; color: #64748b; margin-top: 2px;">${safe(item.variant_title)}</div>`
               : ""
           }
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -51,11 +52,11 @@ export function renderOrderConfirmation(
         📍 Delivery Address
       </div>
       <div style="font-size: 13px; color: #334155; line-height: 1.6;">
-        ${addr.first_name || ""} ${addr.last_name || ""}<br>
+        ${safe(addr.first_name)} ${safe(addr.last_name)}<br>
         ${addr.address_1 ? `${escapeHtml(addr.address_1)}<br>` : ""}
         ${addr.address_2 ? `${escapeHtml(addr.address_2)}<br>` : ""}
-        ${addr.city ? `${escapeHtml(addr.city)}, ` : ""}${addr.postal_code || ""}<br>
-        ${addr.country_code ? `${addr.country_code.toUpperCase()}` : "Zimbabwe"}
+        ${addr.city ? `${safe(addr.city)}, ` : ""}${safe(addr.postal_code)}<br>
+        ${addr.country_code ? safe(addr.country_code.toUpperCase()) : ""}
         ${addr.phone ? `<br>📞 ${escapeHtml(addr.phone)}` : ""}
       </div>
     </div>`
@@ -79,12 +80,12 @@ export function renderOrderConfirmation(
         Thank You for Your Order!
       </h1>
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">
-        Order <strong style="color: #0f172a;">#${orderNumber}</strong> has been successfully placed.
+        Order <strong style="color: #0f172a;">#${safe(orderNumber)}</strong> has been successfully placed.
       </p>
     </div>
 
     <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 20px 0;">
-      Hello <strong>${escapeHtml(customerName)}</strong>,<br>
+      Hello <strong>${safe(customerName)}</strong>,<br>
       We're getting your order ready for processing. You will receive an update as soon as your package has been prepared and dispatched.
     </p>
 
@@ -119,6 +120,14 @@ export function renderOrderConfirmation(
             </tr>`
           : ""
       }
+      ${
+        data.gift_card_total && Number(data.gift_card_total) > 0
+          ? `<tr>
+              <td style="padding: 6px 0; color: #16a34a;">Gift card</td>
+              <td align="right" style="padding: 6px 0; font-weight: 600; color: #16a34a;">-${formatMoney(data.gift_card_total, currency)}</td>
+            </tr>`
+          : ""
+      }
       <tr>
         <td style="padding: 6px 0; color: #64748b;">Shipping / Delivery</td>
         <td align="right" style="padding: 6px 0; font-weight: 600; color: #0f172a;">
@@ -133,9 +142,25 @@ export function renderOrderConfirmation(
             </tr>`
           : ""
       }
+      ${
+        data.delivery_method
+          ? `<tr>
+              <td style="padding: 6px 0; color: #64748b;">Delivery method</td>
+              <td align="right" style="padding: 6px 0; font-weight: 600; color: #0f172a;">${safe(data.delivery_method)}</td>
+            </tr>`
+          : ""
+      }
+      ${
+        data.payment_method || data.payment_status
+          ? `<tr>
+              <td style="padding: 6px 0; color: #64748b;">Payment</td>
+              <td align="right" style="padding: 6px 0; font-weight: 600; color: #0f172a;">${safe(data.payment_method || "Payment")}${data.payment_status ? ` (${safe(data.payment_status)})` : ""}</td>
+            </tr>`
+          : ""
+      }
       <tr>
         <td style="padding: 12px 0 0 0; font-size: 16px; font-weight: 900; color: #0f172a; border-top: 2px solid #e2e8f0;">
-          Total Amount
+          Total Charged
         </td>
         <td align="right" style="padding: 12px 0 0 0; font-size: 18px; font-weight: 900; color: #f97316; border-top: 2px solid #e2e8f0;">
           ${formatMoney(data.total, currency)}
@@ -147,7 +172,7 @@ export function renderOrderConfirmation(
     ${viewOrderBtnHtml}
   `
 
-  const subject = `Order Confirmed: #${orderNumber} - LaptopZone`
+  const subject = `Order Confirmed: #${String(orderNumber)} - Laptopzone`
   const html = renderBaseLayout({
     title: subject,
     previewText: `Thank you for your order #${orderNumber}. We're preparing your items for delivery.`,
@@ -174,6 +199,7 @@ ${itemsText}
 
 Subtotal: ${formatMoney(data.subtotal, currency)}
 ${data.discount_total ? `Discount: -${formatMoney(data.discount_total, currency)}\n` : ""}Shipping: ${Number(data.shipping_total) === 0 ? "FREE" : formatMoney(data.shipping_total, currency)}
+${data.gift_card_total ? `Gift card: -${formatMoney(data.gift_card_total, currency)}\n` : ""}
 ${data.tax_total ? `Tax: ${formatMoney(data.tax_total, currency)}\n` : ""}Total: ${formatMoney(data.total, currency)}
 
 ${data.view_order_url ? `View your order online: ${data.view_order_url}\n` : ""}

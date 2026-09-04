@@ -11,7 +11,7 @@ export default function Loading() {
       </div>
       <div className="text-center space-y-1 mt-2">
         <p className="text-[11px] font-extrabold text-gray-400 tracking-widest uppercase animate-pulse">
-          Loading Laptop Zone
+          Loading Laptopzone
         </p>
         <p className="text-[10px] text-gray-400 font-normal">
           Preparing your high-performance tech deal...

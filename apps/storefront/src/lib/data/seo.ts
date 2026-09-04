@@ -20,7 +20,7 @@ export type SeoMetadataDTO = {
 }
 
 /**
- * Fetches persistent SEO metadata for a product from Medusa backend
+ * Fetches persistent SEO metadata for a product from the commerce backend
  */
 export async function getProductSeo(
   productIdOrHandle: string

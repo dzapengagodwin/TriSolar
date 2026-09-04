@@ -9,13 +9,13 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import CartButton from "@modules/layout/components/cart-button"
 import SideMenu from "@modules/layout/components/side-menu"
 import SearchBar from "@modules/layout/components/search-bar"
+import StickyNav from "@modules/layout/components/sticky-nav"
 import CategoryDropdown from "@modules/layout/components/category-dropdown"
 import Logo from "@modules/common/components/logo"
 import User from "@modules/common/icons/user"
 import {
   Heart,
   ShoppingBag,
-  ArrowsPointingOut,
 } from "@medusajs/icons"
 
 import MegaMenuNav from "@modules/layout/components/mega-menu-nav"
@@ -35,8 +35,9 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
 
   return (
     <div className="relative w-full" suppressHydrationWarning>
-      {/* Row 1: Top Announcement Bar (Scrolls away on scroll) */}
-      <div className="bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
+      <StickyNav
+        announcement={
+          <div className="bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
         <div className="content-container flex flex-wrap sm:flex-row justify-center sm:justify-between items-center gap-x-4 gap-y-0.5 font-normal text-[#333333] text-center" suppressHydrationWarning>
           {/* Left: Call Us */}
           <div className="flex items-center gap-1 shrink-0">
@@ -78,10 +79,10 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
             </a>
           </div>
         </div>
-      </div>
-
-      {/* Sticky Navigation Container (Row 2 & Row 3 remain sticky on scroll) */}
-      <div className="sticky top-0 inset-x-0 z-50 bg-white" suppressHydrationWarning>
+          </div>
+        }
+        topRow={
+          <>
         {/* Row 2: Main White Search Header */}
         <header className="bg-white py-2.5 sm:py-3.5 border-b border-gray-100 shadow-sm">
           <div className="content-container flex items-center justify-between gap-x-2 sm:gap-x-6">
@@ -89,7 +90,12 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
             {/* Left: Brand Logo & Mobile Menu */}
             <div className="flex items-center gap-x-1 sm:gap-x-3 shrink-0">
               <div className="small:hidden flex items-center">
-                <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
+                <SideMenu
+                  regions={regions}
+                  locales={locales}
+                  currentLocale={currentLocale}
+                  categories={categories}
+                />
               </div>
 
               <div className="max-w-[105px] sm:max-w-none">
@@ -138,14 +144,18 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
             </div>
 
           </div>
-
-          {/* Mobile Search Bar Row */}
-          <div className="content-container mt-2.5 small:hidden">
+        </header>
+          </>
+        }
+        mobileSearch={
+          <div className="content-container pb-2">
             <Suspense fallback={<div className="w-full h-9 bg-gray-50 rounded-full animate-pulse" />}>
               <SearchBar categories={categories} />
             </Suspense>
           </div>
-        </header>
+        }
+        desktopNavigation={
+          <>
 
         {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
         <nav className="bg-black  border-black-300 hidden small:block text-white">
@@ -163,7 +173,9 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
             </div>
           </div>
         </nav>
-      </div>
+          </>
+        }
+      />
     </div>
   )
 }

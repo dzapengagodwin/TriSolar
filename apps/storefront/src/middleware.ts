@@ -15,7 +15,7 @@ async function getRegionMap(cacheId: string) {
 
   if (!BACKEND_URL) {
     throw new Error(
-      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable."
+      "Middleware.ts: Error fetching regions. Check the backend URL and region configuration."
     )
   }
 
@@ -23,7 +23,7 @@ async function getRegionMap(cacheId: string) {
     !regionMap.keys().next().value ||
     regionMapUpdated < Date.now() - 3600 * 1000
   ) {
-    // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
+    // Fetch regions directly because middleware runs on Edge and the SDK needs a Node environment.
     const response = await fetch(`${BACKEND_URL}/store/regions`, {
       method: "GET",
       headers: {
@@ -62,7 +62,7 @@ async function getRegionMap(cacheId: string) {
 }
 
 /**
- * Fetches regions from Medusa and sets the region cookie.
+ * Fetches regions and sets the region cookie.
  * @param request
  * @param response
  */

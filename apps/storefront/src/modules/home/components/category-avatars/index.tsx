@@ -8,7 +8,7 @@ export default function CategoryAvatars({
 }) {
   const bgColors = ["bg-amber-100", "bg-pink-100", "bg-blue-100", "bg-rose-100", "bg-gray-200", "bg-orange-100"]
 
-  // Display categories from Medusa or fallback if empty
+  // Display categories from the backend or fallback if empty
   const displayCategories =
     categories && categories.length > 0
       ? categories.slice(0, 6)

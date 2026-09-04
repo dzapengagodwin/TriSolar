@@ -16,9 +16,9 @@ import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 import { getRegion } from "@lib/data/regions"
 
 export const metadata: Metadata = {
-  title: "Laptop Zone | Laptops, Computers & Tech Store",
+  title: "Laptopzone | Laptops, Computers & Tech Store",
   description:
-    "Laptop Zone - Premium Laptops, Computers, Tech & Accessories. High performance e-commerce store.",
+    "Laptopzone - Premium Laptops, Computers, Tech & Accessories. High performance e-commerce store.",
 }
 
 export default async function Home(props: {

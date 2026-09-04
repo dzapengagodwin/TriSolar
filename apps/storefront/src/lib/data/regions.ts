@@ -44,7 +44,7 @@ export const getRegion = async (countryCode: string) => {
   const regions = await listRegions()
 
   if (!regions || regions.length === 0) {
-    console.log("[getRegion] No regions returned from Medusa")
+    console.log("[getRegion] No regions returned from the commerce backend")
     return null
   }
 

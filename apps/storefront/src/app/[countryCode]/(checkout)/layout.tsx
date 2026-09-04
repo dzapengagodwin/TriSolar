@@ -13,7 +13,7 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = createNoIndexMetadata(
   "Secure Checkout",
-  "Complete your secure order on LaptopZone."
+  "Complete your secure order on Laptopzone."
 )
 
 export default function CheckoutLayout({
@@ -45,7 +45,7 @@ export default function CheckoutLayout({
             <span className="inline sm:hidden">Back</span>
           </LocalizedClientLink>
 
-          {/* Laptop Zone Logo */}
+          {/* Laptopzone Logo */}
           <Logo size="sm" />
 
           {/* 256-Bit SSL Security Badge */}
@@ -62,7 +62,7 @@ export default function CheckoutLayout({
         {children}
       </main>
 
-      {/* 4. Laptop Zone Checkout Footer */}
+      {/* 4. Laptopzone Checkout Footer */}
       <footer className="bg-white border-t border-gray-100 py-6 mt-12">
         <div className="content-container flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-x-6 font-semibold">
@@ -87,7 +87,7 @@ export default function CheckoutLayout({
           </div>
 
           <p className="text-gray-400">
-            © {new Date().getFullYear()} Laptop Zone. All rights reserved.
+            © {new Date().getFullYear()} Laptopzone. All rights reserved.
           </p>
         </div>
       </footer>

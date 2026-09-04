@@ -12,6 +12,16 @@ export default async function orderPlacedHandler({
   const notificationModuleService = container.resolve(Modules.NOTIFICATION)
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
+  const toNumber = (value: unknown) => {
+    if (typeof value === "number") return value
+    if (typeof value === "string") return Number(value) || 0
+    if (value && typeof value === "object") {
+      const amount = value as { numeric?: unknown; value?: unknown; amount?: unknown }
+      return Number(amount.numeric ?? amount.value ?? amount.amount) || 0
+    }
+    return 0
+  }
+
   try {
     const { data: orders } = await query.graph({
       entity: "order",
@@ -24,13 +34,16 @@ export default async function orderPlacedHandler({
         "subtotal",
         "shipping_total",
         "discount_total",
+        "gift_card_total",
         "tax_total",
+        "payment_status",
         "created_at",
         "items.id",
         "items.title",
         "items.variant_title",
         "items.quantity",
         "items.unit_price",
+        "items.total",
         "items.thumbnail",
         "shipping_address.first_name",
         "shipping_address.last_name",
@@ -40,6 +53,8 @@ export default async function orderPlacedHandler({
         "shipping_address.postal_code",
         "shipping_address.country_code",
         "shipping_address.phone",
+        "shipping_methods.name",
+        "payment_collections.payments.provider_id",
         "customer.first_name",
         "customer.last_name",
         "customer.email",
@@ -72,14 +87,38 @@ export default async function orderPlacedHandler({
     const countryCode = (order.shipping_address?.country_code || "zw").toLowerCase()
     const viewOrderUrl = `${storefrontUrl}/${countryCode}/order/confirmed/${order.id}`
 
-    const items = (order.items || []).map((item: any) => ({
-      title: item.title || "Product",
-      variant_title: item.variant_title,
-      quantity: item.quantity || 1,
-      unit_price: item.unit_price || 0,
-      total_price: (item.unit_price || 0) * (item.quantity || 1),
-      thumbnail: item.thumbnail,
-    }))
+    const items = (order.items || []).map((item: any) => {
+      const quantity = toNumber(item.quantity) || 1
+      const unitPrice = toNumber(item.unit_price)
+      const totalPrice = toNumber(item.total) || unitPrice * quantity
+
+      return {
+        title: item.title || "Product",
+        variant_title: item.variant_title,
+        quantity,
+        unit_price: unitPrice,
+        total_price: totalPrice,
+        thumbnail: item.thumbnail,
+      }
+    })
+
+    const itemSubtotal = items.reduce(
+      (sum, item) => sum + toNumber(item.total_price),
+      0
+    )
+    const discountTotal = toNumber(order.discount_total)
+    const giftCardTotal = toNumber(order.gift_card_total)
+    const shippingTotal = toNumber(order.shipping_total)
+    const taxTotal = toNumber(order.tax_total)
+    const calculatedTotal =
+      itemSubtotal - discountTotal - giftCardTotal + shippingTotal + taxTotal
+    const reportedTotal = toNumber(order.total)
+
+    if (Math.abs(reportedTotal - calculatedTotal) > 0.01) {
+      logger.warn(
+        `[Subscriber: order.placed] Order #${order.display_id || order.id} totals are inconsistent. Using line-item total for email: reported=${reportedTotal}, calculated=${calculatedTotal}.`
+      )
+    }
 
     const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
       year: "numeric",
@@ -95,11 +134,15 @@ export default async function orderPlacedHandler({
       customer_email: recipientEmail,
       currency_code: order.currency_code || "USD",
       items,
-      subtotal: order.subtotal || 0,
-      discount_total: order.discount_total || 0,
-      shipping_total: order.shipping_total || 0,
-      tax_total: order.tax_total || 0,
-      total: order.total || 0,
+      subtotal: itemSubtotal,
+      discount_total: discountTotal,
+      gift_card_total: giftCardTotal,
+      shipping_total: shippingTotal,
+      tax_total: taxTotal,
+      total: calculatedTotal,
+      payment_method: order.payment_collections?.[0]?.payments?.[0]?.provider_id,
+      payment_status: order.payment_status || (order.payment_collections?.[0]?.payments?.length ? "Paid" : "Pending"),
+      delivery_method: order.shipping_methods?.[0]?.name,
       shipping_address: order.shipping_address,
       view_order_url: viewOrderUrl,
     }

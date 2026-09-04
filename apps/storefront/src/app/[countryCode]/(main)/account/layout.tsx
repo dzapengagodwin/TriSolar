@@ -5,7 +5,7 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = createNoIndexMetadata(
   "Account",
-  "Manage your LaptopZone customer account, orders, and profile."
+  "Manage your Laptopzone customer account, orders, and profile."
 )
 
 export default async function AccountPageLayout({

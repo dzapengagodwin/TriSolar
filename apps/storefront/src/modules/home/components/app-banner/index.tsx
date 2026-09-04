@@ -9,7 +9,7 @@ export default function AppBanner() {
           {/* Left Text & Badges */}
           <div className="lg:col-span-7 space-y-4 text-center lg:text-left">
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-sans">
-              Laptop Zone Mobile <br /> App Available
+              Laptopzone Mobile <br /> App Available
             </h2>
 
             <p className="text-xs sm:text-sm text-gray-400 font-normal max-w-md mx-auto lg:mx-0 leading-relaxed">
@@ -46,12 +46,12 @@ export default function AppBanner() {
               <div className="w-full flex-1 my-2 bg-gradient-to-b from-gray-900 to-black rounded-[1.8rem] flex flex-col items-center justify-center p-4 text-center">
                 <Image
                   src="/logo.png"
-                  alt="Laptop Zone App"
+                  alt="Laptopzone App"
                   width={140}
                   height={50}
                   className="object-contain mb-2"
                 />
-                <span className="text-sm font-extrabold text-white">Laptop Zone App</span>
+                <span className="text-sm font-extrabold text-white">Laptopzone App</span>
                 <span className="text-[10px] text-gray-400 mt-1">Fast & Secure Mobile Shopping</span>
               </div>
               <div className="w-8 h-8 border-2 border-slate-700 rounded-full mb-1"></div>

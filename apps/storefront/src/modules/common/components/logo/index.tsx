@@ -18,7 +18,7 @@ export default function Logo({ size = "md", className }: LogoProps) {
       <div className="relative flex items-center justify-center">
         <Image
           src="/logo.png"
-          alt="Laptop Zone Logo"
+          alt="Laptopzone Logo"
           width={height * 3.5}
           height={height}
           className="object-contain h-auto w-auto max-h-7 sm:max-h-9 md:max-h-11"

@@ -69,7 +69,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     id: `brand_${params.handle}`,
     name: formatBrandName(params.handle),
     handle: params.handle,
-    description: `Browse authentic products from ${formatBrandName(params.handle)} at LaptopZone.`,
+    description: `Browse authentic products from ${formatBrandName(params.handle)} at Laptopzone.`,
   }
 
   return generateBrandMetadata(brand, params.countryCode)
