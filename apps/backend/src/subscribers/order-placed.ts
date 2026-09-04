@@ -36,7 +36,6 @@ export default async function orderPlacedHandler({
         "discount_total",
         "gift_card_total",
         "tax_total",
-        "payment_status",
         "created_at",
         "items.id",
         "items.title",
@@ -141,7 +140,9 @@ export default async function orderPlacedHandler({
       tax_total: taxTotal,
       total: calculatedTotal,
       payment_method: order.payment_collections?.[0]?.payments?.[0]?.provider_id,
-      payment_status: order.payment_status || (order.payment_collections?.[0]?.payments?.length ? "Paid" : "Pending"),
+      payment_status: order.payment_collections?.[0]?.payments?.length
+        ? "Paid"
+        : "Pending",
       delivery_method: order.shipping_methods?.[0]?.name,
       shipping_address: order.shipping_address,
       view_order_url: viewOrderUrl,
