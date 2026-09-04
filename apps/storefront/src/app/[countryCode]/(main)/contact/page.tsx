@@ -26,7 +26,7 @@ export default async function ContactPage() {
 
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
             <h3 className="font-bold text-gray-900 text-sm">Store & Pickup Location</h3>
-            <p className="text-xs text-gray-600">1202 Knowe Norton</p>
+            <p className="text-xs text-gray-600">64 Ridgeway Borrowdale</p>
             <p className="text-xs text-gray-600">Harare, Zimbabwe</p>
             <p className="text-xs text-gray-500 pt-2">Collection available during business hours</p>
           </div>

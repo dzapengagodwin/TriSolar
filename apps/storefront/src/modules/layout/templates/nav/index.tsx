@@ -167,10 +167,6 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
               {/* Top Navigation Items with Mega Menu Dropdown */}
               <MegaMenuNav />
             </div>
-
-            <div className="hidden lg:flex items-center gap-2 text-xs font-black text-gray-900 pr-2">
-              <span>Free Delivery Over $50</span>
-            </div>
           </div>
         </nav>
           </>
