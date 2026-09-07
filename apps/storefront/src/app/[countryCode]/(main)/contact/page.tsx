@@ -20,7 +20,7 @@ export default async function ContactPage() {
           <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
             <h3 className="font-bold text-gray-900 text-sm">Customer Care & Orders</h3>
             <p className="text-xs text-gray-600">Email: support@laptopzone.co.zw</p>
-            <p className="text-xs text-gray-600">Phone: +263 78 151 0697</p>
+            <p className="text-xs text-gray-600">Phone: +263 77 295 3946</p>
             <p className="text-xs text-gray-500 pt-2">Monday – Friday: 8:00 AM – 5:00 PM (CAT)</p>
           </div>
 

@@ -16,7 +16,7 @@ export function renderOrderConfirmation(
       const totalFormatted = formatMoney(item.total_price, currency)
       const thumbnailHtml = item.thumbnail
         ? `<img src="${escapeHtml(item.thumbnail)}" alt="${escapeHtml(item.title)}" width="56" height="56" style="border-radius: 8px; object-fit: contain; background: #f8fafc; border: 1px solid #e2e8f0; display: block;" />`
-        : `<div style="width: 56px; height: 56px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; text-align: center; line-height: 56px; font-size: 20px;">📦</div>`
+        : `<div style="width: 56px; height: 56px; border-radius: 8px; background: #f1f5f9; border: 1px solid #e2e8f0; text-align: center; line-height: 56px; font-size: 11px; font-weight: 700; color: #94a3b8;">ITEM</div>`
 
       return `
       <tr>
@@ -49,7 +49,7 @@ export function renderOrderConfirmation(
     ? `
     <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-top: 24px;">
       <div style="font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #0f172a; margin-bottom: 8px;">
-        📍 Delivery Address
+        Delivery Address
       </div>
       <div style="font-size: 13px; color: #334155; line-height: 1.6;">
         ${safe(addr.first_name)} ${safe(addr.last_name)}<br>
@@ -57,7 +57,7 @@ export function renderOrderConfirmation(
         ${addr.address_2 ? `${escapeHtml(addr.address_2)}<br>` : ""}
         ${addr.city ? `${safe(addr.city)}, ` : ""}${safe(addr.postal_code)}<br>
         ${addr.country_code ? safe(addr.country_code.toUpperCase()) : ""}
-        ${addr.phone ? `<br>📞 ${escapeHtml(addr.phone)}` : ""}
+        ${addr.phone ? `<br>Phone: ${escapeHtml(addr.phone)}` : ""}
       </div>
     </div>`
     : ""
@@ -137,8 +137,8 @@ export function renderOrderConfirmation(
       ${
         data.tax_total && Number(data.tax_total) > 0
           ? `<tr>
-              <td style="padding: 6px 0; color: #64748b;">Taxes</td>
-              <td align="right" style="padding: 6px 0; font-weight: 600; color: #0f172a;">${formatMoney(data.tax_total, currency)}</td>
+              <td style="padding: 6px 0; color: #64748b;">${safe(data.tax_label || (data.tax_rate ? `VAT (${data.tax_rate}% Included)` : "Taxes (Included)"))}</td>
+              <td align="right" style="padding: 6px 0; font-weight: 600; color: #64748b;">${formatMoney(data.tax_total, currency)}</td>
             </tr>`
           : ""
       }
@@ -187,6 +187,8 @@ export function renderOrderConfirmation(
     )
     .join("\n")
 
+  const taxLabelText = data.tax_label || (data.tax_rate ? `VAT (${data.tax_rate}% Included)` : "Taxes (Included)")
+
   const text = `LAPTOPZONE ZIMBABWE - ORDER CONFIRMATION
 Order #${orderNumber}
 
@@ -199,8 +201,7 @@ ${itemsText}
 
 Subtotal: ${formatMoney(data.subtotal, currency)}
 ${data.discount_total ? `Discount: -${formatMoney(data.discount_total, currency)}\n` : ""}Shipping: ${Number(data.shipping_total) === 0 ? "FREE" : formatMoney(data.shipping_total, currency)}
-${data.gift_card_total ? `Gift card: -${formatMoney(data.gift_card_total, currency)}\n` : ""}
-${data.tax_total ? `Tax: ${formatMoney(data.tax_total, currency)}\n` : ""}Total: ${formatMoney(data.total, currency)}
+${data.gift_card_total ? `Gift card: -${formatMoney(data.gift_card_total, currency)}\n` : ""}${data.tax_total ? `${taxLabelText}: ${formatMoney(data.tax_total, currency)}\n` : ""}Total: ${formatMoney(data.total, currency)}
 
 ${data.view_order_url ? `View your order online: ${data.view_order_url}\n` : ""}
 LaptopZone Zimbabwe

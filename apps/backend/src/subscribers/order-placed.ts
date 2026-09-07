@@ -32,7 +32,12 @@ export default async function orderPlacedHandler({
         "currency_code",
         "total",
         "subtotal",
+        "item_total",
+        "item_subtotal",
+        "item_tax_total",
         "shipping_total",
+        "shipping_subtotal",
+        "shipping_tax_total",
         "discount_total",
         "gift_card_total",
         "tax_total",
@@ -43,6 +48,7 @@ export default async function orderPlacedHandler({
         "items.quantity",
         "items.unit_price",
         "items.total",
+        "items.tax_total",
         "items.thumbnail",
         "shipping_address.first_name",
         "shipping_address.last_name",
@@ -53,6 +59,22 @@ export default async function orderPlacedHandler({
         "shipping_address.country_code",
         "shipping_address.phone",
         "shipping_methods.name",
+        "shipping_methods.amount",
+        "shipping_methods.total",
+        "shipping_methods.subtotal",
+        "shipping_methods.tax_total",
+        "shipping_methods.tax_lines.rate",
+        "shipping_methods.tax_lines.code",
+        "shipping_methods.tax_lines.name",
+        "shipping_methods.tax_lines.total",
+        "tax_lines.rate",
+        "tax_lines.code",
+        "tax_lines.name",
+        "tax_lines.total",
+        "items.tax_lines.rate",
+        "items.tax_lines.code",
+        "items.tax_lines.name",
+        "items.tax_lines.total",
         "payment_collections.payments.provider_id",
         "customer.first_name",
         "customer.last_name",
@@ -107,15 +129,88 @@ export default async function orderPlacedHandler({
     )
     const discountTotal = toNumber(order.discount_total)
     const giftCardTotal = toNumber(order.gift_card_total)
-    const shippingTotal = toNumber(order.shipping_total)
-    const taxTotal = toNumber(order.tax_total)
-    const calculatedTotal =
-      itemSubtotal - discountTotal - giftCardTotal + shippingTotal + taxTotal
     const reportedTotal = toNumber(order.total)
 
-    if (Math.abs(reportedTotal - calculatedTotal) > 0.01) {
+    // In our store, product prices and shipping fees already include tax (tax-inclusive pricing)
+    const firstShippingMethod = order.shipping_methods?.[0]
+    let shippingAmount = 0
+
+    if (firstShippingMethod) {
+      if (firstShippingMethod.amount !== undefined && firstShippingMethod.amount !== null && toNumber(firstShippingMethod.amount) > 0) {
+        shippingAmount = toNumber(firstShippingMethod.amount)
+      } else if (firstShippingMethod.subtotal !== undefined && firstShippingMethod.subtotal !== null && toNumber(firstShippingMethod.subtotal) > 0) {
+        shippingAmount = toNumber(firstShippingMethod.subtotal)
+      } else if (firstShippingMethod.total !== undefined && firstShippingMethod.total !== null && toNumber(firstShippingMethod.total) > 0) {
+        shippingAmount = toNumber(firstShippingMethod.total)
+      }
+    }
+
+    const shippingTotal =
+      shippingAmount ||
+      toNumber(order.shipping_total) ||
+      toNumber(order.shipping_subtotal)
+
+    // Extract tax rate and label from tax lines or default to 15.5% VAT from tax region
+    const detectedTaxRate =
+      toNumber(order.tax_lines?.[0]?.rate) ||
+      toNumber(order.items?.[0]?.tax_lines?.[0]?.rate) ||
+      toNumber(firstShippingMethod?.tax_lines?.[0]?.rate) ||
+      15.5
+
+    const taxCode =
+      order.tax_lines?.[0]?.code ||
+      order.items?.[0]?.tax_lines?.[0]?.code ||
+      firstShippingMethod?.tax_lines?.[0]?.code ||
+      "VAT"
+
+    const taxLabel = `${taxCode} (${detectedTaxRate}% Included)`
+
+    // Combined product + delivery tax
+    const itemsTaxSum = (order.items || []).reduce(
+      (sum: number, item: any) => sum + (toNumber(item.tax_total) || 0),
+      0
+    )
+    const shippingTax =
+      toNumber(order.shipping_tax_total) ||
+      toNumber(firstShippingMethod?.tax_total) ||
+      (firstShippingMethod?.tax_lines || []).reduce(
+        (sum: number, tl: any) => sum + (toNumber(tl.total) || toNumber(tl.amount) || 0),
+        0
+      )
+
+    // Compute the included tax amounts using the configured tax rate
+    const calculatedItemsTax =
+      itemsTaxSum > 0
+        ? itemsTaxSum
+        : (itemSubtotal > 0 && detectedTaxRate > 0
+            ? Math.round((itemSubtotal * (detectedTaxRate / (100 + detectedTaxRate))) * 100) / 100
+            : 0)
+
+    const calculatedShippingTax =
+      shippingTax > 0
+        ? shippingTax
+        : (shippingTotal > 0 && detectedTaxRate > 0
+            ? Math.round((shippingTotal * (detectedTaxRate / (100 + detectedTaxRate))) * 100) / 100
+            : 0)
+
+    const combinedTaxTotal =
+      toNumber(order.tax_total) > (calculatedItemsTax + calculatedShippingTax)
+        ? toNumber(order.tax_total)
+        : Math.round((calculatedItemsTax + calculatedShippingTax) * 100) / 100
+
+    // Product prices and delivery are tax-inclusive: Grand Total = Subtotal - Discounts - GiftCards + Shipping
+    const calculatedTotal =
+      itemSubtotal - discountTotal - giftCardTotal + shippingTotal
+
+    // If reportedTotal is missing items (e.g. reportedTotal < itemSubtotal), use calculatedTotal
+    const finalTotal =
+      reportedTotal >= itemSubtotal
+        ? reportedTotal
+        : calculatedTotal
+
+    if (Math.abs(reportedTotal - finalTotal) > 0.01) {
       logger.warn(
-        `[Subscriber: order.placed] Order #${order.display_id || order.id} totals are inconsistent. Using line-item total for email: reported=${reportedTotal}, calculated=${calculatedTotal}.`
+        `[Subscriber: order.placed] Order #${order.display_id || order.id} reported total (${reportedTotal}) is inconsistent with line items (${calculatedTotal}). Using calculated total: ${finalTotal}.`
       )
     }
 
@@ -137,8 +232,10 @@ export default async function orderPlacedHandler({
       discount_total: discountTotal,
       gift_card_total: giftCardTotal,
       shipping_total: shippingTotal,
-      tax_total: taxTotal,
-      total: calculatedTotal,
+      tax_total: combinedTaxTotal,
+      tax_rate: detectedTaxRate,
+      tax_label: taxLabel,
+      total: finalTotal,
       payment_method: order.payment_collections?.[0]?.payments?.[0]?.provider_id,
       payment_status: order.payment_collections?.[0]?.payments?.length
         ? "Paid"

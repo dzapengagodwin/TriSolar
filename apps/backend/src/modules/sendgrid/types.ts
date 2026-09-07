@@ -42,6 +42,8 @@ export type OrderConfirmationData = {
   gift_card_total?: number | string
   shipping_total: number | string
   tax_total?: number | string
+  tax_rate?: number | string
+  tax_label?: string
   total: number | string
   payment_method?: string
   payment_status?: string

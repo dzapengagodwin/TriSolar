@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import React, { useState, useTransition, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
@@ -26,11 +26,22 @@ type ProductDetailsTabsProps = {
 
 type TabType = "accessories" | "description" | "specification" | "reviews"
 
+function StarIcon({ filled, className = "w-4 h-4" }: { filled: boolean; className?: string }) {
+  return (
+    <svg
+      className={`${className} ${filled ? "text-amber-400 fill-amber-400" : "text-gray-200 fill-gray-200"}`}
+      viewBox="0 0 24 24"
+    >
+      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+    </svg>
+  )
+}
+
 function StarRow({ rating, max = 5 }: { rating: number; max?: number }) {
   return (
-    <span className="flex items-center gap-0.5 text-amber-400" aria-label={`${rating} out of ${max} stars`}>
+    <span className="flex items-center gap-0.5" aria-label={`${rating} out of ${max} stars`}>
       {Array.from({ length: max }, (_, i) => (
-        <span key={i}>{i < Math.round(rating) ? "★" : "☆"}</span>
+        <StarIcon key={i} filled={i < Math.round(rating)} className="w-4 h-4" />
       ))}
     </span>
   )
@@ -70,7 +81,7 @@ function RatingSummary({
           {counts.map(({ star, count }) => (
             <div key={star} className="flex items-center gap-2 text-xs text-gray-600">
               <span className="w-2 text-right font-semibold">{star}</span>
-              <span className="text-amber-400 text-[10px]">{"\u2605"}</span>
+              <StarIcon filled={true} className="w-3 h-3 shrink-0" />
               <div className="flex-1 bg-gray-200 rounded-full h-2 overflow-hidden">
                 <div
                   className="bg-amber-400 h-full rounded-full"
@@ -544,17 +555,16 @@ export default function ProductDetailsTabs({
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
                         Rating
                       </label>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
                             type="button"
                             key={star}
                             onClick={() => setNewRating(star)}
-                            className={`text-2xl cursor-pointer transition-colors ${
-                              star <= newRating ? "text-amber-400" : "text-gray-200"
-                            }`}
+                            className="p-1 cursor-pointer transition-transform hover:scale-110"
+                            aria-label={`Rate ${star} stars`}
                           >
-                            â˜…
+                            <StarIcon filled={star <= newRating} className="w-6 h-6" />
                           </button>
                         ))}
                         <span className="text-xs font-semibold text-gray-600 ml-2">
@@ -684,7 +694,10 @@ export default function ProductDetailsTabs({
                                 {displayName}
                               </span>
                               <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                                âœ“ Verified Purchaser
+                                <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                Verified Purchaser
                               </span>
                             </div>
                             <span className="text-[11px] text-gray-400">{date}</span>

@@ -164,9 +164,12 @@ const StripePaymentButton = ({
             <span>Processing Order...</span>
           </>
         ) : (
-          <>
-            <span>Place Order Now ⚡</span>
-          </>
+          <span className="flex items-center gap-1.5">
+            Place Order Now
+            <svg className="w-4 h-4 text-amber-300 fill-amber-300" viewBox="0 0 24 24">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </span>
         )}
       </button>
       <ErrorMessage
@@ -312,9 +315,12 @@ const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
             <span>Processing Order...</span>
           </>
         ) : (
-          <>
-            <span>Place Order Now ⚡</span>
-          </>
+          <span className="flex items-center gap-1.5">
+            Place Order Now
+            <svg className="w-4 h-4 text-amber-300 fill-amber-300" viewBox="0 0 24 24">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </span>
         )}
       </button>
       <ErrorMessage

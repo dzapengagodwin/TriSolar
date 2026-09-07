@@ -30,19 +30,19 @@ export function renderWelcome(
       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
           <td style="padding-bottom: 12px;">
-            <strong style="color: #0f172a; font-size: 13px;">🛡️ 100% Authentic Hardware</strong><br>
+            <strong style="color: #0f172a; font-size: 13px;">100% Authentic Hardware</strong><br>
             <span style="font-size: 12px; color: #64748b;">Direct from authorized global distributors with full warranty support.</span>
           </td>
         </tr>
         <tr>
           <td style="padding-bottom: 12px;">
-            <strong style="color: #0f172a; font-size: 13px;">⚡ Fast &amp; Secure Delivery</strong><br>
+            <strong style="color: #0f172a; font-size: 13px;">Fast &amp; Secure Delivery</strong><br>
             <span style="font-size: 12px; color: #64748b;">Door-to-door delivery across Harare, Bulawayo, and throughout Zimbabwe.</span>
           </td>
         </tr>
         <tr>
           <td>
-            <strong style="color: #0f172a; font-size: 13px;">💳 Flexible Payment Options</strong><br>
+            <strong style="color: #0f172a; font-size: 13px;">Flexible Payment Options</strong><br>
             <span style="font-size: 12px; color: #64748b;">Pay securely using EcoCash, Zipit, USD, or Visa/Mastercard.</span>
           </td>
         </tr>

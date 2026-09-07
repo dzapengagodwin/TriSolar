@@ -226,10 +226,25 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4 text-xs font-semibold">
                   <span className="text-gray-900 font-bold">SEO Readiness:</span>
-                  <span className="text-emerald-700">✓ {analysis.passCount} Passed</span>
-                  <span className="text-amber-600">⚠ {analysis.warningCount} Warnings</span>
+                  <span className="text-emerald-700 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                    {analysis.passCount} Passed
+                  </span>
+                  <span className="text-amber-600 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                    </svg>
+                    {analysis.warningCount} Warnings
+                  </span>
                   {analysis.criticalCount > 0 && (
-                    <span className="text-rose-600 font-bold">✕ {analysis.criticalCount} Critical</span>
+                    <span className="text-rose-600 font-bold flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                      </svg>
+                      {analysis.criticalCount} Critical
+                    </span>
                   )}
                 </div>
 
@@ -271,7 +286,19 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                     >
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2 font-bold">
-                          <span>{check.status === "pass" ? "✓" : check.status === "warn" ? "⚠" : "✕"}</span>
+                          {check.status === "pass" ? (
+                            <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                            </svg>
+                          ) : check.status === "warn" ? (
+                            <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-3.5 h-3.5 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                          )}
                           <span>{check.title}</span>
                         </div>
                         <p className="text-[11px] opacity-85">{check.message}</p>
@@ -450,10 +477,27 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
             <div className="p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-                  <span>🖼️</span> Image SEO & Media Discovery
+                  <svg className="w-4 h-4 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                  </svg>
+                  Image SEO & Media Discovery
                 </span>
-                <span className="text-[11px] font-semibold text-blue-700">
-                  {data.thumbnail ? "✓ Primary Image Active" : "⚠ Missing Thumbnail"}
+                <span className="text-[11px] font-semibold text-blue-700 flex items-center gap-1">
+                  {data.thumbnail ? (
+                    <>
+                      <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                      </svg>
+                      Primary Image Active
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" />
+                      </svg>
+                      Missing Thumbnail
+                    </>
+                  )}
                 </span>
               </div>
               <p className="text-[11px] text-blue-800 leading-relaxed">

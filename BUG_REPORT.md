@@ -4,7 +4,7 @@
 
 ### 1. **CRITICAL: Insecure Environment File Write (Security Vulnerability)**
 **File:** [apps/backend/src/api/admin/pesepay/settings/route.ts](apps/backend/src/api/admin/pesepay/settings/route.ts#L1)  
-**Severity:** 🔴 CRITICAL
+**Severity:** CRITICAL
 
 **Issue:**
 - The `POST` endpoint writes directly to `.env` file without any authentication
@@ -14,11 +14,11 @@
 
 **Code:**
 ```typescript
-export const AUTHENTICATE = false  // ❌ ANYONE can call this endpoint
+export const AUTHENTICATE = false  // [VULNERABILITY] ANYONE can call this endpoint
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const { integrationKey, encryptionKey, environment, callbackUrl } = req.body
-  updateEnvFile(updates)  // ❌ Writes directly to .env without validation
+  updateEnvFile(updates)  // [VULNERABILITY] Writes directly to .env without validation
 }
 ```
 
@@ -34,7 +34,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
 ### 2. **CRITICAL: Missing Webhook Handler for Payment Confirmation**
 **File:** Backend missing webhook route  
-**Severity:** 🔴 CRITICAL
+**Severity:** CRITICAL
 
 **Issue:**
 - No webhook handler exists to process Pesepay payment callbacks
@@ -60,7 +60,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
 ### 3. **CRITICAL: Broken Payment Flow - No Order Created After Pesepay Redirect**
 **File:** [apps/storefront/src/modules/checkout/components/payment-button/index.tsx](apps/storefront/src/modules/checkout/components/payment-button/index.tsx#L168)  
-**Severity:** 🔴 CRITICAL
+**Severity:** CRITICAL
 
 **Issue:**
 - `PesepayPaymentButton` redirects to Pesepay but **never creates an order**
@@ -72,7 +72,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 ```typescript
 const handlePayment = async () => {
   if (redirectUrl) {
-    window.location.href = redirectUrl  // ❌ Redirects away, no order created
+    window.location.href = redirectUrl  // [ISSUE] Redirects away, no order created
     return
   }
   // Fallback only if no redirectUrl - but this should never be reached
@@ -93,7 +93,7 @@ const handlePayment = async () => {
 
 ### 4. **HIGH: Insufficient Encryption Key Validation**
 **File:** [apps/backend/src/modules/pesepay/service.ts](apps/backend/src/modules/pesepay/service.ts#L93)  
-**Severity:** 🟠 HIGH
+**Severity:** HIGH
 
 **Issue:**
 - Encryption key must be at least 16 characters (checked in test-connection route)
@@ -105,10 +105,10 @@ const handlePayment = async () => {
 ```typescript
 protected encryptPayload(payload: Record<string, unknown>): string {
   const key = this.getEncryptionKey()
-  const iv = key.slice(0, 16)  // ❌ Static IV derived from key
+  const iv = key.slice(0, 16)  // [ISSUE] Static IV derived from key
   const cipher = createCipheriv(
     'aes-256-cbc',
-    Buffer.from(key.padEnd(32, '0').slice(0, 32), 'utf8'),  // ❌ Padding with zeros
+    Buffer.from(key.padEnd(32, '0').slice(0, 32), 'utf8'),  // [ISSUE] Padding with zeros
     Buffer.from(iv.padEnd(16, '0').slice(0, 16), 'utf8')
   )
 }
@@ -131,7 +131,7 @@ protected encryptPayload(payload: Record<string, unknown>): string {
 
 ### 5. **HIGH: Payment Redirect URL Not Validated**
 **File:** [apps/storefront/src/modules/checkout/components/payment-button/index.tsx](apps/storefront/src/modules/checkout/components/payment-button/index.tsx#L176)  
-**Severity:** 🟠 HIGH
+**Severity:** HIGH
 
 **Issue:**
 - `redirectUrl` is taken directly from payment session data without validation
@@ -147,7 +147,7 @@ const redirectUrl =
 
 const handlePayment = async () => {
   if (redirectUrl) {
-    window.location.href = redirectUrl  // ❌ No validation of URL origin
+    window.location.href = redirectUrl  // [SECURITY] No validation of URL origin
   }
 }
 ```
@@ -163,7 +163,7 @@ const handlePayment = async () => {
 
 ### 6. **HIGH: Missing Error Handling in Payment Status Check**
 **File:** [apps/backend/src/modules/pesepay/service.ts](apps/backend/src/modules/pesepay/service.ts#L320)  
-**Severity:** 🟠 HIGH
+**Severity:** HIGH
 
 **Issue:**
 - `getPaymentStatus()` uses query parameter for reference number without URL encoding
@@ -176,16 +176,16 @@ async getPaymentStatus(input: GetPaymentStatusInput): Promise<GetPaymentStatusOu
   const referenceNumber = String(input.data?.referenceNumber ?? '')
   
   if (!referenceNumber) {
-    return { status: 'pending', data: input.data ?? {} }  // ❌ Silently returns pending
+    return { status: 'pending', data: input.data ?? {} }  // [ISSUE] Silently returns pending
   }
 
   const response = await this.request<PesepayTransaction>(
     '/payments/check-payment',
     'GET',
     undefined,
-    { referenceNumber }  // ❌ No URL encoding
+    { referenceNumber }  // [ISSUE] No URL encoding
   )
-  // ❌ No error handling for network failures
+  // [ISSUE] No error handling for network failures
 }
 ```
 
@@ -201,7 +201,7 @@ async getPaymentStatus(input: GetPaymentStatusInput): Promise<GetPaymentStatusOu
 
 ### 7. **MEDIUM: Race Condition - Payment Session May Not Have Redirect URL**
 **File:** [apps/storefront/src/modules/checkout/components/payment-button/index.tsx](apps/storefront/src/modules/checkout/components/payment-button/index.tsx#L168)  
-**Severity:** 🟡 MEDIUM
+**Severity:** MEDIUM
 
 **Issue:**
 - Payment button expects `redirectUrl` to be present in payment session
@@ -216,7 +216,7 @@ const handlePayment = async () => {
     return
   }
 
-  // ❌ This places an order without payment verification!
+  // [ISSUE] This places an order without payment verification!
   await placeOrder().catch((err) => {
     setErrorMessage(err.message)
   })
@@ -234,7 +234,7 @@ const handlePayment = async () => {
 
 ### 8. **MEDIUM: Type Safety Issue - Payment Data Casting**
 **File:** [apps/storefront/src/lib/data/payment.ts](apps/storefront/src/lib/data/payment.ts) (not shown but referenced)  
-**Severity:** 🟡 MEDIUM
+**Severity:** MEDIUM
 
 **Issue:**
 - Payment session data is cast to `Record<string, unknown>` without validation
@@ -260,7 +260,7 @@ const redirectUrl =
 
 ### 9. **MEDIUM: Settings Endpoint Exposes Encryption Key**
 **File:** [apps/backend/src/api/admin/pesepay/settings/route.ts](apps/backend/src/api/admin/pesepay/settings/route.ts#L29)  
-**Severity:** 🟡 MEDIUM
+**Severity:** MEDIUM
 
 **Issue:**
 - `GET` endpoint returns full encryption key in response
@@ -272,7 +272,7 @@ const redirectUrl =
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   return res.status(200).json({
     integrationKey,
-    encryptionKey,  // ❌ Full key exposed
+    encryptionKey,  // [EXPOSURE] Full key exposed
     environment,
     callbackUrl,
   })
@@ -290,7 +290,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
 ### 10. **LOW: Inconsistent Amount Normalization**
 **File:** [apps/backend/src/modules/pesepay/service.ts](apps/backend/src/modules/pesepay/service.ts#L151)  
-**Severity:** 🟢 LOW
+**Severity:** LOW
 
 **Issue:**
 - `normalizeAmount()` uses regex `/[^0-9.-]/g` which allows multiple decimal points
@@ -300,7 +300,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 **Code:**
 ```typescript
 protected normalizeAmount(amount: string | number | bigint | null | undefined) {
-  const sanitized = parsed.replace(/[^0-9.-]/g, '')  // ❌ Allows invalid formats
+  const sanitized = parsed.replace(/[^0-9.-]/g, '')  // [ISSUE] Allows invalid formats
   return Number(sanitized || 0)
 }
 ```
@@ -318,16 +318,16 @@ protected normalizeAmount(amount: string | number | bigint | null | undefined) {
 
 | # | Bug | Severity | Type | Impact |
 |---|-----|----------|------|--------|
-| 1 | Unauthenticated credential write | 🔴 CRITICAL | Security | Payment system hijack |
-| 2 | Missing webhook handler | 🔴 CRITICAL | Architecture | Orders never created |
-| 3 | No order creation after redirect | 🔴 CRITICAL | Business Logic | Customers pay but no order |
-| 4 | Weak encryption key handling | 🟠 HIGH | Cryptography | Predictable encryption |
-| 5 | Open redirect in payment URL | 🟠 HIGH | Security | Phishing attacks |
-| 6 | Missing error handling in status check | 🟠 HIGH | Reliability | Silent failures |
-| 7 | Race condition - missing redirect | 🟡 MEDIUM | Logic | Unverified orders |
-| 8 | Type safety in payment data | 🟡 MEDIUM | Code Quality | Runtime errors |
-| 9 | Encryption key exposed in response | 🟡 MEDIUM | Security | Key exposure |
-| 10 | Weak amount normalization | 🟢 LOW | Validation | Rare amount issues |
+| 1 | Unauthenticated credential write | CRITICAL | Security | Payment system hijack |
+| 2 | Missing webhook handler | CRITICAL | Architecture | Orders never created |
+| 3 | No order creation after redirect | CRITICAL | Business Logic | Customers pay but no order |
+| 4 | Weak encryption key handling | HIGH | Cryptography | Predictable encryption |
+| 5 | Open redirect in payment URL | HIGH | Security | Phishing attacks |
+| 6 | Missing error handling in status check | HIGH | Reliability | Silent failures |
+| 7 | Race condition - missing redirect | MEDIUM | Logic | Unverified orders |
+| 8 | Type safety in payment data | MEDIUM | Code Quality | Runtime errors |
+| 9 | Encryption key exposed in response | MEDIUM | Security | Key exposure |
+| 10 | Weak amount normalization | LOW | Validation | Rare amount issues |
 
 ## Recommended Fix Priority
 

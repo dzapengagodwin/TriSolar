@@ -30,7 +30,7 @@ export const paymentInfoMap: Record<
     icon: <PayPal />,
   },
   pp_system_default: {
-    title: "Manual Payment",
+    title: "Pay On Collection",
     icon: <CreditCard />,
   },
   "pp_pesepay_pesepay": {

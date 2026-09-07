@@ -6,7 +6,7 @@ const BulkProductsButtonWidget = () => {
     <Container className="mb-4 flex items-center justify-between p-4 bg-ui-bg-subtle border border-ui-border-base rounded-lg">
       <div className="flex flex-col gap-1">
         <Heading level="h2" className="text-base font-semibold">
-          Bulk Operations Workspace ⚡
+          Bulk Operations Workspace
         </Heading>
         <p className="text-xs text-ui-fg-subtle">
           Perform batch updates on status, brand, categories, collections, and metadata across your catalog.

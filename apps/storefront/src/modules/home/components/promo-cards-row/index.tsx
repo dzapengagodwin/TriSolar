@@ -40,7 +40,9 @@ export default function PromoCardsRow() {
         <div className="relative w-full h-44 flex flex-col items-center justify-center pt-2">
           <div className="text-xl font-black text-white tracking-widest flex items-center gap-1 uppercase mb-1 drop-shadow-md">
             <span>RedStar</span>
-            <span className="text-amber-400">★</span>
+            <svg className="w-4 h-4 text-amber-400 fill-amber-400 inline-block" viewBox="0 0 24 24">
+              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg>
           </div>
           <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
             <Image
