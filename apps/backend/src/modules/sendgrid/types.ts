@@ -49,6 +49,8 @@ export type OrderConfirmationData = {
   payment_status?: string
   delivery_method?: string
   shipping_address?: OrderConfirmationAddress | null
+  billing_address?: OrderConfirmationAddress | null
+  customer_phone?: string
   view_order_url?: string
 }
 
@@ -59,9 +61,9 @@ export type PaymentConfirmationData = {
   customer_email: string
   amount: number | string
   currency_code: string
-  payment_date: string
+  payment_date?: string
   payment_method?: string
-  status: string
+  status?: string
   view_order_url?: string
 }
 

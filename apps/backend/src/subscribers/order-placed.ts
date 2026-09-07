@@ -58,6 +58,14 @@ export default async function orderPlacedHandler({
         "shipping_address.postal_code",
         "shipping_address.country_code",
         "shipping_address.phone",
+        "billing_address.first_name",
+        "billing_address.last_name",
+        "billing_address.address_1",
+        "billing_address.address_2",
+        "billing_address.city",
+        "billing_address.postal_code",
+        "billing_address.country_code",
+        "billing_address.phone",
         "shipping_methods.name",
         "shipping_methods.amount",
         "shipping_methods.total",
@@ -236,12 +244,21 @@ export default async function orderPlacedHandler({
       tax_rate: detectedTaxRate,
       tax_label: taxLabel,
       total: finalTotal,
-      payment_method: order.payment_collections?.[0]?.payments?.[0]?.provider_id,
+      payment_method:
+        order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("pesepay")
+          ? "Pesepay"
+          : order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("stripe")
+            ? "Credit / Debit Card"
+            : order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("manual")
+              ? "Cash on Delivery"
+              : order.payment_collections?.[0]?.payments?.[0]?.provider_id,
       payment_status: order.payment_collections?.[0]?.payments?.length
         ? "Paid"
         : "Pending",
       delivery_method: order.shipping_methods?.[0]?.name,
       shipping_address: order.shipping_address,
+      billing_address: order.billing_address || order.shipping_address,
+      customer_phone: order.shipping_address?.phone || order.billing_address?.phone,
       view_order_url: viewOrderUrl,
     }
 

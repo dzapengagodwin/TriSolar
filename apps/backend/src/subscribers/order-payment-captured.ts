@@ -24,6 +24,7 @@ export default async function orderPaymentCapturedHandler({
         "customer.last_name",
         "customer.email",
         "shipping_address.country_code",
+        "payment_collections.payments.provider_id",
       ],
       filters: {
         id: data.id,
@@ -55,6 +56,15 @@ export default async function orderPaymentCapturedHandler({
       day: "numeric",
     })
 
+    const rawProvider = (order as any).payment_collections?.[0]?.payments?.[0]?.provider_id
+    const formatPaymentMethod = (providerId?: string) => {
+      if (!providerId) return undefined
+      if (providerId.includes("pesepay")) return "Pesepay"
+      if (providerId.includes("stripe")) return "Credit / Debit Card"
+      if (providerId.includes("manual")) return "Cash on Delivery"
+      return providerId
+    }
+
     const payload: PaymentConfirmationData = {
       order_id: order.id,
       display_id: order.display_id || order.id.slice(-6),
@@ -63,6 +73,7 @@ export default async function orderPaymentCapturedHandler({
       amount: order.total || 0,
       currency_code: order.currency_code || "USD",
       payment_date: paymentDate,
+      payment_method: formatPaymentMethod(rawProvider),
       status: "CAPTURED",
       view_order_url: viewOrderUrl,
     }
