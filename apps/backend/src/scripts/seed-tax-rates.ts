@@ -23,7 +23,7 @@ export default async function seedTaxRates({
   const targetCountries = ["zw", "gb", "de", "dk", "us"]
 
   for (const country of targetCountries) {
-    let region = taxRegions?.find(
+    let region: any = taxRegions?.find(
       (r: any) => r.country_code?.toLowerCase() === country.toLowerCase()
     )
 
@@ -58,7 +58,6 @@ export default async function seedTaxRates({
               code: "VAT",
               rate: 15,
               is_default: true,
-              is_combinable: false,
             },
           ],
         })

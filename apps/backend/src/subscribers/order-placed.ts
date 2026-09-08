@@ -160,15 +160,15 @@ export default async function orderPlacedHandler({
 
     // Extract tax rate and label from tax lines or default to 15.5% VAT from tax region
     const detectedTaxRate =
-      toNumber(order.tax_lines?.[0]?.rate) ||
       toNumber(order.items?.[0]?.tax_lines?.[0]?.rate) ||
       toNumber(firstShippingMethod?.tax_lines?.[0]?.rate) ||
+      toNumber((order as any).tax_lines?.[0]?.rate) ||
       15.5
 
     const taxCode =
-      order.tax_lines?.[0]?.code ||
       order.items?.[0]?.tax_lines?.[0]?.code ||
       firstShippingMethod?.tax_lines?.[0]?.code ||
+      (order as any).tax_lines?.[0]?.code ||
       "VAT"
 
     const taxLabel = `${taxCode} (${detectedTaxRate}% Included)`
@@ -258,7 +258,7 @@ export default async function orderPlacedHandler({
       delivery_method: order.shipping_methods?.[0]?.name,
       shipping_address: order.shipping_address,
       billing_address: order.billing_address || order.shipping_address,
-      customer_phone: order.shipping_address?.phone || order.billing_address?.phone,
+      customer_phone: (order.shipping_address?.phone || order.billing_address?.phone) ?? undefined,
       view_order_url: viewOrderUrl,
     }
 
