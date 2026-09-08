@@ -13,6 +13,8 @@ import StickyNav from "@modules/layout/components/sticky-nav"
 import CategoryDropdown from "@modules/layout/components/category-dropdown"
 import Logo from "@modules/common/components/logo"
 import User from "@modules/common/icons/user"
+import MapPin from "@modules/common/icons/map-pin"
+import Package from "@modules/common/icons/package"
 import {
   Heart,
   ShoppingBag,
@@ -37,48 +39,70 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
     <div className="relative w-full" suppressHydrationWarning>
       <StickyNav
         announcement={
-          <div className="bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
-        <div className="content-container flex flex-wrap sm:flex-row justify-center sm:justify-between items-center gap-x-4 gap-y-0.5 font-normal text-[#333333] text-center" suppressHydrationWarning>
-          {/* Left: Call Us */}
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="text-gray-500">Call us:</span>
-            <a href="tel:+2638612600600" className="hover:underline font-medium">
-              +263 8612 600 600
-            </a>
-          </div>
+          <div className="hidden small:block bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
+            <div className="content-container flex justify-between items-center gap-x-4 font-normal text-[#333333]" suppressHydrationWarning>
+              {/* Left: Call Us */}
+              <div className="flex items-center gap-1 shrink-0">
+                <span className="text-gray-500">Call us:</span>
+                <a href="tel:+2638612600600" className="hover:underline font-medium hover:text-primary transition-colors">
+                  +263 8612 600 600
+                </a>
+              </div>
 
-          {/* Center: Free Nationwide Delivery (Tablet & Desktop) */}
-          <div className="hidden md:flex items-center gap-1.5 text-center font-medium shrink-0">
-            <span>Free Nationwide Delivery</span>
-            <svg
-              className="w-3.5 h-3.5 text-primary inline-block shrink-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.8}
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.175V3.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v10.875m12 0H2.25"
-              />
-            </svg>
-            <span>on all orders over USD $ 500.00</span>
-          </div>
+              {/* Center: Free Nationwide Delivery */}
+              <div className="flex items-center gap-1.5 text-center font-medium shrink-0">
+                <span>Free Nationwide Delivery</span>
+                <svg
+                  className="w-3.5 h-3.5 text-primary inline-block shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.8}
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.175V3.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v10.875m12 0H2.25"
+                  />
+                </svg>
+                <span>on all orders over USD $ 500.00</span>
+              </div>
 
-          {/* Right: Chat on WhatsApp */}
-          <div className="flex items-center gap-1 shrink-0">
-            <span className="text-gray-500">WhatsApp:</span>
-            <a
-              href="https://wa.me/263772953946"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:underline font-medium"
-            >
-              +263772953946
-            </a>
-          </div>
-        </div>
+              {/* Right: Find our Store, Track Your Order, WhatsApp */}
+              <div className="flex items-center gap-x-3.5 shrink-0">
+                <LocalizedClientLink
+                  href="/contact"
+                  className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                >
+                  <MapPin size="13" className="text-primary shrink-0" />
+                  <span>Find our Store</span>
+                </LocalizedClientLink>
+
+                <span className="text-gray-300">|</span>
+
+                <LocalizedClientLink
+                  href="/account/orders"
+                  className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                >
+                  <Package size="13" className="text-primary shrink-0" />
+                  <span>Track Your Order</span>
+                </LocalizedClientLink>
+
+                <span className="text-gray-300">|</span>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-gray-500">WhatsApp:</span>
+                  <a
+                    href="https://wa.me/263772953946"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:underline font-medium hover:text-primary transition-colors"
+                  >
+                    +263772953946
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         }
         topRow={
@@ -105,7 +129,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
 
             {/* Search Box with Interactive Autocomplete & Filter (Desktop / Tablet) */}
             <div className="flex-1 max-w-2xl mx-4 hidden small:flex items-center">
-              <Suspense fallback={<div className="w-full h-10 bg-gray-50 rounded-full animate-pulse" />}>
+              <Suspense fallback={<div className="w-full h-10 bg-gray-50 rounded-md animate-pulse" />}>
                 <SearchBar categories={categories} />
               </Suspense>
             </div>
@@ -149,7 +173,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
         }
         mobileSearch={
           <div className="content-container pb-2">
-            <Suspense fallback={<div className="w-full h-9 bg-gray-50 rounded-full animate-pulse" />}>
+            <Suspense fallback={<div className="w-full h-10 bg-gray-50 rounded-md animate-pulse" />}>
               <SearchBar categories={categories} />
             </Suspense>
           </div>

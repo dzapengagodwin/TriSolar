@@ -2,89 +2,125 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Image from "next/image"
 import { ArrowRight } from "@medusajs/icons"
 
-const PROMOTIONAL_CARDS = [
-  {
-    title: "LAPTOP DEALS",
-    action: "EXPLORE",
-    image: "/gaming/gaming-laptops.png",
-    href: "/categories/gaming-laptops",
-    tone: "bg-[#092438] border-[#159bb5]",
-    position: "left-top",
-  },
-  {
-    title: "PRE-BUILT PC'S",
-    action: "BROWSE",
-    image: "/gaming/gaming-pcs.png",
-    href: "/categories/gaming-pcs",
-    tone: "bg-[#280507] border-[#d51d2a]",
-    position: "feature",
-  },
-  {
-    title: "GRAPHICS CARDS",
-    action: "SHOP NOW",
-    image: "/gaming/gaming-accessories.png",
-    href: "/categories/graphics-cards",
-    tone: "bg-[#270619] border-[#a52c78]",
-    position: "right-top",
-  },
-  {
-    title: "UPGRADE KITS",
-    action: "BUILD",
-    image: "/gaming/computer-components.png",
-    href: "/categories/computer-components",
-    tone: "bg-[#170725] border-[#7934c5]",
-    position: "left-bottom",
-  },
-  {
-    title: "MONITOR DEALS",
-    action: "VIEW",
-    image: "/gaming/gaming-monitors.png",
-    href: "/categories/gaming-monitors",
-    tone: "bg-[#062c1b] border-[#73b91a]",
-    position: "right-bottom",
-  },
-] as const
-
 export default function GamingSection() {
   return (
-    <section className="py-6 sm:py-10" aria-label="Gaming categories">
+    <section className="py-4 sm:py-6" aria-label="Featured Categories">
       <div className="content-container">
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:h-[600px]">
-          {PROMOTIONAL_CARDS.map((card) => (
-            <LocalizedClientLink
-              key={card.title}
-              href={card.href}
-              className={`group relative isolate min-h-[220px] overflow-hidden rounded-2xl border-t-2 ${card.tone} p-7 sm:p-8 transition-transform duration-300 hover:-translate-y-1 lg:min-h-0 ${
-                card.position === "feature"
-                  ? "lg:col-start-2 lg:row-span-2"
-                  : card.position === "left-top"
-                    ? "lg:col-start-1 lg:row-start-1"
-                    : card.position === "left-bottom"
-                      ? "lg:col-start-1 lg:row-start-2"
-                      : card.position === "right-top"
-                        ? "lg:col-start-3 lg:row-start-1"
-                        : "lg:col-start-3 lg:row-start-2"
-              }`}
-            >
-              <div className="absolute inset-0 -z-10 bg-black/10" />
-              <div className="relative z-10 flex h-full max-w-[58%] flex-col items-start justify-between">
-                <h2 className="max-w-[9ch] text-3xl font-black uppercase leading-[1.08] tracking-tight text-white sm:text-4xl">
-                  {card.title}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:h-[500px]">
+          
+          {/* 1. Left Feature Hero Card (Spans 7 cols on desktop) */}
+          <LocalizedClientLink
+            href="/categories/gaming-pcs"
+            className="group relative isolate overflow-hidden rounded-3xl bg-[#0B0D12] border border-gray-800/80 p-7 sm:p-10 transition-all duration-300 hover:border-gray-700 hover:shadow-2xl flex flex-col justify-between min-h-[380px] lg:min-h-0 lg:col-span-7"
+          >
+            {/* Subtle Ambient Background Glow */}
+            <div className="absolute top-0 left-0 w-72 h-72 bg-primary/10 rounded-full blur-3xl -z-10 pointer-events-none" />
+
+            <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[54%] flex-col items-start justify-between">
+              <div className="space-y-3">
+                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">
+                  Custom Desktops
+                </span>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+                  High-Performance Gaming PCs
                 </h2>
-                <span className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/5 px-5 py-3 text-xs font-black text-white transition-colors group-hover:bg-white/15">
-                  {card.action}
-                  <ArrowRight className="h-4 w-4" />
+                <p className="text-xs sm:text-sm text-gray-400 font-normal leading-relaxed hidden sm:block pt-1 max-w-sm">
+                  Engineered with latest-gen processors and RTX 40-Series graphics for peak computing power.
+                </p>
+              </div>
+
+              <div className="pt-6">
+                <span className="inline-flex items-center gap-2 bg-white text-gray-900 group-hover:bg-primary group-hover:text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm">
+                  <span>Explore Desktops</span>
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
+            </div>
+
+            <div className="absolute right-0 bottom-0 w-[55%] h-[85%] -z-0 flex items-end justify-end p-2 sm:p-4">
               <Image
-                src={card.image}
-                alt={card.title}
+                src="/gaming/gaming-pcs.png"
+                alt="Gaming Desktops"
                 fill
-                sizes="(max-width: 1024px) 100vw, 33vw"
-                className="-z-0 object-contain object-right-bottom transition-transform duration-500 group-hover:scale-105"
+                priority
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-2xl"
               />
+            </div>
+          </LocalizedClientLink>
+
+          {/* Right Column: 2 Cards Stacked Vertically (Spans 5 cols on desktop) */}
+          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5 lg:h-full">
+            
+            {/* 2. Top Right Card: Laptops */}
+            <LocalizedClientLink
+              href="/categories/gaming-laptops"
+              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-6 sm:p-7 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[225px] lg:min-h-0"
+            >
+              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[56%] flex-col items-start justify-between">
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                    Portable Computing
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+                    Gaming & Pro Laptops
+                  </h3>
+                </div>
+
+                <div className="pt-4">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                    <span>Shop Laptops</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute right-0 bottom-0 w-[52%] h-[80%] -z-0 flex items-end justify-end p-2">
+                <Image
+                  src="/gaming/gaming-laptops.png"
+                  alt="Gaming Laptops"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-xl"
+                />
+              </div>
             </LocalizedClientLink>
-          ))}
+
+            {/* 3. Bottom Right Card: Monitors */}
+            <LocalizedClientLink
+              href="/categories/gaming-monitors"
+              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-6 sm:p-7 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[225px] lg:min-h-0"
+            >
+              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[56%] flex-col items-start justify-between">
+                <div className="space-y-1.5">
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                    Displays & Monitors
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+                    Curved & 4K Displays
+                  </h3>
+                </div>
+
+                <div className="pt-4">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                    <span>View Monitors</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute right-0 bottom-0 w-[52%] h-[80%] -z-0 flex items-end justify-end p-2">
+                <Image
+                  src="/gaming/gaming-monitors.png"
+                  alt="Gaming Monitors"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-xl"
+                />
+              </div>
+            </LocalizedClientLink>
+
+          </div>
         </div>
       </div>
     </section>

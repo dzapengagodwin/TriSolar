@@ -1,12 +1,12 @@
 import { HttpTypes } from "@medusajs/types"
 
 /**
- * 6 Curated Featured Categories specifically for the Homepage Top Categories Carousel/Grid.
+ * Curated Featured Categories specifically for the Homepage Top Categories Carousel.
  */
 export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   {
     id: "pcat_01M07CFV5PGYF341ZA9N3CDWFD",
-    name: "Laptops & Notebooks",
+    name: "Laptop Computers",
     handle: "laptops",
     description: "High-performance laptops, ultrabooks, and mobile workstations.",
     rank: 0,
@@ -60,7 +60,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   },
   {
     id: "pcat_01M07TRXN4V3RE8R54Z0MSFZMH",
-    name: "Computer Mice & Accessories",
+    name: "Computer Mice",
     handle: "computer-accessories",
     description: "Precision wireless and ergonomic gaming and office mice.",
     rank: 3,
@@ -78,7 +78,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   },
   {
     id: "pcat_01M07CFV5D2EVX2QEA9M2S4CHZ",
-    name: "Printing",
+    name: "Printers & Ink",
     handle: "printing",
     description: "Printers, ink, and related supplies.",
     rank: 4,
@@ -96,7 +96,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   },
   {
     id: "pcat_01M07CFV6RKMJJFQFY6E6SP2MM",
-    name: "Gaming",
+    name: "Gaming & VR Gear",
     handle: "gaming",
     description: "Gaming consoles, PC games, and gaming accessories.",
     rank: 5,
@@ -112,19 +112,54 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
       product_count: 1,
     },
   },
+  {
+    id: "pcat_desktops",
+    name: "Desktops & PCs",
+    handle: "desktops",
+    description: "All-in-one PCs, pre-built workstations, and towers.",
+    rank: 6,
+    external_id: null,
+    parent_category_id: null,
+    parent_category: null,
+    category_children: [],
+    created_at: "2026-08-17T08:12:58.476Z",
+    updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
+    metadata: {
+      image: "/gaming/gaming-pcs.png",
+      product_count: 12,
+    },
+  },
+  {
+    id: "pcat_gaming_laptops",
+    name: "Gaming Laptops",
+    handle: "gaming-laptops",
+    description: "High refresh-rate RTX-powered portable gaming rigs.",
+    rank: 7,
+    external_id: null,
+    parent_category_id: null,
+    parent_category: null,
+    category_children: [],
+    created_at: "2026-08-17T08:12:58.476Z",
+    updated_at: "2026-08-18T12:04:49.718Z",
+    deleted_at: null,
+    metadata: {
+      image: "/gaming/gaming-laptops.png",
+      product_count: 24,
+    },
+  },
 ]
 
 // Fallback image map to enrich dynamic categories from the database with icons
 export const CATEGORY_IMAGE_MAP: Record<string, string> = {
   laptops: "/top-categories/laptops.png",
-  "gaming-laptops": "/gaming/gaming-laptops-card.png",
+  "gaming-laptops": "/gaming/gaming-laptops.png",
   monitors: "/top-categories/monitors.png",
-  desktops: "/gaming/gaming-pcs-card.png",
+  desktops: "/gaming/gaming-pcs.png",
   "keyboard_-mouse": "/top-categories/keyboards.png",
   "computer-accessories": "/top-categories/computer-mouse.png",
   printing: "/top-categories/printers.png",
   gaming: "/top-categories/gaming.png",
- 
 }
 
 export const STATIC_CATEGORIES = HOMEPAGE_FEATURED_CATEGORIES

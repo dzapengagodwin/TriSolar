@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { MagnifyingGlass, XMark, ArrowRight } from "@medusajs/icons"
+import { XMark, ArrowRight } from "@medusajs/icons"
 
 type SearchBarProps = {
   categories?: HttpTypes.StoreProductCategory[]
@@ -89,10 +89,10 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
     <div ref={searchRef} className="w-full relative">
       <form
         onSubmit={handleSearchSubmit}
-        className="w-full relative flex items-center border-2 border-gray-200 rounded-full overflow-hidden bg-gray-50 focus-within:border-black focus-within:bg-white transition-all shadow-xs"
+        className="w-full relative flex items-stretch border border-gray-200 rounded-md overflow-hidden bg-white focus-within:border-primary/80 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-2xs h-10 sm:h-11"
       >
-        {/* Text Input with Search Icon */}
-        <div className="relative flex-1 flex items-center">
+        {/* Text Input */}
+        <div className="relative flex-1 flex items-center min-w-0">
           <input
             type="text"
             value={query}
@@ -100,8 +100,8 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
             onFocus={() => {
               if (results.length > 0) setIsOpen(true)
             }}
-            placeholder="Search products, brands and categories..."
-            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-xs px-4 sm:px-5 py-2.5 focus:outline-none"
+            placeholder="I'm searching for..."
+            className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm px-4 sm:px-5 py-2 focus:outline-none"
           />
 
           {/* Clear Button with XMark Icon */}
@@ -113,7 +113,7 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
                 setResults([])
                 setIsOpen(false)
               }}
-              className="text-gray-400 hover:text-gray-600 px-2 flex items-center cursor-pointer"
+              className="text-gray-400 hover:text-gray-600 px-2.5 flex items-center justify-center cursor-pointer transition-colors"
               aria-label="Clear search"
             >
               <XMark className="w-4 h-4" />
@@ -124,15 +124,28 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
         {/* Submit Button with MagnifyingGlass Icon */}
         <button
           type="submit"
-          className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 font-bold text-xs transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+          className="bg-primary hover:bg-primary-hover text-white px-5 sm:px-6 flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+          aria-label="Search"
         >
-          <MagnifyingGlass className="w-4 h-4" />
+          <svg
+            className="w-5 h-5 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
         </button>
       </form>
 
       {/* Live Autocomplete Results Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-gray-100 shadow-2xl overflow-hidden z-50 animate-fade-in max-h-[420px] overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl border border-gray-100 shadow-2xl overflow-hidden z-50 animate-fade-in max-h-[420px] overflow-y-auto">
           {isLoading ? (
             <div className="p-4 text-center text-xs text-gray-500 flex items-center justify-center gap-2">
               <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>

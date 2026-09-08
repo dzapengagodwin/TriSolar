@@ -1,6 +1,5 @@
 import { Metadata } from "next"
 
-import Hero from "@modules/home/components/hero"
 import TopCategories from "@modules/home/components/top-categories"
 import MonthlyDeals from "@modules/home/components/monthly-deals"
 import GamingSection from "@modules/home/components/gaming-section"
@@ -42,7 +41,7 @@ export default async function Home(props: {
     listCategories({ limit: 50 }).catch(() => []),
   ])
 
-  const collections = collectionsRes.collections || []
+  const _collections = collectionsRes.collections || []
   const products = productsRes.response?.products || []
   const brands = STATIC_BRANDS
 
@@ -52,8 +51,8 @@ export default async function Home(props: {
 
   return (
     <div className="bg-[#F9FAFB] min-h-screen pb-0">
-      {/* 1. Hero Grid (Black Theme Banners) */}
-      <Hero />
+    {/* 1. Gaming Categories Section */}
+      <GamingSection />
 
       {/* 2. Featured Laptops */}
       {featuredCollection && (
@@ -81,13 +80,10 @@ export default async function Home(props: {
         region={region}
       />
 
-      {/* 6. Gaming Categories Section */}
-      <GamingSection />
-
-      {/* 7. Top Brands Slider */}
+      {/* 6. Top Brands Slider */}
       <TopBrands brands={brands} />
 
-      {/* 8. 3-Pillar Guarantee Strip */}
+      {/* 7. 3-Pillar Guarantee Strip */}
       <TrustBar />
     </div>
   )
