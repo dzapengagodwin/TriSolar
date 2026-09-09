@@ -46,12 +46,19 @@ const AddAddress = ({
   return (
     <>
       <button
-        className="border border-gray-100 bg-gray-50/50 hover:bg-gray-50 hover:border-gray-300 rounded-2xl p-5 min-h-[220px] h-full w-full flex flex-col justify-between items-center text-center transition-all duration-200 cursor-pointer shadow-xs group"
+        className="border border-dashed border-gray-200 hover:border-primary/50 bg-gray-50/40 hover:bg-white rounded-2xl p-6 min-h-[220px] h-full w-full flex flex-col justify-center items-center text-center transition-all duration-200 cursor-pointer group shadow-2xs"
         onClick={open}
         data-testid="add-address-button"
       >
-        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider group-hover:text-gray-900 transition-colors mt-auto">New address</span>
-        <Plus className="text-gray-400 group-hover:text-black group-hover:scale-110 transition-all mb-auto mt-4 w-6 h-6" />
+        <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 group-hover:border-primary group-hover:text-primary group-hover:scale-105 transition-all shadow-2xs mb-3">
+          <Plus className="w-5 h-5" />
+        </div>
+        <span className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">
+          Add new address
+        </span>
+        <span className="text-[11px] text-gray-400 mt-0.5">
+          Save a shipping or delivery destination
+        </span>
       </button>
 
       <Modal isOpen={state} close={close} data-testid="add-address-modal">

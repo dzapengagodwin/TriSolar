@@ -22,16 +22,16 @@ export default async function Profile() {
   }
 
   return (
-    <div className="w-full" data-testid="profile-page-wrapper">
-      <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Profile</h1>
-        <p className="text-base-regular">
-          View and update your profile information, including your name, email,
-          and phone number. You can also update your billing address, or change
-          your password.
+    <div className="w-full space-y-6" data-testid="profile-page-wrapper">
+      <div className="pb-5 border-b border-gray-100">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+          Profile & Security
+        </h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          Manage your personal details, contact preferences, and default billing address.
         </p>
       </div>
-      <div className="flex flex-col gap-y-4 w-full">
+      <div className="flex flex-col gap-y-3 w-full">
         <ProfileName customer={customer} />
         <ProfileEmail customer={customer} />
         <ProfilePhone customer={customer} />

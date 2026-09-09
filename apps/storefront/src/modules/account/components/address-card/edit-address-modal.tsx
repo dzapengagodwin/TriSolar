@@ -63,53 +63,60 @@ const EditAddress: React.FC<EditAddressProps> = ({
     <>
       <div
         className={clx(
-          "border rounded-2xl p-5 min-h-[220px] h-full w-full flex flex-col justify-between transition-all duration-200 shadow-xs",
+          "rounded-2xl p-5 sm:p-6 min-h-[220px] h-full w-full flex flex-col justify-between transition-all duration-200 shadow-xs",
           isActive
-            ? "border-black bg-white"
-            : "border-gray-100 bg-gray-50/50 hover:bg-gray-50 hover:border-gray-300"
+            ? "border-2 border-gray-900 bg-white"
+            : "border border-gray-100 bg-white hover:border-gray-200 hover:shadow-sm"
         )}
         data-testid="address-container"
       >
         <div className="flex flex-col">
-          <Heading
-            className="text-left text-base-semi"
-            data-testid="address-name"
-          >
-            {address.first_name} {address.last_name}
-          </Heading>
+          <div className="flex items-center justify-between gap-2">
+            <Heading
+              className="text-left text-sm sm:text-base font-bold text-gray-900 tracking-tight"
+              data-testid="address-name"
+            >
+              {address.first_name} {address.last_name}
+            </Heading>
+            {isActive && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-900 text-white">
+                Default
+              </span>
+            )}
+          </div>
           {address.company && (
             <Text
-              className="txt-compact-small text-ui-fg-base"
+              className="text-xs text-gray-500 font-medium mt-0.5"
               data-testid="address-company"
             >
               {address.company}
             </Text>
           )}
-          <Text className="flex flex-col text-left text-base-regular mt-2">
-            <span data-testid="address-address">
+          <div className="flex flex-col text-left text-xs text-gray-600 leading-relaxed mt-3 space-y-0.5">
+            <span data-testid="address-address" className="font-medium text-gray-800">
               {address.address_1}
               {address.address_2 && <span>, {address.address_2}</span>}
             </span>
             <span data-testid="address-postal-city">
-              {address.postal_code}, {address.city}
+              {address.postal_code ? `${address.postal_code}, ` : ""}{address.city}
             </span>
-            <span data-testid="address-province-country">
+            <span data-testid="address-province-country" className="text-gray-400">
               {address.province && `${address.province}, `}
               {address.country_code?.toUpperCase()}
             </span>
-          </Text>
+          </div>
         </div>
-        <div className="flex items-center gap-x-3 pt-3 border-t border-gray-100/50 mt-4 text-[10px] font-extrabold uppercase tracking-wider">
+        <div className="flex items-center gap-x-4 pt-4 border-t border-gray-100 mt-4 text-xs font-semibold">
           <button
-            className="text-gray-500 hover:text-black flex items-center gap-x-1.5 transition-colors cursor-pointer"
+            className="text-gray-600 hover:text-gray-900 flex items-center gap-x-1.5 transition-colors cursor-pointer"
             onClick={open}
             data-testid="address-edit-button"
           >
-            <Edit className="w-3.5 h-3.5" />
+            <Edit className="w-3.5 h-3.5 text-gray-400" />
             <span>Edit</span>
           </button>
           <button
-            className="text-gray-400 hover:text-red-600 flex items-center gap-x-1.5 transition-colors cursor-pointer"
+            className="text-gray-400 hover:text-red-600 flex items-center gap-x-1.5 transition-colors cursor-pointer ml-auto"
             onClick={removeAddress}
             data-testid="address-delete-button"
           >

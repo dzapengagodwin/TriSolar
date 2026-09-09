@@ -1,5 +1,6 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import { Container, Button, Heading } from "@medusajs/ui"
+import { Link } from "react-router-dom"
 
 const BulkProductsButtonWidget = () => {
   return (
@@ -12,11 +13,11 @@ const BulkProductsButtonWidget = () => {
           Perform batch updates on status, brand, categories, collections, and metadata across your catalog.
         </p>
       </div>
-      <a href="/admin/bulk-products">
+      <Link to="/bulk-products">
         <Button variant="primary" size="small">
           Open Bulk Workspace
         </Button>
-      </a>
+      </Link>
     </Container>
   )
 }

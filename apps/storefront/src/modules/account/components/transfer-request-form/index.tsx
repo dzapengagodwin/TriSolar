@@ -23,27 +23,30 @@ export default function TransferRequestForm() {
   }, [state.success, state.order])
 
   return (
-    <div className="flex flex-col gap-y-4 w-full">
+    <div className="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 sm:p-6 flex flex-col gap-y-4 w-full">
       <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
         <div className="flex flex-col gap-y-1">
-          <Heading level="h3" className="!text-sm font-semibold text-neutral-950">
+          <Heading level="h3" className="!text-sm font-bold text-gray-900">
             Order transfers
           </Heading>
-          <p className="text-small-regular text-neutral-500">
-            Can&apos;t find the order you are looking for?
-            <br /> Connect an order to your account.
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Missing an order placed before creating this account? Connect an order to your profile using its Order ID.
           </p>
         </div>
         <form
           action={formAction}
-          className="flex flex-col gap-y-1 sm:items-end"
+          className="flex flex-col gap-y-2 sm:items-end"
         >
-          <div className="flex flex-col gap-y-2 w-full">
-            <Input className="w-full" name="order_id" placeholder="Order ID" />
+          <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+            <Input
+              className="w-full bg-white text-xs"
+              name="order_id"
+              placeholder="e.g. order_01..."
+            />
             <SubmitButton
               variant="secondary"
               size="small"
-              className="w-fit whitespace-nowrap self-end"
+              className="w-full sm:w-auto text-xs font-semibold py-2 px-4 whitespace-nowrap cursor-pointer"
             >
               Request transfer
             </SubmitButton>

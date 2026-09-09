@@ -26,7 +26,9 @@ export default defineConfig({
     },
 
   ],
-
+  featureFlags: {
+    view_configurations: true,
+  },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     http: {

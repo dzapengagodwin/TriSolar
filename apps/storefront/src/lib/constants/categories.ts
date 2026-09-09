@@ -1,7 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 
 /**
- * Curated Featured Categories specifically for the Homepage Top Categories Carousel.
+ * 6 Curated Featured Categories specifically for the Homepage Top Categories Carousel.
  */
 export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
   {
@@ -110,42 +110,6 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     metadata: {
       image: "/top-categories/gaming.png",
       product_count: 1,
-    },
-  },
-  {
-    id: "pcat_desktops",
-    name: "Desktops & PCs",
-    handle: "desktops",
-    description: "All-in-one PCs, pre-built workstations, and towers.",
-    rank: 6,
-    external_id: null,
-    parent_category_id: null,
-    parent_category: null,
-    category_children: [],
-    created_at: "2026-08-17T08:12:58.476Z",
-    updated_at: "2026-08-18T12:04:49.718Z",
-    deleted_at: null,
-    metadata: {
-      image: "/gaming/gaming-pcs.png",
-      product_count: 12,
-    },
-  },
-  {
-    id: "pcat_gaming_laptops",
-    name: "Gaming Laptops",
-    handle: "gaming-laptops",
-    description: "High refresh-rate RTX-powered portable gaming rigs.",
-    rank: 7,
-    external_id: null,
-    parent_category_id: null,
-    parent_category: null,
-    category_children: [],
-    created_at: "2026-08-17T08:12:58.476Z",
-    updated_at: "2026-08-18T12:04:49.718Z",
-    deleted_at: null,
-    metadata: {
-      image: "/gaming/gaming-laptops.png",
-      product_count: 24,
     },
   },
 ]

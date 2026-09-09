@@ -269,7 +269,7 @@ export default function ProductActions({
             ) : (
               <>
                 <span>
-                  {!selectedVariant && !options
+                  {!selectedVariant
                     ? "Select variant"
                     : !inStock || !isValidVariant
                     ? "Out of stock"
