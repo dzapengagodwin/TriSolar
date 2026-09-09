@@ -34,8 +34,14 @@ export const listOrders = async (
   offset: number = 0,
   filters?: Record<string, unknown>
 ) => {
+  const authHeaders = await getAuthHeaders()
+
+  if (!authHeaders || !("authorization" in authHeaders) || !authHeaders.authorization) {
+    return null
+  }
+
   const headers = {
-    ...(await getAuthHeaders()),
+    ...authHeaders,
   }
 
   const next = {
@@ -57,7 +63,12 @@ export const listOrders = async (
       cache: "no-store",
     })
     .then(({ orders }) => orders)
-    .catch((err) => medusaError(err))
+    .catch((err) => {
+      if (err.status === 401 || err.message?.includes("Unauthorized")) {
+        return null
+      }
+      return medusaError(err)
+    })
 }
 
 export const createTransferRequest = async (

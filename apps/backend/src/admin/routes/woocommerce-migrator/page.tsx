@@ -320,6 +320,20 @@ const WooCommerceMigratorPage = () => {
         )}
       </Container>
 
+      {/* Yoast SEO Importer Cross-Link Banner */}
+      <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl text-xs">
+        <div className="flex items-center gap-2 text-blue-800">
+          <span className="font-bold">Already imported your products?</span>
+          <span className="text-blue-600">Import your Yoast SEO titles, descriptions, and OpenGraph data into LaptopZone.</span>
+        </div>
+        <a
+          href="/app/yoast-seo-importer"
+          className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+        >
+          Import Yoast SEO →
+        </a>
+      </div>
+
       {/* Data Source Toggle */}
       <Container>
         <Heading level="h2" className="mb-4">

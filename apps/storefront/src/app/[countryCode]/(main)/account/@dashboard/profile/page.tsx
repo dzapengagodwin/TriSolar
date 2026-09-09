@@ -1,10 +1,6 @@
 import { Metadata } from "next"
 
-import ProfilePhone from "@modules/account/components/profile-phone"
-import ProfileBillingAddress from "@modules/account/components/profile-billing-address"
-import ProfileEmail from "@modules/account/components/profile-email"
-import ProfileName from "@modules/account/components/profile-name"
-import { notFound } from "next/navigation"
+import ProfileForm from "@modules/account/components/profile-form"
 import { listRegions } from "@lib/data/regions"
 import { retrieveCustomer } from "@lib/data/customer"
 
@@ -14,11 +10,11 @@ export const metadata: Metadata = {
 }
 
 export default async function Profile() {
-  const customer = await retrieveCustomer()
-  const regions = await listRegions()
+  const customer = await retrieveCustomer().catch(() => null)
+  const regions = await listRegions().catch(() => null)
 
   if (!customer || !regions) {
-    notFound()
+    return null
   }
 
   return (
@@ -31,12 +27,7 @@ export default async function Profile() {
           Manage your personal details, contact preferences, and default billing address.
         </p>
       </div>
-      <div className="flex flex-col gap-y-3 w-full">
-        <ProfileName customer={customer} />
-        <ProfileEmail customer={customer} />
-        <ProfilePhone customer={customer} />
-        <ProfileBillingAddress customer={customer} regions={regions} />
-      </div>
+      <ProfileForm customer={customer} regions={regions} />
     </div>
   )
 }

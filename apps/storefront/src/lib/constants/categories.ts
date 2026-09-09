@@ -118,6 +118,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
 export const CATEGORY_IMAGE_MAP: Record<string, string> = {
   laptops: "/top-categories/laptops.png",
   "gaming-laptops": "/gaming/gaming-laptops.png",
+  "home-student": "/gaming/home-student-laptops.png",
   monitors: "/top-categories/monitors.png",
   desktops: "/gaming/gaming-pcs.png",
   "keyboard_-mouse": "/top-categories/keyboards.png",

@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 import OrderOverview from "@modules/account/components/order-overview"
-import { notFound } from "next/navigation"
+import { retrieveCustomer } from "@lib/data/customer"
 import { listOrders } from "@lib/data/orders"
 import TransferRequestForm from "@modules/account/components/transfer-request-form"
 
@@ -11,10 +11,16 @@ export const metadata: Metadata = {
 }
 
 export default async function Orders() {
-  const orders = await listOrders()
+  const customer = await retrieveCustomer().catch(() => null)
+
+  if (!customer) {
+    return null
+  }
+
+  const orders = await listOrders().catch(() => null)
 
   if (!orders) {
-    notFound()
+    return null
   }
 
   return (

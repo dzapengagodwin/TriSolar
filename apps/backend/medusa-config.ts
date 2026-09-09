@@ -29,6 +29,33 @@ export default defineConfig({
   featureFlags: {
     view_configurations: true,
   },
+  admin: {
+    disable: false,
+    vite: () => {
+      const backendDir = path.resolve(__dirname, '..', '..')
+      let reactPath: string
+      let reactDomPath: string
+      try {
+        reactPath = path.dirname(require.resolve("react/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
+        reactDomPath = path.dirname(require.resolve("react-dom/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
+      } catch {
+        reactPath = path.resolve(process.cwd(), "node_modules/react")
+        reactDomPath = path.resolve(process.cwd(), "node_modules/react-dom")
+      }
+
+      return {
+        resolve: {
+          alias: [
+            { find: /^react$/, replacement: reactPath },
+            { find: /^react-dom$/, replacement: reactDomPath },
+            { find: /^react\/(.*)$/, replacement: `${reactPath}/$1` },
+            { find: /^react-dom\/(.*)$/, replacement: `${reactDomPath}/$1` },
+          ],
+          dedupe: ["react", "react-dom"],
+        },
+      }
+    },
+  },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
     http: {

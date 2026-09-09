@@ -84,6 +84,98 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
   return updateRes
 }
 
+export const updateProfile = async (
+  _currentState: Record<string, unknown>,
+  formData: FormData
+): Promise<{ success: boolean; error: string | null }> => {
+  try {
+    const firstName = (formData.get("first_name") as string)?.trim()
+    const lastName = (formData.get("last_name") as string)?.trim()
+    const phone = (formData.get("phone") as string)?.trim()
+
+    if (!firstName) {
+      return { success: false, error: "First name is required" }
+    }
+    if (!lastName) {
+      return { success: false, error: "Last name is required" }
+    }
+
+    // 1. Update customer profile
+    await updateCustomer({
+      first_name: firstName,
+      last_name: lastName,
+      phone: phone || undefined,
+    })
+
+    // 2. Handle billing address
+    const addressId = (formData.get("billing_address_id") as string)?.trim()
+    const billingAddress1 = (formData.get("billing_address_1") as string)?.trim()
+    const billingCity = (formData.get("billing_city") as string)?.trim()
+    const billingPostalCode = (formData.get("billing_postal_code") as string)?.trim()
+    const billingCountryCode = (formData.get("billing_country_code") as string)?.trim()
+
+    if (addressId || (billingAddress1 && billingCity && billingCountryCode)) {
+      if (!billingAddress1 || !billingCity || !billingCountryCode) {
+        return {
+          success: false,
+          error: "Address, city, and country are required for the billing address",
+        }
+      }
+
+      const billingFirstName =
+        (formData.get("billing_first_name") as string)?.trim() || firstName
+      const billingLastName =
+        (formData.get("billing_last_name") as string)?.trim() || lastName
+      const billingCompany = (formData.get("billing_company") as string)?.trim()
+      const billingAddress2 = (formData.get("billing_address_2") as string)?.trim()
+      const billingProvince = (formData.get("billing_province") as string)?.trim()
+      const billingPhone =
+        (formData.get("billing_phone") as string)?.trim() || phone
+
+      const addressData: HttpTypes.StoreUpdateCustomerAddress = {
+        first_name: billingFirstName,
+        last_name: billingLastName,
+        company: billingCompany,
+        address_1: billingAddress1,
+        address_2: billingAddress2,
+        city: billingCity,
+        postal_code: billingPostalCode,
+        province: billingProvince,
+        country_code: billingCountryCode,
+        phone: billingPhone,
+      }
+
+      const headers = {
+        ...(await getAuthHeaders()),
+      }
+
+      if (addressId) {
+        await sdk.store.customer.updateAddress(addressId, addressData, {}, headers)
+      } else {
+        await sdk.store.customer.createAddress(
+          {
+            ...addressData,
+            is_default_billing: true,
+            is_default_shipping: false,
+          },
+          {},
+          headers
+        )
+      }
+    }
+
+    const customerCacheTag = await getCacheTag("customers")
+    revalidateTag(customerCacheTag)
+
+    return { success: true, error: null }
+  } catch (err: unknown) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : String(err),
+    }
+  }
+}
+
 export async function signup(
   _currentState: unknown,
   formData: FormData

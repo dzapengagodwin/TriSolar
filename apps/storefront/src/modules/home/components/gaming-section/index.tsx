@@ -6,7 +6,7 @@ export default function GamingSection() {
   return (
     <section className="py-4 sm:py-6" aria-label="Featured Categories">
       <div className="content-container">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:h-[560px]">
           
           {/* 1. Left Feature Hero Card (Spans 7 cols on desktop) */}
           <LocalizedClientLink
@@ -49,25 +49,25 @@ export default function GamingSection() {
             </div>
           </LocalizedClientLink>
 
-          {/* Right Column: 2 Cards Stacked Vertically (Spans 5 cols on desktop) */}
-          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5 lg:h-full">
+          {/* Right Column: 3 Cards Stacked Vertically (Spans 5 cols on desktop) */}
+          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 sm:gap-4 lg:gap-3.5 lg:h-full">
             
-            {/* 2. Top Right Card: Laptops */}
+            {/* 2. Top Right Card: Gaming Laptops */}
             <LocalizedClientLink
               href="/categories/gaming-laptops"
-              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-6 sm:p-7 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[225px] lg:min-h-0"
+              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4.5 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
             >
-              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[56%] flex-col items-start justify-between">
-                <div className="space-y-1.5">
+              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[58%] lg:max-w-[60%] flex-col items-start justify-between">
+                <div className="space-y-1">
                   <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                     Portable Computing
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+                  <h3 className="text-lg sm:text-xl lg:text-base xl:text-lg 2xl:text-xl font-bold tracking-tight text-white leading-snug">
                     Gaming & Pro Laptops
                   </h3>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-3">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
                     <span>Shop Laptops</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -75,33 +75,67 @@ export default function GamingSection() {
                 </div>
               </div>
 
-              <div className="absolute right-0 bottom-0 w-[52%] h-[80%] -z-0 flex items-end justify-end p-2">
+              <div className="absolute right-0 bottom-0 w-[50%] sm:w-[52%] lg:w-[48%] h-[82%] sm:h-[85%] -z-0 flex items-end justify-end p-2">
                 <Image
                   src="/gaming/gaming-laptops.png"
                   alt="Gaming Laptops"
                   fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-xl"
                 />
               </div>
             </LocalizedClientLink>
 
-            {/* 3. Bottom Right Card: Monitors */}
+            {/* 3. Middle Right Card: Home and Student Laptops */}
+            <LocalizedClientLink
+              href="/categories/home-student"
+              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4.5 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
+            >
+              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[58%] lg:max-w-[60%] flex-col items-start justify-between">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                    Everyday & Education
+                  </span>
+                  <h3 className="text-lg sm:text-xl lg:text-base xl:text-lg 2xl:text-xl font-bold tracking-tight text-white leading-snug">
+                    Home & Student Laptops
+                  </h3>
+                </div>
+
+                <div className="pt-3">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                    <span>Shop Student</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute right-0 bottom-0 w-[50%] sm:w-[52%] lg:w-[48%] h-[82%] sm:h-[85%] -z-0 flex items-end justify-end p-2">
+                <Image
+                  src="/gaming/home-student-laptops.png"
+                  alt="Home and Student Laptops"
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-xl"
+                />
+              </div>
+            </LocalizedClientLink>
+
+            {/* 4. Bottom Right Card: Monitors */}
             <LocalizedClientLink
               href="/categories/gaming-monitors"
-              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-6 sm:p-7 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[225px] lg:min-h-0"
+              className="group relative isolate overflow-hidden rounded-3xl bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4.5 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
             >
-              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[56%] flex-col items-start justify-between">
-                <div className="space-y-1.5">
+              <div className="relative z-10 flex h-full max-w-[62%] sm:max-w-[58%] lg:max-w-[60%] flex-col items-start justify-between">
+                <div className="space-y-1">
                   <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                     Displays & Monitors
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug">
+                  <h3 className="text-lg sm:text-xl lg:text-base xl:text-lg 2xl:text-xl font-bold tracking-tight text-white leading-snug">
                     Curved & 4K Displays
                   </h3>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-3">
                   <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
                     <span>View Monitors</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -109,12 +143,12 @@ export default function GamingSection() {
                 </div>
               </div>
 
-              <div className="absolute right-0 bottom-0 w-[52%] h-[80%] -z-0 flex items-end justify-end p-2">
+              <div className="absolute right-0 bottom-0 w-[50%] sm:w-[52%] lg:w-[48%] h-[82%] sm:h-[85%] -z-0 flex items-end justify-end p-2">
                 <Image
                   src="/gaming/gaming-monitors.png"
                   alt="Gaming Monitors"
                   fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-xl"
                 />
               </div>

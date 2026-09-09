@@ -18,7 +18,7 @@ const MAX_ATTEMPTS = 3
 export const reclaimStaleItemsStep = createStep(
   "reclaim-stale-items",
   async (input: { operationId: string }, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
     // Find any items that were left in 'processing' status
@@ -52,7 +52,7 @@ export const reclaimStaleItemsStep = createStep(
 export const createSnapshotStep = createStep(
   "create-snapshot",
   async (input: { operationId: string }, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
@@ -135,7 +135,7 @@ export const createSnapshotStep = createStep(
 export const executeBatchesStep = createStep(
   "execute-batches",
   async (input: { operationId: string }, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
     // Retrieve active operation
@@ -289,7 +289,7 @@ export const executeBatchesStep = createStep(
 export const completeBulkOperationStep = createStep(
   "complete-bulk-operation",
   async (input: { operationId: string }, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
 
     const operation = await bulkModule.retrieveBulkOperation(input.operationId)
@@ -362,7 +362,7 @@ export type CreateBulkOperationInput = {
 export const createBulkOperationRecordStep = createStep(
   "create-bulk-operation-record",
   async (input: CreateBulkOperationInput, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const operation = await bulkModule.createBulkOperations(input)
     return new StepResponse(operation)
   }
@@ -383,7 +383,7 @@ export type CancelBulkOperationInput = {
 export const cancelBulkOperationRecordStep = createStep(
   "cancel-bulk-operation-record",
   async (input: CancelBulkOperationInput, { container }) => {
-    const bulkModule = container.resolve(BULK_OPERATION_MODULE)
+    const bulkModule: any = container.resolve(BULK_OPERATION_MODULE)
     const operation = await bulkModule.updateBulkOperations({
       id: input.id,
       status: "cancelling",
