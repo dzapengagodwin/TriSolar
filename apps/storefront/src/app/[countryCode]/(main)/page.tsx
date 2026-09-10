@@ -8,7 +8,7 @@ import FeaturedProducts from "@modules/home/components/featured-products"
 import ProductRail from "@modules/home/components/featured-products/product-rail"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
-import { getCollectionByHandle, listCollections } from "@lib/data/collections"
+import { getCollectionByHandle } from "@lib/data/collections"
 import { STATIC_BRANDS } from "@lib/data/brands"
 import { listCategories } from "@lib/data/categories"
 import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
@@ -29,8 +29,7 @@ export default async function Home(props: {
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [collectionsRes, featuredCollection, productsRes, categories] = await Promise.all([
-    listCollections({ fields: "id, handle, title" }).catch(() => ({ collections: [] })),
+  const [featuredCollection, productsRes, categories] = await Promise.all([
     getCollectionByHandle("featured").catch(() => null),
     region
       ? listProducts({
@@ -41,7 +40,6 @@ export default async function Home(props: {
     listCategories({ limit: 50 }).catch(() => []),
   ])
 
-  const _collections = collectionsRes.collections || []
   const products = productsRes.response?.products || []
   const brands = STATIC_BRANDS
 

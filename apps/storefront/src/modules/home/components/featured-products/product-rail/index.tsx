@@ -3,6 +3,7 @@ import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import ProductPreview from "@modules/products/components/product-preview"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Image from "next/image"
 
 export default async function ProductRail({
   collectionId,
@@ -11,6 +12,7 @@ export default async function ProductRail({
   viewAllHref,
   region,
   title,
+  bannerImage,
 }: {
   collectionId?: string
   categoryId?: string
@@ -18,6 +20,7 @@ export default async function ProductRail({
   viewAllHref?: string
   region: HttpTypes.StoreRegion
   title: string
+  bannerImage?: string | null
 }) {
   let pricedProducts: HttpTypes.StoreProduct[] = []
 
@@ -64,6 +67,36 @@ export default async function ProductRail({
 
   return (
     <div className="content-container py-6 sm:py-8">
+      {/* Optional Banner Image */}
+      {bannerImage && (
+        <div className="mb-4 sm:mb-6 overflow-hidden  shadow-sm">
+          {viewAllHref ? (
+            <LocalizedClientLink
+              href={viewAllHref}
+              className="block group"
+            >
+              <Image
+                src={bannerImage}
+                alt={title}
+                width={1440}
+                height={136}
+                className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                sizes="(max-width: 1280px) 100vw, 1280px"
+              />
+            </LocalizedClientLink>
+          ) : (
+            <Image
+              src={bannerImage}
+              alt={title}
+              width={1440}
+              height={136}
+              className="w-full h-auto"
+              sizes="(max-width: 1280px) 100vw, 1280px"
+            />
+          )}
+        </div>
+      )}
+
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4 sm:mb-6 pb-2 border-b border-gray-100">
         <h2 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide">

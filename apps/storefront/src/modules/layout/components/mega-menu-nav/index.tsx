@@ -95,11 +95,7 @@ export default function MegaMenuNav() {
             }}
             aria-expanded={isOpen}
             aria-controls={menuPanelId}
-            className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer ${
-              isOpen
-                ? "bg-white text-black border-t-2 border-primary shadow-sm"
-                : "text-white hover:text-black hover:bg-black/5"
-            }`}
+            className="px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer hover:bg-gray-800"
           >
             <span>{menu.label}</span>
             <svg
@@ -122,13 +118,27 @@ export default function MegaMenuNav() {
         )
       })}
 
-      {/* New Releases Accent Link */}
+      {/* Hot Deals Link */}
       <LocalizedClientLink
         href="/store"
         onClick={closeMenu}
-        className="bg-[#e62e04] hover:bg-[#c92500] text-white px-3.5 py-1.5 rounded-md transition-colors uppercase tracking-wider text-[11px] font-black shadow-xs ml-1"
+        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-black ml-1"
       >
-        New Releases
+        <span>Hot Deals</span>
+        <svg
+          className="w-3.5 h-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M12 22c4 0 7-2.8 7-6.5 0-2.8-1.7-5-4.2-6.5.3 2.1-1 3.5-2.3 4.2.2-3.4-1.5-6.5-4.5-9.2.2 3.2-1.6 5.4-2.6 7.2C4.5 12.7 5 15 5 15.5 5 19.2 8 22 12 22Z"
+          />
+        </svg>
       </LocalizedClientLink>
 
       {/* Unified Data-Driven Mega Dropdown Panel */}

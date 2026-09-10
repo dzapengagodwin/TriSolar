@@ -15,12 +15,12 @@ export type StoreBrand = {
 
 export const STATIC_BRANDS: StoreBrand[] = [
   {
-    id: "brand_apple",
-    name: "Apple",
-    handle: "apple",
-    logo: "/top-brands/apple.png",
-    description: "MacBook, iMac, iPad, and genuine Apple accessories.",
-    website: "https://www.apple.com",
+    id: "brand_brother",
+    name: "Brother",
+    handle: "brother",
+    logo: "/top-brands/brother.png",
+    description: "Brother printers, scanners, and office equipment for home and business.",
+    website: "https://www.brother.com",
   },
   {
     id: "brand_hp",
@@ -55,11 +55,11 @@ export const STATIC_BRANDS: StoreBrand[] = [
     website: "https://www.asus.com",
   },
   {
-    id: "brand_amd",
-    name: "AMD",
-    handle: "amd",
-    logo: "/brands/amd.svg",
-    description: "Ryzen processors, Radeon graphics, and powerful computing hardware.",
-    website: "https://www.amd.com",
+    id: "brand_canon",
+    name: "Canon",
+    handle: "canon",
+    logo: "/top-brands/canon.png",
+    description: "Canon printers, cameras, and office equipment for home and business.",
+    website: "https://www.canon.com",
   },
 ]

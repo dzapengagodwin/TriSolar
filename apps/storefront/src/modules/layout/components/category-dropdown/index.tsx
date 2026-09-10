@@ -65,12 +65,12 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
       {/* Multi-Tier Mega Menu Dropdown */}
       {isOpen && (
         <div 
-          className="absolute top-full left-0 w-[920px] bg-white border border-gray-100  shadow-2xl z-50 grid grid-cols-[220px_300px_1fr] min-h-[460px] overflow-hidden animate-fade-in"
+          className="absolute top-full mt-1 left-0 w-[920px] bg-white border border-gray-100 shadow-2xl z-50 grid grid-cols-[220px_300px_1fr] min-h-[460px] overflow-hidden animate-fade-in"
           style={{ transformOrigin: "top left" }}
         >
        
           {/* Column 2: Main Categories (Hover to reveal column 3) */}
-          <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto">
+          <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#d1d5db_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
             <div className="px-4 pb-2 border-b border-gray-50 mb-2">
               <h4 className="text-[11px] font-bold text-gray-400">All Products</h4>
             </div>
