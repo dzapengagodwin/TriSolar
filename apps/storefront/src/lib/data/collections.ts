@@ -97,8 +97,11 @@ export const getHomeFeaturedCollections = async (): Promise<ParsedHomeCollection
           limit: "1000",
           fields: "id,handle,title,metadata",
         },
-        next,
-        cache: "force-cache",
+        next: {
+          ...next,
+          revalidate: 60,
+        },
+        cache: "no-store",
       }
     )
     .then(({ collections }) => {
