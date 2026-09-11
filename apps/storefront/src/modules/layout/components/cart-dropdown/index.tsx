@@ -97,7 +97,6 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
     cartState?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
 
   const subtotal = cartState?.item_subtotal ?? 0
-  const shipping = cartState?.shipping_subtotal ?? 0
   const taxes = cartState?.tax_total ?? 0
   const total = cartState?.total ?? 0
   const itemRef = useRef<number>(totalItems || 0)
@@ -436,16 +435,6 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
               >
                 {convertToLocale({
                   amount: subtotal,
-                  currency_code: cartState.currency_code,
-                })}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between text-xs text-gray-600">
-              <span>Shipping</span>
-              <span className="font-bold text-gray-900">
-                {convertToLocale({
-                  amount: shipping,
                   currency_code: cartState.currency_code,
                 })}
               </span>

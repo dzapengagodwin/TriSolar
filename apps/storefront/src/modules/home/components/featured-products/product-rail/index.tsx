@@ -125,10 +125,10 @@ export default async function ProductRail({
         )}
       </div>
 
-      {/* 5 Columns Product Grid */}
-      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-        {pricedProducts.map((product) => (
-          <li key={product.id}>
+      {/* Five products on desktop; four products in a 2x2 grid below lg. */}
+      <ul className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        {pricedProducts.map((product, index) => (
+          <li key={product.id} className={index === 4 ? "hidden lg:list-item" : undefined}>
             <ProductPreview product={product} region={region} />
           </li>
         ))}

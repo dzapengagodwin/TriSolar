@@ -6,8 +6,6 @@ export default async function FeaturedProducts({
   region,
 }: {
   region: HttpTypes.StoreRegion
-  categories?: HttpTypes.StoreProductCategory[]
-  collections?: HttpTypes.StoreCollection[]
 }) {
   // Dynamically discover all collections starting with "home-", sorted by metadata.priority
   const homeCollections = await getHomeFeaturedCollections()
@@ -22,6 +20,7 @@ export default async function FeaturedProducts({
         <ProductRail
           key={collection.id}
           collectionId={collection.id}
+          limit={5}
           title={collection.title}
           viewAllHref={collection.viewAllHref}
           bannerImage={collection.bannerImage}
@@ -31,4 +30,3 @@ export default async function FeaturedProducts({
     </div>
   )
 }
-
