@@ -8,155 +8,113 @@ type SubcategoryCardsProps = {
   category: HttpTypes.StoreProductCategory
 }
 
-const SUBCATEGORY_CARDS_MAP: Record<
-  string,
-  { name: string; handle: string; icon?: string; count?: number }[]
-> = {
-  laptops: [
-    {
-      name: "Gaming Laptops",
-      handle: "gaming-laptops",
-      icon: "/gaming/gaming-laptops-card.png",
-      count: 28,
-    },
-    {
-      name: "Business & Office",
-      handle: "office-laptops",
-      icon: "/top-categories/laptops.png",
-      count: 21,
-    },
-    {
-      name: "MacBooks & Apple",
-      handle: "macbooks",
-      icon: "/top-brands/apple.png",
-      count: 7,
-    },
-    {
-      name: "Ultrabooks & 2-in-1",
-      handle: "ultrabooks",
-      icon: "/top-categories/laptops.png",
-      count: 5,
-    },
-  ],
-  monitors: [
-    {
-      name: "Gaming Monitors",
-      handle: "gaming-monitors",
-      icon: "/gaming/gaming-monitors-card.png",
-      count: 2,
-    },
-    {
-      name: "4K & Office Displays",
-      handle: "office-monitors",
-      icon: "/top-categories/monitors.png",
-      count: 1,
-    },
-  ],
-  "keyboard_-mouse": [
-    {
-      name: "Mechanical Keyboards",
-      handle: "mechanical-keyboards",
-      icon: "/top-categories/keyboards.png",
-      count: 1,
-    },
-    {
-      name: "Gaming Mice",
-      handle: "gaming-mice",
-      icon: "/top-categories/computer-mouse.png",
-      count: 1,
-    },
-  ],
-  "computer-accessories": [
-    {
-      name: "Laptop Bags & Sleeves",
-      handle: "laptop-bags",
-      icon: "/gaming/gaming-accessories-card.png",
-      count: 1,
-    },
-    {
-      name: "USB Hubs & Docks",
-      handle: "usb-hubs",
-      icon: "/top-categories/computer-mouse.png",
-      count: 1,
-    },
-  ],
-  headphones_mics: [
-    {
-      name: "Noise-Cancelling",
-      handle: "noise-cancelling-headphones",
-      icon: "/top-categories/headphones.png",
-      count: 1,
-    },
-    {
-      name: "Gaming Headsets",
-      handle: "gaming-headsets",
-      icon: "/top-categories/headphones.png",
-      count: 1,
-    },
-  ],
-  "smart-watches": [
-    {
-      name: "Fitness Trackers",
-      handle: "fitness-trackers",
-      icon: "/top-categories/smartwatches.png",
-      count: 1,
-    },
-    {
-      name: "GPS Smartwatches",
-      handle: "gps-smartwatches",
-      icon: "/top-categories/smartwatches.png",
-      count: 1,
-    },
-  ],
-}
-
 export default function SubcategoryCards({ category }: SubcategoryCardsProps) {
-  // If this is a subcategory, don't show the root category card grid
+  // Only display subcategory navigation on top-level (root) categories
   if (category.parent_category_id || category.parent_category) {
     return null
   }
 
-  const handleKey = category.handle?.toLowerCase() || ""
-  const subcategories = SUBCATEGORY_CARDS_MAP[handleKey] || []
-
-  if (subcategories.length === 0) {
+  const children = category.category_children || []
+  if (children.length === 0) {
     return null
   }
 
+  const activeChildren = children
+    .filter((c) => c.is_active !== false)
+    .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+
+  if (activeChildren.length === 0) {
+    return null
+  }
+
+  const items = activeChildren.map((child) => {
+    const meta = (child.metadata && typeof child.metadata === "object" ? child.metadata : {}) as Record<string, unknown>
+    const rawImage = meta.image || meta.icon
+    const image = typeof rawImage === "string" && rawImage.trim().length > 0 ? rawImage.trim() : null
+
+    const rawCount = meta.product_count
+    let count: number | undefined
+    if (typeof rawCount === "number" && !isNaN(rawCount)) {
+      count = rawCount
+    } else if (typeof rawCount === "string") {
+      const parsed = parseInt(rawCount, 10)
+      if (!isNaN(parsed)) count = parsed
+    }
+
+    return {
+      name: child.name,
+      handle: child.handle,
+      image,
+      count,
+    }
+  })
+
+  // Dynamic grid column sizing based on number of subcategories
+  const gridColsClass =
+    items.length >= 6
+      ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+      : items.length === 5
+        ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
+        : items.length === 4
+          ? "grid-cols-2 sm:grid-cols-4"
+          : items.length === 3
+            ? "grid-cols-1 sm:grid-cols-3"
+            : "grid-cols-2"
+
   return (
     <div className="w-full mb-6">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3.5">
-        {subcategories.map((sub, idx) => {
-          return (
-            <LocalizedClientLink
-              key={idx}
-              href={`/categories/${sub.handle}`}
-              className="group bg-white hover:bg-gray-50 border border-gray-200 hover:border-black rounded-xl p-3 sm:p-4 flex items-center gap-3 transition-all duration-200 shadow-2xs hover:shadow-sm"
-            >
-              {sub.icon && (
-                <div className="relative w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-gray-50 rounded-lg p-1 flex items-center justify-center">
-                  <Image
-                    src={sub.icon}
-                    alt={sub.name}
-                    fill
-                    sizes="48px"
-                    className="object-contain object-center group-hover:scale-105 transition-transform duration-200"
-                  />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <span className="block font-bold text-xs sm:text-sm text-gray-900 group-hover:text-primary transition-colors truncate">
-                  {sub.name}
-                </span>
-                {sub.count && (
-                  <span className="block text-[11px] text-[#7b91a8] font-normal mt-0.5">
-                    {sub.count} Products
-                  </span>
-                )}
+      {/* Header Bar */}
+      <div className="flex items-center justify-between mb-3 px-0.5">
+        <h2 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          Subcategories
+        </h2>
+        <span className="text-[11px] text-gray-500 font-medium hidden sm:inline">
+          {items.length} {items.length === 1 ? "Subcategory" : "Subcategories"}
+        </span>
+      </div>
+
+      {/* Subcategory Cards */}
+      <div className={`grid ${gridColsClass} gap-2.5 sm:gap-3`}>
+        {items.map((item) => (
+          <LocalizedClientLink
+            key={item.handle}
+            href={`/categories/${item.handle}`}
+            className="group relative bg-white hover:bg-gray-50/80 border border-gray-200/90 hover:border-primary/60 rounded-xl p-3 flex items-center justify-between gap-2.5 transition-all duration-200 shadow-2xs hover:shadow-sm"
+          >
+            {/* If an image is explicitly available, display it */}
+            {item.image && (
+              <div className="relative w-10 h-10 shrink-0 bg-gray-50 rounded-lg p-1 flex items-center justify-center border border-gray-100 group-hover:border-gray-200 transition-colors">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="40px"
+                  className="object-contain object-center group-hover:scale-108 transition-transform duration-200"
+                />
               </div>
-            </LocalizedClientLink>
-          )
-        })}
+            )}
+
+            {/* Text content */}
+            <div className="flex-1 min-w-0">
+              <span className="block font-semibold text-xs sm:text-sm text-gray-900 group-hover:text-primary transition-colors truncate">
+                {item.name}
+              </span>
+              {item.count !== undefined && (
+                <span className="block text-[11px] text-[#7b91a8] font-normal mt-0.5">
+                  {item.count} {item.count === 1 ? "Product" : "Products"}
+                </span>
+              )}
+            </div>
+
+            {/* Arrow indicator when text-only */}
+            {!item.image && (
+              <span className="text-gray-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all text-sm shrink-0">
+                &rarr;
+              </span>
+            )}
+          </LocalizedClientLink>
+        ))}
       </div>
     </div>
   )

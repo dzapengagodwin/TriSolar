@@ -21,7 +21,8 @@ export type MegaMenuPromo = {
   description: string
   href: string
   cta: string
-  gradient: string
+  image: string
+  gradient?: string
   darkText?: boolean
 }
 
@@ -130,7 +131,7 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
       description: "Upgrade your setup with top tier performance laptops and hardware.",
       href: "/categories/laptops",
       cta: "Shop Catalog",
-      gradient: "from-orange-500 via-amber-500 to-yellow-500",
+      image: "/hero-laptops.png",
     },
   },
 
@@ -199,7 +200,7 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
       description: "High speed, wireless, and heavy duty printers engineered for business.",
       href: "/categories/printers_for_sale",
       cta: "Explore Printers",
-      gradient: "from-neutral-800 via-neutral-900 to-black",
+      image: "/printer.png",
     },
   },
 
@@ -267,7 +268,7 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
       description: "Authentic devices with 100% manufacturer warranty and guaranteed support.",
       href: "/categories/mobile-phones-zimbabwe",
       cta: "Shop Devices",
-      gradient: "from-blue-900 via-indigo-900 to-sky-700",
+      image: "/hero-phone.png",
     },
   },
 
@@ -334,8 +335,7 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
       description: "Crystal clear 4K displays, home theater soundbars, and gaming gear.",
       href: "/categories/tv-audio",
       cta: "Shop Electronics",
-      gradient: "from-amber-400 via-yellow-400 to-orange-400",
-      darkText: true,
+      image: "/hero-monitor.png",
     },
   },
 ]

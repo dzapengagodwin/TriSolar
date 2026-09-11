@@ -289,12 +289,22 @@ export default async function orderPlacedHandler({
         sendgrid.setApiKey(apiKey)
         const rendered = renderOrderConfirmation(payload)
         if (rendered) {
-          const msg = {
+          const rawCc =
+            process.env.SENDGRID_ORDER_CC_EMAIL || "laptops@laptopzone.co.zw"
+          const fallbackCc =
+            rawCc &&
+            !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim()) &&
+            rawCc.toLowerCase().trim() !== recipientEmail.toLowerCase()
+              ? rawCc.trim()
+              : undefined
+
+          const msg: any = {
             to: recipientEmail,
             from: {
               email: orderFromEmail,
               name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
             },
+            ...(fallbackCc ? { cc: fallbackCc } : {}),
             subject: rendered.subject,
             html: rendered.html,
             text: rendered.text,

@@ -1,4 +1,5 @@
 import React from "react"
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { MegaMenuPromo as MegaMenuPromoType } from "./mega-menu-config"
 
@@ -8,32 +9,18 @@ type MegaMenuPromoProps = {
 }
 
 export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
-  const isDarkText = promo.darkText
-
   return (
-    <div
-      className={`col-span-12 lg:col-span-4 bg-gradient-to-br ${promo.gradient} rounded-2xl p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden shadow-md`}
+    <LocalizedClientLink
+      href={promo.href}
+      onClick={onClose}
+      className="group relative col-span-12 lg:col-span-4 bg-[#0B0D12] border border-gray-800/80 rounded-xl p-5 sm:p-6 flex flex-col justify-between overflow-hidden shadow-sm hover:border-gray-700 transition-colors min-h-[220px] lg:min-h-full"
     >
-      {/* Decorative ambient pattern */}
-      <div
-        className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10 blur-xl pointer-events-none"
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 space-y-1.5">
-        <span
-          className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full inline-block ${
-            isDarkText ? "bg-black/10 text-black" : "bg-white/20 text-white"
-          }`}
-        >
+      <div className="relative z-10 max-w-[58%] space-y-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-primary inline-block">
           {promo.eyebrow}
         </span>
 
-        <h3
-          className={`text-xl sm:text-2xl font-black tracking-tight leading-tight pt-1 ${
-            isDarkText ? "text-gray-950" : "text-white"
-          }`}
-        >
+        <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight text-white pt-0.5">
           {promo.title.map((line, idx) => (
             <React.Fragment key={idx}>
               {line}
@@ -42,25 +29,13 @@ export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
           ))}
         </h3>
 
-        <p
-          className={`text-xs font-medium pt-1 line-clamp-2 ${
-            isDarkText ? "text-gray-800" : "text-white/90"
-          }`}
-        >
+        <p className="text-xs font-medium text-gray-400 pt-1 line-clamp-2">
           {promo.description}
         </p>
       </div>
 
       <div className="relative z-10 pt-5">
-        <LocalizedClientLink
-          href={promo.href}
-          onClick={onClose}
-          className={`inline-flex items-center gap-1.5 font-bold text-xs px-4 py-2 rounded-full transition-all shadow-sm ${
-            isDarkText
-              ? "bg-black hover:bg-gray-900 text-white"
-              : "bg-white hover:bg-gray-100 text-black"
-          }`}
-        >
+        <span className="inline-flex items-center gap-1.5 font-bold text-xs px-4 py-2 rounded-lg bg-white text-gray-900 group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
           <span>{promo.cta}</span>
           <svg
             className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
@@ -76,8 +51,21 @@ export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
               d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
             />
           </svg>
-        </LocalizedClientLink>
+        </span>
       </div>
-    </div>
+
+      {promo.image && (
+        <div className="absolute right-0 bottom-0 w-[46%] h-[86%] -z-0 flex items-end justify-end p-2 sm:p-3 pointer-events-none">
+          <Image
+            src={promo.image}
+            alt={promo.title.join(" ")}
+            fill
+            sizes="(max-width: 1024px) 100vw, 25vw"
+            className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-105 drop-shadow-xl"
+          />
+        </div>
+      )}
+    </LocalizedClientLink>
   )
 }
+

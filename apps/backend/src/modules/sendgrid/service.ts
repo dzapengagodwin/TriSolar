@@ -120,6 +120,27 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
       const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "LaptopZone"
       const templateData = (notification.data || {}) as Record<string, any>
 
+      // Resolve CC email for order notifications (defaults to laptops@laptopzone.co.zw)
+      let ccEmails: string[] = []
+      if (isOrderEmail) {
+        const rawCc =
+          notification.data?.cc ||
+          this.options_?.order_cc_email ||
+          process.env.SENDGRID_ORDER_CC_EMAIL ||
+          "laptops@laptopzone.co.zw"
+
+        if (rawCc && typeof rawCc === "string" && !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim())) {
+          ccEmails = rawCc
+            .split(",")
+            .map((e) => e.trim())
+            .filter((e) => e.length > 0 && e.toLowerCase() !== to.toLowerCase())
+        } else if (Array.isArray(rawCc)) {
+          ccEmails = rawCc
+            .map((e) => String(e).trim())
+            .filter((e) => e.length > 0 && e.toLowerCase() !== to.toLowerCase())
+        }
+      }
+
       // Render template
       const rendered = this.renderTemplate(notification.template, templateData, notification.content)
       if (!rendered) {
@@ -131,8 +152,9 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
 
       // Sandbox / Mock Mode
       if (this.options_?.sandbox || !this.isConfigured_) {
+        const ccInfo = ccEmails.length > 0 ? `\n  CC: ${ccEmails.join(", ")}` : ""
         this.logger_.info(
-          `[SendGrid Sandbox] Email simulated successfully:\n  To: ${to}\n  From: ${fromName} <${fromEmail}>\n  Template: ${notification.template}\n  Subject: ${rendered.subject}`
+          `[SendGrid Sandbox] Email simulated successfully:\n  To: ${to}${ccInfo}\n  From: ${fromName} <${fromEmail}>\n  Template: ${notification.template}\n  Subject: ${rendered.subject}`
         )
         return { id: `mock_sendgrid_${Date.now()}` }
       }
@@ -144,6 +166,9 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
           email: fromEmail,
           name: fromName,
         },
+        ...(ccEmails.length > 0
+          ? { cc: ccEmails.length === 1 ? ccEmails[0] : ccEmails }
+          : {}),
         subject: rendered.subject,
         html: rendered.html,
         text: rendered.text,

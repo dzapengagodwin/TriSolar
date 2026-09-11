@@ -141,12 +141,130 @@ describe("SendgridNotificationService", () => {
       )
 
       const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
+      expect(message.cc).toBe("laptops@laptopzone.co.zw")
       expect(message.html).toContain("Gift card")
       expect(message.html).toContain("Harare Same-Day Delivery")
       expect(message.html).toContain("Cash on Delivery (Pending)")
       expect(message.html).toContain("&lt;John&gt;")
       expect(message.html).not.toContain("<John>")
       expect(message.html).not.toContain(">Zimbabwe<")
+    })
+
+    it("attaches default CC laptops@laptopzone.co.zw to order confirmation emails", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "order-confirmation",
+        data: orderData as any,
+      })
+
+      expect(sendgrid.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: "customer@example.com",
+          cc: "laptops@laptopzone.co.zw",
+        })
+      )
+    })
+
+    it("respects custom order_cc_email option and supports comma-separated list", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_cc_email: "sales@laptopzone.co.zw, manager@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "order-confirmation",
+        data: orderData as any,
+      })
+
+      expect(sendgrid.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: "customer@example.com",
+          cc: ["sales@laptopzone.co.zw", "manager@laptopzone.co.zw"],
+        })
+      )
+    })
+
+    it("filters out CC if recipient email is identical to prevent SendGrid error", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_cc_email: "laptops@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "laptops@laptopzone.co.zw",
+        channel: "email",
+        template: "order-confirmation",
+        data: orderData as any,
+      })
+
+      const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
+      expect(message.cc).toBeUndefined()
+    })
+
+    it("disables CC when order_cc_email is 'false' or 'none'", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_cc_email: "false",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "order-confirmation",
+        data: orderData as any,
+      })
+
+      const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
+      expect(message.cc).toBeUndefined()
+    })
+
+    it("does not attach CC to non-order emails like password reset", async () => {
+      const service = new SendgridNotificationService(
+        { logger: mockLogger },
+        {
+          api_key: "SG.test_key_live",
+          from: "orders@laptopzone.co.zw",
+          order_cc_email: "laptops@laptopzone.co.zw",
+          sandbox: false,
+        }
+      )
+
+      await service.send({
+        to: "customer@example.com",
+        channel: "email",
+        template: "password-reset",
+        data: { customer_name: "Customer", email: "customer@example.com", token: "xyz", reset_url: "http://..." } as any,
+      })
+
+      const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
+      expect(message.cc).toBeUndefined()
     })
   })
 
