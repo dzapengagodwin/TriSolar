@@ -52,3 +52,71 @@ export async function getProductSeo(
     return null
   }
 }
+
+/**
+ * Fetches persistent SEO metadata for a product category from the commerce backend
+ */
+export async function getCategorySeo(
+  categoryId: string
+): Promise<SeoMetadataDTO | null> {
+  if (!categoryId) return null
+
+  try {
+    const headers = {
+      ...(await getAuthHeaders()),
+    }
+
+    const next = {
+      ...(await getCacheOptions("categories")),
+    }
+
+    const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
+      `/store/categories/${categoryId}/seo`,
+      {
+        method: "GET",
+        headers,
+        next,
+        cache: "no-store",
+      }
+    )
+
+    return res.seo || null
+  } catch (_error) {
+    // Return null silently so standard category fallback metadata is used
+    return null
+  }
+}
+
+/**
+ * Fetches persistent SEO metadata for a brand from the commerce backend
+ */
+export async function getBrandSeo(
+  brandHandle: string
+): Promise<SeoMetadataDTO | null> {
+  if (!brandHandle) return null
+
+  try {
+    const headers = {
+      ...(await getAuthHeaders()),
+    }
+
+    const next = {
+      ...(await getCacheOptions("brands")),
+    }
+
+    const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
+      `/store/brands/${brandHandle}/seo`,
+      {
+        method: "GET",
+        headers,
+        next,
+        cache: "no-store",
+      }
+    )
+
+    return res.seo || null
+  } catch (_error) {
+    // Return null silently so standard brand fallback metadata is used
+    return null
+  }
+}

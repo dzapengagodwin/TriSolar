@@ -8,6 +8,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { parseOptionValueIds } from "@lib/util/product-option-filters"
 import { generateBrandMetadata } from "@lib/seo/brand"
 import { getCanonicalUrl, getBrandCanonicalUrl } from "@lib/seo/canonical"
+import { getBrandSeo } from "@lib/data/seo"
 
 type Props = {
   params: Promise<{ handle: string; countryCode: string }>
@@ -72,7 +73,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     description: `Browse authentic products from ${formatBrandName(params.handle)} at Laptopzone.`,
   }
 
-  return generateBrandMetadata(brand, params.countryCode)
+  const seo = await getBrandSeo(params.handle)
+  return generateBrandMetadata(brand, params.countryCode, seo)
 }
 
 export default async function BrandPage(props: Props) {

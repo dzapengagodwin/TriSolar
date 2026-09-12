@@ -7,6 +7,8 @@ import {
   Table,
   Badge,
   Input,
+  Textarea,
+  Checkbox,
   Drawer,
   StatusBadge,
   toast,
@@ -220,6 +222,360 @@ const BrandLogoField = ({ value, onChange }: BrandLogoFieldProps) => {
   )
 }
 
+type SeoFormState = {
+  meta_title: string
+  meta_description: string
+  focus_keyphrase: string
+  canonical_url: string
+  og_title: string
+  og_description: string
+  og_image: string
+  robots_index: boolean
+  robots_follow: boolean
+}
+
+type BrandSeoProps = {
+  brand: { id: string; name: string; handle: string; logo?: string } | null
+  open: boolean
+}
+
+const EMPTY_SEO: SeoFormState = {
+  meta_title: "",
+  meta_description: "",
+  focus_keyphrase: "",
+  canonical_url: "",
+  og_title: "",
+  og_description: "",
+  og_image: "",
+  robots_index: true,
+  robots_follow: true,
+}
+
+const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [showSocial, setShowSocial] = useState(false)
+  const [previewTab, setPreviewTab] = useState<"desktop" | "mobile">("desktop")
+  const [form, setForm] = useState<SeoFormState>(EMPTY_SEO)
+  const [defaults, setDefaults] = useState<Partial<SeoFormState>>({})
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  const fetchSeo = useCallback(async () => {
+    if (!brand?.handle) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/admin/seo/brands/${brand.handle}`, {
+        credentials: "include",
+      })
+      if (res.ok) {
+        const json = await res.json()
+        const seo = json.seo || {}
+        const def = json.defaults || {}
+        setDefaults(def)
+        setForm({
+          meta_title: seo.meta_title ?? def.meta_title ?? "",
+          meta_description: seo.meta_description ?? def.meta_description ?? "",
+          focus_keyphrase: seo.focus_keyphrase ?? def.focus_keyphrase ?? "",
+          canonical_url: seo.canonical_url ?? def.canonical_url ?? "",
+          og_title: seo.og_title ?? def.og_title ?? "",
+          og_description: seo.og_description ?? def.og_description ?? "",
+          og_image: seo.og_image ?? def.og_image ?? brand.logo ?? "",
+          robots_index: seo.robots_index !== undefined ? seo.robots_index : true,
+          robots_follow: seo.robots_follow !== undefined ? seo.robots_follow : true,
+        })
+        setHasUnsavedChanges(false)
+      }
+    } catch (err) {
+      console.error("Failed to load brand SEO:", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [brand?.handle, brand?.logo])
+
+  // Reload whenever the drawer opens for a (possibly different) brand
+  useEffect(() => {
+    if (open && brand?.handle) {
+      fetchSeo()
+    }
+  }, [open, fetchSeo])
+
+  const handleChange = (field: keyof SeoFormState, value: any) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+    setHasUnsavedChanges(true)
+  }
+
+  const handleReset = () => {
+    setForm({
+      meta_title: defaults.meta_title || `${brand?.name ?? ""} | LaptopZone`,
+      meta_description: defaults.meta_description || "",
+      focus_keyphrase: defaults.focus_keyphrase || brand?.name || "",
+      canonical_url: defaults.canonical_url || "",
+      og_title: defaults.og_title || defaults.meta_title || "",
+      og_description: defaults.og_description || defaults.meta_description || "",
+      og_image: defaults.og_image || brand?.logo || "",
+      robots_index: true,
+      robots_follow: true,
+    })
+    setHasUnsavedChanges(true)
+  }
+
+  const handleSave = async () => {
+    if (!brand?.handle) return
+    setSaving(true)
+    try {
+      const res = await fetch(`/admin/seo/brands/${brand.handle}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setHasUnsavedChanges(false)
+        toast.success("Brand SEO saved successfully")
+      } else {
+        const errJson = await res.json().catch(() => ({}))
+        toast.error(errJson.message || "Failed to save SEO metadata")
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save SEO metadata")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const previewTitle = form.meta_title || defaults.meta_title || `${brand?.name ?? ""} | LaptopZone`
+  const previewSlug = brand?.handle || "brand-url"
+  const previewDesc =
+    form.meta_description ||
+    defaults.meta_description ||
+    "Shop original products at LaptopZone. Official warranty, fast delivery across Zimbabwe."
+
+  const titleLength = form.meta_title.length
+  const descLength = form.meta_description.length
+
+  if (loading) {
+    return (
+      <div className="py-8 text-center text-xs text-ui-fg-muted">
+        Loading SEO metadata...
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-5 pt-1">
+      {/* Unsaved badge */}
+      {hasUnsavedChanges && (
+        <div className="flex items-center gap-2">
+          <Badge color="orange" size="small">Unsaved Changes</Badge>
+        </div>
+      )}
+
+      {/* Live Google Search Preview */}
+      <div className="border border-ui-border-base rounded-xl p-4 bg-ui-bg-subtle space-y-3">
+        <div className="flex items-center justify-between border-b border-ui-border-base pb-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-ui-fg-muted">
+            Google Snippet Preview
+          </span>
+          <div className="flex items-center gap-1 bg-ui-bg-base p-0.5 rounded-lg border border-ui-border-base text-[11px]">
+            <button
+              type="button"
+              onClick={() => setPreviewTab("desktop")}
+              className={clx(
+                "px-2.5 py-1 rounded-md font-bold transition-colors",
+                previewTab === "desktop" ? "bg-white text-black shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
+              )}
+            >
+              Desktop
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreviewTab("mobile")}
+              className={clx(
+                "px-2.5 py-1 rounded-md font-bold transition-colors",
+                previewTab === "mobile" ? "bg-white text-black shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
+              )}
+            >
+              Mobile
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={clx(
+            "p-3 rounded-lg bg-[#F8F9FA] border border-gray-100 font-sans",
+            previewTab === "mobile" ? "max-w-xs" : "w-full"
+          )}
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-[9px] text-white font-bold">
+              LZ
+            </div>
+            <div className="text-[11px] text-gray-700 leading-tight">
+              <span className="font-medium text-gray-900">LaptopZone</span>
+              <span className="text-gray-400 mx-1">›</span>
+              <span className="text-gray-500 text-[10px]">brands › {previewSlug}</span>
+            </div>
+          </div>
+          <div className="text-[#1a0dab] text-sm font-medium leading-snug cursor-pointer line-clamp-1">
+            {previewTitle}
+          </div>
+          <div className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">
+            {previewDesc}
+          </div>
+        </div>
+      </div>
+
+      {/* SEO Fields */}
+      <div className="space-y-4">
+        {/* Focus Keyphrase */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-ui-fg-base flex items-center justify-between">
+            <span>Focus Keyphrase</span>
+            <span className="text-[10px] text-ui-fg-muted font-normal">Primary search term for this brand</span>
+          </label>
+          <Input
+            placeholder={`e.g. ${brand?.name ?? "Lenovo"} laptops Zimbabwe`}
+            value={form.focus_keyphrase}
+            onChange={(e) => handleChange("focus_keyphrase", e.target.value)}
+          />
+        </div>
+
+        {/* Meta Title */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-ui-fg-base">SEO Meta Title</label>
+            <span
+              className={clx(
+                "text-[10px] font-bold",
+                titleLength >= 40 && titleLength <= 60
+                  ? "text-emerald-600"
+                  : titleLength > 60
+                  ? "text-amber-600"
+                  : "text-ui-fg-muted"
+              )}
+            >
+              {titleLength} / 60
+            </span>
+          </div>
+          <Input
+            placeholder={`${brand?.name ?? "Brand"} Laptops & Tech | LaptopZone`}
+            value={form.meta_title}
+            onChange={(e) => handleChange("meta_title", e.target.value)}
+          />
+        </div>
+
+        {/* Meta Description */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-ui-fg-base">Meta Description</label>
+            <span
+              className={clx(
+                "text-[10px] font-bold",
+                descLength >= 120 && descLength <= 160
+                  ? "text-emerald-600"
+                  : descLength > 160
+                  ? "text-amber-600"
+                  : "text-ui-fg-muted"
+              )}
+            >
+              {descLength} / 160
+            </span>
+          </div>
+          <Textarea
+            rows={3}
+            placeholder="Compelling description of this brand's product range, warranty, and availability in Zimbabwe"
+            value={form.meta_description}
+            onChange={(e) => handleChange("meta_description", e.target.value)}
+          />
+        </div>
+
+        {/* Canonical URL */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-ui-fg-base flex items-center justify-between">
+            <span>Canonical URL</span>
+            <span className="text-[10px] text-ui-fg-muted font-normal">Optional override (auto-generated by default)</span>
+          </label>
+          <Input
+            placeholder={`https://laptopzone.co.zw/zw/brands/${brand?.handle ?? "..."}`}
+            value={form.canonical_url}
+            onChange={(e) => handleChange("canonical_url", e.target.value)}
+          />
+        </div>
+
+        {/* Robots */}
+        <div className="flex flex-wrap items-center gap-6 pt-1">
+          <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-ui-fg-base">
+            <Checkbox
+              checked={form.robots_index}
+              onCheckedChange={(checked) => handleChange("robots_index", !!checked)}
+            />
+            <span>Allow Search Engines to Index</span>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-ui-fg-base">
+            <Checkbox
+              checked={form.robots_follow}
+              onCheckedChange={(checked) => handleChange("robots_follow", !!checked)}
+            />
+            <span>Follow Links on this Page</span>
+          </label>
+        </div>
+
+        {/* Open Graph Accordion */}
+        <div className="pt-1">
+          <Button
+            variant="transparent"
+            size="small"
+            onClick={() => setShowSocial(!showSocial)}
+            className="text-xs text-blue-600 font-bold p-0 flex items-center gap-1.5"
+          >
+            {showSocial ? "▲ Hide" : "▼ Show"} Social Media (OpenGraph) Overrides
+          </Button>
+
+          {showSocial && (
+            <div className="mt-3 p-4 bg-ui-bg-subtle rounded-xl border border-ui-border-base space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ui-fg-base">OG Title</label>
+                <Input
+                  placeholder="Title for social media sharing"
+                  value={form.og_title}
+                  onChange={(e) => handleChange("og_title", e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ui-fg-base">OG Description</label>
+                <Textarea
+                  rows={2}
+                  placeholder="Description for social media shares"
+                  value={form.og_description}
+                  onChange={(e) => handleChange("og_description", e.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-ui-fg-base">OG Image URL</label>
+                <Input
+                  placeholder="https://.../brand-og.jpg (1200×630 recommended)"
+                  value={form.og_image}
+                  onChange={(e) => handleChange("og_image", e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action Footer */}
+      <div className="pt-4 border-t border-ui-border-base flex items-center justify-between">
+        <Button variant="secondary" size="small" onClick={handleReset} disabled={saving}>
+          Reset to Defaults
+        </Button>
+        <Button variant="primary" size="small" onClick={handleSave} disabled={saving}>
+          {saving ? "Saving..." : "Save SEO"}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
 const BrandsAdminPage = () => {
   const [brands, setBrands] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -230,6 +586,7 @@ const BrandsAdminPage = () => {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [selectedBrand, setSelectedBrand] = useState<any | null>(null)
   const [saving, setSaving] = useState(false)
+  const [editTab, setEditTab] = useState<"info" | "seo">("info")
 
   // Form states
   const [formName, setFormName] = useState("")
@@ -279,6 +636,7 @@ const BrandsAdminPage = () => {
     setFormDescription(brand.description || "")
     setFormWebsite(brand.website || "")
     setFormIsActive(brand.is_active ?? true)
+    setEditTab("info")
     setIsEditOpen(true)
   }
 
@@ -618,82 +976,124 @@ const BrandsAdminPage = () => {
 
       {/* Edit Brand Drawer */}
       <Drawer open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <Drawer.Content className="max-w-md p-6">
+        <Drawer.Content className="max-w-lg p-6">
           <Drawer.Header>
             <Drawer.Title>Edit Brand: {selectedBrand?.name}</Drawer.Title>
             <Drawer.Description>
-              Update brand information and details.
+              Update brand information, details, and SEO metadata.
             </Drawer.Description>
           </Drawer.Header>
-          <form onSubmit={handleUpdateBrand} className="space-y-4 my-6">
-            <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
-                Brand Name *
-              </label>
-              <Input
-                value={formName}
-                onChange={(e) => setFormName(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
-                Handle
-              </label>
-              <Input
-                value={formHandle}
-                onChange={(e) => setFormHandle(e.target.value)}
-              />
-            </div>
 
-            {/* Logo Upload / URL Component */}
-            <BrandLogoField value={formLogo} onChange={setFormLogo} />
+          {/* Tab Bar */}
+          <div className="flex items-center gap-1 bg-ui-bg-subtle p-1 rounded-xl border border-ui-border-base mt-4">
+            <button
+              type="button"
+              onClick={() => setEditTab("info")}
+              className={clx(
+                "flex-1 py-2 rounded-lg text-xs font-bold transition-colors",
+                editTab === "info"
+                  ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
+                  : "text-ui-fg-muted hover:text-ui-fg-base"
+              )}
+            >
+              Brand Info
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditTab("seo")}
+              className={clx(
+                "flex-1 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5",
+                editTab === "seo"
+                  ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
+                  : "text-ui-fg-muted hover:text-ui-fg-base"
+              )}
+            >
+              <span className="w-4 h-4 rounded bg-blue-600/15 text-blue-700 flex items-center justify-center text-[9px] font-black">
+                S
+              </span>
+              SEO
+            </button>
+          </div>
 
-            <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
-                Website URL
-              </label>
-              <Input
-                value={formWebsite}
-                onChange={(e) => setFormWebsite(e.target.value)}
-              />
+          {/* Brand Info Tab */}
+          {editTab === "info" && (
+            <form onSubmit={handleUpdateBrand} className="space-y-4 my-6">
+              <div>
+                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                  Brand Name *
+                </label>
+                <Input
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                  Handle
+                </label>
+                <Input
+                  value={formHandle}
+                  onChange={(e) => setFormHandle(e.target.value)}
+                />
+              </div>
+
+              {/* Logo Upload / URL Component */}
+              <BrandLogoField value={formLogo} onChange={setFormLogo} />
+
+              <div>
+                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                  Website URL
+                </label>
+                <Input
+                  value={formWebsite}
+                  onChange={(e) => setFormWebsite(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                  Description
+                </label>
+                <textarea
+                  rows={3}
+                  className="w-full bg-ui-bg-base border border-ui-border-base rounded-lg p-2.5 text-xs text-ui-fg-base focus:outline-none focus:border-ui-border-interactive"
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="is_active_edit"
+                  checked={formIsActive}
+                  onChange={(e) => setFormIsActive(e.target.checked)}
+                  className="rounded border-ui-border-base text-ui-fg-interactive"
+                />
+                <label htmlFor="is_active_edit" className="text-xs text-ui-fg-base">
+                  Active Brand (Visible on Storefront)
+                </label>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 border-t border-ui-border-base">
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setIsEditOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button variant="primary" type="submit" disabled={saving}>
+                  {saving ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {/* SEO Tab */}
+          {editTab === "seo" && (
+            <div className="my-6">
+              <BrandSeoPanel brand={selectedBrand} open={isEditOpen} />
             </div>
-            <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
-                Description
-              </label>
-              <textarea
-                rows={3}
-                className="w-full bg-ui-bg-base border border-ui-border-base rounded-lg p-2.5 text-xs text-ui-fg-base focus:outline-none focus:border-ui-border-interactive"
-                value={formDescription}
-                onChange={(e) => setFormDescription(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-2 pt-2">
-              <input
-                type="checkbox"
-                id="is_active_edit"
-                checked={formIsActive}
-                onChange={(e) => setFormIsActive(e.target.checked)}
-                className="rounded border-ui-border-base text-ui-fg-interactive"
-              />
-              <label htmlFor="is_active_edit" className="text-xs text-ui-fg-base">
-                Active Brand (Visible on Storefront)
-              </label>
-            </div>
-            <div className="flex justify-end gap-2 pt-4 border-t border-ui-border-base">
-              <Button
-                variant="secondary"
-                type="button"
-                onClick={() => setIsEditOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button variant="primary" type="submit" disabled={saving}>
-                {saving ? "Saving..." : "Save Changes"}
-              </Button>
-            </div>
-          </form>
+          )}
         </Drawer.Content>
       </Drawer>
     </Container>

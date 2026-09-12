@@ -10,6 +10,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { parseOptionValueIds } from "@lib/util/product-option-filters"
 import { generateCategoryMetadata } from "@lib/seo/category"
 import { getCanonicalUrl, getCategoryCanonicalUrl } from "@lib/seo/canonical"
+import { getCategorySeo } from "@lib/data/seo"
 
 type Props = {
   params: Promise<{ category: string[]; countryCode: string }>
@@ -61,7 +62,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     if (!productCategory) {
       notFound()
     }
-    return generateCategoryMetadata(productCategory, params.countryCode)
+    const seo = await getCategorySeo(productCategory.id)
+    return generateCategoryMetadata(productCategory, params.countryCode, seo)
   } catch {
     notFound()
   }
