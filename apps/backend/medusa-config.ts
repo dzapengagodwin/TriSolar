@@ -20,7 +20,7 @@ export default defineConfig({
       resolve: "@alphabite/medusa-wishlist",
       options: {
         includeWishlistItems: true,
-        includeWishlistItemsTake: 5,
+        includeWishlistItemsTake: 50,
         allowGuestWishlist: true,
       },
     },
