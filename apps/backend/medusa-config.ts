@@ -32,15 +32,23 @@ export default defineConfig({
   admin: {
     disable: false,
     vite: () => {
-      const backendDir = path.resolve(__dirname, '..', '..')
       let reactPath: string
       let reactDomPath: string
+      let reactRouterDomPath: string
+      let reactRouterPath: string
+      let reactRouterDomExportPath: string
       try {
         reactPath = path.dirname(require.resolve("react/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
         reactDomPath = path.dirname(require.resolve("react-dom/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
+        reactRouterDomPath = path.dirname(require.resolve("react-router-dom/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
+        reactRouterPath = path.dirname(require.resolve("react-router/package.json", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] }))
+        reactRouterDomExportPath = require.resolve("react-router/dom", { paths: [path.resolve(process.cwd(), "apps/backend"), process.cwd(), __dirname] })
       } catch {
         reactPath = path.resolve(process.cwd(), "node_modules/react")
         reactDomPath = path.resolve(process.cwd(), "node_modules/react-dom")
+        reactRouterDomPath = path.resolve(process.cwd(), "node_modules/react-router-dom")
+        reactRouterPath = path.resolve(process.cwd(), "node_modules/react-router")
+        reactRouterDomExportPath = path.resolve(process.cwd(), "node_modules/react-router/dist/development/dom-export.mjs")
       }
 
       return {
@@ -50,8 +58,14 @@ export default defineConfig({
             { find: /^react-dom$/, replacement: reactDomPath },
             { find: /^react\/(.*)$/, replacement: `${reactPath}/$1` },
             { find: /^react-dom\/(.*)$/, replacement: `${reactDomPath}/$1` },
+            { find: /^react-router-dom$/, replacement: reactRouterDomPath },
+            { find: /^react-router\/dom$/, replacement: reactRouterDomExportPath },
+            { find: /^react-router$/, replacement: reactRouterPath },
           ],
-          dedupe: ["react", "react-dom"],
+          dedupe: ["react", "react-dom", "react-router-dom", "react-router"],
+        },
+        optimizeDeps: {
+          exclude: ["@alphabite/medusa-wishlist"],
         },
       }
     },
