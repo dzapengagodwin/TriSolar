@@ -6,6 +6,7 @@ import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/util
 import { SEO_MODULE } from "../../../../../modules/seo"
 import SeoModuleService from "../../../../../modules/seo/service"
 import { UpsertSeoMetadataInput } from "../../../../../modules/seo/types"
+import { upsertEntitySeoWorkflow } from "../../../../../workflows/upsert-entity-seo"
 
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -71,7 +72,6 @@ export const POST = async (
   }
 
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
-  const seoService: SeoModuleService = req.scope.resolve(SEO_MODULE)
 
   const { data: brands } = await query.graph({
     entity: "brand",
@@ -116,7 +116,13 @@ export const POST = async (
     metadata: body.metadata || null,
   }
 
-  const updatedSeo = await seoService.upsertForEntity("brand", brand.id, cleanData)
+  const { result: updatedSeo } = await upsertEntitySeoWorkflow(req.scope).run({
+    input: {
+      entityType: "brand",
+      entityId: brand.id,
+      data: cleanData,
+    },
+  })
 
   return res.status(200).json({
     success: true,
