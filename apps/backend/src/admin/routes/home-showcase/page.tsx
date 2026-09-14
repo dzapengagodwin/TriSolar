@@ -408,29 +408,40 @@ const HomeShowcasePage = () => {
   const fetchCollections = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch(
-        "/admin/collections?limit=100&fields=*metadata,*products",
-        {
-          credentials: "include",
-        }
-      )
+      let homeList: Collection[] = []
+      const res = await fetch("/admin/home-showcase", {
+        credentials: "include",
+      })
+
       if (res.ok) {
         const data = await res.json()
-        const all: Collection[] = data.collections || []
-        const homeList = all.filter((c) =>
-          c.handle?.toLowerCase().startsWith("home-")
+        homeList = data.collections || []
+      } else {
+        // Fallback to standard admin collections endpoint with high limit if needed
+        const fallbackRes = await fetch(
+          "/admin/collections?limit=1000&fields=id,title,handle,metadata,+products.id",
+          {
+            credentials: "include",
+          }
         )
-
-        // Sort by priority ascending
-        homeList.sort((a, b) => {
-          const pA = Number(a.metadata?.priority ?? Number.MAX_SAFE_INTEGER)
-          const pB = Number(b.metadata?.priority ?? Number.MAX_SAFE_INTEGER)
-          if (pA !== pB) return pA - pB
-          return a.title.localeCompare(b.title)
-        })
-
-        setCollections(homeList)
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json()
+          const all: Collection[] = fallbackData.collections || []
+          homeList = all.filter((c) =>
+            c.handle?.toLowerCase().startsWith("home-")
+          )
+        }
       }
+
+      // Sort by priority ascending
+      homeList.sort((a, b) => {
+        const pA = Number(a.metadata?.priority ?? Number.MAX_SAFE_INTEGER)
+        const pB = Number(b.metadata?.priority ?? Number.MAX_SAFE_INTEGER)
+        if (pA !== pB) return pA - pB
+        return a.title.localeCompare(b.title)
+      })
+
+      setCollections(homeList)
     } catch (err) {
       console.error("Failed to load collections:", err)
       toast.error("Error", { description: "Failed to load home collections" })

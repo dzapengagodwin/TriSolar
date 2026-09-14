@@ -117,7 +117,6 @@ export const POST = async (
     metadata: body.metadata || null,
   }
 
-  const updatedSeo = await seoService.upsertForEntity("brand", brand.id, cleanData)
   const { result: updatedSeo } = await upsertEntitySeoWorkflow(req.scope).run({
     input: {
       entityType: "brand",
