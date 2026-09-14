@@ -16,3 +16,4 @@ export const upsertEntitySeoWorkflow = createWorkflow(
     return new WorkflowResponse(seo)
   }
 )
+

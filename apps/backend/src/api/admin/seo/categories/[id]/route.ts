@@ -71,6 +71,7 @@ export const POST = async (
   }
 
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
+  const seoService: SeoModuleService = req.scope.resolve(SEO_MODULE)
 
   const { data: categories } = await query.graph({
     entity: "product_category",
@@ -115,6 +116,7 @@ export const POST = async (
     metadata: body.metadata || null,
   }
 
+  const updatedSeo = await seoService.upsertForEntity("category", id, cleanData)
   const { result: updatedSeo } = await upsertEntitySeoWorkflow(req.scope).run({
     input: {
       entityType: "category",
