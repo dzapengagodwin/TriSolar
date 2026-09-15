@@ -22,8 +22,6 @@ export function getCheckoutStep(cart: HttpTypes.StoreCart) {
 }
 
 const Summary = ({ cart }: SummaryProps) => {
-  const step = getCheckoutStep(cart)
-
   return (
     <div className="flex flex-col gap-y-5">
       <h2 className="text-xl font-black text-black tracking-tight">
@@ -33,7 +31,7 @@ const Summary = ({ cart }: SummaryProps) => {
       <Divider />
       <CartTotals totals={cart} />
       <LocalizedClientLink
-        href={"/checkout?step=" + step}
+        href="/checkout"
         data-testid="checkout-button"
         className="w-full"
       >

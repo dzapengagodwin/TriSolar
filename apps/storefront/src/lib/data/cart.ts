@@ -1,5 +1,6 @@
 "use server"
 
+import { isManual, isPesepay, isStripeLike } from "@lib/constants"
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
@@ -522,3 +523,216 @@ export async function listCartOptions() {
     cache: "force-cache",
   })
 }
+
+export type CheckoutAddressData = {
+  first_name: string
+  last_name: string
+  address_1: string
+  address_2?: string
+  company?: string
+  postal_code?: string
+  city: string
+  country_code: string
+  province?: string
+  phone: string
+}
+
+export type CheckoutFormData = {
+  email: string
+  shipping_address: CheckoutAddressData
+  billing_address?: CheckoutAddressData
+  same_as_billing?: boolean
+  shipping_method_id: string
+  payment_provider_id: string
+}
+
+export async function submitOnePageCheckout(data: CheckoutFormData) {
+  const cartId = await getCartId()
+  if (!cartId) {
+    return { error: "No active cart found." }
+  }
+
+  const headers = await getAuthHeaders()
+
+  try {
+    const shippingAddress = {
+      first_name: data.shipping_address.first_name.trim(),
+      last_name: data.shipping_address.last_name.trim(),
+      address_1: data.shipping_address.address_1.trim(),
+      address_2: data.shipping_address.address_2?.trim() || "",
+      company: data.shipping_address.company?.trim() || "",
+      postal_code: data.shipping_address.postal_code?.trim() || "",
+      city: data.shipping_address.city.trim(),
+      country_code: data.shipping_address.country_code.trim().toLowerCase(),
+      province: data.shipping_address.province?.trim() || "",
+      phone: data.shipping_address.phone.trim(),
+    }
+
+    const billingAddress =
+      data.same_as_billing !== false &&
+      (!data.billing_address || !data.billing_address.address_1)
+        ? shippingAddress
+        : {
+            first_name:
+              data.billing_address?.first_name?.trim() ||
+              shippingAddress.first_name,
+            last_name:
+              data.billing_address?.last_name?.trim() ||
+              shippingAddress.last_name,
+            address_1:
+              data.billing_address?.address_1?.trim() ||
+              shippingAddress.address_1,
+            address_2: data.billing_address?.address_2?.trim() || "",
+            company: data.billing_address?.company?.trim() || "",
+            postal_code:
+              data.billing_address?.postal_code?.trim() || "",
+            city:
+              data.billing_address?.city?.trim() || shippingAddress.city,
+            country_code: (
+              data.billing_address?.country_code?.trim() ||
+              shippingAddress.country_code
+            ).toLowerCase(),
+            province: data.billing_address?.province?.trim() || "",
+            phone:
+              data.billing_address?.phone?.trim() || shippingAddress.phone,
+          }
+
+    // 1. Update cart with email & addresses
+    await sdk.store.cart.update(
+      cartId,
+      {
+        email: data.email.trim(),
+        shipping_address: shippingAddress,
+        billing_address: billingAddress,
+      },
+      {},
+      headers
+    )
+
+    // 2. Set shipping method if provided
+    if (data.shipping_method_id) {
+      await sdk.store.cart.addShippingMethod(
+        cartId,
+        { option_id: data.shipping_method_id },
+        {},
+        headers
+      )
+    }
+
+    // 3. Re-fetch fresh cart state
+    const freshCart = await retrieveCart(cartId)
+    if (!freshCart) {
+      return { error: "Failed to retrieve cart details after saving addresses." }
+    }
+
+    // 4. Validate payment provider
+    if (!data.payment_provider_id) {
+      return { error: "Please select a payment method." }
+    }
+
+    // 5. Initiate payment session
+    let paymentSessionRes: HttpTypes.StorePaymentCollectionResponse | undefined
+    try {
+      paymentSessionRes = await sdk.store.payment.initiatePaymentSession(
+        freshCart,
+        { provider_id: data.payment_provider_id },
+        {},
+        headers
+      )
+    } catch (payErr: unknown) {
+      const errorObj = payErr as {
+        response?: { data?: { message?: string } }
+        message?: string
+      }
+      const msg =
+        errorObj?.response?.data?.message ||
+        errorObj?.message ||
+        "Failed to initialize payment method."
+      return { error: msg }
+    }
+
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+
+    const countryCode =
+      shippingAddress.country_code ||
+      freshCart.shipping_address?.country_code?.toLowerCase() ||
+      "zw"
+
+    // 6. Provider-specific actions
+    // A) Pesepay
+    if (isPesepay(data.payment_provider_id)) {
+      const sessions =
+        paymentSessionRes?.payment_collection?.payment_sessions ||
+        freshCart.payment_collection?.payment_sessions ||
+        []
+      const session =
+        sessions.find((s) => isPesepay(s.provider_id)) || sessions[0]
+      const sData = (session?.data || {}) as Record<string, unknown>
+      const redirectUrl = (sData.redirectUrl ||
+        sData.redirect_url ||
+        sData.payment_url) as string | undefined
+
+      if (redirectUrl) {
+        return { success: true, redirectUrl }
+      }
+      return {
+        error:
+          "Pesepay payment gateway URL could not be generated. Please try again or choose another payment method.",
+      }
+    }
+
+    // B) Manual / Pay on Collection
+    if (
+      isManual(data.payment_provider_id) ||
+      data.payment_provider_id === "pp_system_default"
+    ) {
+      const completeRes = await sdk.store.cart.complete(cartId, {}, headers)
+      if (completeRes?.type === "order" && completeRes.order) {
+        const orderCacheTag = await getCacheTag("orders")
+        revalidateTag(orderCacheTag)
+        await removeCartId()
+        return {
+          success: true,
+          orderId: completeRes.order.id,
+          redirectUrl: `/${countryCode}/order/${completeRes.order.id}/confirmed`,
+        }
+      } else {
+        const errorObj = completeRes as unknown as {
+          error?: { message?: string }
+        }
+        const err =
+          errorObj?.error?.message ||
+          "Could not complete order with Pay on Collection. Please try again."
+        return { error: err }
+      }
+    }
+
+    // C) Stripe
+    if (isStripeLike(data.payment_provider_id)) {
+      const sessions =
+        paymentSessionRes?.payment_collection?.payment_sessions || []
+      const session = sessions.find((s) => isStripeLike(s.provider_id))
+      return {
+        success: true,
+        requiresStripeConfirm: true,
+        clientSecret: session?.data?.client_secret as string,
+      }
+    }
+
+    return { success: true }
+  } catch (err: unknown) {
+    console.error("submitOnePageCheckout error:", err)
+    const errorObj = err as {
+      response?: { data?: { message?: string } }
+      message?: string
+    }
+    return {
+      error:
+        errorObj?.response?.data?.message ||
+        errorObj?.message ||
+        "An unexpected error occurred during checkout.",
+    }
+  }
+}
+

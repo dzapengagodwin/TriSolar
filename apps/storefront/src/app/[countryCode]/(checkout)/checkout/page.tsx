@@ -1,10 +1,9 @@
 import { getOrSetCart, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
-import { getCheckoutStep } from "@modules/cart/templates/summary"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
-import { notFound, redirect } from "next/navigation"
+import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -16,7 +15,6 @@ export default async function Checkout(props: {
   searchParams: Promise<{ step?: string }>
 }) {
   const params = await props.params
-  const searchParams = await props.searchParams
   const { countryCode } = params
 
   const cart = await getOrSetCart(countryCode).catch(async () => {
@@ -25,10 +23,6 @@ export default async function Checkout(props: {
 
   if (!cart) {
     return notFound()
-  }
-
-  if (!searchParams.step) {
-    redirect(`/${countryCode}/checkout?step=${getCheckoutStep(cart)}`)
   }
 
   const customer = await retrieveCustomer()

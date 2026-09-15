@@ -472,7 +472,7 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
               </LocalizedClientLink>
 
               <LocalizedClientLink
-                href="/checkout?step=address"
+                href="/checkout"
                 onClick={close}
                 className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg"
               >
