@@ -124,7 +124,6 @@ export default function MegaMenuNav() {
         )
       })}
 
-      {/* New Releases Accent Link */}
       {/* Hot Deals Link */}
       <LocalizedClientLink
         href="/store"
@@ -132,7 +131,6 @@ export default function MegaMenuNav() {
         className="bg-[#e62e04] hover:bg-[#c92500] text-white px-3.5 py-1.5 rounded-md transition-colors uppercase tracking-wider text-[11px] font-black shadow-xs ml-1"
         className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-black ml-1"
       >
-        New Releases
         <span>Hot Deals</span>
        <svg className="w-3.5 h-3.5"
   fill="currentColor"
