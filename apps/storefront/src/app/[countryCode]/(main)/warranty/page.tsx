@@ -5,7 +5,6 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 export const metadata: Metadata = {
   title: "Warranty Policy | Laptopzone",
   description:
-    "Explore Laptopzone's warranty coverage for new and certified pre-owned laptops, hardware defect protections, exclusions, and warranty claim procedures in Zimbabwe.",
     "Explore Laptopzone's warranty coverage for brand-new laptops and computers, hardware defect protections, exclusions, and warranty claim procedures in Zimbabwe.",
 }
 
@@ -31,21 +30,13 @@ export default async function WarrantyPage() {
             <tr>
               <td className="p-3.5 sm:p-4 font-semibold text-gray-900">Brand-New Laptops &amp; Desktops</td>
               <td className="p-3.5 sm:p-4 text-gray-600">12 to 24 Months</td>
-              <td className="p-3.5 sm:p-4 text-gray-600">Official Manufacturer / Local Retailer Warranty</td>
               <td className="p-3.5 sm:p-4 text-gray-600">Official Manufacturer / Authorized Retailer Warranty</td>
             </tr>
             <tr className="bg-gray-50/50">
-              <td className="p-3.5 sm:p-4 font-semibold text-gray-900">Certified Pre-Owned Laptops</td>
-              <td className="p-3.5 sm:p-4 text-gray-600">6 Months</td>
-              <td className="p-3.5 sm:p-4 text-gray-600">Laptopzone Certified Hardware Warranty</td>
-            </tr>
-            <tr>
               <td className="p-3.5 sm:p-4 font-semibold text-gray-900">Laptop Batteries &amp; AC Adapters</td>
-              <td className="p-3.5 sm:p-4 text-gray-600">3 to 6 Months</td>
               <td className="p-3.5 sm:p-4 text-gray-600">6 to 12 Months</td>
               <td className="p-3.5 sm:p-4 text-gray-600">Consumable Component Limited Warranty</td>
             </tr>
-            <tr className="bg-gray-50/50">
             <tr>
               <td className="p-3.5 sm:p-4 font-semibold text-gray-900">Peripherals &amp; Accessories</td>
               <td className="p-3.5 sm:p-4 text-gray-600">6 to 12 Months</td>

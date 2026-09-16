@@ -95,10 +95,8 @@ export default function MegaMenuNav() {
             }}
             aria-expanded={isOpen}
             aria-controls={menuPanelId}
-            className={`px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer ${
-              isOpen
-                ? "bg-white text-black border-t-2 border-primary shadow-sm rounded-t-md"
-                : "text-white hover:text-white hover:bg-gray-800 rounded-md"
+            className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer rounded-md ${
+              isOpen ? "bg-gray-800" : "hover:bg-gray-800"
             }`}
           >
             <span>{menu.label}</span>
