@@ -27,7 +27,7 @@ export default function CheckoutLayout({
       <div className="bg-black text-white text-xs py-2 text-center font-medium">
         <div className="content-container flex justify-center items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
-          <span>Fast & Secure Checkout • 100% Money Back Guarantee</span>
+          <span>Fast & Secure Checkout</span>
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function CheckoutLayout({
           {/* 256-Bit SSL Security Badge */}
           <div className="flex items-center gap-1.5 bg-gray-100 text-black text-xs font-bold px-3 py-1.5 rounded-full border border-gray-200">
             <LockClosedSolid className="w-4 h-4 text-black" />
-            <span className="hidden md:inline">256-Bit SSL Encrypted</span>
+            <span className="hidden md:inline">Encrypted</span>
             <span className="inline md:hidden">Secure</span>
           </div>
         </nav>

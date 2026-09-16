@@ -386,7 +386,7 @@ const OnePageCheckoutForm = ({
     }
 
     if (isPesepay(paymentProviderId)) {
-      return "Pay with Pesepay (EcoCash, Cards) →"
+      return "Pay with Pesepay →"
     }
 
     if (isManual(paymentProviderId) || paymentProviderId === "pp_system_default") {
