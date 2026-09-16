@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false)
@@ -35,7 +36,11 @@ export default function CookieConsent() {
           Cookie Settings
         </h3>
         <p className="text-xs text-gray-500 leading-relaxed font-medium">
-          We use cookies to enhance your shopping experience, analyze site usage, and serve personalized offers. By clicking &quot;Accept&quot;, you consent to our use of cookies.
+          We use cookies to enhance your shopping experience, analyze site usage, and serve personalized offers. Learn more in our{" "}
+          <LocalizedClientLink href="/cookies" className="underline hover:text-gray-900 font-semibold">
+            Cookie Policy
+          </LocalizedClientLink>
+          . By clicking &quot;Accept&quot;, you consent to our use of cookies.
         </p>
       </div>
 

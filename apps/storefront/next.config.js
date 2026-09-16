@@ -70,6 +70,60 @@ const nextConfig = {
         : []),
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: "/:countryCode/terms-and-conditions",
+        destination: "/:countryCode/terms",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/content/terms-of-use",
+        destination: "/:countryCode/terms",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/privacy-policy",
+        destination: "/:countryCode/privacy",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/content/privacy-policy",
+        destination: "/:countryCode/privacy",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/warranty-policy",
+        destination: "/:countryCode/warranty",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/shipping-policy",
+        destination: "/:countryCode/shipping",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/delivery-and-shipping",
+        destination: "/:countryCode/shipping",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/cookie-policy",
+        destination: "/:countryCode/cookies",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/returns-and-refunds",
+        destination: "/:countryCode/returns",
+        permanent: true,
+      },
+      {
+        source: "/:countryCode/refund-policy",
+        destination: "/:countryCode/returns",
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

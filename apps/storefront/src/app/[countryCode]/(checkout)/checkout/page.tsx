@@ -7,7 +7,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "Checkout | NexCart",
+  title: "Checkout | Laptopzone",
 }
 
 export default async function Checkout(props: {

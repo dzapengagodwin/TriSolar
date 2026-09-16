@@ -21,6 +21,7 @@ import Input from "@modules/common/components/input"
 import CountrySelect from "@modules/checkout/components/country-select"
 import AddressSelect from "@modules/checkout/components/address-select"
 import CheckboxWithLabel from "@modules/common/components/checkbox"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
 import { clx } from "@modules/common/components/ui"
 
@@ -854,7 +855,19 @@ const OnePageCheckoutForm = ({
       {/* SECTION 4: Order Submission */}
       <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm space-y-4">
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
-          By clicking <span className="font-bold text-black">{getSubmitButtonLabel()}</span>, you confirm that you accept our Terms of Sale and Returns Policy, and acknowledge NexCart&apos;s Privacy Policy.
+          By clicking <span className="font-bold text-black">{getSubmitButtonLabel()}</span>, you confirm that you accept our{" "}
+          <LocalizedClientLink href="/terms" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+            Terms &amp; Conditions
+          </LocalizedClientLink>{" "}
+          and{" "}
+          <LocalizedClientLink href="/returns" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+            Returns Policy
+          </LocalizedClientLink>
+          , and acknowledge Laptopzone&apos;s{" "}
+          <LocalizedClientLink href="/privacy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+            Privacy Policy
+          </LocalizedClientLink>
+          .
         </div>
 
         <button

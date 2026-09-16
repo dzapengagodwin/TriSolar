@@ -83,17 +83,17 @@ const Register = ({ setCurrentView }: Props) => {
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
           By creating an account, you agree to Laptopzone&apos;s{" "}
           <LocalizedClientLink
-            href="/content/privacy-policy"
-            className="underline"
+            href="/privacy"
+            className="underline hover:text-black font-semibold"
           >
             Privacy Policy
           </LocalizedClientLink>{" "}
           and{" "}
           <LocalizedClientLink
-            href="/content/terms-of-use"
-            className="underline"
+            href="/terms"
+            className="underline hover:text-black font-semibold"
           >
-            Terms of Use
+            Terms &amp; Conditions
           </LocalizedClientLink>
           .
         </span>

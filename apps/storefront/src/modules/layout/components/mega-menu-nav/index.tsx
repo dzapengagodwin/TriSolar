@@ -78,7 +78,6 @@ export default function MegaMenuNav() {
       onMouseLeave={handleMouseLeave}
       onMouseEnter={clearCloseTimeout}
       onBlur={handleFocusOut}
-      className="flex items-center gap-0.5 font-bold text-xs relative"
       className="flex items-center gap-0.5 font-bold text-xs"
     >
       {/* Dynamic Department Tabs */}
@@ -96,12 +95,11 @@ export default function MegaMenuNav() {
             }}
             aria-expanded={isOpen}
             aria-controls={menuPanelId}
-            className={`px-3.5 py-2 rounded-t-md transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer ${
+            className={`px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer ${
               isOpen
-                ? "bg-white text-black border-t-2 border-primary shadow-sm"
-                : "text-white hover:text-black hover:bg-black/5"
+                ? "bg-white text-black border-t-2 border-primary shadow-sm rounded-t-md"
+                : "text-white hover:text-white hover:bg-gray-800 rounded-md"
             }`}
-            className="px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer hover:bg-gray-800"
           >
             <span>{menu.label}</span>
             <svg
@@ -128,8 +126,7 @@ export default function MegaMenuNav() {
       <LocalizedClientLink
         href="/store"
         onClick={closeMenu}
-        className="bg-[#e62e04] hover:bg-[#c92500] text-white px-3.5 py-1.5 rounded-md transition-colors uppercase tracking-wider text-[11px] font-black shadow-xs ml-1"
-        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-black ml-1"
+        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-black ml-1 rounded-md"
       >
         <span>Hot Deals</span>
        <svg className="w-3.5 h-3.5"
@@ -150,7 +147,6 @@ export default function MegaMenuNav() {
         <div
           id={menuPanelId}
           onMouseEnter={clearCloseTimeout}
-          className="absolute top-full left-0 right-0 w-full bg-white border border-gray-200 rounded-b-2xl shadow-2xl z-50 p-6 overflow-hidden animate-fade-in text-gray-900"
           className="absolute top-full left-0 right-0 w-full bg-white border border-gray-200 shadow-2xl z-50 p-6 overflow-hidden animate-fade-in text-gray-900"
           style={{ transformOrigin: "top left" }}
         >

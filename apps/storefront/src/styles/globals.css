@@ -67,11 +67,11 @@ body {
     @apply max-w-[1440px] w-full mx-auto px-4 sm:px-6;
   }
 
-  .nexcart-btn-black {
+  .laptopzone-btn-black {
     @apply px-5 py-2.5 bg-black hover:bg-gray-800 text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
   }
 
-  .nexcart-btn-amber {
+  .laptopzone-btn-amber {
     @apply px-5 py-2.5 bg-primary hover:bg-primary-hover text-white font-bold rounded-full transition-all duration-200 shadow-sm flex items-center justify-center gap-2 text-xs uppercase tracking-wider;
   }
 

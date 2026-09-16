@@ -279,10 +279,10 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/cart"
+                  href="/shipping"
                   className="hover:text-white transition-colors block"
                 >
-                  Shopping Cart
+                  Delivery &amp; Shipping
                 </LocalizedClientLink>
               </li>
               <li>
@@ -290,7 +290,15 @@ export default async function Footer() {
                   href="/returns"
                   className="hover:text-white transition-colors block"
                 >
-                  Returns & Refunds
+                  Returns &amp; Refunds
+                </LocalizedClientLink>
+              </li>
+              <li>
+                <LocalizedClientLink
+                  href="/warranty"
+                  className="hover:text-white transition-colors block"
+                >
+                  Warranty Policy
                 </LocalizedClientLink>
               </li>
               <li>
@@ -316,20 +324,48 @@ export default async function Footer() {
 
       {/* Bottom Bar: Copyright & Payment Badges */}
       <div
-        className="bg-[#181818] border-t border-[#2d2d2d] py-4"
+        className="bg-[#181818] border-t border-[#2d2d2d] py-5"
         suppressHydrationWarning
       >
         <div
-          className="content-container flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400"
+          className="content-container flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-gray-400"
           suppressHydrationWarning
         >
-          <div>
-            &copy; <span className="text-white font-semibold">Laptopzone</span>{" "}
-            - All Rights Reserved
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+            <div>
+              &copy; <span className="text-white font-semibold">Laptopzone</span>{" "}
+              - All Rights Reserved
+            </div>
+            <span className="hidden sm:inline text-gray-600">|</span>
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-gray-400">
+              <LocalizedClientLink href="/terms" className="hover:text-white transition-colors">
+                Terms &amp; Conditions
+              </LocalizedClientLink>
+              <span>&bull;</span>
+              <LocalizedClientLink href="/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </LocalizedClientLink>
+              <span>&bull;</span>
+              <LocalizedClientLink href="/returns" className="hover:text-white transition-colors">
+                Returns &amp; Refunds
+              </LocalizedClientLink>
+              <span>&bull;</span>
+              <LocalizedClientLink href="/warranty" className="hover:text-white transition-colors">
+                Warranty
+              </LocalizedClientLink>
+              <span>&bull;</span>
+              <LocalizedClientLink href="/shipping" className="hover:text-white transition-colors">
+                Shipping
+              </LocalizedClientLink>
+              <span>&bull;</span>
+              <LocalizedClientLink href="/cookies" className="hover:text-white transition-colors">
+                Cookies
+              </LocalizedClientLink>
+            </div>
           </div>
 
           {/* Payment Method Badges */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <div className="px-3 py-1 flex items-center justify-center">
               <Image
                 src="/payment-methods.png"

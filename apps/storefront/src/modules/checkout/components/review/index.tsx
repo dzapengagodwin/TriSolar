@@ -4,6 +4,7 @@ import { clx } from "@modules/common/components/ui"
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   const searchParams = useSearchParams()
@@ -42,7 +43,19 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
         <>
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
             <p className="text-xs text-gray-700 leading-relaxed">
-              By clicking <span className="font-bold text-black">Place Order</span>, you confirm that you accept our Terms of Sale and Returns Policy, and acknowledge NexCart&apos;s Privacy Policy.
+              By clicking <span className="font-bold text-black">Place Order</span>, you confirm that you accept our{" "}
+              <LocalizedClientLink href="/terms" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+                Terms &amp; Conditions
+              </LocalizedClientLink>{" "}
+              and{" "}
+              <LocalizedClientLink href="/returns" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+                Returns Policy
+              </LocalizedClientLink>
+              , and acknowledge Laptopzone&apos;s{" "}
+              <LocalizedClientLink href="/privacy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+                Privacy Policy
+              </LocalizedClientLink>
+              .
             </p>
           </div>
           <PaymentButton cart={cart} data-testid="submit-order-button" />
