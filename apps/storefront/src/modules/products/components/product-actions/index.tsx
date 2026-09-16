@@ -1,6 +1,7 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
+import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
 import {
   addToWishlist,
   isVariantInWishlist,
@@ -158,13 +159,23 @@ export default function ProductActions({
 
     setIsAdding(true)
 
-    await addToCart({
-      variantId: selectedVariant.id,
-      quantity,
-      countryCode,
-    })
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      })
 
-    setIsAdding(false)
+      trackAddToCart({
+        item: transformProductToGA4Item(product, selectedVariant, quantity),
+        quantity,
+        currency: region.currency_code?.toUpperCase() || "USD",
+      })
+    } catch (error) {
+      console.error("Failed to add item to cart:", error)
+    } finally {
+      setIsAdding(false)
+    }
   }
 
   // Toggle the selected variant in the wishlist

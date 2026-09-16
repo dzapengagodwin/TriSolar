@@ -2,6 +2,7 @@ import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
+import CartViewTracker from "../components/cart-view-tracker"
 import { HttpTypes } from "@medusajs/types"
 
 const CartTemplate = ({
@@ -13,6 +14,7 @@ const CartTemplate = ({
 }) => {
   return (
     <div className="py-8 sm:py-12 bg-[#F8FAF9] min-h-screen">
+      <CartViewTracker cart={cart} />
       <div className="content-container" data-testid="cart-container">
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 small:grid-cols-[1fr_340px] medium:grid-cols-[1fr_380px] gap-6 sm:gap-8 items-start">

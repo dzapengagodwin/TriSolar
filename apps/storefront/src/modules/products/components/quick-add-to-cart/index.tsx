@@ -4,6 +4,7 @@ import { useState, useTransition, useMemo, MouseEvent } from "react"
 import { useParams } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { addToCart } from "@lib/data/cart"
+import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
 
@@ -65,6 +66,10 @@ export default function QuickAddToCart({
           variantId: targetVariant.id,
           quantity: 1,
           countryCode,
+        })
+        trackAddToCart({
+          item: transformProductToGA4Item(product, targetVariant, 1),
+          quantity: 1,
         })
         setIsAdded(true)
         // Automatically trigger cart slideout drawer

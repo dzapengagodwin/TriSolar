@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useMemo, useEffect, useTransition } from "react"
+import React, { useState, useMemo, useEffect, useRef, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
@@ -17,6 +17,12 @@ import {
   isManual,
   isStripeLike,
 } from "@lib/constants"
+import {
+  trackBeginCheckout,
+  trackAddShippingInfo,
+  trackAddPaymentInfo,
+  transformLineItemToGA4Item,
+} from "@lib/analytics/ecommerce"
 import Input from "@modules/common/components/input"
 import CountrySelect from "@modules/checkout/components/country-select"
 import AddressSelect from "@modules/checkout/components/address-select"
@@ -107,6 +113,20 @@ const OnePageCheckoutForm = ({
 
   // Calculated shipping prices
   const [calculatedPricesMap, setCalculatedPricesMap] = useState<Record<string, number>>({})
+
+  // Track GA4 begin_checkout event once on mount
+  const hasTrackedBeginCheckout = useRef(false)
+  useEffect(() => {
+    if (!hasTrackedBeginCheckout.current && cart?.items?.length) {
+      const items = cart.items.map((item) => transformLineItemToGA4Item(item))
+      trackBeginCheckout({
+        items,
+        total: cart.total ?? 0,
+        currency: cart.currency_code?.toUpperCase() || "USD",
+      })
+      hasTrackedBeginCheckout.current = true
+    }
+  }, [cart])
 
   const countriesInRegion = useMemo(
     () => cart?.region?.countries?.map((c) => c.iso_2),
@@ -206,6 +226,16 @@ const OnePageCheckoutForm = ({
       })
     }
 
+    const selectedOption = availableShippingMethods.find((sm) => sm.id === id)
+    if (cart.items?.length) {
+      trackAddShippingInfo({
+        items: cart.items.map((item) => transformLineItemToGA4Item(item)),
+        total: cart.total ?? 0,
+        currency: cart.currency_code?.toUpperCase() || "USD",
+        shippingTier: selectedOption?.name || id,
+      })
+    }
+
     setUpdatingShipping(true)
     try {
       await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
@@ -227,6 +257,16 @@ const OnePageCheckoutForm = ({
         const copy = { ...prev }
         delete copy["payment_provider_id"]
         return copy
+      })
+    }
+
+    if (cart.items?.length) {
+      const paymentTitle = paymentInfoMap[providerId]?.title || providerId
+      trackAddPaymentInfo({
+        items: cart.items.map((item) => transformLineItemToGA4Item(item)),
+        total: cart.total ?? 0,
+        currency: cart.currency_code?.toUpperCase() || "USD",
+        paymentType: paymentTitle,
       })
     }
   }

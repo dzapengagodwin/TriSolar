@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { updateConsent } from "@lib/analytics/gtag"
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false)
@@ -16,11 +17,13 @@ export default function CookieConsent() {
 
   const handleAccept = () => {
     localStorage.setItem("cookie-consent-accepted", "true")
+    updateConsent("granted")
     setIsVisible(false)
   }
 
   const handleDecline = () => {
     localStorage.setItem("cookie-consent-accepted", "false")
+    updateConsent("denied")
     setIsVisible(false)
   }
 

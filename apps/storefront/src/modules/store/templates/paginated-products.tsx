@@ -5,6 +5,7 @@ import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import CatalogToolbar from "@modules/store/components/catalog-toolbar"
+import ProductListViewTracker from "@modules/products/components/product-list-view-tracker"
 import clsx from "clsx"
 
 const PRODUCT_LIMIT = 12
@@ -93,6 +94,13 @@ export default async function PaginatedProducts({
 
   return (
     <div className="w-full">
+      {products.length > 0 && (
+        <ProductListViewTracker
+          products={products}
+          listId={categoryId || collectionId || "catalog"}
+          listName={title || "Product Catalog"}
+        />
+      )}
       {/* Top Catalog Status & Control Toolbar */}
       <CatalogToolbar
         totalCount={count}

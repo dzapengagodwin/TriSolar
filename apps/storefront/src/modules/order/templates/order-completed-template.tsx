@@ -5,6 +5,7 @@ import { cookies as nextCookies } from "next/headers"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import OnboardingCta from "@modules/order/components/onboarding-cta"
 import Thumbnail from "@modules/products/components/thumbnail"
+import OrderPurchaseTracker from "@modules/order/components/order-purchase-tracker"
 
 type OrderCompletedTemplateProps = {
   order: HttpTypes.StoreOrder
@@ -23,6 +24,7 @@ export default async function OrderCompletedTemplate({
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-gray-50/60 py-8 sm:py-12">
+      <OrderPurchaseTracker order={order} />
       <div className="content-container max-w-3xl mx-auto px-4">
         {isOnboarding && <OnboardingCta orderId={order.id} />}
 

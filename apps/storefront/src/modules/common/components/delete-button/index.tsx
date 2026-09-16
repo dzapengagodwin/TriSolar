@@ -2,23 +2,40 @@ import { deleteLineItem } from "@lib/data/cart"
 import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@modules/common/components/ui"
 import { useState } from "react"
+import { HttpTypes } from "@medusajs/types"
+import { trackRemoveFromCart, transformLineItemToGA4Item } from "@lib/analytics/ecommerce"
 
 const DeleteButton = ({
   id,
   children,
   className,
+  item,
+  currencyCode = "USD",
 }: {
   id: string
   children?: React.ReactNode
   className?: string
+  item?: HttpTypes.StoreCartLineItem | Record<string, unknown>
+  currencyCode?: string
 }) => {
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async (id: string) => {
     setIsDeleting(true)
-    await deleteLineItem(id).catch((_err) => {
+    try {
+      await deleteLineItem(id)
+      if (item) {
+        trackRemoveFromCart({
+          item: transformLineItemToGA4Item(item),
+          quantity: typeof item.quantity === "number" ? item.quantity : 1,
+          currency: currencyCode.toUpperCase(),
+        })
+      }
+    } catch (_err) {
+      // ignore
+    } finally {
       setIsDeleting(false)
-    })
+    }
   }
 
   return (

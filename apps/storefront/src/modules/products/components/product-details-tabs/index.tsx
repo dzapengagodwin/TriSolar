@@ -5,6 +5,7 @@ import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { convertToLocale } from "@lib/util/money"
 import { addToCart } from "@lib/data/cart"
+import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
 import { getProductRecommendations } from "@lib/data/recommendations"
 import {
   listProductReviews,
@@ -200,6 +201,11 @@ export default function ProductDetailsTabs({
     startTransition(async () => {
       try {
         await addToCart({ variantId, quantity: 1, countryCode })
+        trackAddToCart({
+          item: transformProductToGA4Item(accessory, accessory.variants?.[0], 1),
+          quantity: 1,
+          currency: region?.currency_code?.toUpperCase() || "USD",
+        })
         setAddedAccessoryId(accessory.id)
         setTimeout(() => setAddedAccessoryId(null), 2500)
       } finally {

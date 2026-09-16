@@ -2,6 +2,12 @@
 
 import { convertToLocale } from "@lib/util/money"
 import { deleteLineItem, updateLineItem, addToCart } from "@lib/data/cart"
+import {
+  trackAddToCart,
+  trackRemoveFromCart,
+  transformLineItemToGA4Item,
+  transformProductToGA4Item,
+} from "@lib/analytics/ecommerce"
 import { getCartAccessoryRecommendations } from "@lib/data/recommendations"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
@@ -87,6 +93,11 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
           quantity: 1,
           countryCode,
         })
+        trackAddToCart({
+          item: transformProductToGA4Item(accessory, accessory.variants?.[0], 1),
+          quantity: 1,
+          currency: cartState?.currency_code?.toUpperCase() || "USD",
+        })
       } finally {
         setAddingAccessoryId(null)
       }
@@ -153,10 +164,18 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
   }
 
   const handleDelete = (lineId: string) => {
+    const itemToDelete = cartState?.items?.find((i) => i.id === lineId)
     setUpdatingLineId(lineId)
     startTransition(async () => {
       try {
         await deleteLineItem(lineId)
+        if (itemToDelete) {
+          trackRemoveFromCart({
+            item: transformLineItemToGA4Item(itemToDelete),
+            quantity: itemToDelete.quantity,
+            currency: cartState?.currency_code?.toUpperCase() || "USD",
+          })
+        }
       } finally {
         setUpdatingLineId(null)
       }
