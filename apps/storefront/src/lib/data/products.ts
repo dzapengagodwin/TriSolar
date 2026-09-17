@@ -5,6 +5,13 @@ import { OptionValueIds } from "@lib/util/product-option-filters"
 import { sortProducts } from "@lib/util/sort-products"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import {
+  CACHE_TAGS,
+  productTag,
+  productHandleTag,
+  categoryTag,
+  collectionTag,
+} from "@lib/cache-tags"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
@@ -56,9 +63,36 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("products")),
+  const sessionNext = await getCacheOptions("products")
+
+  const extraTags: string[] = []
+  if (queryParams?.category_id) {
+    const catIds = Array.isArray(queryParams.category_id)
+      ? queryParams.category_id
+      : [queryParams.category_id]
+    catIds.forEach((id) => extraTags.push(categoryTag(id)))
   }
+  if (queryParams?.collection_id) {
+    const colIds = Array.isArray(queryParams.collection_id)
+      ? queryParams.collection_id
+      : [queryParams.collection_id]
+    colIds.forEach((id) => extraTags.push(collectionTag(id)))
+  }
+  if (queryParams?.handle) {
+    extraTags.push(productHandleTag(queryParams.handle))
+  }
+  if (queryParams?.id) {
+    const ids = Array.isArray(queryParams.id) ? queryParams.id : [queryParams.id]
+    ids.forEach((id) => extraTags.push(productTag(id)))
+  }
+
+  const tags = Array.from(
+    new Set([
+      CACHE_TAGS.products,
+      ...(sessionNext.tags || []),
+      ...extraTags,
+    ])
+  )
 
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
@@ -74,8 +108,11 @@ export const listProducts = async ({
           ...queryParams,
         },
         headers,
-        next,
-        cache: "no-store",
+        next: {
+          ...sessionNext,
+          tags,
+          revalidate: 300,
+        },
       }
     )
     .then(({ products, count }) => {
@@ -203,9 +240,14 @@ export async function getProductRecommendations({
     ...(await getAuthHeaders()),
   }
 
-  const next = {
-    ...(await getCacheOptions("products")),
-  }
+  const sessionNext = await getCacheOptions("products")
+  const tags = Array.from(
+    new Set([
+      CACHE_TAGS.products,
+      productTag(productId),
+      ...(sessionNext.tags || []),
+    ])
+  )
 
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[] }>(
@@ -217,8 +259,11 @@ export async function getProductRecommendations({
           limit,
         },
         headers,
-        next,
-        cache: "no-store",
+        next: {
+          ...sessionNext,
+          tags,
+          revalidate: 300,
+        },
       }
     )
     .then(({ products }) => products || [])

@@ -1,5 +1,6 @@
 import { Metadata } from "next"
-import { getBrandByHandle, listBrands, StoreBrand } from "@lib/data/brands"
+import type { StoreBrand } from "@lib/data/brands"
+import { getBrandByHandle, listBrands } from "@lib/data/brands"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import BrandTemplate from "@modules/brands/templates"

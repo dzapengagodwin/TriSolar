@@ -1,6 +1,8 @@
 import { sdk } from "@lib/config"
 import { getCacheOptions } from "./cookies"
-import { StoreBrand, STATIC_BRANDS } from "@lib/constants/brands"
+import { CACHE_TAGS, brandTag } from "@lib/cache-tags"
+import type { StoreBrand } from "@lib/constants/brands"
+import { STATIC_BRANDS } from "@lib/constants/brands"
 
 export type { StoreBrand }
 export { STATIC_BRANDS }
@@ -40,9 +42,13 @@ export const listBrands = async (query?: {
   limit?: number
   offset?: number
 }): Promise<StoreBrand[]> => {
-  const next = {
-    ...(await getCacheOptions("brands")),
-  }
+  const sessionNext = await getCacheOptions("brands")
+  const tags = Array.from(
+    new Set([
+      CACHE_TAGS.brands,
+      ...(sessionNext.tags || []),
+    ])
+  )
 
   const limit = query?.limit || 100
   const offset = query?.offset || 0
@@ -53,8 +59,11 @@ export const listBrands = async (query?: {
         limit,
         offset,
       },
-      next,
-      cache: "no-store",
+      next: {
+        ...sessionNext,
+        tags,
+        revalidate: 3600,
+      },
     })
     .then(({ brands }) => {
       if (!brands || brands.length === 0) {
@@ -71,14 +80,22 @@ export const listBrands = async (query?: {
 export const getBrandByHandle = async (
   handle: string
 ): Promise<StoreBrand | null> => {
-  const next = {
-    ...(await getCacheOptions("brands")),
-  }
+  const sessionNext = await getCacheOptions("brands")
+  const tags = Array.from(
+    new Set([
+      CACHE_TAGS.brands,
+      brandTag(handle),
+      ...(sessionNext.tags || []),
+    ])
+  )
 
   return sdk.client
     .fetch<{ brand: StoreBrand }>(`/store/brands/${handle}`, {
-      next,
-      cache: "no-store",
+      next: {
+        ...sessionNext,
+        tags,
+        revalidate: 3600,
+      },
     })
     .then(({ brand }) => {
       if (!brand) {

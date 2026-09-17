@@ -10,7 +10,7 @@ import {
 } from "@lib/util/product-option-filters"
 import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
-import { StoreBrand } from "@lib/data/brands"
+import type { StoreBrand } from "@lib/data/brands"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default async function BrandTemplate({

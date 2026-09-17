@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { StoreBrand } from "@lib/data/brands"
+import type { StoreBrand } from "@lib/data/brands"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export default function BrandDirectoryTemplate({
