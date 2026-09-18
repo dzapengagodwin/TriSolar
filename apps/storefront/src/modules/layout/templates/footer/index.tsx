@@ -95,9 +95,12 @@ export default async function Footer() {
                 <span className="block text-[11px] text-gray-400 font-medium tracking-wide">
                   Got Questions ? Call us!
                 </span>
-                <span className="block text-base sm:text-lg font-bold text-white tracking-tight mt-0.5">
+                <a
+                  href="tel:+2638612600600"
+                  className="block text-base sm:text-lg font-bold text-white tracking-tight mt-0.5 hover:text-primary transition-colors"
+                >
                   +263 8612 600 600
-                </span>
+                </a>
               </div>
             </div>
 
@@ -180,22 +183,18 @@ export default async function Footer() {
             </div>
           </div>
 
-          {/* Column 2 & 3: "Find It Fast" with 2 sub-columns (4 cols on lg) */}
-          <div className="lg:col-span-4 space-y-4" suppressHydrationWarning>
-            <h4 className="text-white font-bold text-sm tracking-wide">
-              Find It Fast
-            </h4>
-
+          {/* Column 2 & 3: Categories & Featured (4 cols on lg) */}
+          <div className="lg:col-span-4" suppressHydrationWarning>
             <div
-              className="grid grid-cols-2 gap-6 sm:gap-8 pt-1"
+              className="grid grid-cols-2 gap-6 sm:gap-8"
               suppressHydrationWarning
             >
               {/* Product Categories Sub-column */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+              <div className="space-y-4">
+                <h4 className="text-white font-bold text-sm tracking-wide">
                   Categories
-                </span>
-                <ul className="space-y-2.5 text-gray-400">
+                </h4>
+                <ul className="space-y-2.5 text-gray-400 pt-1">
                   {topCategories.map((cat) => (
                     <li key={cat.id}>
                       <LocalizedClientLink
@@ -206,23 +205,15 @@ export default async function Footer() {
                       </LocalizedClientLink>
                     </li>
                   ))}
-                  <li>
-                    <LocalizedClientLink
-                      href="/store"
-                      className="hover:text-primary transition-colors block font-semibold text-gray-300"
-                    >
-                      All Categories &rarr;
-                    </LocalizedClientLink>
-                  </li>
                 </ul>
               </div>
 
               {/* Collections & Store Links Sub-column */}
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">
+              <div className="space-y-4">
+                <h4 className="text-white font-bold text-sm tracking-wide">
                   Featured
-                </span>
-                <ul className="space-y-2.5 text-gray-400">
+                </h4>
+                <ul className="space-y-2.5 text-gray-400 pt-1">
                   {topCollections.map((col) => (
                     <li key={col.id}>
                       <LocalizedClientLink
@@ -279,10 +270,26 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/shipping"
+                  href="/contact"
                   className="hover:text-white transition-colors block"
                 >
-                  Delivery &amp; Shipping
+                  Customer Support
+                </LocalizedClientLink>
+              </li>
+              <li>
+                <LocalizedClientLink
+                  href="/terms"
+                  className="hover:text-white transition-colors block"
+                >
+                  Terms &amp; Conditions
+                </LocalizedClientLink>
+              </li>
+              <li>
+                <LocalizedClientLink
+                  href="/privacy"
+                  className="hover:text-white transition-colors block"
+                >
+                  Privacy Policy
                 </LocalizedClientLink>
               </li>
               <li>
@@ -298,23 +305,23 @@ export default async function Footer() {
                   href="/warranty"
                   className="hover:text-white transition-colors block"
                 >
-                  Warranty Policy
+                  Warranty
                 </LocalizedClientLink>
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/contact"
+                  href="/shipping"
                   className="hover:text-white transition-colors block"
                 >
-                  Customer Support
+                  Shipping
                 </LocalizedClientLink>
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/store"
+                  href="/cookies"
                   className="hover:text-white transition-colors block"
                 >
-                  Browse Store Catalog
+                  Cookies
                 </LocalizedClientLink>
               </li>
             </ul>
@@ -335,32 +342,6 @@ export default async function Footer() {
             <div>
               &copy; <span className="text-white font-semibold">Laptopzone</span>{" "}
               - All Rights Reserved
-            </div>
-            <span className="hidden sm:inline text-gray-600">|</span>
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px] text-gray-400">
-              <LocalizedClientLink href="/terms" className="hover:text-white transition-colors">
-                Terms &amp; Conditions
-              </LocalizedClientLink>
-              <span>&bull;</span>
-              <LocalizedClientLink href="/privacy" className="hover:text-white transition-colors">
-                Privacy Policy
-              </LocalizedClientLink>
-              <span>&bull;</span>
-              <LocalizedClientLink href="/returns" className="hover:text-white transition-colors">
-                Returns &amp; Refunds
-              </LocalizedClientLink>
-              <span>&bull;</span>
-              <LocalizedClientLink href="/warranty" className="hover:text-white transition-colors">
-                Warranty
-              </LocalizedClientLink>
-              <span>&bull;</span>
-              <LocalizedClientLink href="/shipping" className="hover:text-white transition-colors">
-                Shipping
-              </LocalizedClientLink>
-              <span>&bull;</span>
-              <LocalizedClientLink href="/cookies" className="hover:text-white transition-colors">
-                Cookies
-              </LocalizedClientLink>
             </div>
           </div>
 

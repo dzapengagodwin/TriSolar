@@ -46,7 +46,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
       {/* Category Toggle Button (Orange with Hamburger icon) */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-bold transition-all cursor-pointer relative z-50 shadow-sm ${
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-semibold transition-all cursor-pointer relative z-50 shadow-sm ${
           isOpen
             ? "bg-black text-white"
             : "bg-black text-white hover:bg-gray rounded-b-xl"

@@ -78,7 +78,7 @@ export default function MegaMenuNav() {
       onMouseLeave={handleMouseLeave}
       onMouseEnter={clearCloseTimeout}
       onBlur={handleFocusOut}
-      className="flex items-center gap-0.5 font-bold text-xs"
+      className="flex items-center gap-0.5 font-semibold text-xs"
     >
       {/* Dynamic Department Tabs */}
       {MEGA_MENUS.map((menu) => {
@@ -95,7 +95,7 @@ export default function MegaMenuNav() {
             }}
             aria-expanded={isOpen}
             aria-controls={menuPanelId}
-            className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-black cursor-pointer rounded-md ${
+            className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-semibold cursor-pointer rounded-md ${
               isOpen ? "bg-gray-800" : "hover:bg-gray-800"
             }`}
           >
@@ -124,7 +124,7 @@ export default function MegaMenuNav() {
       <LocalizedClientLink
         href="/store"
         onClick={closeMenu}
-        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-black ml-1 rounded-md"
+        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold ml-1 rounded-md"
       >
         <span>Hot Deals</span>
        <svg className="w-3.5 h-3.5"
@@ -155,7 +155,7 @@ export default function MegaMenuNav() {
                 key={idx}
                 className="col-span-12 sm:col-span-6 lg:col-span-2 space-y-3"
               >
-                <h4 className="text-xs font-black text-gray-900 uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
                   {section.title}
                 </h4>
                 <ul className="space-y-2 text-xs font-medium text-gray-600">

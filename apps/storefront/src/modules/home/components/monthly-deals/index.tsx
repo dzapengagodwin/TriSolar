@@ -151,7 +151,7 @@ function DealProductCard({
     : null
 
   return (
-    <div className="group bg-white rounded-2xl p-3 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-gray-300 hover:shadow-lg transition-all duration-300">
+    <div className="group bg-white rounded-2xl p-3 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:shadow-md transition-all duration-200">
       {/* Discount badge */}
       {discountPct > 0 && (
         <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">

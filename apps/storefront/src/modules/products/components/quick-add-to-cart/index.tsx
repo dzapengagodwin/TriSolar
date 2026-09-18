@@ -102,7 +102,7 @@ export default function QuickAddToCart({
     return (
       <LocalizedClientLink
         href={`/products/${product.handle}`}
-        className={`w-full block bg-black hover:bg-gray-800 text-white text-xs font-bold py-2 px-3 transition-colors uppercase tracking-wider text-center shadow-xs ${className}`}
+        className={`w-full block bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 px-3 transition-colors uppercase tracking-wider text-center shadow-xs ${className}`}
       >
         Select Options
       </LocalizedClientLink>
@@ -125,7 +125,7 @@ export default function QuickAddToCart({
           ? "bg-emerald-600 hover:bg-emerald-700 text-white"
           : isPending
           ? "bg-gray-800 text-white cursor-wait opacity-90"
-          : "bg-black hover:bg-primary text-white"
+          : "bg-primary hover:bg-primary-hover text-white"
       } ${sizeClasses} ${className}`}
       data-testid="quick-add-to-cart-button"
       aria-label={`Add ${product.title} to cart`}

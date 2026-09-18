@@ -22,13 +22,13 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
   }
 
   return (
-    <section className="py-6 sm:py-8 bg-white" aria-label="Top Brands">
+    <section className="py-6 sm:py-8 bg-white" aria-label="Brands">
       <div className="content-container">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-4">
             <h2 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide">
-              TOP BRANDS
+              BRANDS
             </h2>
             <LocalizedClientLink
               href="/brands"

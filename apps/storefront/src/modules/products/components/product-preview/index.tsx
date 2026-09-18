@@ -49,7 +49,7 @@ export default function ProductPreview({
     return (
       <div
         data-testid="product-wrapper"
-        className="group bg-white p-4 border border-gray-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative hover:border-black transition-all shadow-xs w-full"
+        className="group bg-white p-4 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative transition-all duration-200 shadow-xs hover:shadow-md w-full"
       >
         {/* Left: Thumbnail & Badges */}
         <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
@@ -132,7 +132,7 @@ export default function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:border-black transition-colors shadow-xs"
+      className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative transition-all duration-200 shadow-xs hover:shadow-md"
     >
       {/* Product Image & Sale Badge */}
       <div className="relative mb-3 flex items-center justify-center">

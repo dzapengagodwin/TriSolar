@@ -358,7 +358,7 @@ export default function ProductDetailsTabs({
                   return (
                     <div
                       key={accessory.id}
-                      className="group bg-white border border-gray-200 rounded-xl p-3 flex flex-col justify-between hover:border-gray-300 hover:shadow-xs transition-all relative"
+                      className="group bg-white border border-gray-100 rounded-xl p-3 flex flex-col justify-between hover:shadow-md transition-all duration-200 relative"
                     >
                       <LocalizedClientLink
                         href={`/products/${accessory.handle}`}
