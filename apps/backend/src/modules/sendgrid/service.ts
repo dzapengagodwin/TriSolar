@@ -17,6 +17,10 @@ import { renderShipmentConfirmation } from "./templates/shipment-confirmation"
 import { renderPasswordReset } from "./templates/password-reset"
 import { renderWelcome } from "./templates/welcome"
 import { renderInvite } from "./templates/invite"
+import {
+  renderOwnerOrderNotification,
+  OwnerOrderNotificationData,
+} from "./templates/owner-order-notification"
 
 function ensureEnvLoaded() {
   if (process.env.SENDGRID_API_KEY) return
@@ -120,14 +124,13 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
       const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "LaptopZone"
       const templateData = (notification.data || {}) as Record<string, any>
 
-      // Resolve CC email for order notifications (defaults to laptops@laptopzone.co.zw)
+      // Resolve CC email for order notifications if explicitly configured
       let ccEmails: string[] = []
       if (isOrderEmail) {
         const rawCc =
           notification.data?.cc ||
           this.options_?.order_cc_email ||
-          process.env.SENDGRID_ORDER_CC_EMAIL ||
-          "laptops@laptopzone.co.zw"
+          process.env.SENDGRID_ORDER_CC_EMAIL
 
         if (rawCc && typeof rawCc === "string" && !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim())) {
           ccEmails = rawCc
@@ -225,6 +228,11 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
       case "order.placed":
       case "order.created":
         return renderOrderConfirmation(data as OrderConfirmationData)
+
+      case "owner-order-notification":
+      case "order-notification":
+      case "order.owner_notification":
+        return renderOwnerOrderNotification(data as OwnerOrderNotificationData)
 
       case "payment-confirmation":
       case "payment-captured":

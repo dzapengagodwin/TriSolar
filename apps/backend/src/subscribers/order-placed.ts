@@ -3,6 +3,16 @@ import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
 import sendgrid from "@sendgrid/mail"
 import { OrderConfirmationData } from "../modules/sendgrid/types"
 import { renderOrderConfirmation } from "../modules/sendgrid/templates/order-confirmation"
+import { renderOwnerOrderNotification } from "../modules/sendgrid/templates/owner-order-notification"
+import { STORE_SETTINGS_MODULE } from "../modules/store-settings"
+
+function parseNotificationEmails(raw: string | null | undefined): string[] {
+  if (!raw || typeof raw !== "string") return []
+  return raw
+    .split(",")
+    .map((e) => e.trim())
+    .filter((e) => e.length > 0 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+}
 
 export default async function orderPlacedHandler({
   event: { data },
@@ -289,22 +299,12 @@ export default async function orderPlacedHandler({
         sendgrid.setApiKey(apiKey)
         const rendered = renderOrderConfirmation(payload)
         if (rendered) {
-          const rawCc =
-            process.env.SENDGRID_ORDER_CC_EMAIL || "laptops@laptopzone.co.zw"
-          const fallbackCc =
-            rawCc &&
-            !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim()) &&
-            rawCc.toLowerCase().trim() !== recipientEmail.toLowerCase()
-              ? rawCc.trim()
-              : undefined
-
           const msg: any = {
             to: recipientEmail,
             from: {
               email: orderFromEmail,
               name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
             },
-            ...(fallbackCc ? { cc: fallbackCc } : {}),
             subject: rendered.subject,
             html: rendered.html,
             text: rendered.text,
@@ -316,6 +316,107 @@ export default async function orderPlacedHandler({
       }
     } else {
       logger.info(`[Subscriber: order.placed] Order #${order.display_id || order.id} confirmation sent via notification service (ID: ${externalId})`)
+    }
+
+    // ----------------------------------------------------
+    // Isolated Non-Blocking Owner Notification
+    // ----------------------------------------------------
+    try {
+      let configuredEmailsStr: string | null = null
+      try {
+        const storeSettingsService: any = container.resolve(STORE_SETTINGS_MODULE)
+        if (storeSettingsService) {
+          const settingsList = await storeSettingsService.listStoreSettings(
+            { is_active: true },
+            { take: 1, order: { created_at: "DESC" } }
+          )
+          if (settingsList?.[0]?.order_notification_emails) {
+            configuredEmailsStr = settingsList[0].order_notification_emails
+          }
+        }
+      } catch {
+        // Ignore DB resolution error, fallback to env
+      }
+
+      if (!configuredEmailsStr) {
+        configuredEmailsStr =
+          process.env.SENDGRID_ORDER_NOTIFICATION_EMAIL ||
+          process.env.SENDGRID_ORDER_CC_EMAIL ||
+          null
+      }
+
+      const ownerEmails = parseNotificationEmails(configuredEmailsStr)
+      if (ownerEmails.length === 0) {
+        logger.info(
+          `[Subscriber: order.placed] No owner notification emails configured for order #${order.display_id || order.id}.`
+        )
+      } else {
+        const adminUrl = process.env.ADMIN_URL || "http://localhost:9000/app"
+        const adminOrderUrl = `${adminUrl.replace(/\/$/, "")}/orders/${order.id}`
+
+        const ownerPayload = {
+          ...payload,
+          is_test: false,
+          admin_order_url: adminOrderUrl,
+        }
+
+        for (const ownerEmail of ownerEmails) {
+          try {
+            const ownerNotifs = await notificationModuleService.createNotifications({
+              to: ownerEmail,
+              from: orderFromEmail,
+              channel: "email",
+              template: "owner-order-notification",
+              data: ownerPayload as Record<string, unknown>,
+              trigger_type: "order.owner_notification",
+              resource_id: order.id,
+              resource_type: "order",
+              idempotency_key: `owner_notif_${order.id}_${ownerEmail}`,
+            })
+
+            const ownerItem = Array.isArray(ownerNotifs) ? ownerNotifs[0] : ownerNotifs
+            const ownerExtId = ownerItem?.external_id
+
+            if (!ownerExtId || ownerExtId.startsWith("mock_")) {
+              const apiKey = process.env.SENDGRID_API_KEY
+              if (apiKey) {
+                sendgrid.setApiKey(apiKey)
+                const renderedOwner = renderOwnerOrderNotification(ownerPayload)
+                if (renderedOwner) {
+                  const ownerMsg: any = {
+                    to: ownerEmail,
+                    from: {
+                      email: orderFromEmail,
+                      name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
+                    },
+                    subject: renderedOwner.subject,
+                    html: renderedOwner.html,
+                    text: renderedOwner.text,
+                  }
+                  const [ownerSgRes] = await sendgrid.send(ownerMsg)
+                  const ownerMsgId =
+                    ownerSgRes?.headers?.["x-message-id"] || `sg_owner_${Date.now()}`
+                  logger.info(
+                    `[Subscriber: order.placed] Owner notification for order #${order.display_id || order.id} sent directly to ${ownerEmail} (ID: ${ownerMsgId})`
+                  )
+                }
+              }
+            } else {
+              logger.info(
+                `[Subscriber: order.placed] Owner notification for order #${order.display_id || order.id} sent to ${ownerEmail} via notification service (ID: ${ownerExtId})`
+              )
+            }
+          } catch (ownerSendError: any) {
+            logger.error(
+              `[Subscriber: order.placed] Failed to send owner notification to ${ownerEmail} for order #${order.display_id || order.id}: ${ownerSendError.message}`
+            )
+          }
+        }
+      }
+    } catch (ownerNotifErr: any) {
+      logger.error(
+        `[Subscriber: order.placed] Unexpected error in owner notification handler for order #${order.display_id || order.id}: ${ownerNotifErr.message}`
+      )
     }
   } catch (error: any) {
     logger.error(`[Subscriber: order.placed] Failed to process notification for order ${data.id}: ${error.message}`)
