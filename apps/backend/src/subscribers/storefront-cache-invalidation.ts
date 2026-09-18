@@ -46,7 +46,7 @@ export default async function storefrontCacheInvalidationHandler({
         if (products?.[0]) {
           handle = products[0].handle
           categoryId = products[0].categories?.[0]?.id
-          collectionId = products[0].collection_id
+          collectionId = products[0].collection_id ?? undefined
         }
       } catch {
         // Fallback gracefully if query fails or product was deleted
