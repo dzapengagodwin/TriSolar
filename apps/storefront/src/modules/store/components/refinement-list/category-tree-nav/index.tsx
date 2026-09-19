@@ -102,7 +102,7 @@ export default function CategoryTreeNav({
     <div className="flex flex-col gap-y-3.5">
       {/* Header with back link if inside individual category */}
       <div className="flex items-center justify-between">
-        <h3 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wide">
+        <h3 className="text-xs sm:text-sm font-bold text-gray-900 uppercase tracking-wide">
           CATEGORIES
         </h3>
         {isIndividualCategoryPage && (
@@ -150,7 +150,7 @@ export default function CategoryTreeNav({
                 className={clsx(
                   "flex items-center justify-between py-1 px-1 rounded-md transition-colors group cursor-pointer",
                   {
-                    "text-primary font-black bg-primary/5": isRootActive,
+                    "text-primary font-bold bg-primary/5": isRootActive,
                     "text-gray-900 hover:text-primary": !isRootActive,
                   }
                 )}

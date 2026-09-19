@@ -102,7 +102,7 @@ const OrderCard = ({ order }: OrderCardProps) => {
             Total:
           </span>
           <span
-            className="text-sm sm:text-base font-extrabold text-gray-900"
+            className="text-sm sm:text-base font-bold text-gray-900"
             data-testid="order-amount"
           >
             {convertToLocale({

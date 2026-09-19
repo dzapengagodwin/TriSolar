@@ -167,7 +167,7 @@ const Payment = ({
           </span>
           <h2
             className={clx(
-              "text-xl font-black text-black tracking-tight flex items-center gap-2",
+              "text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2",
               {
                 "opacity-50 pointer-events-none select-none":
                   !isOpen && !paymentReady,

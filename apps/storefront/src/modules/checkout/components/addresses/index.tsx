@@ -44,7 +44,7 @@ const Addresses = ({
           <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">
             1
           </span>
-          <h2 className="text-xl font-black text-black tracking-tight flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
             Shipping Address
             {!isOpen && <CheckCircleSolid className="text-emerald-500 w-5 h-5" />}
           </h2>

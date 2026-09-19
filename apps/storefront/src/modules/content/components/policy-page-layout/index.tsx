@@ -39,7 +39,7 @@ export default function PolicyPageLayout({
             Last Updated: {lastUpdated}
           </span>
         </div>
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-2">
+        <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-2">
           {title}
         </h1>
         <p className="text-sm text-gray-500 max-w-2xl leading-relaxed">

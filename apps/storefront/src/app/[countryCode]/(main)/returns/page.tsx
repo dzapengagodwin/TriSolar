@@ -21,7 +21,7 @@ export default async function ReturnsPage() {
         <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-primary shrink-0" />
-            <h3 className="font-extrabold text-gray-900 text-sm">7-Day DOA Replacement Guarantee</h3>
+            <h3 className="font-bold text-gray-900 text-sm">7-Day DOA Replacement Guarantee</h3>
           </div>
           <p className="text-xs text-gray-600 leading-relaxed">
             If your laptop or hardware presents a manufacturer defect within 7 days of delivery, we provide priority diagnostics and an immediate direct replacement.
@@ -31,7 +31,7 @@ export default async function ReturnsPage() {
         <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5 space-y-1.5">
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-gray-600 shrink-0" />
-            <h3 className="font-extrabold text-gray-900 text-sm">14-Day Unopened Returns</h3>
+            <h3 className="font-bold text-gray-900 text-sm">14-Day Unopened Returns</h3>
           </div>
           <p className="text-xs text-gray-600 leading-relaxed">
             Changed your mind? Return any unopened, brand new item in its original sealed manufacturer packaging within 14 calendar days for a refund or store credit.

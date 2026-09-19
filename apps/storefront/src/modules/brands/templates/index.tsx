@@ -88,10 +88,10 @@ export default async function BrandTemplate({
 
             <div className="space-y-1.5">
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
                   {brand.name}
                 </h1>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full">
+                <span className="text-[10px] font-semibold uppercase tracking-wider bg-gray-100 text-gray-700 px-2.5 py-0.5 rounded-full">
                   Brand
                 </span>
               </div>
@@ -111,21 +111,11 @@ export default async function BrandTemplate({
                     href={brand.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-laptopzone-blue hover:underline font-medium inline-flex items-center gap-1"
+                    className="text-primary hover:underline flex items-center gap-1 font-semibold"
                   >
-                    Official Website
-                    <svg
-                      className="w-3 h-3"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
+                    <span>Official Website</span>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                     </svg>
                   </a>
                 )}
@@ -135,7 +125,7 @@ export default async function BrandTemplate({
 
           <LocalizedClientLink
             href="/brands"
-            className="text-xs font-extrabold uppercase tracking-wider text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-xl transition-all shrink-0 self-end sm:self-center"
+            className="text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-xl transition-all shrink-0 self-end sm:self-center"
           >
             ← View All Brands
           </LocalizedClientLink>
@@ -207,13 +197,13 @@ export default async function BrandTemplate({
                 <div className="flex items-center justify-center gap-3 pt-2">
                   <LocalizedClientLink
                     href="/brands"
-                    className="inline-block bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
+                    className="inline-block bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
                   >
                     View All Brands
                   </LocalizedClientLink>
                   <LocalizedClientLink
                     href="/store"
-                    className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-extrabold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shadow-sm"
+                    className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shadow-sm"
                   >
                     Browse Full Store
                   </LocalizedClientLink>

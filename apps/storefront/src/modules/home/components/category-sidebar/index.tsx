@@ -97,7 +97,7 @@ export default function CategorySidebar() {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hidden lg:block w-72 flex-shrink-0">
-      <div className="bg-laptopzone-navy text-white px-4 py-3 font-extrabold text-xs uppercase tracking-wider flex items-center justify-between">
+      <div className="bg-laptopzone-navy text-white px-4 py-3 font-bold text-xs uppercase tracking-wider flex items-center justify-between">
         <span className="flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />

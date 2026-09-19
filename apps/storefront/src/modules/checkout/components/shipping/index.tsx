@@ -193,7 +193,7 @@ const Shipping: React.FC<ShippingProps> = ({
           </span>
           <h2
             className={clx(
-              "text-xl font-black text-black tracking-tight flex items-center gap-2",
+              "text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2",
               {
                 "opacity-50 pointer-events-none select-none":
                   !isOpen && cart.shipping_methods?.length === 0,
@@ -306,7 +306,7 @@ const Shipping: React.FC<ShippingProps> = ({
                           />
                           <span>{option.name}</span>
                         </div>
-                        <span className="font-extrabold">
+                        <span className="font-bold">
                           {option.price_type === "flat" ? (
                             convertToLocale({
                               amount: option.amount!,

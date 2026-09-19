@@ -117,7 +117,7 @@ export default function SellerGrid() {
         
         {/* Centered Title */}
         <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-sans tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-sans tracking-tight">
             Most Popular Seller
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 font-normal">

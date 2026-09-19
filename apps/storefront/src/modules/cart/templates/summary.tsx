@@ -24,7 +24,7 @@ export function getCheckoutStep(cart: HttpTypes.StoreCart) {
 const Summary = ({ cart }: SummaryProps) => {
   return (
     <div className="flex flex-col gap-y-5">
-      <h2 className="text-xl font-black text-black tracking-tight">
+      <h2 className="text-xl font-bold text-gray-900 tracking-tight">
         Order Summary
       </h2>
       <DiscountCode cart={cart} />

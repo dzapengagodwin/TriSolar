@@ -118,7 +118,7 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
     <div className="content-container py-12">
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-black text-black tracking-tight">Your Wishlist</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Your Wishlist</h1>
           <p className="text-sm text-gray-500 mt-1 font-medium">
             Saved items you want to keep an eye on.
           </p>
@@ -166,14 +166,14 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
                     <div className="flex flex-col gap-0.5">
                       <LocalizedClientLink
                         href={`/products/${product.handle}`}
-                        className="text-sm font-extrabold text-gray-900 hover:text-primary transition-colors line-clamp-1"
+                        className="text-sm font-normal text-gray-800 hover:text-primary transition-colors line-clamp-1"
                       >
                         {product.title}
                       </LocalizedClientLink>
                       <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
                         {variant.title !== "Default Variant" ? variant.title : "Standard"}
                       </span>
-                      <span className="text-sm font-extrabold text-primary mt-1">
+                      <span className="text-sm font-bold text-primary mt-1">
                         {price || "Price unavailable"}
                       </span>
                       {!isAvailable && (

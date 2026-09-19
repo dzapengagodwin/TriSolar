@@ -38,7 +38,7 @@ export default function PromoCardsRow() {
       borderColor: "border-red-800/50",
       graphic: (
         <div className="relative w-full h-44 flex flex-col items-center justify-center pt-2">
-          <div className="text-xl font-black text-white tracking-widest flex items-center gap-1 uppercase mb-1 drop-shadow-md">
+          <div className="text-xl font-bold text-white tracking-wider flex items-center gap-1 uppercase mb-1 drop-shadow-md">
             <span>RedStar</span>
             <svg className="w-4 h-4 text-amber-400 fill-amber-400 inline-block" viewBox="0 0 24 24">
               <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
@@ -66,7 +66,7 @@ export default function PromoCardsRow() {
       borderColor: "border-blue-800/50",
       graphic: (
         <div className="relative w-full h-44 flex flex-col items-center justify-center pt-2">
-          <div className="bg-blue-600/40 border border-blue-400/60 backdrop-blur-md text-white font-black text-xs px-3 py-1 rounded-full uppercase tracking-widest shadow-lg mb-2 animate-pulse">
+          <div className="bg-blue-600/40 border border-blue-400/60 backdrop-blur-md text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider shadow-lg mb-2 animate-pulse">
             FLASH SALE
           </div>
           <div className="relative w-32 h-28 transform hover:scale-105 transition-transform duration-300">
@@ -91,7 +91,7 @@ export default function PromoCardsRow() {
       borderColor: "border-sky-800/50",
       graphic: (
         <div className="relative w-full h-44 flex flex-col items-center justify-center pt-2">
-          <span className="text-[11px] font-black tracking-widest text-white/90 uppercase mb-1">
+          <span className="text-[11px] font-bold tracking-widest text-white/90 uppercase mb-1">
             SAMSUNG
           </span>
           <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
@@ -146,17 +146,17 @@ export default function PromoCardsRow() {
               {/* Bottom Content: Titles & White Pill Button */}
               <div className="z-10 space-y-4 pt-4">
                 <div className="space-y-0.5">
-                  <h3 className="text-2xl sm:text-2xl font-extrabold text-white tracking-tight leading-none">
+                  <h3 className="text-2xl sm:text-2xl font-bold text-white tracking-tight leading-none">
                     {card.title}
                   </h3>
-                  <p className="text-sm font-bold text-white/90 leading-tight">
+                  <p className="text-sm font-medium text-white/90 leading-tight">
                     {card.subtitle}
                   </p>
                 </div>
 
                 <LocalizedClientLink href="/store" className="block">
                   <button
-                    className={`w-full bg-white hover:bg-gray-100 ${card.textColor} font-black text-xs py-3 px-4 rounded-full transition-all duration-200 shadow-md hover:shadow-lg text-center truncate`}
+                    className={`w-full bg-white hover:bg-gray-100 ${card.textColor} font-bold text-xs py-2.5 px-4 rounded-full transition-all duration-200 shadow-md hover:shadow-lg text-center truncate`}
                   >
                     {card.buttonText}
                   </button>

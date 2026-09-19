@@ -27,12 +27,12 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
         {/* Section Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="flex items-center gap-4">
-            <h2 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">
               BRANDS
             </h2>
             <LocalizedClientLink
               href="/brands"
-              className="text-[11px] font-extrabold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors hidden sm:inline-block"
+              className="text-[11px] font-semibold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors hidden sm:inline-block"
             >
               View Directory →
             </LocalizedClientLink>
@@ -41,7 +41,7 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
           <div className="flex items-center gap-2">
             <LocalizedClientLink
               href="/brands"
-              className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors sm:hidden mr-2"
+              className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors sm:hidden mr-2"
             >
               All Brands →
             </LocalizedClientLink>

@@ -8,7 +8,7 @@ const CheckoutSummary = ({ cart }: { cart: HttpTypes.StoreCart }) => {
   return (
     <div className="sticky top-28 flex flex-col gap-y-6">
       <div className="w-full bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm flex flex-col gap-y-5">
-        <h2 className="text-xl font-black text-black tracking-tight">
+        <h2 className="text-xl font-bold text-gray-900 tracking-tight">
           In Your Cart
         </h2>
 

@@ -11,10 +11,10 @@ export default function BrandDirectoryTemplate({
     <div className="py-8 sm:py-12 content-container space-y-8">
       {/* Header Banner */}
       <div className="bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-xs text-center max-w-3xl mx-auto space-y-3">
-        <span className="text-[10px] font-extrabold uppercase tracking-widest text-laptopzone-orange bg-laptopzone-orange/10 px-3 py-1 rounded-full">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-laptopzone-orange bg-laptopzone-orange/10 px-3 py-1 rounded-full">
           Brand Directory
         </span>
-        <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
           Shop by Official Brands
         </h1>
         <p className="text-xs sm:text-sm text-gray-500 font-normal max-w-xl mx-auto leading-relaxed">
@@ -46,14 +46,14 @@ export default function BrandDirectoryTemplate({
                       />
                     </div>
                   ) : (
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-700 font-black text-sm">
+                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-700 font-bold text-sm">
                       {brand.name.substring(0, 2).toUpperCase()}
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-1 w-full pt-2 border-t border-gray-50">
-                  <span className="text-xs sm:text-sm font-extrabold text-gray-900 group-hover:text-laptopzone-orange transition-colors line-clamp-1 block">
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-laptopzone-orange transition-colors line-clamp-1 block">
                     {brand.name}
                   </span>
                   <span className="text-[10px] font-bold text-gray-400 block">
@@ -74,7 +74,7 @@ export default function BrandDirectoryTemplate({
           </p>
           <LocalizedClientLink
             href="/store"
-            className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-extrabold uppercase tracking-wider px-6 py-3 rounded-full transition-colors shadow-sm"
+            className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-semibold uppercase tracking-wider px-6 py-3 rounded-full transition-colors shadow-sm"
           >
             Browse Store
           </LocalizedClientLink>

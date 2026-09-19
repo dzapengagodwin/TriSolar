@@ -24,7 +24,7 @@ export default function CategoryAvatars({
         
         {/* Centered Heading */}
         <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 font-sans tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 font-sans tracking-tight">
             Deals by Category
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 font-normal">
@@ -46,7 +46,7 @@ export default function CategoryAvatars({
                 className="group flex flex-col items-center gap-3"
               >
                 <div
-                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-black text-gray-900 shadow-sm group-hover:scale-105 transition-transform border border-gray-100 overflow-hidden relative`}
+                  className={`w-20 h-20 sm:w-24 sm:h-24 ${bgClass} rounded-full flex items-center justify-center text-2xl font-bold text-gray-900 shadow-sm group-hover:scale-105 transition-transform border border-gray-100 overflow-hidden relative`}
                 >
                   {imageUrl ? (
                     <img
@@ -70,7 +70,7 @@ export default function CategoryAvatars({
         <div className="bg-black text-white rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg border border-gray-800">
           <div className="space-y-1 text-center sm:text-left">
             <span className="text-[10px] font-bold text-primary uppercase tracking-wider">SPECIAL CATALOG SELECTION</span>
-            <h3 className="text-xl sm:text-2xl font-extrabold font-sans">
+            <h3 className="text-xl sm:text-2xl font-bold font-sans">
               Shop Top Rated Hardware & Accessories
             </h3>
           </div>

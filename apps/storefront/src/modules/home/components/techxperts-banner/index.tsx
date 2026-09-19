@@ -42,13 +42,13 @@ export default function TechxpertsBanner() {
         
         <div className="lg:col-span-5 space-y-2">
           <div className="flex items-center gap-2">
-            <span className="bg-laptopzone-orange text-white text-[10px] font-black px-2.5 py-0.5 rounded tracking-widest uppercase">
+            <span className="bg-laptopzone-orange text-white text-[10px] font-bold px-2.5 py-0.5 rounded tracking-wider uppercase">
               CORPORATE & IT SERVICES
             </span>
             <span className="text-xs text-gray-400 font-semibold">HARARE, ZIMBABWE</span>
           </div>
 
-          <h3 className="text-2xl font-black uppercase tracking-tight text-white">
+          <h3 className="text-2xl font-bold uppercase tracking-tight text-white">
             CORPORATE IT SOLUTIONS & WHOLESALE
           </h3>
 

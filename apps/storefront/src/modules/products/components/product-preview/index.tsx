@@ -86,7 +86,7 @@ export default function ProductPreview({
 
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}
@@ -172,7 +172,7 @@ export default function ProductPreview({
 
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-snug"
+              className="text-xs font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}

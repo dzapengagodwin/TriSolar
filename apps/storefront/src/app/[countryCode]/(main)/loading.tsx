@@ -10,7 +10,7 @@ export default function Loading() {
         <Spinner size="44" className="text-primary" />
       </div>
       <div className="text-center space-y-1 mt-2">
-        <p className="text-[11px] font-extrabold text-gray-400 tracking-widest uppercase animate-pulse">
+        <p className="text-[11px] font-bold text-gray-400 tracking-widest uppercase animate-pulse">
           Loading Laptopzone
         </p>
         <p className="text-[10px] text-gray-400 font-normal">

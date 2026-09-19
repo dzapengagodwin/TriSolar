@@ -179,7 +179,7 @@ function DealProductCard({
             <div className="text-[10px] font-semibold text-gray-400 line-clamp-1">{categoryLabel}</div>
           )}
           <LocalizedClientLink href={`/products/${product.handle}`}>
-            <h3 className="text-xs font-bold text-gray-900 group-hover:text-black transition-colors line-clamp-2 leading-snug mt-0.5">
+            <h3 className="text-xs font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug mt-0.5">
               {product.title}
             </h3>
           </LocalizedClientLink>
@@ -283,7 +283,7 @@ export default function MonthlyDeals({
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="inline-block w-1 h-6 bg-primary rounded-full" />
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
                 {currentMonth} Best Deals
               </h2>
             </div>

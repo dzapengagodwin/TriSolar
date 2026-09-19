@@ -65,7 +65,7 @@ function RatingSummary({
     <div className="bg-gray-50/60 border border-gray-200 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row gap-6 sm:gap-10">
       {/* Average score */}
       <div className="flex items-center gap-4 shrink-0">
-        <div className="text-5xl font-black text-gray-900">
+        <div className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
           {averageRating > 0 ? averageRating.toFixed(1) : "\u2014"}
         </div>
         <div className="space-y-1">
@@ -377,11 +377,11 @@ export default function ProductDetailsTabs({
 
                       <div className="space-y-2">
                         <LocalizedClientLink href={`/products/${accessory.handle}`}>
-                          <p className="text-[11px] sm:text-xs font-semibold text-gray-900 line-clamp-2 leading-tight hover:text-primary transition-colors">
+                          <p className="text-[11px] sm:text-xs font-normal text-gray-800 line-clamp-2 leading-tight hover:text-primary transition-colors">
                             {accessory.title}
                           </p>
                         </LocalizedClientLink>
-                        <p className="text-xs font-black text-gray-900">{formattedPrice}</p>
+                        <p className="text-xs font-bold text-gray-900">{formattedPrice}</p>
 
                         <button
                           type="button"

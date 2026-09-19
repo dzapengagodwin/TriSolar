@@ -17,7 +17,7 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
     <div>
       <div className="pb-4 flex items-center justify-between border-b border-gray-100 mb-4">
         <div className="flex items-center gap-x-3">
-          <h1 className="text-2xl font-black text-black tracking-tight">Shopping Cart</h1>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Shopping Cart</h1>
           <span className="bg-gray-100 text-black text-xs font-bold px-3 py-1 rounded-full border border-gray-200">
             {totalQuantity} {totalQuantity === 1 ? "item" : "items"}
           </span>

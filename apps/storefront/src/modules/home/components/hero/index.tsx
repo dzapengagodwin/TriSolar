@@ -145,12 +145,12 @@ export default function Hero() {
                     {/* Left: Text & CTA */}
                     <div className="lg:col-span-7 space-y-4 max-w-xl pr-0 lg:pr-6">
                       <span
-                        className={`text-[10px] sm:text-xs font-black uppercase tracking-wider px-3.5 py-1 inline-block shadow-xs ${slide.badgeBg}`}
+                        className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider px-3.5 py-1 inline-block shadow-xs ${slide.badgeBg}`}
                       >
                         {slide.badge}
                       </span>
 
-                      <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
+                      <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-tight">
                         {slide.title}
                       </h1>
 

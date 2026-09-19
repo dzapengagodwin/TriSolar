@@ -471,7 +471,7 @@ const OnePageCheckoutForm = ({
             <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
               1
             </span>
-            <h2 className="text-xl font-black text-black tracking-tight flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
               Customer & Shipping Details
             </h2>
           </div>
@@ -712,7 +712,7 @@ const OnePageCheckoutForm = ({
             <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
               2
             </span>
-            <h2 className="text-xl font-black text-black tracking-tight flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
               Delivery Method
               {updatingShipping && <Spinner size="16" />}
             </h2>
@@ -774,7 +774,7 @@ const OnePageCheckoutForm = ({
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm font-extrabold text-black">
+                  <span className="text-sm font-bold text-gray-900">
                     {formattedPrice}
                   </span>
                 </div>
@@ -796,7 +796,7 @@ const OnePageCheckoutForm = ({
             <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
               3
             </span>
-            <h2 className="text-xl font-black text-black tracking-tight flex items-center gap-2">
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
               Payment Method
             </h2>
           </div>
@@ -913,7 +913,7 @@ const OnePageCheckoutForm = ({
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-primary hover:bg-primary-hover text-white font-extrabold py-4 px-8 rounded-full text-base transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-full text-base transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {submitting ? (
             <>

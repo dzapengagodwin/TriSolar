@@ -32,7 +32,7 @@ const OptionsPicker = ({
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex items-center justify-between px-1">
-        <span className="text-[11px] font-extrabold text-gray-900 uppercase tracking-wider">
+        <span className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">
           Filter by Options
         </span>
       </div>

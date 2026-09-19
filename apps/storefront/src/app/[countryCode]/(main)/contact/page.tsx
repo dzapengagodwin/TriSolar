@@ -9,7 +9,7 @@ export default async function ContactPage() {
   return (
     <div className="content-container py-12 max-w-4xl mx-auto">
       <div className="bg-white border border-gray-100 rounded-3xl p-8 sm:p-12 shadow-sm">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
           Contact Customer Support
         </h1>
         <p className="text-sm text-gray-500 mb-8 leading-relaxed">

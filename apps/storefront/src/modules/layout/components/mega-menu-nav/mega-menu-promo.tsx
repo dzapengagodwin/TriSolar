@@ -20,7 +20,7 @@ export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
           {promo.eyebrow}
         </span>
 
-        <h3 className="text-xl sm:text-2xl font-black tracking-tight leading-tight text-white pt-0.5">
+        <h3 className="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-white pt-0.5">
           {promo.title.map((line, idx) => (
             <React.Fragment key={idx}>
               {line}

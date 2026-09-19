@@ -90,7 +90,7 @@ export default function PriceFilterSlider({
   return (
     <div className="flex flex-col gap-y-3 pt-2">
       <div className="flex items-center justify-between px-1">
-        <span className="text-[11px] font-extrabold text-gray-900 uppercase tracking-wider">
+        <span className="text-[11px] font-bold text-gray-900 uppercase tracking-wider">
           Price Range
         </span>
         {isFiltered && (

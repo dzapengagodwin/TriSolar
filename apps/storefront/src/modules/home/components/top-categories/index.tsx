@@ -35,12 +35,12 @@ export default function TopCategories({
         {/* Section Header */}
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div className="flex items-center gap-4">
-            <h2 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">
               TOP CATEGORIES
             </h2>
             <LocalizedClientLink
               href="/store"
-              className="text-[11px] font-extrabold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors hidden sm:inline-block"
+              className="text-[11px] font-semibold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors hidden sm:inline-block"
             >
               Browse All →
             </LocalizedClientLink>
@@ -49,7 +49,7 @@ export default function TopCategories({
           <div className="flex items-center gap-2">
             <LocalizedClientLink
               href="/store"
-              className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors sm:hidden mr-2"
+              className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 hover:text-gray-900 transition-colors sm:hidden mr-2"
             >
               Browse All →
             </LocalizedClientLink>

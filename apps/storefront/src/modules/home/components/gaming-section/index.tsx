@@ -41,9 +41,9 @@ export default function GamingSection() {
     </div> 
  
     <div className="pt-6"> 
-      <span className="inline-flex items-center gap-2 bg-white text-gray-900 group-hover:bg-primary group-hover:text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
+      <span className="inline-flex items-center gap-2 bg-primary group-hover:bg-primary-hover text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
         <span>Shop Now</span> 
-        <ArrowRight className="w-4 h-4" /> 
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" /> 
       </span> 
     </div> 
   </div> 
@@ -92,9 +92,9 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>
@@ -138,9 +138,9 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>
@@ -184,9 +184,9 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-300 group-hover:text-primary transition-colors">
+                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>

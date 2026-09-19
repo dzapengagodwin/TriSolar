@@ -66,7 +66,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
           </div>
           <div className="mt-4">
             <div className="flex items-baseline gap-x-2">
-              <span className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-none">
+              <span className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-none">
                 {totalOrders}
               </span>
               <span className="text-xs text-gray-400 font-medium">
@@ -96,7 +96,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
           <div className="mt-4">
             <div className="flex items-baseline gap-x-2">
               <span
-                className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-none"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-none"
                 data-testid="addresses-count"
                 data-value={savedAddressesCount}
               >
@@ -129,7 +129,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
           <div className="mt-4">
             <div className="flex items-baseline gap-x-2">
               <span
-                className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-none"
+                className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-none"
                 data-testid="customer-profile-completion"
                 data-value={profileCompletion}
               >
@@ -248,7 +248,7 @@ const Overview = ({ customer, orders }: OverviewProps) => {
                             Total ({itemCount} {itemCount === 1 ? "item" : "items"})
                           </span>
                           <span
-                            className="text-gray-900 font-extrabold mt-0.5 text-xs sm:text-sm"
+                            className="text-gray-900 font-bold mt-0.5 text-xs sm:text-sm"
                             data-testid="order-amount"
                           >
                             {convertToLocale({

@@ -48,7 +48,7 @@ export default function CatalogToolbar({
     <div className="w-full mb-6 border-b border-gray-200 pb-4">
       {/* Top Header Title */}
       {title && (
-        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight mb-3">
           {title}
         </h1>
       )}

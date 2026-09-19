@@ -99,13 +99,13 @@ export default async function ProductRail({
 
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4 sm:mb-6 pb-2 border-b border-gray-100">
-        <h2 className="text-base sm:text-lg font-black text-gray-900 uppercase tracking-wide">
+        <h2 className="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">
           {title}
         </h2>
         {viewAllHref && (
           <LocalizedClientLink
             href={viewAllHref}
-            className="text-xs font-bold text-gray-500 hover:text-primary transition-colors flex items-center gap-1"
+            className="text-xs font-semibold text-gray-500 hover:text-primary transition-colors flex items-center gap-1"
           >
             <span>View all</span>
             <svg

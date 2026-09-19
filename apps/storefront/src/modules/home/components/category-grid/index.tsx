@@ -82,7 +82,7 @@ export default function CategoryGrid() {
       <div className="content-container">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-xl font-black text-laptopzone-navy uppercase tracking-tight flex items-center gap-2">
+            <h2 className="text-xl font-bold text-laptopzone-navy uppercase tracking-tight flex items-center gap-2">
               <span className="w-2.5 h-6 bg-laptopzone-orange rounded-sm inline-block"></span>
               Explore Hardware Categories
             </h2>
@@ -104,7 +104,7 @@ export default function CategoryGrid() {
               className="group bg-white rounded-lg p-4 border border-gray-200 hover:border-laptopzone-blue hover:shadow-md transition-all flex flex-col justify-between items-center text-center relative overflow-hidden"
             >
               <span
-                className={`absolute top-2 right-2 text-[9px] font-black text-white px-1.5 py-0.5 rounded tracking-widest uppercase ${cat.badgeColor}`}
+                className={`absolute top-2 right-2 text-[9px] font-bold text-white px-1.5 py-0.5 rounded tracking-wider uppercase ${cat.badgeColor}`}
               >
                 {cat.badge}
               </span>
@@ -114,7 +114,7 @@ export default function CategoryGrid() {
               </div>
 
               <div>
-                <h3 className="text-xs font-extrabold text-laptopzone-navy group-hover:text-laptopzone-blue transition-colors line-clamp-1">
+                <h3 className="text-xs font-bold text-laptopzone-navy group-hover:text-laptopzone-blue transition-colors line-clamp-1">
                   {cat.title}
                 </h3>
                 <p className="text-[10px] text-gray-500 line-clamp-1 mt-0.5 font-medium">
