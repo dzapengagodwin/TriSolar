@@ -377,11 +377,11 @@ export default function ProductDetailsTabs({
 
                       <div className="space-y-2">
                         <LocalizedClientLink href={`/products/${accessory.handle}`}>
-                          <p className="text-[11px] sm:text-xs font-normal text-gray-800 line-clamp-2 leading-tight hover:text-primary transition-colors">
+                          <p className="text-xs sm:text-sm font-normal text-gray-800 line-clamp-2 leading-tight hover:text-primary transition-colors">
                             {accessory.title}
                           </p>
                         </LocalizedClientLink>
-                        <p className="text-xs font-bold text-gray-900">{formattedPrice}</p>
+                        <p className="text-sm font-bold text-gray-900">{formattedPrice}</p>
 
                         <button
                           type="button"

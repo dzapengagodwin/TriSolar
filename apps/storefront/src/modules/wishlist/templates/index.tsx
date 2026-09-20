@@ -170,14 +170,14 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
                       >
                         {product.title}
                       </LocalizedClientLink>
-                      <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
+                      <span className="text-[11px] text-gray-500 font-semibold uppercase tracking-wider">
                         {variant.title !== "Default Variant" ? variant.title : "Standard"}
                       </span>
-                      <span className="text-sm font-bold text-primary mt-1">
+                      <span className="text-[15px] sm:text-base font-bold text-primary mt-1">
                         {price || "Price unavailable"}
                       </span>
                       {!isAvailable && (
-                        <span className="text-[10px] font-bold uppercase text-red-500">
+                        <span className="text-[11px] font-bold uppercase text-red-500">
                           Out of stock
                         </span>
                       )}

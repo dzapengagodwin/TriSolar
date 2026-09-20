@@ -25,7 +25,7 @@ import { getLocale } from "./locale-actions"
 export async function retrieveCart(cartId?: string, fields?: string) {
   const id = cartId || (await getCartId())
   fields ??=
-    "*items, *region, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, *promotions, +shipping_methods.name, *payment_collection, *payment_collection.payment_sessions"
+    "*items, *region, *shipping_address, *items.product, *items.variant, *items.thumbnail, *items.metadata, +items.total, +items.tax_total, *items.tax_lines, +item_tax_total, +shipping_tax_total, +tax_total, *promotions, +shipping_methods.name, *payment_collection, *payment_collection.payment_sessions"
 
   if (!id) {
     return null
@@ -85,7 +85,11 @@ export async function getOrSetCart(countryCode: string) {
     await removeCartId()
     const locale = await getLocale()
     const cartResp = await sdk.store.cart.create(
-      { region_id: region.id, locale: locale || undefined },
+      {
+        region_id: region.id,
+        locale: locale || undefined,
+        shipping_address: { country_code: countryCode },
+      },
       {},
       headers
     )
@@ -100,7 +104,29 @@ export async function getOrSetCart(countryCode: string) {
   }
 
   if (cart && (cart?.region_id !== region.id || cart?.currency_code !== region.currency_code)) {
-    await sdk.store.cart.update(cart.id, { region_id: region.id }, {}, headers)
+    await sdk.store.cart.update(
+      cart.id,
+      { region_id: region.id, shipping_address: { country_code: countryCode } },
+      {},
+      headers
+    )
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+
+    return await retrieveCart(cart.id)
+  }
+
+  if (
+    cart &&
+    (!cart.shipping_address?.country_code ||
+      cart.shipping_address.country_code.toLowerCase() !== countryCode.toLowerCase())
+  ) {
+    await sdk.store.cart.update(
+      cart.id,
+      { shipping_address: { country_code: countryCode } },
+      {},
+      headers
+    )
     const cartCacheTag = await getCacheTag("carts")
     revalidateTag(cartCacheTag)
 

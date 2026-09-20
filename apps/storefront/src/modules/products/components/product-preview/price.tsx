@@ -76,7 +76,7 @@ export default function PreviewPrice({ price }: PreviewPriceProps) {
 
   return (
     <div className="flex items-baseline gap-x-2">
-      <span className="text-xs font-bold text-gray-900" data-testid="price">
+      <span className="text-[15px] sm:text-base font-bold text-gray-900" data-testid="price">
         {displayPrice}
       </span>
       {isSale && originalPrice && (

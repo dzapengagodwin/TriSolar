@@ -154,7 +154,7 @@ function DealProductCard({
     <div className="group bg-white rounded-2xl p-3 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative hover:shadow-md transition-all duration-200">
       {/* Discount badge */}
       {discountPct > 0 && (
-        <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+        <span className="absolute top-2 left-2 z-10 bg-primary text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
           -{discountPct}%
         </span>
       )}
@@ -176,10 +176,10 @@ function DealProductCard({
       <div className="flex-1 flex flex-col justify-between space-y-1.5">
         <div>
           {categoryLabel && (
-            <div className="text-[10px] font-semibold text-gray-400 line-clamp-1">{categoryLabel}</div>
+            <div className="text-[11px] font-medium text-gray-400 line-clamp-1">{categoryLabel}</div>
           )}
           <LocalizedClientLink href={`/products/${product.handle}`}>
-            <h3 className="text-xs font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug mt-0.5">
+            <h3 className="text-[13px] sm:text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug mt-0.5">
               {product.title}
             </h3>
           </LocalizedClientLink>
@@ -190,9 +190,9 @@ function DealProductCard({
           <div className="flex items-center justify-between gap-2">
             {priceInfo && (
               <div className="flex items-baseline gap-x-1.5">
-                <span className="text-xs font-bold text-gray-900">{priceInfo.calculated_price}</span>
+                <span className="text-[15px] sm:text-base font-bold text-gray-900">{priceInfo.calculated_price}</span>
                 {priceInfo.original_price_number > priceInfo.calculated_price_number && (
-                  <span className="text-[10px] line-through text-gray-400">{priceInfo.original_price}</span>
+                  <span className="text-xs line-through text-gray-400">{priceInfo.original_price}</span>
                 )}
               </div>
             )}

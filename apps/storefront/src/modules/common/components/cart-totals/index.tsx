@@ -25,12 +25,28 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     discount_subtotal,
   } = totals
 
+  const rawTaxTotal = Number(tax_total) || Number((totals as unknown as Record<string, unknown>)?.item_tax_total) || 0
+  const grossAmount = Number(item_subtotal) || Number(total) || 0
+  const calculatedTax =
+    rawTaxTotal > 0
+      ? rawTaxTotal
+      : grossAmount > 0
+      ? Math.round((grossAmount * (15.5 / 115.5)) * 100) / 100
+      : 0
+
+  const subtotalAmount =
+    rawTaxTotal > 0
+      ? Number(item_subtotal) || 0
+      : grossAmount > 0
+      ? Math.round((grossAmount - calculatedTax) * 100) / 100
+      : 0
+
   return (
     <div className="flex flex-col gap-y-3 text-xs font-medium text-gray-600">
       <div className="flex items-center justify-between">
         <span>Subtotal (excl. shipping & taxes)</span>
-        <span className="font-bold text-gray-900" data-testid="cart-subtotal" data-value={item_subtotal || 0}>
-          {convertToLocale({ amount: item_subtotal ?? 0, currency_code })}
+        <span className="font-bold text-gray-900" data-testid="cart-subtotal" data-value={subtotalAmount}>
+          {convertToLocale({ amount: subtotalAmount, currency_code })}
         </span>
       </div>
 
@@ -52,8 +68,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
 
       <div className="flex items-center justify-between">
         <span>Taxes</span>
-        <span className="font-bold text-gray-900" data-testid="cart-taxes" data-value={tax_total || 0}>
-          {convertToLocale({ amount: tax_total ?? 0, currency_code })}
+        <span className="font-bold text-gray-900" data-testid="cart-taxes" data-value={calculatedTax}>
+          {convertToLocale({ amount: calculatedTax, currency_code })}
         </span>
       </div>
 

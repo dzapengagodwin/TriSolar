@@ -54,7 +54,7 @@ export default function ProductPreview({
         {/* Left: Thumbnail & Badges */}
         <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
           {isSale && (
-            <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
+            <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
               {discountText}
             </span>
           )}
@@ -80,7 +80,7 @@ export default function ProductPreview({
 
         {/* Center: Info, Category, Title, Short Description */}
         <div className="flex-1 space-y-2 min-w-0">
-          <div className="text-[10px] font-semibold text-gray-400">
+          <div className="text-[11px] font-medium text-gray-400">
             {categoriesString}
           </div>
 
@@ -137,7 +137,7 @@ export default function ProductPreview({
       {/* Product Image & Sale Badge */}
       <div className="relative mb-3 flex items-center justify-center">
         {isSale && (
-          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
+          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
             {discountText}
           </span>
         )}
@@ -166,13 +166,13 @@ export default function ProductPreview({
       <div className="flex-1 flex flex-col justify-between">
         {/* Category Subtitle & Product Title */}
         <div className="space-y-1">
-          <div className="text-[10px] font-semibold text-gray-400 line-clamp-1">
+          <div className="text-[11px] font-medium text-gray-400 line-clamp-1">
             {categoriesString}
           </div>
 
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-xs font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="text-[13px] sm:text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}

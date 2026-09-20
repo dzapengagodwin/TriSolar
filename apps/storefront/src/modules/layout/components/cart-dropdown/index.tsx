@@ -107,9 +107,52 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
   const totalItems =
     cartState?.items?.reduce((acc, item) => acc + item.quantity, 0) || 0
 
-  const subtotal = cartState?.item_subtotal ?? 0
-  const taxes = cartState?.tax_total ?? 0
-  const total = cartState?.total ?? 0
+  // Product taxes without shipping included:
+  // 1. From Medusa's computed item_tax_total (which specifically excludes shipping tax)
+  // 2. Or from sum of line items' tax_total
+  // 3. Or fallback using standard tax-inclusive VAT (15.5% for Zimbabwe/Africa region)
+  const defaultTaxRate = 15.5
+  const rawItemTaxTotal =
+    Number((cartState as unknown as Record<string, unknown>)?.item_tax_total) || 0
+  const itemsTaxSum =
+    cartState?.items?.reduce(
+      (sum, item) =>
+        sum +
+        (Number((item as unknown as Record<string, unknown>)?.tax_total) || 0),
+      0
+    ) || 0
+
+  const itemsGross =
+    cartState?.items?.reduce(
+      (sum, item) =>
+        sum + (Number(item.unit_price) || 0) * (Number(item.quantity) || 1),
+      0
+    ) ||
+    Number(cartState?.total) ||
+    0
+
+  let productTaxes = 0
+  if (rawItemTaxTotal > 0) {
+    productTaxes = rawItemTaxTotal
+  } else if (itemsTaxSum > 0) {
+    productTaxes = itemsTaxSum
+  } else if (itemsGross > 0) {
+    // Tax-inclusive pricing: Product Tax = Gross * (Rate / (100 + Rate))
+    productTaxes =
+      Math.round((itemsGross * (defaultTaxRate / (100 + defaultTaxRate))) * 100) /
+      100
+  }
+
+  // Subtotal excl. shipping & taxes
+  const rawItemSubtotal = Number(cartState?.item_subtotal) || 0
+  const subtotal =
+    rawItemTaxTotal > 0 && rawItemSubtotal < itemsGross
+      ? rawItemSubtotal
+      : itemsGross > 0
+      ? Math.round((itemsGross - productTaxes) * 100) / 100
+      : 0
+
+  const total = Number(cartState?.total) || itemsGross
   const itemRef = useRef<number>(totalItems || 0)
 
   // Auto-open drawer when modifying cart items, unless on cart/checkout pages
@@ -448,7 +491,7 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
             <div className="flex items-center justify-between text-xs text-gray-600">
               <span>Subtotal (excl. shipping & taxes)</span>
               <span
-                className="font-bold text-gray-900"
+                className="font-semibold text-gray-900"
                 data-testid="cart-subtotal"
                 data-value={subtotal}
               >
@@ -461,16 +504,16 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
 
             <div className="flex items-center justify-between text-xs text-gray-600">
               <span>Taxes</span>
-              <span className="font-bold text-gray-900">
+              <span className="font-semibold text-gray-900">
                 {convertToLocale({
-                  amount: taxes,
+                  amount: productTaxes,
                   currency_code: cartState.currency_code,
                 })}
               </span>
             </div>
 
             <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-sm">
-              <span className="font-bold text-gray-900">Total:</span>
+              <span className="font-semibold text-gray-900">Total:</span>
               <span className="font-bold text-base text-gray-900">
                 {convertToLocale({
                   amount: total,
@@ -478,6 +521,10 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
                 })}
               </span>
             </div>
+
+            <p className="text-[11px] text-gray-400 text-center">
+              Shipping &amp; delivery calculated at checkout
+            </p>
 
             {/* Action Buttons */}
             <div className="space-y-2.5 pt-1">
