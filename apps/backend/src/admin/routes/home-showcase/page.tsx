@@ -849,7 +849,6 @@ const HomeShowcasePage = () => {
             </Drawer.Description>
           </Drawer.Header>
 
-          <form onSubmit={handleCreate} className="space-y-5 my-6">
           <form onSubmit={handleCreateShowcase} className="space-y-5 my-6">
             {/* Collection Title */}
             <div>
