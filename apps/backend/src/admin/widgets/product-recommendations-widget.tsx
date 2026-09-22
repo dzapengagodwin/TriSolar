@@ -38,11 +38,9 @@ const TYPE_COLORS: Record<string, "blue" | "green" | "purple" | "orange" | "grey
   alternative: "grey",
 }
 
-const SOURCE_COLORS: Record<string, "grey" | "blue" | "purple" | "green"> = {
+const SOURCE_COLORS: Record<string, "grey" | "blue"> = {
   manual: "grey",
   rule: "blue",
-  ai: "purple",
-  behavioral: "green",
 }
 
 const ProductRecommendationsWidget = ({

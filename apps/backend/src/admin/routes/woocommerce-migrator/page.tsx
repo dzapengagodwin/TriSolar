@@ -11,6 +11,7 @@ import {
   Switch,
   Badge,
   Table,
+  toast,
   clx,
 } from "@medusajs/ui"
 import { useState, useCallback } from "react"
@@ -71,7 +72,6 @@ const WooCommerceMigratorPage = () => {
   // Delete state
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteConfirming, setDeleteConfirming] = useState(false)
-  const [deleteMessage, setDeleteMessage] = useState("")
 
   const handleTestConnection = useCallback(async () => {
     if (!wooUrl || !consumerKey || !consumerSecret) return
@@ -225,7 +225,6 @@ const WooCommerceMigratorPage = () => {
 
   const handleDeleteAllProducts = useCallback(async () => {
     setIsDeleting(true)
-    setDeleteMessage("")
 
     try {
       const response = await fetch(
@@ -239,14 +238,19 @@ const WooCommerceMigratorPage = () => {
       const data = await response.json()
 
       if (response.ok) {
-        setDeleteMessage(data.message || `Deleted ${data.deletedCount} products.`)
+        toast.success("Deleted", {
+          description: data.message || `Deleted ${data.deletedCount} products.`,
+        })
         setDeleteConfirming(false)
         setImportResult(null)
       } else {
-        setDeleteMessage(`Delete failed: ${data.error || "Unknown error"}`)
+        toast.error("Delete Failed", {
+          description: data.error || "Unknown error occurred.",
+        })
       }
-    } catch (err: any) {
-      setDeleteMessage(`Delete error: ${err.message || "Network error"}`)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Network error"
+      toast.error("Delete Error", { description: msg })
     } finally {
       setIsDeleting(false)
     }
@@ -310,29 +314,7 @@ const WooCommerceMigratorPage = () => {
             )}
           </div>
         </div>
-
-        {deleteMessage && (
-          <div className="mt-3 p-3 bg-ui-bg-subtle rounded-md">
-            <Text size="small" className="text-ui-fg-subtle">
-              {deleteMessage}
-            </Text>
-          </div>
-        )}
       </Container>
-
-      {/* Yoast SEO Importer Cross-Link Banner */}
-      <div className="flex items-center justify-between px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl text-xs">
-        <div className="flex items-center gap-2 text-blue-800">
-          <span className="font-bold">Already imported your products?</span>
-          <span className="text-blue-600">Import your Yoast SEO titles, descriptions, and OpenGraph data into LaptopZone.</span>
-        </div>
-        <a
-          href="/app/yoast-seo-importer"
-          className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
-        >
-          Import Yoast SEO →
-        </a>
-      </div>
 
       {/* Data Source Toggle */}
       <Container>

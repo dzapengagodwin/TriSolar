@@ -1,8 +1,6 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import {
   BellAlert,
-  CheckCircleSolid,
-  ExclamationCircleSolid,
   ArrowPath,
   InformationCircle,
   Mailbox,
@@ -15,6 +13,7 @@ import {
   Input,
   Label,
   Badge,
+  toast,
   clx,
 } from "@medusajs/ui"
 import { useState, useEffect, useCallback } from "react"
@@ -27,11 +26,6 @@ type NotificationSettingsResponse = {
   has_db_record: boolean
 }
 
-type FeedbackStatus = {
-  type: "success" | "error" | "info"
-  message: string
-}
-
 const OrderNotificationsPage = () => {
   const [emailsInput, setEmailsInput] = useState("")
   const [savedEmails, setSavedEmails] = useState<string[]>([])
@@ -42,9 +36,6 @@ const OrderNotificationsPage = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
-
-  const [saveFeedback, setSaveFeedback] = useState<FeedbackStatus | null>(null)
-  const [testFeedback, setTestFeedback] = useState<FeedbackStatus | null>(null)
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -84,8 +75,6 @@ const OrderNotificationsPage = () => {
 
   const handleSave = async () => {
     setSaving(true)
-    setSaveFeedback(null)
-    setTestFeedback(null)
 
     try {
       const res = await fetch("/admin/notification-settings", {
@@ -105,24 +94,20 @@ const OrderNotificationsPage = () => {
         setSavedEmails(data.valid_emails || [])
         setIsConfigured(data.is_configured)
         setHasDbRecord(true)
-        setSaveFeedback({
-          type: "success",
-          message:
+        toast.success("Settings Saved", {
+          description:
             data.valid_emails.length > 0
-              ? `Settings saved. Notifications will be delivered to ${data.valid_emails.length} recipient(s).`
-              : "Settings saved. Cleared database override (system will use default fallback if set).",
+              ? `Notifications will be delivered to ${data.valid_emails.length} recipient(s).`
+              : "Cleared database override. Using default fallback if configured.",
         })
       } else {
-        setSaveFeedback({
-          type: "error",
-          message: data.error || data.message || "Failed to save settings.",
+        toast.error("Save Failed", {
+          description: data.error || data.message || "Failed to save settings.",
         })
       }
-    } catch (err: any) {
-      setSaveFeedback({
-        type: "error",
-        message: err.message || "Network error while saving settings.",
-      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Network error while saving settings."
+      toast.error("Save Error", { description: msg })
     } finally {
       setSaving(false)
     }
@@ -130,7 +115,6 @@ const OrderNotificationsPage = () => {
 
   const handleSendTest = async () => {
     setTesting(true)
-    setTestFeedback(null)
 
     try {
       const res = await fetch("/admin/notification-settings/test", {
@@ -146,21 +130,17 @@ const OrderNotificationsPage = () => {
       const data = await res.json()
 
       if (res.ok) {
-        setTestFeedback({
-          type: "success",
-          message: data.message || "Test order notification sent successfully!",
+        toast.success("Test Email Sent", {
+          description: data.message || "Test order notification sent successfully.",
         })
       } else {
-        setTestFeedback({
-          type: "error",
-          message: data.error || "Failed to send test notification.",
+        toast.error("Test Failed", {
+          description: data.error || "Failed to send test notification.",
         })
       }
-    } catch (err: any) {
-      setTestFeedback({
-        type: "error",
-        message: err.message || "Network error while sending test email.",
-      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Network error while sending test email."
+      toast.error("Test Error", { description: msg })
     } finally {
       setTesting(false)
     }
@@ -184,8 +164,7 @@ const OrderNotificationsPage = () => {
 
         <div>
           {isConfigured ? (
-            <Badge color="green" className="flex items-center gap-1.5 px-3 py-1">
-              <CheckCircleSolid className="w-3.5 h-3.5" />
+            <Badge color="green" className="px-3 py-1">
               Active ({savedEmails.length} recipient{savedEmails.length !== 1 ? "s" : ""})
             </Badge>
           ) : fallbackEmail ? (
@@ -194,50 +173,12 @@ const OrderNotificationsPage = () => {
               Fallback ({fallbackEmail})
             </Badge>
           ) : (
-            <Badge color="grey" className="flex items-center gap-1.5 px-3 py-1">
+            <Badge color="grey" className="px-3 py-1">
               Not Configured
             </Badge>
           )}
         </div>
       </div>
-
-      {/* Save status alert */}
-      {saveFeedback && (
-        <div
-          className={clx(
-            "p-4 rounded-lg flex items-start gap-3 text-sm",
-            saveFeedback.type === "success"
-              ? "bg-ui-bg-subtle-pressed border border-ui-border-strong text-ui-fg-base"
-              : "bg-ui-bg-danger-subtle border border-ui-border-danger text-ui-fg-danger"
-          )}
-        >
-          {saveFeedback.type === "success" ? (
-            <CheckCircleSolid className="w-5 h-5 text-ui-fg-interactive flex-shrink-0 mt-0.5" />
-          ) : (
-            <ExclamationCircleSolid className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          )}
-          <span>{saveFeedback.message}</span>
-        </div>
-      )}
-
-      {/* Test status alert */}
-      {testFeedback && (
-        <div
-          className={clx(
-            "p-4 rounded-lg flex items-start gap-3 text-sm",
-            testFeedback.type === "success"
-              ? "bg-ui-bg-highlight-subtle border border-ui-border-highlight text-ui-fg-base"
-              : "bg-ui-bg-danger-subtle border border-ui-border-danger text-ui-fg-danger"
-          )}
-        >
-          {testFeedback.type === "success" ? (
-            <CheckCircleSolid className="w-5 h-5 text-ui-fg-interactive flex-shrink-0 mt-0.5" />
-          ) : (
-            <ExclamationCircleSolid className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          )}
-          <span>{testFeedback.message}</span>
-        </div>
-      )}
 
       {/* Main Settings Card */}
       <Container className="p-6">

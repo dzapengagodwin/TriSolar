@@ -154,7 +154,7 @@ const CustomerWishlistWidget = ({ data }: CustomerWishlistWidgetProps) => {
                           to={`/products/${product.id}`}
                           className="text-xs font-semibold text-ui-fg-interactive hover:underline"
                         >
-                          View Product &rarr;
+                          View Product
                         </Link>
                       )}
                     </Table.Cell>

@@ -21,6 +21,7 @@ import {
   ArrowUpRightMini,
   Tag,
 } from "@medusajs/icons"
+import { MediaUploadField } from "../../components/media-upload-field"
 import { useState, useEffect, useCallback, useRef, useMemo } from "react"
 
 type ProductCategory = {
@@ -31,15 +32,33 @@ type ProductCategory = {
 
 type CollectionMetadata = {
   title?: string
-  bannerImage?: string
-  Bannerimage?: string
   banner_image?: string
-  categoryHandle?: string
+  bannerImage?: string
   category_handle?: string
-  viewAllHref?: string
+  categoryHandle?: string
   view_all_href?: string
+  viewAllHref?: string
   priority?: number | string
   [key: string]: unknown
+}
+
+const getCollectionMetadata = (meta?: Record<string, any> | null) => {
+  if (!meta) {
+    return {
+      title: "",
+      banner_image: "",
+      category_handle: "",
+      view_all_href: "",
+      priority: 0,
+    }
+  }
+  return {
+    title: meta.title || "",
+    banner_image: meta.banner_image || meta.bannerImage || meta.Bannerimage || "",
+    category_handle: meta.category_handle || meta.categoryHandle || "",
+    view_all_href: meta.view_all_href || meta.viewAllHref || "",
+    priority: meta.priority ?? 0,
+  }
 }
 
 type Collection = {
@@ -50,180 +69,6 @@ type Collection = {
   updated_at?: string
   products?: { id: string }[]
   metadata?: CollectionMetadata | null
-}
-
-type BannerUploaderProps = {
-  value: string
-  onChange: (url: string) => void
-}
-
-const BannerUploader = ({ value, onChange }: BannerUploaderProps) => {
-  const [tab, setTab] = useState<"upload" | "url">(value ? "url" : "upload")
-  const [uploading, setUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const handleFileUpload = async (file: File) => {
-    if (!file) return
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Invalid file", {
-        description: "Please upload an image file (JPEG, PNG, WebP, SVG, AVIF).",
-      })
-      return
-    }
-
-    setUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("files", file)
-
-      const res = await fetch("/admin/uploads", {
-        method: "POST",
-        credentials: "include",
-        body: formData,
-      })
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.message || "Failed to upload image.")
-      }
-
-      const data = await res.json()
-      const uploadedUrl = data.files?.[0]?.url
-
-      if (!uploadedUrl) {
-        throw new Error("No URL returned from upload server.")
-      }
-
-      onChange(uploadedUrl)
-      toast.success("Uploaded successfully", {
-        description: "Banner image uploaded and URL set.",
-      })
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Image upload failed"
-      toast.error("Upload Error", { description: msg })
-    } finally {
-      setUploading(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
-    }
-  }
-
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center gap-1 bg-ui-bg-subtle p-1 rounded-lg border border-ui-border-base w-fit">
-        <button
-          type="button"
-          onClick={() => setTab("upload")}
-          className={clx(
-            "px-3 py-1 rounded-md text-xs font-medium transition-colors",
-            tab === "upload"
-              ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-              : "text-ui-fg-muted hover:text-ui-fg-base"
-          )}
-        >
-          Upload File
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab("url")}
-          className={clx(
-            "px-3 py-1 rounded-md text-xs font-medium transition-colors",
-            tab === "url"
-              ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-              : "text-ui-fg-muted hover:text-ui-fg-base"
-          )}
-        >
-          Image URL
-        </button>
-      </div>
-
-      {tab === "upload" ? (
-        <div
-          onClick={() => !uploading && fileInputRef.current?.click()}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault()
-            const file = e.dataTransfer.files?.[0]
-            if (file) handleFileUpload(file)
-          }}
-          className={clx(
-            "border border-dashed border-ui-border-strong rounded-xl p-5 text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-2",
-            uploading
-              ? "bg-ui-bg-subtle opacity-70 cursor-not-allowed"
-              : "hover:bg-ui-bg-subtle hover:border-ui-border-interactive"
-          )}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) handleFileUpload(file)
-            }}
-          />
-          <Photo className="text-ui-fg-muted w-6 h-6" />
-          <Text className="text-xs text-ui-fg-subtle">
-            {uploading ? (
-              <span className="font-semibold text-ui-fg-interactive">
-                Uploading to storage...
-              </span>
-            ) : (
-              <>
-                <span className="font-medium text-ui-fg-base underline">
-                  Click to browse
-                </span>{" "}
-                or drag & drop banner image
-              </>
-            )}
-          </Text>
-          <Text className="text-[11px] text-ui-fg-muted">
-            PNG, JPG, WebP or SVG up to 10MB (recommended aspect ratio: 21:9 or 16:6)
-          </Text>
-        </div>
-      ) : (
-        <Input
-          placeholder="https://example.com/banners/hero-laptops.webp"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      )}
-
-      {value ? (
-        <div className="relative rounded-xl overflow-hidden border border-ui-border-base bg-ui-bg-subtle group">
-          <img
-            src={value}
-            alt="Showcase Banner Preview"
-            className="w-full h-32 object-cover"
-            onError={(e) => {
-              ;(e.currentTarget as HTMLElement).style.display = "none"
-            }}
-          />
-          <div className="flex items-center justify-between p-2 bg-ui-bg-base/90 border-t border-ui-border-base text-xs">
-            <span className="truncate max-w-[280px] text-ui-fg-muted font-mono text-[11px]">
-              {value}
-            </span>
-            <Button
-              variant="transparent"
-              size="small"
-              type="button"
-              onClick={() => onChange("")}
-              className="text-ui-fg-error hover:bg-ui-bg-subtle text-xs"
-            >
-              Remove
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-20 rounded-xl border border-dashed border-ui-border-base flex items-center justify-center text-xs text-ui-fg-muted bg-ui-bg-subtle/50">
-          No banner selected (storefront will show product rail without header image)
-        </div>
-      )}
-    </div>
-  )
 }
 
 type SearchableCategorySelectProps = {
@@ -457,26 +302,14 @@ const HomeShowcasePage = () => {
 
   const openEditDrawer = (col: Collection) => {
     setSelectedCollection(col)
-    setFormTitle(col.title || "")
-    setFormHandle(col.handle || "")
-    setFormDisplayTitle(col.metadata?.title || "")
-    setFormPriority(
-      col.metadata?.priority !== undefined && col.metadata?.priority !== null
-        ? col.metadata.priority
-        : ""
-    )
-    setFormBannerImage(
-      col.metadata?.bannerImage ||
-        col.metadata?.Bannerimage ||
-        col.metadata?.banner_image ||
-        ""
-    )
-    const catHandle =
-      col.metadata?.categoryHandle || col.metadata?.category_handle || ""
-    setFormCategoryHandle(catHandle)
-    setFormViewAllHref(
-      col.metadata?.viewAllHref || col.metadata?.view_all_href || ""
-    )
+    const meta = getCollectionMetadata(col.metadata)
+    setFormTitle(col.title)
+    setFormHandle(col.handle)
+    setFormDisplayTitle(meta.title)
+    setFormPriority(meta.priority !== 0 ? String(meta.priority) : "")
+    setFormBannerImage(meta.banner_image)
+    setFormCategoryHandle(meta.category_handle)
+    setFormViewAllHref(meta.view_all_href)
     setIsEditOpen(true)
   }
 
@@ -522,8 +355,11 @@ const HomeShowcasePage = () => {
       const updatedMetadata: Record<string, unknown> = {
         ...existingMeta,
         title: formDisplayTitle.trim() || undefined,
+        banner_image: formBannerImage.trim() || undefined,
         bannerImage: formBannerImage.trim() || undefined,
+        category_handle: formCategoryHandle.trim() || undefined,
         categoryHandle: formCategoryHandle.trim() || undefined,
+        view_all_href: formViewAllHref.trim() || undefined,
         viewAllHref: formViewAllHref.trim() || undefined,
         priority: priorityNum,
       }
@@ -553,19 +389,19 @@ const HomeShowcasePage = () => {
       }
 
       toast.success("Showcase Updated", {
-        description: `Saved changes to "${formTitle}".`,
+        description: `Collection "${formTitle}" homepage settings saved.`,
       })
       setIsEditOpen(false)
       fetchCollections()
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Save failed"
-      toast.error("Save Error", { description: msg })
+      toast.error("Error", { description: msg })
     } finally {
       setSaving(false)
     }
   }
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleCreateShowcase = async (e: React.FormEvent) => {
     e.preventDefault()
 
     let cleanHandle = formHandle.trim().toLowerCase()
@@ -589,8 +425,11 @@ const HomeShowcasePage = () => {
 
       const metadata: Record<string, unknown> = {
         title: formDisplayTitle.trim() || undefined,
+        banner_image: formBannerImage.trim() || undefined,
         bannerImage: formBannerImage.trim() || undefined,
+        category_handle: formCategoryHandle.trim() || undefined,
         categoryHandle: formCategoryHandle.trim() || undefined,
+        view_all_href: formViewAllHref.trim() || undefined,
         viewAllHref: formViewAllHref.trim() || undefined,
         priority: priorityNum,
       }
@@ -764,21 +603,13 @@ const HomeShowcasePage = () => {
             </Table.Header>
             <Table.Body>
               {filteredCollections.map((col, idx) => {
-                const priority =
-                  col.metadata?.priority !== undefined &&
-                  col.metadata?.priority !== null
-                    ? Number(col.metadata.priority)
-                    : idx + 1
-                const banner =
-                  col.metadata?.bannerImage ||
-                  col.metadata?.Bannerimage ||
-                  col.metadata?.banner_image
-                const displayTitle = col.metadata?.title || col.title
-                const categoryHandle =
-                  col.metadata?.categoryHandle || col.metadata?.category_handle
+                const meta = getCollectionMetadata(col.metadata)
+                const priority = meta.priority || idx + 1
+                const banner = meta.banner_image
+                const displayTitle = meta.title || col.title
+                const categoryHandle = meta.category_handle
                 const viewAllHref =
-                  col.metadata?.viewAllHref ||
-                  col.metadata?.view_all_href ||
+                  meta.view_all_href ||
                   (categoryHandle
                     ? `/categories/${categoryHandle}`
                     : `/collections/${col.handle}`)
@@ -951,12 +782,11 @@ const HomeShowcasePage = () => {
 
             {/* Banner Image Uploader */}
             <div className="pt-2 border-t border-ui-border-base">
-              <label className="text-xs font-semibold text-ui-fg-base mb-1.5 block">
-                Promo Banner Image
-              </label>
-              <BannerUploader
+              <MediaUploadField
                 value={formBannerImage}
                 onChange={setFormBannerImage}
+                label="Promo Banner Image"
+                aspectRatio="banner"
               />
             </div>
 
@@ -1020,6 +850,7 @@ const HomeShowcasePage = () => {
           </Drawer.Header>
 
           <form onSubmit={handleCreate} className="space-y-5 my-6">
+          <form onSubmit={handleCreateShowcase} className="space-y-5 my-6">
             {/* Collection Title */}
             <div>
               <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
@@ -1088,12 +919,11 @@ const HomeShowcasePage = () => {
 
             {/* Banner Image Uploader */}
             <div className="pt-2 border-t border-ui-border-base">
-              <label className="text-xs font-semibold text-ui-fg-base mb-1.5 block">
-                Promo Banner Image
-              </label>
-              <BannerUploader
+              <MediaUploadField
                 value={formBannerImage}
                 onChange={setFormBannerImage}
+                label="Promo Banner Image"
+                aspectRatio="banner"
               />
             </div>
 

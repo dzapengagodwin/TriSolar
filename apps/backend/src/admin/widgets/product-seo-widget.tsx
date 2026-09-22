@@ -317,18 +317,18 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
           )}
 
           {/* 3. Live Google Search Preview */}
-          <div className="border border-gray-200 rounded-xl p-4 bg-white shadow-2xs space-y-3">
-            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+          <div className="border border-ui-border-base rounded-xl p-4 bg-ui-bg-base space-y-3">
+            <div className="flex items-center justify-between border-b border-ui-border-base pb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-ui-fg-subtle">
                 Google Search Snippet Preview
               </span>
-              <div className="flex items-center gap-1 bg-gray-100 p-0.5 rounded-lg text-[11px]">
+              <div className="flex items-center gap-1 bg-ui-bg-subtle p-0.5 rounded-lg border border-ui-border-base text-[11px]">
                 <button
                   type="button"
                   onClick={() => setPreviewTab("desktop")}
                   className={clx(
-                    "px-2.5 py-1 rounded-md font-bold transition-colors",
-                    previewTab === "desktop" ? "bg-white text-black shadow-2xs" : "text-gray-500 hover:text-black"
+                    "px-2.5 py-1 rounded-md font-medium transition-colors",
+                    previewTab === "desktop" ? "bg-ui-bg-base text-ui-fg-base shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
                   )}
                 >
                   Desktop View
@@ -337,8 +337,8 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   type="button"
                   onClick={() => setPreviewTab("mobile")}
                   className={clx(
-                    "px-2.5 py-1 rounded-md font-bold transition-colors",
-                    previewTab === "mobile" ? "bg-white text-black shadow-2xs" : "text-gray-500 hover:text-black"
+                    "px-2.5 py-1 rounded-md font-medium transition-colors",
+                    previewTab === "mobile" ? "bg-ui-bg-base text-ui-fg-base shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
                   )}
                 >
                   Mobile View
@@ -348,26 +348,26 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
 
             <div
               className={clx(
-                "p-3 rounded-lg bg-[#F8F9FA] border border-gray-100 font-sans",
+                "p-3 rounded-lg bg-ui-bg-subtle border border-ui-border-base font-sans",
                 previewTab === "mobile" ? "max-w-xs" : "w-full"
               )}
             >
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-[9px] text-white font-bold">
+                <div className="w-4 h-4 rounded-full bg-ui-fg-interactive flex items-center justify-center text-[9px] text-white font-bold">
                   LZ
                 </div>
-                <div className="text-[11px] text-gray-700 leading-tight">
-                  <span className="font-medium text-gray-900">LaptopZone</span>
-                  <span className="text-gray-400 mx-1">›</span>
-                  <span className="text-gray-500 text-[10px]">products › {previewSlug}</span>
+                <div className="text-[11px] text-ui-fg-subtle leading-tight">
+                  <span className="font-medium text-ui-fg-base">LaptopZone</span>
+                  <span className="text-ui-fg-muted mx-1">›</span>
+                  <span className="text-ui-fg-muted text-[10px]">products › {previewSlug}</span>
                 </div>
               </div>
 
-              <div className="text-[#1a0dab] hover:underline text-sm sm:text-base font-medium leading-snug cursor-pointer line-clamp-1">
+              <div className="text-ui-fg-interactive hover:underline text-sm sm:text-base font-medium leading-snug cursor-pointer line-clamp-1">
                 {previewTitle}
               </div>
 
-              <div className="text-xs text-gray-600 mt-1 leading-relaxed line-clamp-2">
+              <div className="text-xs text-ui-fg-subtle mt-1 leading-relaxed line-clamp-2">
                 {previewDesc}
               </div>
             </div>
@@ -435,7 +435,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
               </div>
               <Textarea
                 rows={3}
-                placeholder="Compelling description summarizing product specs, warranty, and fast delivery in Zimbabwe"
+                placeholder="Brief summary of product specifications, condition, and warranty details..."
                 value={form.meta_description}
                 onChange={(e) => handleFieldChange("meta_description", e.target.value)}
               />

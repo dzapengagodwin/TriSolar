@@ -112,22 +112,31 @@ const BulkProductsPage = () => {
         params.set("category_id[]", categoryFilter)
       }
 
-      // Standard API query
+      // If brand filter is selected, query brand's linked product IDs
+      if (brandFilter) {
+        const brandRes = await fetch(`/admin/brands/${brandFilter}`, { credentials: "include" })
+        if (brandRes.ok) {
+          const brandData = await brandRes.json()
+          const brandProductIds = (brandData.brand?.products || []).map((p: any) => p.id)
+          if (brandProductIds.length === 0) {
+            setProducts([])
+            setTotalCount(0)
+            return
+          }
+          brandProductIds.forEach((id: string) => params.append("id[]", id))
+        }
+      }
+
+      // Standard API query with server-side filtering
       const res = await fetch(`/admin/products?${params.toString()}`, { credentials: "include" })
       if (!res.ok) throw new Error("Failed to fetch products")
       const data = await res.json()
 
-      // Client-side brand filter fallback since core Medusa endpoint doesn't natively filter brand_id directly
-      let list = data.products || []
-      if (brandFilter) {
-        // Query custom brand mappings or filter locally
-        list = list.filter((p: any) => p.brand?.id === brandFilter)
-      }
-
-      setProducts(list)
+      setProducts(data.products || [])
       setTotalCount(data.count || 0)
-    } catch (err: any) {
-      toast.error("Error", { description: err.message || "Failed to load products" })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load products"
+      toast.error("Error", { description: msg })
     } finally {
       setLoading(false)
     }

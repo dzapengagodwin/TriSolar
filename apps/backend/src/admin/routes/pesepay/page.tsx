@@ -4,8 +4,6 @@ import {
   Key,
   Eye,
   EyeSlash,
-  CheckCircleSolid,
-  ExclamationCircleSolid,
   ArrowPath,
   InformationCircle,
 } from "@medusajs/icons"
@@ -16,17 +14,11 @@ import {
   Button,
   Input,
   Label,
-  Select,
   Badge,
+  toast,
   clx,
 } from "@medusajs/ui"
 import { useState, useEffect, useCallback } from "react"
-
-type ConnectionTestResult = {
-  success: boolean
-  message?: string
-  error?: string
-}
 
 const PesepaySettingsPage = () => {
   const [integrationKey, setIntegrationKey] = useState("")
@@ -43,11 +35,6 @@ const PesepaySettingsPage = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
-  const [testResult, setTestResult] = useState<ConnectionTestResult | null>(null)
-  const [saveStatus, setSaveStatus] = useState<{
-    type: "success" | "error"
-    message: string
-  } | null>(null)
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -80,8 +67,6 @@ const PesepaySettingsPage = () => {
 
   const handleSave = async () => {
     setSaving(true)
-    setSaveStatus(null)
-    setTestResult(null)
 
     try {
       const res = await fetch("/admin/pesepay/settings", {
@@ -106,21 +91,17 @@ const PesepaySettingsPage = () => {
         if (data.maskedIntegrationKey) {
           setIntegrationKey(data.maskedIntegrationKey)
         }
-        setSaveStatus({
-          type: "success",
-          message: "Pesepay configuration saved successfully!",
+        toast.success("Settings Saved", {
+          description: "Pesepay configuration saved successfully.",
         })
       } else {
-        setSaveStatus({
-          type: "error",
-          message: data.error || "Failed to save settings.",
+        toast.error("Save Failed", {
+          description: data.error || "Failed to save settings.",
         })
       }
-    } catch (err: any) {
-      setSaveStatus({
-        type: "error",
-        message: err.message || "An error occurred while saving.",
-      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "An error occurred while saving."
+      toast.error("Save Error", { description: msg })
     } finally {
       setSaving(false)
     }
@@ -128,8 +109,6 @@ const PesepaySettingsPage = () => {
 
   const handleTestConnection = async () => {
     setTesting(true)
-    setTestResult(null)
-    setSaveStatus(null)
 
     try {
       const res = await fetch("/admin/pesepay/test-connection", {
@@ -147,23 +126,17 @@ const PesepaySettingsPage = () => {
       const data = await res.json()
 
       if (res.ok && data.success) {
-        setTestResult({
-          success: true,
-          message:
-            data.message || "Connected to Pesepay gateway successfully!",
+        toast.success("Connection Verified", {
+          description: data.message || "Connected to Pesepay gateway successfully.",
         })
       } else {
-        setTestResult({
-          success: false,
-          error:
-            data.error || "Failed to connect to Pesepay with these credentials.",
+        toast.error("Connection Failed", {
+          description: data.error || "Failed to connect to Pesepay with these credentials.",
         })
       }
-    } catch (err: any) {
-      setTestResult({
-        success: false,
-        error: err.message || "Connection test request failed.",
-      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Connection test request failed."
+      toast.error("Connection Error", { description: msg })
     } finally {
       setTesting(false)
     }
@@ -202,53 +175,6 @@ const PesepaySettingsPage = () => {
           </div>
         </div>
       </Container>
-
-      {/* Save Status Alert */}
-      {saveStatus && (
-        <div
-          className={clx(
-            "p-4 rounded-xl border flex items-center gap-3 text-sm transition-all",
-            saveStatus.type === "success"
-              ? "bg-ui-bg-success-subtle border-ui-border-success text-ui-fg-success"
-              : "bg-ui-bg-error-subtle border-ui-border-error text-ui-fg-error"
-          )}
-        >
-          {saveStatus.type === "success" ? (
-            <CheckCircleSolid className="w-5 h-5 flex-shrink-0" />
-          ) : (
-            <ExclamationCircleSolid className="w-5 h-5 flex-shrink-0" />
-          )}
-          <span>{saveStatus.message}</span>
-        </div>
-      )}
-
-      {/* Test Connection Alert */}
-      {testResult && (
-        <div
-          className={clx(
-            "p-4 rounded-xl border flex items-center gap-3 text-sm transition-all",
-            testResult.success
-              ? "bg-ui-bg-success-subtle border-ui-border-success text-ui-fg-success"
-              : "bg-ui-bg-error-subtle border-ui-border-error text-ui-fg-error"
-          )}
-        >
-          {testResult.success ? (
-            <CheckCircleSolid className="w-5 h-5 flex-shrink-0" />
-          ) : (
-            <ExclamationCircleSolid className="w-5 h-5 flex-shrink-0" />
-          )}
-          <div>
-            <p className="font-semibold">
-              {testResult.success
-                ? "Connection Verified"
-                : "Connection Failed"}
-            </p>
-            <p className="text-xs mt-0.5">
-              {testResult.success ? testResult.message : testResult.error}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Environment / Mode Section */}
       <Container className="p-6">
