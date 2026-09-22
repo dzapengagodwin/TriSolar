@@ -4,6 +4,7 @@ import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 
+
 export const listCartShippingMethods = async (cartId: string) => {
   const headers = {
     ...(await getAuthHeaders()),
@@ -20,6 +21,7 @@ export const listCartShippingMethods = async (cartId: string) => {
         method: "GET",
         query: {
           cart_id: cartId,
+          fields: "*service_zone.fulfillment_set",
         },
         headers,
         next,

@@ -1,5 +1,10 @@
 import { getOrSetCart, retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
+import { listCartShippingMethods } from "@lib/data/fulfillment"
+import {
+  isPickupShippingOption,
+  isDeliveryShippingOption,
+} from "@lib/util/fulfillment"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
@@ -25,6 +30,17 @@ export default async function Checkout(props: {
     return notFound()
   }
 
+  const shippingMethods = await listCartShippingMethods(cart.id).catch(() => [])
+  const pickupOptions = shippingMethods.filter(isPickupShippingOption)
+  const deliveryOptions = shippingMethods.filter(isDeliveryShippingOption)
+  const isPickupOnly = pickupOptions.length > 0 && deliveryOptions.length === 0
+  const isCartPickup =
+    isPickupOnly ||
+    cart.shipping_methods?.some((sm) =>
+      pickupOptions.some((po) => po.id === sm.shipping_option_id)
+    ) ||
+    false
+
   const customer = await retrieveCustomer()
 
   return (
@@ -34,9 +50,13 @@ export default async function Checkout(props: {
           <div className="w-full h-96 bg-gray-50 rounded-2xl animate-pulse" />
         }
       >
-        <CheckoutForm cart={cart} customer={customer} />
+        <CheckoutForm
+          cart={cart}
+          customer={customer}
+          initialShippingMethods={shippingMethods}
+        />
       </Suspense>
-      <CheckoutSummary cart={cart} />
+      <CheckoutSummary cart={cart} isPickup={isCartPickup} />
     </div>
   )
 }

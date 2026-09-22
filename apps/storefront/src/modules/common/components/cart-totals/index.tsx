@@ -12,10 +12,18 @@ type CartTotalsProps = {
     item_subtotal?: number | null
     shipping_subtotal?: number | null
     discount_subtotal?: number | null
+    shipping_methods?:
+      | {
+          name?: string
+          amount?: number
+          shipping_option_id?: string
+        }[]
+      | null
   }
+  isPickup?: boolean
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, isPickup }) => {
   const {
     currency_code = "usd",
     total,
@@ -24,6 +32,22 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     shipping_subtotal,
     discount_subtotal,
   } = totals
+
+  const isPickupMethod =
+    isPickup ||
+    totals.shipping_methods?.some(
+      (sm) =>
+        sm.name?.toLowerCase().includes("pickup") ||
+        (sm as unknown as { service_zone?: { fulfillment_set?: { type?: string } } })
+          ?.service_zone?.fulfillment_set?.type === "pickup"
+    ) ||
+    false
+
+  const shippingLabel = isPickupMethod ? "Pickup" : "Shipping"
+  const isFreeShipping = isPickupMethod && (shipping_subtotal === 0 || !shipping_subtotal)
+  const shippingFormatted = isFreeShipping
+    ? "Free"
+    : convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })
 
   const rawTaxTotal = Number(tax_total) || Number((totals as unknown as Record<string, unknown>)?.item_tax_total) || 0
   const grossAmount = Number(item_subtotal) || Number(total) || 0
@@ -51,9 +75,13 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
       </div>
 
       <div className="flex items-center justify-between">
-        <span>Shipping</span>
-        <span className="font-bold text-gray-900" data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-          {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+        <span>{shippingLabel}</span>
+        <span
+          className={isFreeShipping ? "font-bold text-emerald-600" : "font-bold text-gray-900"}
+          data-testid="cart-shipping"
+          data-value={shipping_subtotal || 0}
+        >
+          {shippingFormatted}
         </span>
       </div>
 

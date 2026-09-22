@@ -8,9 +8,11 @@ import { HttpTypes } from "@medusajs/types"
 const CartTemplate = ({
   cart,
   customer,
+  isPickupOnly,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  isPickupOnly?: boolean
 }) => {
   return (
     <div className="py-8 sm:py-12 bg-[#F8FAF9] min-h-screen">
@@ -30,7 +32,7 @@ const CartTemplate = ({
             <div className="sticky top-28">
               {cart && cart.region && (
                 <div className="bg-white rounded-2xl p-5 sm:p-8 border border-gray-100 shadow-sm">
-                  <Summary cart={cart} />
+                  <Summary cart={cart} isPickup={isPickupOnly} />
                 </div>
               )}
             </div>

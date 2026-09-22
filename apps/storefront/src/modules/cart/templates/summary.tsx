@@ -9,6 +9,7 @@ import { ArrowRight } from "@medusajs/icons"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart
+  isPickup?: boolean
 }
 
 export function getCheckoutStep(cart: HttpTypes.StoreCart) {
@@ -21,7 +22,7 @@ export function getCheckoutStep(cart: HttpTypes.StoreCart) {
   }
 }
 
-const Summary = ({ cart }: SummaryProps) => {
+const Summary = ({ cart, isPickup }: SummaryProps) => {
   return (
     <div className="flex flex-col gap-y-5">
       <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -29,7 +30,7 @@ const Summary = ({ cart }: SummaryProps) => {
       </h2>
       <DiscountCode cart={cart} />
       <Divider />
-      <CartTotals totals={cart} />
+      <CartTotals totals={cart} isPickup={isPickup} />
       <LocalizedClientLink
         href="/checkout"
         data-testid="checkout-button"

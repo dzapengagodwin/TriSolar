@@ -20,9 +20,10 @@ import Image from "next/image"
 
 type CartDropdownProps = {
   cart?: HttpTypes.StoreCart | null
+  isPickupOnly?: boolean
 }
 
-const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
+const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [updatingLineId, setUpdatingLineId] = useState<string | null>(null)
   const [accessories, setAccessories] = useState<HttpTypes.StoreProduct[]>([])
@@ -522,8 +523,10 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
               </span>
             </div>
 
-            <p className="text-[11px] text-gray-400 text-center">
-              Shipping &amp; delivery calculated at checkout
+            <p className="text-[11px] text-gray-500 text-center font-medium">
+              {isPickupOnly
+                ? "Free in-store pickup · Pay on collection"
+                : "Shipping & delivery calculated at checkout"}
             </p>
 
             {/* Action Buttons */}
@@ -561,13 +564,20 @@ const CartDropdown = ({ cart: cartState }: CartDropdownProps) => {
 
             {/* Payment Method Badges Row */}
             <div className="pt-2 flex items-center justify-center">
-              <Image
-                src="/payment-methods.png"
-                alt="Accepted Payment Methods - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
-                width={260}
-                height={28}
-                className="h-5 w-auto object-contain"
-              />
+              {isPickupOnly ? (
+                <div className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/60 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  <span>Pay on Collection: Cash or Swipe In-Store</span>
+                </div>
+              ) : (
+                <Image
+                  src="/payment-methods.png"
+                  alt="Accepted Payment Methods - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
+                  width={260}
+                  height={28}
+                  className="h-5 w-auto object-contain"
+                />
+              )}
             </div>
           </div>
         ) : null}

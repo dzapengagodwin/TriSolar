@@ -1,10 +1,15 @@
 "use client"
 
-import React, { useState, useMemo, useEffect, useRef, useTransition } from "react"
+import React, { useState, useMemo, useEffect, useRef, useTransition, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
-import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
+import { CreditCard } from "@medusajs/icons"
 import { convertToLocale } from "@lib/util/money"
+import {
+  isPickupShippingOption,
+  isDeliveryShippingOption,
+  getPickupLocationAddress,
+} from "@lib/util/fulfillment"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import {
   setShippingMethod,
@@ -47,21 +52,65 @@ const OnePageCheckoutForm = ({
   const router = useRouter()
   const [, startTransition] = useTransition()
 
+  // Explicitly classify fulfillment options
+  const pickupOptions = useMemo(
+    () => availableShippingMethods.filter(isPickupShippingOption),
+    [availableShippingMethods]
+  )
+  const shippingOptions = useMemo(
+    () => availableShippingMethods.filter(isDeliveryShippingOption),
+    [availableShippingMethods]
+  )
+  const pickupEnabled = pickupOptions.length > 0
+  const shippingEnabled = shippingOptions.length > 0
+  const isPickupOnly = pickupEnabled && !shippingEnabled
+
+  // Displayed fulfillment methods (in pickup-only mode, only show pickup options)
+  const displayedShippingMethods = useMemo(() => {
+    if (isPickupOnly) {
+      return pickupOptions
+    }
+    return availableShippingMethods
+  }, [isPickupOnly, pickupOptions, availableShippingMethods])
+
+  // Default shipping selection
+  const defaultShippingId = isPickupOnly
+    ? (pickupOptions.find((p) => p.id === cart.shipping_methods?.at(-1)?.shipping_option_id)?.id || pickupOptions[0]?.id || "")
+    : (cart.shipping_methods?.at(-1)?.shipping_option_id || availableShippingMethods[0]?.id || "")
+
+  // Selected delivery
+  const [shippingMethodId, setShippingMethodId] = useState<string>(defaultShippingId)
+
+  // Currently selected shipping option
+  const selectedShippingOption = useMemo(
+    () => displayedShippingMethods.find((sm) => sm.id === shippingMethodId),
+    [displayedShippingMethods, shippingMethodId]
+  )
+
+  // Is pickup selected either because store is in pickup-only mode OR customer chose in-store pickup
+  const isPickupSelected = isPickupOnly || isPickupShippingOption(selectedShippingOption)
+
+  // Displayed payment methods (in pickup mode, only show Pay On Collection / manual, hide Pesepay)
+  const displayedPaymentMethods = useMemo(() => {
+    if (isPickupSelected) {
+      return availablePaymentMethods.filter(
+        (pm) => isManual(pm.id) || pm.id === "pp_system_default"
+      )
+    }
+    return availablePaymentMethods
+  }, [isPickupSelected, availablePaymentMethods])
+
   // Active payment session on cart if any
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (s) => s.status === "pending"
   )
 
-  // Default selections
-  const defaultShippingId =
-    cart.shipping_methods?.at(-1)?.shipping_option_id ||
-    availableShippingMethods[0]?.id ||
-    ""
+  const defaultPaymentId = isPickupSelected
+    ? (displayedPaymentMethods.find((pm) => isManual(pm.id) || pm.id === "pp_system_default")?.id || displayedPaymentMethods[0]?.id || "pp_system_default")
+    : (activeSession?.provider_id || availablePaymentMethods[0]?.id || "")
 
-  const defaultPaymentId =
-    activeSession?.provider_id ||
-    availablePaymentMethods[0]?.id ||
-    ""
+  // Selected payment
+  const [paymentProviderId, setPaymentProviderId] = useState<string>(defaultPaymentId)
 
   // Form states: Shipping address & Contact
   const [email, setEmail] = useState(cart.email || customer?.email || "")
@@ -100,10 +149,6 @@ const OnePageCheckoutForm = ({
     "billing_address.province": cart.billing_address?.province || "",
     "billing_address.phone": cart.billing_address?.phone || "",
   })
-
-  // Selected delivery & payment
-  const [shippingMethodId, setShippingMethodId] = useState<string>(defaultShippingId)
-  const [paymentProviderId, setPaymentProviderId] = useState<string>(defaultPaymentId)
 
   // Status & validation states
   const [submitting, setSubmitting] = useState(false)
@@ -216,38 +261,96 @@ const OnePageCheckoutForm = ({
   }
 
   // Handle shipping method selection with background cart update
-  const handleSelectShippingMethod = async (id: string) => {
-    setShippingMethodId(id)
-    if (fieldErrors["shipping_method_id"]) {
-      setFieldErrors((prev) => {
-        const copy = { ...prev }
-        delete copy["shipping_method_id"]
-        return copy
-      })
-    }
+  const handleSelectShippingMethod = useCallback(
+    async (id: string) => {
+      setShippingMethodId(id)
+      if (fieldErrors["shipping_method_id"]) {
+        setFieldErrors((prev) => {
+          const copy = { ...prev }
+          delete copy["shipping_method_id"]
+          return copy
+        })
+      }
 
-    const selectedOption = availableShippingMethods.find((sm) => sm.id === id)
-    if (cart.items?.length) {
-      trackAddShippingInfo({
-        items: cart.items.map((item) => transformLineItemToGA4Item(item)),
-        total: cart.total ?? 0,
-        currency: cart.currency_code?.toUpperCase() || "USD",
-        shippingTier: selectedOption?.name || id,
-      })
-    }
+      const selectedOption = displayedShippingMethods.find((sm) => sm.id === id)
+      const isClickedPickup = isPickupOnly || isPickupShippingOption(selectedOption)
 
-    setUpdatingShipping(true)
-    try {
-      await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
-      startTransition(() => {
-        router.refresh()
-      })
-    } catch (err) {
-      console.warn("Could not pre-set shipping method:", err)
-    } finally {
-      setUpdatingShipping(false)
+      // If user selected pickup, immediately ensure payment is switched to Pay On Collection / manual
+      if (isClickedPickup) {
+        const manualPm = availablePaymentMethods.find(
+          (pm) => isManual(pm.id) || pm.id === "pp_system_default"
+        )
+        if (manualPm) {
+          setPaymentProviderId(manualPm.id)
+        }
+      }
+
+      if (cart.items?.length) {
+        trackAddShippingInfo({
+          items: cart.items.map((item) => transformLineItemToGA4Item(item)),
+          total: cart.total ?? 0,
+          currency: cart.currency_code?.toUpperCase() || "USD",
+          shippingTier: selectedOption?.name || id,
+        })
+      }
+
+      setUpdatingShipping(true)
+      try {
+        await setShippingMethod({ cartId: cart.id, shippingMethodId: id })
+        startTransition(() => {
+          router.refresh()
+        })
+      } catch (err) {
+        console.warn("Could not pre-set shipping method:", err)
+      } finally {
+        setUpdatingShipping(false)
+      }
+    },
+    [
+      cart.id,
+      cart.items,
+      cart.total,
+      cart.currency_code,
+      displayedShippingMethods,
+      isPickupOnly,
+      availablePaymentMethods,
+      fieldErrors,
+      router,
+    ]
+  )
+
+  // Auto-switch payment method if current selection is not valid in displayedPaymentMethods
+  // (e.g. user selected Shop Pickup -> Pesepay is hidden -> automatically switch to Pay On Collection)
+  useEffect(() => {
+    if (isPickupSelected) {
+      const isCurrentValid = displayedPaymentMethods.some(
+        (pm) => pm.id === paymentProviderId
+      )
+      if (!isCurrentValid && displayedPaymentMethods.length > 0) {
+        const manualPm = displayedPaymentMethods.find(
+          (pm) => isManual(pm.id) || pm.id === "pp_system_default"
+        )
+        setPaymentProviderId(manualPm?.id || displayedPaymentMethods[0].id)
+      }
     }
-  }
+  }, [isPickupSelected, displayedPaymentMethods, paymentProviderId])
+
+  // Auto-select pickup option when in pickup-only mode
+  useEffect(() => {
+    if (isPickupOnly) {
+      if (
+        pickupOptions.length > 0 &&
+        (!shippingMethodId || !pickupOptions.some((p) => p.id === shippingMethodId))
+      ) {
+        handleSelectShippingMethod(pickupOptions[0].id)
+      }
+    }
+  }, [
+    isPickupOnly,
+    pickupOptions,
+    shippingMethodId,
+    handleSelectShippingMethod,
+  ])
 
   // Handle payment method selection
   const handleSelectPaymentMethod = (providerId: string) => {
@@ -287,39 +390,45 @@ const OnePageCheckoutForm = ({
       errors["shipping_address.last_name"] = "Last name is required."
     }
 
-    if (!formData["shipping_address.address_1"]?.trim()) {
-      errors["shipping_address.address_1"] = "Street address is required."
-    }
-
-    if (!formData["shipping_address.city"]?.trim()) {
-      errors["shipping_address.city"] = "City is required."
-    }
-
-    if (!formData["shipping_address.country_code"]?.trim()) {
-      errors["shipping_address.country_code"] = "Country is required."
-    }
-
     if (!formData["shipping_address.phone"]?.trim()) {
-      errors["shipping_address.phone"] = "Phone number is required for delivery contact."
+      errors["shipping_address.phone"] = isPickupSelected
+        ? "Phone number is required for collection notification."
+        : "Phone number is required for delivery contact."
     }
 
-    if (!sameAsBilling) {
-      if (!billingFormData["billing_address.first_name"]?.trim()) {
-        errors["billing_address.first_name"] = "Billing first name is required."
+    if (!isPickupSelected) {
+      if (!formData["shipping_address.address_1"]?.trim()) {
+        errors["shipping_address.address_1"] = "Street address is required."
       }
-      if (!billingFormData["billing_address.last_name"]?.trim()) {
-        errors["billing_address.last_name"] = "Billing last name is required."
+
+      if (!formData["shipping_address.city"]?.trim()) {
+        errors["shipping_address.city"] = "City is required."
       }
-      if (!billingFormData["billing_address.address_1"]?.trim()) {
-        errors["billing_address.address_1"] = "Billing street address is required."
+
+      if (!formData["shipping_address.country_code"]?.trim()) {
+        errors["shipping_address.country_code"] = "Country is required."
       }
-      if (!billingFormData["billing_address.city"]?.trim()) {
-        errors["billing_address.city"] = "Billing city is required."
+
+      if (!sameAsBilling) {
+        if (!billingFormData["billing_address.first_name"]?.trim()) {
+          errors["billing_address.first_name"] = "Billing first name is required."
+        }
+        if (!billingFormData["billing_address.last_name"]?.trim()) {
+          errors["billing_address.last_name"] = "Billing last name is required."
+        }
+        if (!billingFormData["billing_address.address_1"]?.trim()) {
+          errors["billing_address.address_1"] = "Billing street address is required."
+        }
+        if (!billingFormData["billing_address.city"]?.trim()) {
+          errors["billing_address.city"] = "Billing city is required."
+        }
       }
     }
 
     if (!shippingMethodId) {
-      errors["shipping_method_id"] = "Please select a delivery method."
+      errors["shipping_method_id"] = isPickupSelected
+        ? "Please select a collection location."
+        : "Please select a delivery method."
     }
 
     if (!paymentProviderId) {
@@ -353,35 +462,65 @@ const OnePageCheckoutForm = ({
     setSubmitting(true)
     setErrorMessage(null)
 
+    const selectedPickup = isPickupSelected
+      ? (selectedShippingOption || displayedShippingMethods.find((sm) => sm.id === shippingMethodId))
+      : null
+    const pickupAddressStr = selectedPickup
+      ? getPickupLocationAddress(selectedPickup)
+      : "64 Ridgeway / Borrowdale, Harare"
+
     const payload: CheckoutFormData = {
       email: email.trim(),
-      shipping_address: {
-        first_name: formData["shipping_address.first_name"],
-        last_name: formData["shipping_address.last_name"],
-        address_1: formData["shipping_address.address_1"],
-        address_2: formData["shipping_address.address_2"] || "",
-        company: formData["shipping_address.company"] || "",
-        postal_code: formData["shipping_address.postal_code"] || "",
-        city: formData["shipping_address.city"],
-        country_code: formData["shipping_address.country_code"],
-        province: formData["shipping_address.province"] || "",
-        phone: formData["shipping_address.phone"],
-      },
-      same_as_billing: sameAsBilling,
-      billing_address: sameAsBilling
-        ? undefined
+      shipping_address: isPickupSelected
+        ? {
+            first_name: formData["shipping_address.first_name"],
+            last_name: formData["shipping_address.last_name"],
+            address_1:
+              formData["shipping_address.address_1"]?.trim() ||
+              pickupAddressStr ||
+              "64 Ridgeway / Borrowdale",
+            address_2:
+              formData["shipping_address.address_2"] || "In-Store Collection",
+            company: formData["shipping_address.company"] || "",
+            postal_code: formData["shipping_address.postal_code"] || "0000",
+            city: formData["shipping_address.city"]?.trim() || "Harare",
+            country_code:
+              formData["shipping_address.country_code"] ||
+              cart.region?.countries?.[0]?.iso_2 ||
+              "zw",
+            province: formData["shipping_address.province"] || "",
+            phone: formData["shipping_address.phone"],
+          }
         : {
-            first_name: billingFormData["billing_address.first_name"],
-            last_name: billingFormData["billing_address.last_name"],
-            address_1: billingFormData["billing_address.address_1"],
-            address_2: billingFormData["billing_address.address_2"] || "",
-            company: billingFormData["billing_address.company"] || "",
-            postal_code: billingFormData["billing_address.postal_code"] || "",
-            city: billingFormData["billing_address.city"],
-            country_code: billingFormData["billing_address.country_code"],
-            province: billingFormData["billing_address.province"] || "",
-            phone: billingFormData["billing_address.phone"] || formData["shipping_address.phone"],
+            first_name: formData["shipping_address.first_name"],
+            last_name: formData["shipping_address.last_name"],
+            address_1: formData["shipping_address.address_1"],
+            address_2: formData["shipping_address.address_2"] || "",
+            company: formData["shipping_address.company"] || "",
+            postal_code: formData["shipping_address.postal_code"] || "",
+            city: formData["shipping_address.city"],
+            country_code: formData["shipping_address.country_code"],
+            province: formData["shipping_address.province"] || "",
+            phone: formData["shipping_address.phone"],
           },
+      same_as_billing: isPickupSelected ? true : sameAsBilling,
+      billing_address:
+        !isPickupSelected && !sameAsBilling
+          ? {
+              first_name: billingFormData["billing_address.first_name"],
+              last_name: billingFormData["billing_address.last_name"],
+              address_1: billingFormData["billing_address.address_1"],
+              address_2: billingFormData["billing_address.address_2"] || "",
+              company: billingFormData["billing_address.company"] || "",
+              postal_code: billingFormData["billing_address.postal_code"] || "",
+              city: billingFormData["billing_address.city"],
+              country_code: billingFormData["billing_address.country_code"],
+              province: billingFormData["billing_address.province"] || "",
+              phone:
+                billingFormData["billing_address.phone"] ||
+                formData["shipping_address.phone"],
+            }
+          : undefined,
       shipping_method_id: shippingMethodId,
       payment_provider_id: paymentProviderId,
     }
@@ -422,22 +561,26 @@ const OnePageCheckoutForm = ({
   const getSubmitButtonLabel = () => {
     if (submitting) {
       if (isPesepay(paymentProviderId)) return "Connecting to Pesepay..."
-      return "Processing Your Order..."
+      return "Processing Order..."
+    }
+
+    if (isPickupSelected) {
+      return "Confirm Pickup Order"
     }
 
     if (isPesepay(paymentProviderId)) {
-      return "Pay with Pesepay →"
+      return "Pay with Pesepay"
     }
 
     if (isManual(paymentProviderId) || paymentProviderId === "pp_system_default") {
-      return "Place Order (Pay on Collection) →"
+      return "Place Order"
     }
 
     if (isStripeLike(paymentProviderId)) {
-      return "Pay with Card →"
+      return "Pay with Card"
     }
 
-    return "Place Order Now →"
+    return "Place Order"
   }
 
   return (
@@ -464,472 +607,514 @@ const OnePageCheckoutForm = ({
         </div>
       )}
 
-      {/* SECTION 1: Contact & Shipping Address */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-          <div className="flex items-center gap-x-3">
-            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
-              1
-            </span>
-            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              Customer & Shipping Details
+      {/* Unified Checkout Form Card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100 overflow-hidden">
+        {/* SECTION 1: Contact & Delivery / Collector Details */}
+        <div className="p-6 sm:p-8 space-y-6">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+              {isPickupOnly ? "Contact & Collector Details" : "Contact & Delivery Address"}
             </h2>
-          </div>
-        </div>
-
-        {/* Quick select saved customer address if logged in */}
-        {customer && (addressesInRegion?.length || 0) > 0 && (
-          <div className="mb-6 p-4 bg-gray-50/80 rounded-xl border border-gray-200">
-            <span className="text-xs font-bold text-gray-700 block mb-2">
-              Saved Delivery Addresses:
-            </span>
-            <AddressSelect
-              addresses={customer.addresses}
-              addressInput={cart.shipping_address}
-              onSelect={handleSavedAddressSelect}
-            />
-          </div>
-        )}
-
-        <div className="space-y-4">
-          {/* Email & Phone */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Input
-                label="Email Address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  if (fieldErrors["email"]) {
-                    setFieldErrors((prev) => {
-                      const copy = { ...prev }
-                      delete copy["email"]
-                      return copy
-                    })
-                  }
-                }}
-                required
-              />
-              {fieldErrors["email"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["email"]}
-                </span>
-              )}
-            </div>
-            <div>
-              <Input
-                label="Phone Number"
-                name="shipping_address.phone"
-                autoComplete="tel"
-                value={formData["shipping_address.phone"]}
-                onChange={handleShippingChange}
-                required
-              />
-              {fieldErrors["shipping_address.phone"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["shipping_address.phone"]}
-                </span>
-              )}
-            </div>
+            {isPickupOnly && (
+              <p className="text-xs text-gray-500 mt-1">
+                Please provide the contact details of the person collecting this order in store.
+              </p>
+            )}
           </div>
 
-          {/* First & Last Name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <Input
-                label="First Name"
-                name="shipping_address.first_name"
-                autoComplete="given-name"
-                value={formData["shipping_address.first_name"]}
-                onChange={handleShippingChange}
-                required
+          {/* Quick select saved customer address if logged in (normal shipping mode only) */}
+          {!isPickupOnly && customer && (addressesInRegion?.length || 0) > 0 && (
+            <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-200">
+              <span className="text-xs font-bold text-gray-700 block mb-2">
+                Saved Delivery Addresses:
+              </span>
+              <AddressSelect
+                addresses={customer.addresses}
+                addressInput={cart.shipping_address}
+                onSelect={handleSavedAddressSelect}
               />
-              {fieldErrors["shipping_address.first_name"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["shipping_address.first_name"]}
-                </span>
-              )}
-            </div>
-            <div>
-              <Input
-                label="Last Name"
-                name="shipping_address.last_name"
-                autoComplete="family-name"
-                value={formData["shipping_address.last_name"]}
-                onChange={handleShippingChange}
-                required
-              />
-              {fieldErrors["shipping_address.last_name"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["shipping_address.last_name"]}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Street Address */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <Input
-                label="Street Address (Line 1)"
-                name="shipping_address.address_1"
-                autoComplete="address-line1"
-                value={formData["shipping_address.address_1"]}
-                onChange={handleShippingChange}
-                required
-              />
-              {fieldErrors["shipping_address.address_1"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["shipping_address.address_1"]}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Address Line 2 & Company */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Apartment, suite, unit (optional)"
-              name="shipping_address.address_2"
-              autoComplete="address-line2"
-              value={formData["shipping_address.address_2"]}
-              onChange={handleShippingChange}
-            />
-            <Input
-              label="Company (optional)"
-              name="shipping_address.company"
-              autoComplete="organization"
-              value={formData["shipping_address.company"]}
-              onChange={handleShippingChange}
-            />
-          </div>
-
-          {/* City, Province, Postal Code, Country */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <Input
-                label="City / Town"
-                name="shipping_address.city"
-                autoComplete="address-level2"
-                value={formData["shipping_address.city"]}
-                onChange={handleShippingChange}
-                required
-              />
-              {fieldErrors["shipping_address.city"] && (
-                <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
-                  {fieldErrors["shipping_address.city"]}
-                </span>
-              )}
-            </div>
-            <div>
-              <Input
-                label="State / Province"
-                name="shipping_address.province"
-                autoComplete="address-level1"
-                value={formData["shipping_address.province"]}
-                onChange={handleShippingChange}
-              />
-            </div>
-            <div>
-              <CountrySelect
-                name="shipping_address.country_code"
-                autoComplete="country"
-                region={cart?.region}
-                value={formData["shipping_address.country_code"]}
-                onChange={handleShippingChange}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Same as Billing Checkbox */}
-          <div className="pt-2">
-            <CheckboxWithLabel
-              label="Billing address same as shipping address"
-              name="same_as_billing"
-              checked={sameAsBilling}
-              onChange={() => setSameAsBilling(!sameAsBilling)}
-            />
-          </div>
-
-          {/* Optional Billing Address Section */}
-          {!sameAsBilling && (
-            <div className="pt-4 border-t border-gray-100 mt-4 space-y-4 animate-in fade-in duration-200">
-              <h3 className="text-md font-bold text-black">
-                Billing Address
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="First Name"
-                  name="billing_address.first_name"
-                  value={billingFormData["billing_address.first_name"]}
-                  onChange={handleBillingChange}
-                  required
-                />
-                <Input
-                  label="Last Name"
-                  name="billing_address.last_name"
-                  value={billingFormData["billing_address.last_name"]}
-                  onChange={handleBillingChange}
-                  required
-                />
-              </div>
-              <Input
-                label="Billing Address"
-                name="billing_address.address_1"
-                value={billingFormData["billing_address.address_1"]}
-                onChange={handleBillingChange}
-                required
-              />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="City"
-                  name="billing_address.city"
-                  value={billingFormData["billing_address.city"]}
-                  onChange={handleBillingChange}
-                  required
-                />
-                <CountrySelect
-                  name="billing_address.country_code"
-                  region={cart?.region}
-                  value={billingFormData["billing_address.country_code"]}
-                  onChange={handleBillingChange}
-                  required
-                />
-              </div>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* SECTION 2: Delivery / Shipping Method */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-          <div className="flex items-center gap-x-3">
-            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
-              2
-            </span>
-            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              Delivery Method
-              {updatingShipping && <Spinner size="16" />}
-            </h2>
-          </div>
-        </div>
+          <div className="space-y-4">
+            {/* Email & Phone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Input
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    if (fieldErrors["email"]) {
+                      setFieldErrors((prev) => {
+                        const copy = { ...prev }
+                        delete copy["email"]
+                        return copy
+                      })
+                    }
+                  }}
+                  required
+                />
+                {fieldErrors["email"] && (
+                  <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                    {fieldErrors["email"]}
+                  </span>
+                )}
+              </div>
+              <div>
+                <Input
+                  label={isPickupOnly ? "Collector Phone Number" : "Phone Number"}
+                  name="shipping_address.phone"
+                  autoComplete="tel"
+                  value={formData["shipping_address.phone"]}
+                  onChange={handleShippingChange}
+                  required
+                />
+                {fieldErrors["shipping_address.phone"] && (
+                  <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                    {fieldErrors["shipping_address.phone"]}
+                  </span>
+                )}
+              </div>
+            </div>
 
-        {availableShippingMethods.length === 0 ? (
-          <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
-            No shipping options available for this destination.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3">
-            {availableShippingMethods.map((option) => {
-              const isSelected = option.id === shippingMethodId
-              const calculatedPrice = calculatedPricesMap[option.id]
-              const price =
-                option.price_type === "flat"
-                  ? option.amount ?? 0
-                  : calculatedPrice ?? option.amount ?? 0
+            {/* First & Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <Input
+                  label={isPickupOnly ? "Collector First Name" : "First Name"}
+                  name="shipping_address.first_name"
+                  autoComplete="given-name"
+                  value={formData["shipping_address.first_name"]}
+                  onChange={handleShippingChange}
+                  required
+                />
+                {fieldErrors["shipping_address.first_name"] && (
+                  <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                    {fieldErrors["shipping_address.first_name"]}
+                  </span>
+                )}
+              </div>
+              <div>
+                <Input
+                  label={isPickupOnly ? "Collector Last Name" : "Last Name"}
+                  name="shipping_address.last_name"
+                  autoComplete="family-name"
+                  value={formData["shipping_address.last_name"]}
+                  onChange={handleShippingChange}
+                  required
+                />
+                {fieldErrors["shipping_address.last_name"] && (
+                  <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                    {fieldErrors["shipping_address.last_name"]}
+                  </span>
+                )}
+              </div>
+            </div>
 
-              const formattedPrice =
-                price === 0
-                  ? "Free"
-                  : convertToLocale({
-                      amount: price,
-                      currency_code: cart.currency_code,
-                    })
+            {!isPickupOnly && (
+              <>
+                {/* Street Address */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Input
+                      label="Street Address (Line 1)"
+                      name="shipping_address.address_1"
+                      autoComplete="address-line1"
+                      value={formData["shipping_address.address_1"]}
+                      onChange={handleShippingChange}
+                      required
+                    />
+                    {fieldErrors["shipping_address.address_1"] && (
+                      <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                        {fieldErrors["shipping_address.address_1"]}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-              return (
-                <div
-                  key={option.id}
-                  onClick={() => handleSelectShippingMethod(option.id)}
-                  className={clx(
-                    "relative flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all duration-150",
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-xs"
-                      : "border-gray-100 hover:border-gray-300 hover:bg-gray-50/50"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={clx(
-                        "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
-                        isSelected
-                          ? "border-primary bg-primary text-white"
-                          : "border-gray-300 bg-white"
-                      )}
-                    >
-                      {isSelected && (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
+                {/* Address Line 2 & Company */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="Apartment, suite, unit (optional)"
+                    name="shipping_address.address_2"
+                    autoComplete="address-line2"
+                    value={formData["shipping_address.address_2"]}
+                    onChange={handleShippingChange}
+                  />
+                  <Input
+                    label="Company (optional)"
+                    name="shipping_address.company"
+                    autoComplete="organization"
+                    value={formData["shipping_address.company"]}
+                    onChange={handleShippingChange}
+                  />
+                </div>
+
+                {/* City & Country */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Input
+                      label="City"
+                      name="shipping_address.city"
+                      autoComplete="address-level2"
+                      value={formData["shipping_address.city"]}
+                      onChange={handleShippingChange}
+                      required
+                    />
+                    {fieldErrors["shipping_address.city"] && (
+                      <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                        {fieldErrors["shipping_address.city"]}
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <CountrySelect
+                      name="shipping_address.country_code"
+                      autoComplete="country"
+                      region={cart?.region}
+                      value={formData["shipping_address.country_code"]}
+                      onChange={handleShippingChange}
+                      required
+                    />
+                    {fieldErrors["shipping_address.country_code"] && (
+                      <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                        {fieldErrors["shipping_address.country_code"]}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* State / Province & Postal Code */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="State / Province (optional)"
+                    name="shipping_address.province"
+                    autoComplete="address-level1"
+                    value={formData["shipping_address.province"]}
+                    onChange={handleShippingChange}
+                  />
+                  <Input
+                    label="Postal Code (optional)"
+                    name="shipping_address.postal_code"
+                    autoComplete="postal-code"
+                    value={formData["shipping_address.postal_code"]}
+                    onChange={handleShippingChange}
+                  />
+                </div>
+
+                {/* Same as billing checkbox */}
+                <div className="pt-2">
+                  <CheckboxWithLabel
+                    label="Billing address same as delivery address"
+                    name="same_as_billing"
+                    checked={sameAsBilling}
+                    onChange={() => setSameAsBilling(!sameAsBilling)}
+                  />
+                </div>
+
+                {/* Billing Address Form if different */}
+                {!sameAsBilling && (
+                  <div className="pt-4 border-t border-gray-100 space-y-4">
+                    <span className="text-sm font-bold text-gray-900 block">
+                      Billing Address
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Input
+                          label="First Name"
+                          name="billing_address.first_name"
+                          value={billingFormData["billing_address.first_name"]}
+                          onChange={handleBillingChange}
+                          required
+                        />
+                        {fieldErrors["billing_address.first_name"] && (
+                          <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                            {fieldErrors["billing_address.first_name"]}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <Input
+                          label="Last Name"
+                          name="billing_address.last_name"
+                          value={billingFormData["billing_address.last_name"]}
+                          onChange={handleBillingChange}
+                          required
+                        />
+                        {fieldErrors["billing_address.last_name"] && (
+                          <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                            {fieldErrors["billing_address.last_name"]}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-sm font-bold text-black block">
-                        {option.name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Reliable courier delivery to your address
-                      </span>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
+                        <Input
+                          label="Street Address"
+                          name="billing_address.address_1"
+                          value={billingFormData["billing_address.address_1"]}
+                          onChange={handleBillingChange}
+                          required
+                        />
+                        {fieldErrors["billing_address.address_1"] && (
+                          <span className="text-[11px] text-rose-600 font-semibold mt-1 block">
+                            {fieldErrors["billing_address.address_1"]}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Input
+                        label="City"
+                        name="billing_address.city"
+                        value={billingFormData["billing_address.city"]}
+                        onChange={handleBillingChange}
+                        required
+                      />
+                      <CountrySelect
+                        name="billing_address.country_code"
+                        region={cart?.region}
+                        value={billingFormData["billing_address.country_code"]}
+                        onChange={handleBillingChange}
+                        required
+                      />
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-gray-900">
-                    {formattedPrice}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {fieldErrors["shipping_method_id"] && (
-          <span className="text-xs text-rose-600 font-semibold mt-2 block">
-            {fieldErrors["shipping_method_id"]}
-          </span>
-        )}
-      </div>
-
-      {/* SECTION 3: Payment Method */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm">
-        <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-6">
-          <div className="flex items-center gap-x-3">
-            <span className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">
-              3
-            </span>
-            <h2 className="text-xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-              Payment Method
-            </h2>
+                )}
+              </>
+            )}
           </div>
         </div>
 
-        {availablePaymentMethods.length === 0 ? (
-          <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
-            No payment methods available for this region.
+        {/* SECTION 2: Fulfillment / Collection Location */}
+        <div className="p-6 sm:p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+              {isPickupOnly ? "Collection Location" : "Delivery Method"}
+            </h2>
+            {updatingShipping && <Spinner size="16" />}
           </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3">
-            {availablePaymentMethods.map((pm) => {
-              const isSelected = pm.id === paymentProviderId
-              const info = paymentInfoMap[pm.id] || {
-                title: pm.id.replace(/^pp_/, "").replace(/_/g, " ").toUpperCase(),
-                icon: <CreditCard />,
-              }
 
-              return (
-                <div
-                  key={pm.id}
-                  onClick={() => handleSelectPaymentMethod(pm.id)}
-                  className={clx(
-                    "relative flex flex-col p-4 rounded-xl border-2 cursor-pointer transition-all duration-150",
-                    isSelected
-                      ? "border-primary bg-primary/5 shadow-xs"
-                      : "border-gray-100 hover:border-gray-300 hover:bg-gray-50/50"
-                  )}
-                >
-                  <div className="flex items-center justify-between">
+          {displayedShippingMethods.length === 0 ? (
+            <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
+              {isPickupOnly
+                ? "No pickup location available."
+                : "No shipping options available for this destination."}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {displayedShippingMethods.map((option) => {
+                const isSelected = option.id === shippingMethodId
+                const isPickup = isPickupShippingOption(option)
+                const calculatedPrice = calculatedPricesMap[option.id]
+                const price =
+                  option.price_type === "flat"
+                    ? option.amount ?? 0
+                    : calculatedPrice ?? option.amount ?? 0
+
+                const formattedPrice =
+                  price === 0 || isPickup
+                    ? "Free"
+                    : convertToLocale({
+                        amount: price,
+                        currency_code: cart.currency_code,
+                      })
+
+                const pickupAddress = isPickup
+                  ? getPickupLocationAddress(option)
+                  : null
+
+                return (
+                  <div
+                    key={option.id}
+                    onClick={() => handleSelectShippingMethod(option.id)}
+                    className={clx(
+                      "relative flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-150",
+                      isSelected
+                        ? "border-gray-900 bg-gray-50/70 shadow-xs"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/30"
+                    )}
+                  >
                     <div className="flex items-center gap-3">
                       <div
                         className={clx(
-                          "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                          "w-4 h-4 rounded-full border flex items-center justify-center transition-colors shrink-0",
                           isSelected
-                            ? "border-primary bg-primary text-white"
+                            ? "border-gray-900 bg-gray-900 text-white"
                             : "border-gray-300 bg-white"
                         )}
                       >
                         {isSelected && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
                         )}
                       </div>
                       <div>
-                        <span className="text-sm font-bold text-black block">
-                          {info.title}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-gray-900 block">
+                            {isPickup
+                              ? (option.name.toLowerCase().includes("pickup")
+                                  ? option.name
+                                  : `Shop Pickup — ${option.name}`)
+                              : option.name}
+                          </span>
+                          {isPickup && !isPickupOnly && (
+                            <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 shrink-0">
+                              Pickup
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-500 block mt-0.5">
+                          {isPickup
+                            ? (pickupAddress || "Collect at our physical shop")
+                            : "Standard courier delivery to your address"}
+                        </span>
+                      </div>
+                    </div>
+                    <span
+                      className={clx(
+                        "text-sm font-semibold shrink-0 ml-2",
+                        price === 0 || isPickup ? "text-emerald-600" : "text-gray-900"
+                      )}
+                    >
+                      {formattedPrice}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {fieldErrors["shipping_method_id"] && (
+            <span className="text-xs text-rose-600 font-semibold mt-2 block">
+              {fieldErrors["shipping_method_id"]}
+            </span>
+          )}
+        </div>
+
+        {/* SECTION 3: Payment Method */}
+        <div className="p-6 sm:p-8 space-y-4">
+          <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+            Payment Method
+          </h2>
+
+          {displayedPaymentMethods.length === 0 ? (
+            <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
+              {isPickupSelected
+                ? "No payment method available for collection."
+                : "No payment methods available for this region."}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3">
+              {displayedPaymentMethods.map((pm) => {
+                const isSelected = pm.id === paymentProviderId
+                const isManualMethod =
+                  isManual(pm.id) || pm.id === "pp_system_default"
+                const info = paymentInfoMap[pm.id] || {
+                  title: isManualMethod
+                    ? "Pay On Collection"
+                    : pm.id.replace(/^pp_/, "").replace(/_/g, " ").toUpperCase(),
+                  icon: <CreditCard />,
+                }
+
+                return (
+                  <div
+                    key={pm.id}
+                    onClick={() => handleSelectPaymentMethod(pm.id)}
+                    className={clx(
+                      "relative flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-150",
+                      isSelected
+                        ? "border-gray-900 bg-gray-50/70 shadow-xs"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50/30"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={clx(
+                          "w-4 h-4 rounded-full border flex items-center justify-center transition-colors shrink-0",
+                          isSelected
+                            ? "border-gray-900 bg-gray-900 text-white"
+                            : "border-gray-300 bg-white"
+                        )}
+                      >
+                        {isSelected && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-sm font-semibold text-gray-900 block">
+                          {isManualMethod ? "Pay On Collection" : info.title}
                         </span>
                         {isPesepay(pm.id) && (
-                          <span className="text-xs text-gray-500">
-                            EcoCash, OneMoney, Visa, Mastercard, Innbucks & Zimswitch
+                          <span className="text-xs text-gray-500 block mt-0.5">
+                            EcoCash, OneMoney, Visa, Mastercard, InnBucks &amp; Zimswitch
                           </span>
                         )}
-                        {(isManual(pm.id) || pm.id === "pp_system_default") && (
-                          <span className="text-xs text-gray-500">
-                            Pay with cash or swipe on pickup / courier delivery
+                        {isManualMethod && (
+                          <span className="text-xs text-gray-500 block mt-0.5">
+                            {isPickupSelected
+                              ? "Cash or card swipe in store upon collection"
+                              : "Cash or card swipe upon delivery or collection"}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="text-gray-400">
+                    <div className="text-gray-400 shrink-0">
                       {info.icon}
                     </div>
                   </div>
-
-                  {/* Pesepay Info Box when selected */}
-                  {isSelected && isPesepay(pm.id) && (
-                    <div className="mt-3 pt-3 border-t border-gray-200/60 text-xs text-gray-600 bg-white/60 p-3 rounded-lg flex items-center gap-2">
-                      <CheckCircleSolid className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>
-                        You will be securely redirected to Pesepay to complete your payment with EcoCash, OneMoney, or Card.
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Pay On Collection Info Box when selected */}
-                  {isSelected && (isManual(pm.id) || pm.id === "pp_system_default") && (
-                    <div className="mt-3 pt-3 border-t border-gray-200/60 text-xs text-gray-600 bg-white/60 p-3 rounded-lg flex items-center gap-2">
-                      <CheckCircleSolid className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>
-                        Your order will be confirmed immediately. Payment is collected upon delivery or collection.
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {fieldErrors["payment_provider_id"] && (
-          <span className="text-xs text-rose-600 font-semibold mt-2 block">
-            {fieldErrors["payment_provider_id"]}
-          </span>
-        )}
-      </div>
-
-      {/* SECTION 4: Order Submission */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-100 shadow-sm space-y-4">
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-xs text-gray-600 leading-relaxed">
-          By clicking <span className="font-bold text-black">{getSubmitButtonLabel()}</span>, you confirm that you accept our{" "}
-          <LocalizedClientLink href="/terms" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
-            Terms &amp; Conditions
-          </LocalizedClientLink>{" "}
-          and{" "}
-          <LocalizedClientLink href="/returns" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
-            Returns Policy
-          </LocalizedClientLink>
-          , and acknowledge Laptopzone&apos;s{" "}
-          <LocalizedClientLink href="/privacy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
-            Privacy Policy
-          </LocalizedClientLink>
-          .
-        </div>
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-full text-base transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {submitting ? (
-            <>
-              <Spinner size="18" />
-              <span>{getSubmitButtonLabel()}</span>
-            </>
-          ) : (
-            <span className="flex items-center gap-2">
-              {getSubmitButtonLabel()}
+                )
+              })}
+            </div>
+          )}
+          {fieldErrors["payment_provider_id"] && (
+            <span className="text-xs text-rose-600 font-semibold mt-2 block">
+              {fieldErrors["payment_provider_id"]}
             </span>
           )}
-        </button>
+        </div>
+
+        {/* SECTION 4: Order Submission */}
+        <div className="p-6 sm:p-8 space-y-4 bg-gray-50/40">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-xl text-base transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {submitting ? (
+              <>
+                <Spinner size="18" />
+                <span>Processing Order...</span>
+              </>
+            ) : (
+              <span>{getSubmitButtonLabel()}</span>
+            )}
+          </button>
+
+          <p className="text-center text-xs text-gray-400 leading-relaxed">
+            By placing your order, you agree to Laptopzone&apos;s{" "}
+            <LocalizedClientLink href="/terms" target="_blank" className="underline hover:text-gray-700">
+              Terms &amp; Conditions
+            </LocalizedClientLink>
+            ,{" "}
+            <LocalizedClientLink href="/privacy" target="_blank" className="underline hover:text-gray-700">
+              Privacy Policy
+            </LocalizedClientLink>
+            , and{" "}
+            <LocalizedClientLink href="/returns" target="_blank" className="underline hover:text-gray-700">
+              Returns Policy
+            </LocalizedClientLink>
+            .
+          </p>
+        </div>
       </div>
     </form>
   )
 }
 
 export default OnePageCheckoutForm
-

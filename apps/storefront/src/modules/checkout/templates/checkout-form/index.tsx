@@ -6,16 +6,20 @@ import OnePageCheckoutForm from "@modules/checkout/components/one-page-checkout-
 export default async function CheckoutForm({
   cart,
   customer,
+  initialShippingMethods,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  initialShippingMethods?: HttpTypes.StoreCartShippingOption[]
 }) {
   if (!cart) {
     return null
   }
 
   const [shippingMethodsResult, paymentMethodsResult] = await Promise.all([
-    listCartShippingMethods(cart.id),
+    initialShippingMethods
+      ? Promise.resolve(initialShippingMethods)
+      : listCartShippingMethods(cart.id),
     listCartPaymentMethods(cart.region?.id ?? ""),
   ])
 
