@@ -4,6 +4,7 @@ import {
   Heading,
   Text,
   Button,
+  IconButton,
   Table,
   Badge,
   StatusBadge,
@@ -218,7 +219,7 @@ const ProductReviewsWidget = ({ data }: ProductReviewsWidgetProps) => {
 
                     <Table.Cell className="max-w-xs">
                       {rev.title && (
-                        <p className="font-semibold text-xs text-ui-fg-base truncate">
+                        <p className="font-medium text-xs text-ui-fg-base truncate">
                           {rev.title}
                         </p>
                       )}
@@ -266,14 +267,14 @@ const ProductReviewsWidget = ({ data }: ProductReviewsWidgetProps) => {
                           Reject
                         </Button>
                       )}
-                      <Button
+                      <IconButton
                         variant="transparent"
                         size="small"
                         className="text-ui-fg-muted hover:text-ui-fg-danger"
                         onClick={() => setReviewToDelete(rev)}
                       >
                         <Trash className="w-3.5 h-3.5" />
-                      </Button>
+                      </IconButton>
                     </Table.Cell>
                   </Table.Row>
                 )

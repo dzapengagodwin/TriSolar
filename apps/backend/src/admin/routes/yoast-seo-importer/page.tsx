@@ -9,6 +9,7 @@ import {
   Label,
   Switch,
   Badge,
+  StatusBadge,
   Table,
   clx,
 } from "@medusajs/ui"
@@ -189,38 +190,42 @@ const YoastSeoImporterPage = () => {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <Heading level="h1" className="text-2xl font-bold text-gray-900">
+          <Heading level="h1">
             Yoast SEO Importer
           </Heading>
-          <Text className="text-sm text-gray-500 mt-1">
+          <Text className="text-sm text-ui-fg-subtle mt-1">
             Import Yoast SEO metadata (titles, descriptions, OpenGraph, robots) from your old WordPress site into LaptopZone.
           </Text>
         </div>
         {importResult && (
-          <Badge color={importResult.errors.length > 0 ? "orange" : "green"}>
+          <StatusBadge color={importResult.errors.length > 0 ? "orange" : "green"}>
             {importResult.imported} records imported
-          </Badge>
+          </StatusBadge>
         )}
       </div>
 
       {/* Step 1: Connection */}
-      <Container className="p-6 space-y-5 border border-gray-200 rounded-xl shadow-xs">
-        <div className="flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">1</span>
-          <Heading level="h2" className="text-sm font-bold text-gray-900">
-            WordPress Connection
-          </Heading>
+      <Container className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <Heading level="h2">
+              WordPress Connection
+            </Heading>
+            <Text size="small" className="text-ui-fg-subtle">
+              Enter your WordPress REST API credentials with read permissions.
+            </Text>
+          </div>
           {connectionStatus === "connected" && (
-            <Badge color={yoastDetected ? "green" : "orange"} size="small">
-              {yoastDetected ? "Yoast Detected" : "Connected — No Yoast"}
-            </Badge>
+            <StatusBadge color={yoastDetected ? "green" : "orange"}>
+              {yoastDetected ? "Yoast Detected" : "Connected (No Yoast)"}
+            </StatusBadge>
           )}
-          {connectionStatus === "failed" && <Badge color="red" size="small">Failed</Badge>}
+          {connectionStatus === "failed" && <StatusBadge color="red">Connection Failed</StatusBadge>}
         </div>
 
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-4 pt-2">
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-700">WordPress Site URL</Label>
+            <Label size="small" className="text-ui-fg-subtle">WordPress Site URL</Label>
             <Input
               placeholder="https://old-site.laptopzone.co.zw"
               value={wooUrl}
@@ -229,7 +234,7 @@ const YoastSeoImporterPage = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-700">Consumer Key</Label>
+              <Label size="small" className="text-ui-fg-subtle">Consumer Key</Label>
               <Input
                 placeholder="ck_xxxxxxxxxxxxxxxxxxxxxxxx"
                 value={consumerKey}
@@ -238,7 +243,7 @@ const YoastSeoImporterPage = () => {
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-700">Consumer Secret</Label>
+              <Label size="small" className="text-ui-fg-subtle">Consumer Secret</Label>
               <Input
                 placeholder="cs_xxxxxxxxxxxxxxxxxxxxxxxx"
                 value={consumerSecret}
@@ -254,7 +259,7 @@ const YoastSeoImporterPage = () => {
             className={clx(
               "p-3 rounded-lg text-xs",
               connectionStatus === "connected"
-                ? yoastDetected ? "bg-green-50 text-green-800 border border-green-200" : "bg-amber-50 text-amber-800 border border-amber-200"
+                ? yoastDetected ? "bg-ui-bg-subtle text-ui-fg-base border border-ui-border-base" : "bg-amber-50 text-amber-800 border border-amber-200"
                 : "bg-red-50 text-red-800 border border-red-200"
             )}
           >
@@ -262,22 +267,26 @@ const YoastSeoImporterPage = () => {
           </div>
         )}
 
-        <Button
-          variant="secondary"
-          size="small"
-          isLoading={connectionStatus === "testing"}
-          disabled={!wooUrl || !consumerKey || !consumerSecret || connectionStatus === "testing"}
-          onClick={handleTestConnection}
-        >
-          {connectionStatus === "connected" ? "Re-Test Connection" : "Test Connection"}
-        </Button>
+        <div className="pt-2">
+          <Button
+            variant="secondary"
+            size="small"
+            isLoading={connectionStatus === "testing"}
+            disabled={!wooUrl || !consumerKey || !consumerSecret || connectionStatus === "testing"}
+            onClick={handleTestConnection}
+          >
+            {connectionStatus === "connected" ? "Re-Test Connection" : "Test Connection"}
+          </Button>
+        </div>
       </Container>
 
       {/* Step 2: Import Scope */}
-      <Container className="p-6 space-y-5 border border-gray-200 rounded-xl shadow-xs">
-        <div className="flex items-center gap-2">
-          <span className={clx("w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center", canProceed ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-400")}>2</span>
-          <Heading level="h2" className="text-sm font-bold text-gray-900">Import Scope</Heading>
+      <Container className="p-6 space-y-5">
+        <div>
+          <Heading level="h2">Import Scope</Heading>
+          <Text size="small" className="text-ui-fg-subtle">
+            Select the content types you want to import metadata for.
+          </Text>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -287,25 +296,25 @@ const YoastSeoImporterPage = () => {
             { label: "Brands", value: importBrands, setter: setImportBrands, desc: "Brand taxonomy Yoast metadata (YITH or WC Brands)" },
             { label: "Static Pages", value: importPages, setter: setImportPages, desc: "About, Contact, and other WordPress static pages" },
           ].map(({ label, value, setter, desc }) => (
-            <label key={label} className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-gray-100 hover:border-gray-300 transition-colors">
+            <label key={label} className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-ui-border-base hover:border-ui-border-strong transition-colors">
               <Switch checked={value} onCheckedChange={setter} disabled={!canProceed} />
               <div>
-                <div className="text-xs font-bold text-gray-900">{label}</div>
-                <div className="text-[11px] text-gray-500 leading-relaxed">{desc}</div>
+                <Text size="small" weight="plus" className="text-ui-fg-base">{label}</Text>
+                <Text size="xsmall" className="text-ui-fg-subtle leading-relaxed mt-0.5">{desc}</Text>
               </div>
             </label>
           ))}
         </div>
 
-        <div className="border-t border-gray-100 pt-4">
+        <div className="border-t border-ui-border-base pt-4">
           <label className="flex items-center gap-3 cursor-pointer">
             <Switch checked={overwriteExisting} onCheckedChange={setOverwriteExisting} disabled={!canProceed} />
             <div>
-              <div className="text-xs font-bold text-gray-900">Overwrite Existing SEO Data</div>
-              <div className="text-[11px] text-gray-500">
+              <Text size="small" weight="plus" className="text-ui-fg-base">Overwrite Existing SEO Data</Text>
+              <Text size="xsmall" className="text-ui-fg-subtle mt-0.5">
                 When enabled, Yoast data will overwrite any SEO already set in the Medusa Admin SEO Widget.
                 Disable to only fill in blank records.
-              </div>
+              </Text>
             </div>
           </label>
         </div>
@@ -335,19 +344,18 @@ const YoastSeoImporterPage = () => {
 
       {/* Step 3: Dry-Run Preview */}
       {previewData && previewData.length > 0 && importStatus !== "importing" && importStatus !== "complete" && (
-        <Container className="p-6 space-y-4 border border-blue-100 bg-blue-50/30 rounded-xl shadow-xs">
+        <Container className="p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">3</span>
-              <Heading level="h2" className="text-sm font-bold text-gray-900">Preview</Heading>
-              <Badge color="blue" size="small">{previewData.length} records</Badge>
+            <div className="flex items-center gap-3">
+              <Heading level="h2">Preview</Heading>
+              <Badge color="grey" size="small">{previewData.length} records</Badge>
             </div>
-            <div className="flex gap-2 text-xs">
-              <Badge color="green" size="small">{previewData.filter(r => r.willMatch).length} matched</Badge>
-              <Badge color="orange" size="small">{previewData.filter(r => !r.willMatch).length} no match</Badge>
+            <div className="flex gap-3 text-xs">
+              <StatusBadge color="green">{previewData.filter(r => r.willMatch).length} matched</StatusBadge>
+              <StatusBadge color="orange">{previewData.filter(r => !r.willMatch).length} no match</StatusBadge>
             </div>
           </div>
-          <div className="overflow-x-auto rounded-lg border border-blue-100">
+          <div className="overflow-x-auto rounded-lg border border-ui-border-base">
             <Table>
               <Table.Header>
                 <Table.Row>
@@ -370,28 +378,28 @@ const YoastSeoImporterPage = () => {
                         {row.entityType}
                       </Badge>
                     </Table.Cell>
-                    <Table.Cell className="text-xs font-mono text-gray-600 max-w-[140px] truncate">
+                    <Table.Cell className="text-xs font-mono text-ui-fg-subtle max-w-[140px] truncate">
                       {row.wpSlug}
                     </Table.Cell>
-                    <Table.Cell className="text-xs text-gray-700 max-w-[220px] truncate">
-                      {row.metaTitle || <span className="text-gray-400 italic">—</span>}
+                    <Table.Cell className="text-xs text-ui-fg-base max-w-[220px] truncate">
+                      {row.metaTitle || <span className="text-ui-fg-muted italic">—</span>}
                     </Table.Cell>
-                    <Table.Cell className="text-xs text-gray-500 max-w-[200px] truncate">
+                    <Table.Cell className="text-xs text-ui-fg-subtle max-w-[200px] truncate">
                       {row.metaDescription
                         ? `${row.metaDescription.slice(0, 60)}…`
-                        : <span className="text-gray-300 italic">—</span>}
+                        : <span className="text-ui-fg-muted italic">—</span>}
                     </Table.Cell>
                     <Table.Cell className="text-xs">
                       {row.ogImage ? (
-                        <span className="text-green-600 font-bold">✓</span>
+                        <span className="text-ui-fg-interactive">Yes</span>
                       ) : (
-                        <span className="text-gray-300">—</span>
+                        <span className="text-ui-fg-muted">—</span>
                       )}
                     </Table.Cell>
                     <Table.Cell>
-                      <Badge color={row.willMatch ? "green" : "red"} size="small">
+                      <StatusBadge color={row.willMatch ? "green" : "red"}>
                         {row.willMatch ? "Match" : "No Match"}
-                      </Badge>
+                      </StatusBadge>
                     </Table.Cell>
                   </Table.Row>
                 ))}
@@ -399,11 +407,11 @@ const YoastSeoImporterPage = () => {
             </Table>
           </div>
           {previewData.length > 50 && (
-            <Text className="text-xs text-gray-400 text-center">
+            <Text className="text-xs text-ui-fg-muted text-center">
               Showing 50 of {previewData.length} records. Run the import to process all.
             </Text>
           )}
-          <Text className="text-[11px] text-blue-700 bg-blue-50 border border-blue-100 rounded-lg p-2.5">
+          <Text className="text-[11px] text-ui-fg-subtle bg-ui-bg-subtle border border-ui-border-base rounded-lg p-2.5">
             This is a dry run — nothing has been saved. Click <strong>Run Import</strong> above to apply these changes.
           </Text>
         </Container>
@@ -411,55 +419,59 @@ const YoastSeoImporterPage = () => {
 
       {/* Error state */}
       {importStatus === "error" && importError && (
-        <Container className="p-4 bg-red-50 border border-red-200 rounded-xl">
-          <Text className="text-sm font-bold text-red-700">Import Failed</Text>
-          <Text className="text-xs text-red-600 mt-1">{importError}</Text>
+        <Container className="p-4 bg-ui-bg-subtle border border-ui-border-error">
+          <Text size="small" weight="plus" className="text-ui-fg-error">Import Failed</Text>
+          <Text size="xsmall" className="text-ui-fg-subtle mt-1">{importError}</Text>
         </Container>
       )}
 
       {/* Step 4: Results */}
       {importResult && importStatus === "complete" && (
-        <Container className="p-6 space-y-5 border border-green-100 bg-green-50/20 rounded-xl shadow-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-green-600 text-white text-xs font-bold flex items-center justify-center">✓</span>
-            <Heading level="h2" className="text-sm font-bold text-gray-900">Import Complete</Heading>
+        <Container className="p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <Heading level="h2">Import Complete</Heading>
+            <StatusBadge color={importResult.errors.length > 0 ? "orange" : "green"}>
+              {importResult.imported} of {importResult.totalFetched} imported
+            </StatusBadge>
           </div>
 
           {/* Summary stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
-              { label: "Fetched", value: importResult.totalFetched, color: "bg-gray-50 border-gray-200 text-gray-700" },
-              { label: "Imported", value: importResult.imported, color: "bg-green-50 border-green-200 text-green-700" },
-              { label: "No Match", value: importResult.noMatch, color: "bg-amber-50 border-amber-200 text-amber-700" },
-              { label: "Errors", value: importResult.errors.length, color: "bg-red-50 border-red-200 text-red-700" },
-            ].map(({ label, value, color }) => (
-              <div key={label} className={clx("p-4 rounded-xl border text-center", color)}>
-                <div className="text-2xl font-black">{value}</div>
-                <div className="text-[11px] font-semibold uppercase tracking-wider mt-0.5">{label}</div>
+              { label: "Fetched", value: importResult.totalFetched },
+              { label: "Imported", value: importResult.imported },
+              { label: "No Match", value: importResult.noMatch },
+              { label: "Errors", value: importResult.errors.length },
+            ].map(({ label, value }) => (
+              <div key={label} className="p-4 rounded-lg border border-ui-border-base bg-ui-bg-subtle">
+                <Text size="xsmall" className="text-ui-fg-muted uppercase tracking-wider">{label}</Text>
+                <Text size="xlarge" weight="plus" className="text-ui-fg-base mt-1">{value}</Text>
               </div>
             ))}
           </div>
 
           {/* Tabs */}
-          <div className="border-b border-gray-200 flex gap-4">
+          <div className="border-b border-ui-border-base flex gap-2">
             {(["details", "errors"] as const).map((tab) => (
-              <button
+              <Button
                 key={tab}
+                variant="transparent"
+                size="small"
                 onClick={() => setActiveTab(tab)}
                 className={clx(
-                  "text-xs font-bold pb-2 border-b-2 -mb-px transition-colors capitalize",
+                  "border-b-2 rounded-none px-3 pb-2 -mb-px transition-colors capitalize",
                   activeTab === tab
-                    ? "border-black text-gray-900"
-                    : "border-transparent text-gray-400 hover:text-gray-600"
+                    ? "border-ui-border-interactive text-ui-fg-base font-medium"
+                    : "border-transparent text-ui-fg-muted hover:text-ui-fg-subtle"
                 )}
               >
                 {tab === "details" ? `Details (${importResult.details.length})` : `Errors (${importResult.errors.length})`}
-              </button>
+              </Button>
             ))}
           </div>
 
           {activeTab === "details" && (
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <div className="overflow-x-auto rounded-lg border border-ui-border-base">
               <Table>
                 <Table.Header>
                   <Table.Row>
@@ -480,31 +492,30 @@ const YoastSeoImporterPage = () => {
                           {d.entityType}
                         </Badge>
                       </Table.Cell>
-                      <Table.Cell className="text-xs text-gray-700 max-w-[220px] truncate">
+                      <Table.Cell className="text-xs text-ui-fg-base max-w-[220px] truncate">
                         {d.entityTitle}
                       </Table.Cell>
-                      <Table.Cell className="text-xs font-mono text-gray-500 max-w-[160px] truncate">
+                      <Table.Cell className="text-xs font-mono text-ui-fg-subtle max-w-[160px] truncate">
                         {d.slug}
                       </Table.Cell>
                       <Table.Cell>
-                        <Badge
+                        <StatusBadge
                           color={
                             d.status === "imported" ? "green"
                               : d.status === "skipped" ? "blue"
                               : d.status === "no_match" ? "orange"
                               : "red"
                           }
-                          size="small"
                         >
                           {d.status}
-                        </Badge>
+                        </StatusBadge>
                       </Table.Cell>
                     </Table.Row>
                   ))}
                 </Table.Body>
               </Table>
               {importResult.details.length > 100 && (
-                <div className="p-3 text-center text-xs text-gray-400 border-t border-gray-100">
+                <div className="p-3 text-center text-xs text-ui-fg-muted border-t border-ui-border-base">
                   Showing first 100 of {importResult.details.length} records
                 </div>
               )}
@@ -514,7 +525,7 @@ const YoastSeoImporterPage = () => {
           {activeTab === "errors" && (
             <div className="space-y-2">
               {importResult.errors.length === 0 ? (
-                <Text className="text-xs text-gray-400 text-center py-6">No errors</Text>
+                <Text className="text-xs text-ui-fg-muted text-center py-6">No errors</Text>
               ) : (
                 importResult.errors.map((err, i) => (
                   <div key={i} className="p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-700 font-mono">
@@ -525,9 +536,9 @@ const YoastSeoImporterPage = () => {
             </div>
           )}
 
-          <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-700">
+          <div className="p-3 bg-ui-bg-subtle border border-ui-border-base rounded-lg text-xs text-ui-fg-subtle">
             Imported SEO data is now visible in the <strong>Product SEO Widget</strong> for each product in the Medusa Admin, and at{" "}
-            <code className="font-mono text-[11px]">GET /admin/seo/products/:id</code>.
+            <code className="font-mono text-[11px] text-ui-fg-base">GET /admin/seo/products/:id</code>.
           </div>
         </Container>
       )}

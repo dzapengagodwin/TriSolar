@@ -12,9 +12,12 @@ import {
   Heading,
   Text,
   Button,
+  IconButton,
   Input,
   Label,
   Badge,
+  StatusBadge,
+  RadioGroup,
   toast,
   clx,
 } from "@medusajs/ui"
@@ -156,7 +159,7 @@ const PesepaySettingsPage = () => {
               <CreditCard className="w-5 h-5" />
             </div>
             <div>
-              <Heading level="h1" className="text-xl font-bold">
+              <Heading level="h1">
                 Pesepay Payment Gateway
               </Heading>
               <Text size="small" className="text-ui-fg-subtle">
@@ -166,12 +169,12 @@ const PesepaySettingsPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-x-2">
-            <Badge color={environment === "production" ? "green" : "orange"}>
+            <StatusBadge color={environment === "production" ? "green" : "orange"}>
               {environment === "production" ? "Live (Production)" : "Test (Sandbox)"}
-            </Badge>
-            <Badge color={isConfigured ? "green" : "grey"}>
+            </StatusBadge>
+            <StatusBadge color={isConfigured ? "green" : "grey"}>
               {isConfigured ? "Configured" : "Unconfigured"}
-            </Badge>
+            </StatusBadge>
           </div>
         </div>
       </Container>
@@ -180,7 +183,7 @@ const PesepaySettingsPage = () => {
       <Container className="p-6">
         <div className="flex flex-col gap-y-4">
           <div className="border-b border-ui-border-base pb-3">
-            <Heading level="h2" className="text-base font-semibold">
+            <Heading level="h2" className="text-base font-medium">
               Environment & Mode
             </Heading>
             <Text size="small" className="text-ui-fg-subtle">
@@ -189,7 +192,11 @@ const PesepaySettingsPage = () => {
             </Text>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          <RadioGroup
+            value={environment}
+            onValueChange={(val) => setEnvironment(val as "sandbox" | "production")}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2"
+          >
             <div
               onClick={() => setEnvironment("sandbox")}
               className={clx(
@@ -201,16 +208,10 @@ const PesepaySettingsPage = () => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">Sandbox (Test Mode)</span>
-                  <Badge color="orange">Test</Badge>
+                  <Text size="small" weight="plus">Sandbox (Test Mode)</Text>
+                  <StatusBadge color="orange">Test</StatusBadge>
                 </div>
-                <input
-                  type="radio"
-                  name="environment"
-                  checked={environment === "sandbox"}
-                  onChange={() => setEnvironment("sandbox")}
-                  className="accent-ui-fg-interactive"
-                />
+                <RadioGroup.Item value="sandbox" id="env-sandbox" />
               </div>
               <Text size="xsmall" className="text-ui-fg-muted">
                 Endpoint: <code>https://api.test.sandbox.pesepay.com</code>
@@ -232,18 +233,12 @@ const PesepaySettingsPage = () => {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">
+                  <Text size="small" weight="plus">
                     Production (Live Mode)
-                  </span>
-                  <Badge color="green">Live</Badge>
+                  </Text>
+                  <StatusBadge color="green">Live</StatusBadge>
                 </div>
-                <input
-                  type="radio"
-                  name="environment"
-                  checked={environment === "production"}
-                  onChange={() => setEnvironment("production")}
-                  className="accent-ui-fg-interactive"
-                />
+                <RadioGroup.Item value="production" id="env-production" />
               </div>
               <Text size="xsmall" className="text-ui-fg-muted">
                 Endpoint: <code>https://api.pesepay.com</code>
@@ -253,7 +248,7 @@ const PesepaySettingsPage = () => {
                 Visa, and Mastercard.
               </Text>
             </div>
-          </div>
+          </RadioGroup>
         </div>
       </Container>
 
@@ -261,7 +256,7 @@ const PesepaySettingsPage = () => {
       <Container className="p-6">
         <div className="flex flex-col gap-y-4">
           <div className="border-b border-ui-border-base pb-3">
-            <Heading level="h2" className="text-base font-semibold">
+            <Heading level="h2" className="text-base font-medium">
               API Credentials
             </Heading>
             <Text size="small" className="text-ui-fg-subtle">
@@ -274,8 +269,9 @@ const PesepaySettingsPage = () => {
             {/* Integration Key */}
             <div className="flex flex-col gap-y-1.5">
               <Label
+                size="small"
                 htmlFor="pesepay-integration-key"
-                className="text-xs font-semibold uppercase tracking-wider text-ui-fg-subtle flex items-center gap-1.5"
+                className="text-ui-fg-subtle flex items-center gap-1.5 font-medium"
               >
                 <Key className="w-3.5 h-3.5" />
                 Integration Key
@@ -289,25 +285,28 @@ const PesepaySettingsPage = () => {
                   placeholder="e.g. 74b09b55-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                   className="font-mono text-sm pr-10"
                 />
-                <button
+                <IconButton
                   type="button"
+                  variant="transparent"
+                  size="small"
                   onClick={() => setShowIntegrationKey(!showIntegrationKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ui-fg-muted hover:text-ui-fg-base"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-ui-fg-muted hover:text-ui-fg-base"
                 >
                   {showIntegrationKey ? (
                     <EyeSlash className="w-4 h-4" />
                   ) : (
                     <Eye className="w-4 h-4" />
                   )}
-                </button>
+                </IconButton>
               </div>
             </div>
 
             {/* Encryption Key */}
             <div className="flex flex-col gap-y-1.5">
               <Label
+                size="small"
                 htmlFor="pesepay-encryption-key"
-                className="text-xs font-semibold uppercase tracking-wider text-ui-fg-subtle flex items-center gap-1.5"
+                className="text-ui-fg-subtle flex items-center gap-1.5 font-medium"
               >
                 <Key className="w-3.5 h-3.5" />
                 Encryption Key
@@ -325,25 +324,28 @@ const PesepaySettingsPage = () => {
                   }
                   className="font-mono text-sm pr-10"
                 />
-                <button
+                <IconButton
                   type="button"
+                  variant="transparent"
+                  size="small"
                   onClick={() => setShowEncryptionKey(!showEncryptionKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ui-fg-muted hover:text-ui-fg-base"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-ui-fg-muted hover:text-ui-fg-base"
                 >
                   {showEncryptionKey ? (
                     <EyeSlash className="w-4 h-4" />
                   ) : (
                     <Eye className="w-4 h-4" />
                   )}
-                </button>
+                </IconButton>
               </div>
             </div>
 
             {/* Callback URL */}
             <div className="flex flex-col gap-y-1.5">
               <Label
+                size="small"
                 htmlFor="pesepay-callback-url"
-                className="text-xs font-semibold uppercase tracking-wider text-ui-fg-subtle"
+                className="text-ui-fg-subtle font-medium"
               >
                 Storefront Callback / Return URL
               </Label>
@@ -382,7 +384,7 @@ const PesepaySettingsPage = () => {
               >
                 Pesepay Merchant Portal
               </a>
-              , navigate to <strong>Integrations / API Settings</strong>, and
+              , navigate to <span className="font-medium text-ui-fg-base">Integrations / API Settings</span>, and
               copy your Integration Key and Encryption Key.
             </p>
           </div>

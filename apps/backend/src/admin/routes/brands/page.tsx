@@ -7,6 +7,7 @@ import {
   Table,
   Badge,
   Input,
+  Label,
   Textarea,
   Checkbox,
   Drawer,
@@ -169,30 +170,28 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
       {/* Live Google Search Preview */}
       <div className="border border-ui-border-base rounded-xl p-4 bg-ui-bg-subtle space-y-3">
         <div className="flex items-center justify-between border-b border-ui-border-base pb-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-ui-fg-muted">
+          <Text size="xsmall" className="uppercase tracking-wider text-ui-fg-muted">
             Google Snippet Preview
-          </span>
-          <div className="flex items-center gap-1 bg-ui-bg-base p-0.5 rounded-lg border border-ui-border-base text-[11px]">
-            <button
+          </Text>
+          <div className="flex items-center gap-1 bg-ui-bg-base p-0.5 rounded-lg border border-ui-border-base">
+            <Button
               type="button"
+              variant={previewTab === "desktop" ? "secondary" : "transparent"}
+              size="small"
               onClick={() => setPreviewTab("desktop")}
-              className={clx(
-                "px-2.5 py-1 rounded-md font-bold transition-colors",
-                previewTab === "desktop" ? "bg-white text-black shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
-              )}
+              className="text-xs"
             >
               Desktop
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant={previewTab === "mobile" ? "secondary" : "transparent"}
+              size="small"
               onClick={() => setPreviewTab("mobile")}
-              className={clx(
-                "px-2.5 py-1 rounded-md font-bold transition-colors",
-                previewTab === "mobile" ? "bg-white text-black shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
-              )}
+              className="text-xs"
             >
               Mobile
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -203,7 +202,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
           )}
         >
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-[9px] text-white font-bold">
+            <div className="w-4 h-4 rounded-full bg-blue-600 flex items-center justify-center text-[9px] text-white font-medium">
               LZ
             </div>
             <div className="text-[11px] text-gray-700 leading-tight">
@@ -225,10 +224,10 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
       <div className="space-y-4">
         {/* Focus Keyphrase */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-ui-fg-base flex items-center justify-between">
+          <Label size="small" className="text-ui-fg-base flex items-center justify-between">
             <span>Focus Keyphrase</span>
             <span className="text-[10px] text-ui-fg-muted font-normal">Primary search term for this brand</span>
-          </label>
+          </Label>
           <Input
             placeholder={`e.g. ${brand?.name ?? "Lenovo"} laptops Zimbabwe`}
             value={form.focus_keyphrase}
@@ -239,10 +238,10 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
         {/* Meta Title */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-ui-fg-base">SEO Meta Title</label>
+            <Label size="small" className="text-ui-fg-base">SEO Meta Title</Label>
             <span
               className={clx(
-                "text-[10px] font-bold",
+                "text-[10px] font-medium",
                 titleLength >= 40 && titleLength <= 60
                   ? "text-emerald-600"
                   : titleLength > 60
@@ -263,10 +262,10 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
         {/* Meta Description */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-ui-fg-base">Meta Description</label>
+            <Label size="small" className="text-ui-fg-base">Meta Description</Label>
             <span
               className={clx(
-                "text-[10px] font-bold",
+                "text-[10px] font-medium",
                 descLength >= 120 && descLength <= 160
                   ? "text-emerald-600"
                   : descLength > 160
@@ -287,10 +286,10 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
 
         {/* Canonical URL */}
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-ui-fg-base flex items-center justify-between">
+          <Label size="small" className="text-ui-fg-base flex items-center justify-between">
             <span>Canonical URL</span>
             <span className="text-[10px] text-ui-fg-muted font-normal">Optional override (auto-generated by default)</span>
-          </label>
+          </Label>
           <Input
             placeholder={`https://laptopzone.co.zw/zw/brands/${brand?.handle ?? "..."}`}
             value={form.canonical_url}
@@ -322,7 +321,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
             variant="transparent"
             size="small"
             onClick={() => setShowSocial(!showSocial)}
-            className="text-xs text-blue-600 font-bold p-0 flex items-center gap-1.5"
+            className="text-xs text-ui-fg-interactive flex items-center gap-1.5"
           >
             {showSocial ? "▲ Hide" : "▼ Show"} Social Media (OpenGraph) Overrides
           </Button>
@@ -330,7 +329,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
           {showSocial && (
             <div className="mt-3 p-4 bg-ui-bg-subtle rounded-xl border border-ui-border-base space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-ui-fg-base">OG Title</label>
+                <Label size="small" className="text-ui-fg-base">OG Title</Label>
                 <Input
                   placeholder="Title for social media sharing"
                   value={form.og_title}
@@ -338,7 +337,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-ui-fg-base">OG Description</label>
+                <Label size="small" className="text-ui-fg-base">OG Description</Label>
                 <Textarea
                   rows={2}
                   placeholder="Description for social media shares"
@@ -347,7 +346,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-ui-fg-base">OG Image URL</label>
+                <Label size="small" className="text-ui-fg-base">OG Image URL</Label>
                 <Input
                   placeholder="https://.../brand-og.jpg (1200×630 recommended)"
                   value={form.og_image}
@@ -547,15 +546,15 @@ const BrandsAdminPage = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-ui-border-base pb-6">
         <div>
-          <Heading level="h1" className="text-2xl font-bold text-ui-fg-base">
+          <Heading level="h1">
             Brands
           </Heading>
           <Text size="small" className="text-ui-fg-subtle mt-1">
             Manage your store&apos;s hardware and device brands, logos, and catalog relationships.
           </Text>
         </div>
-        <Button variant="primary" size="base" onClick={openCreateDrawer}>
-          + Add Brand
+        <Button variant="primary" size="small" onClick={openCreateDrawer}>
+          Add Brand
         </Button>
       </div>
 
@@ -568,11 +567,11 @@ const BrandsAdminPage = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Badge color="grey">{brands.length} Total Brands</Badge>
-          <Badge color="green">
+          <StatusBadge color="green">
             {brands.filter((b) => b.is_active).length} Active
-          </Badge>
+          </StatusBadge>
         </div>
       </div>
 
@@ -599,7 +598,7 @@ const BrandsAdminPage = () => {
             ) : filteredBrands.length === 0 ? (
               <Table.Row>
                 <Table.Cell colSpan={6} className="text-center py-12 text-ui-fg-muted">
-                  No brands found. Click &quot;+ Add Brand&quot; or import products via WooCommerce Migrator to automatically populate.
+                  No brands found. Click &quot;Add Brand&quot; or import products via WooCommerce Migrator to automatically populate.
                 </Table.Cell>
               </Table.Row>
             ) : (
@@ -614,12 +613,12 @@ const BrandsAdminPage = () => {
                           className="w-8 h-8 rounded-lg object-contain border border-ui-border-base p-1 bg-white"
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-lg bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center font-bold text-xs text-ui-fg-muted">
+                        <div className="w-8 h-8 rounded-lg bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center font-medium text-xs text-ui-fg-muted">
                           {brand.name?.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <Text size="base" className="font-semibold text-ui-fg-base">
+                        <Text size="small" weight="plus" className="text-ui-fg-base">
                           {brand.name}
                         </Text>
                         {brand.description && (
@@ -693,9 +692,9 @@ const BrandsAdminPage = () => {
           </Drawer.Header>
           <form onSubmit={handleCreateBrand} className="space-y-4 my-6">
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="text-ui-fg-base mb-1 block">
                 Brand Name *
-              </label>
+              </Label>
               <Input
                 placeholder="e.g. Lenovo"
                 value={formName}
@@ -711,9 +710,9 @@ const BrandsAdminPage = () => {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="text-ui-fg-base mb-1 block">
                 Handle (URL Slug)
-              </label>
+              </Label>
               <Input
                 placeholder="e.g. lenovo"
                 value={formHandle}
@@ -730,9 +729,9 @@ const BrandsAdminPage = () => {
             />
 
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="text-ui-fg-base mb-1 block">
                 Website URL
-              </label>
+              </Label>
               <Input
                 placeholder="https://www.lenovo.com"
                 value={formWebsite}
@@ -740,26 +739,23 @@ const BrandsAdminPage = () => {
               />
             </div>
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="text-ui-fg-base mb-1 block">
                 Description
-              </label>
-              <textarea
+              </Label>
+              <Textarea
                 rows={3}
                 placeholder="Brief summary of the brand..."
-                className="w-full bg-ui-bg-base border border-ui-border-base rounded-lg p-2.5 text-xs text-ui-fg-base focus:outline-none focus:border-ui-border-interactive"
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2 pt-2">
-              <input
-                type="checkbox"
+              <Checkbox
                 id="is_active_create"
                 checked={formIsActive}
-                onChange={(e) => setFormIsActive(e.target.checked)}
-                className="rounded border-ui-border-base text-ui-fg-interactive"
+                onCheckedChange={(checked) => setFormIsActive(!!checked)}
               />
-              <label htmlFor="is_active_create" className="text-xs text-ui-fg-base">
+              <label htmlFor="is_active_create" className="text-xs text-ui-fg-base cursor-pointer">
                 Active Brand (Visible on Storefront)
               </label>
             </div>
@@ -791,42 +787,33 @@ const BrandsAdminPage = () => {
 
           {/* Tab Bar */}
           <div className="flex items-center gap-1 bg-ui-bg-subtle p-1 rounded-xl border border-ui-border-base mt-4">
-            <button
+            <Button
               type="button"
+              variant={editTab === "info" ? "secondary" : "transparent"}
+              size="small"
               onClick={() => setEditTab("info")}
-              className={clx(
-                "flex-1 py-2 rounded-lg text-xs font-bold transition-colors",
-                editTab === "info"
-                  ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-                  : "text-ui-fg-muted hover:text-ui-fg-base"
-              )}
+              className="flex-1 text-xs"
             >
               Brand Info
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant={editTab === "seo" ? "secondary" : "transparent"}
+              size="small"
               onClick={() => setEditTab("seo")}
-              className={clx(
-                "flex-1 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5",
-                editTab === "seo"
-                  ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-                  : "text-ui-fg-muted hover:text-ui-fg-base"
-              )}
+              className="flex-1 text-xs"
             >
-              <span className="w-4 h-4 rounded bg-blue-600/15 text-blue-700 flex items-center justify-center text-[9px] font-black">
-                S
-              </span>
-              SEO
-            </button>
+              SEO & Metadata
+            </Button>
           </div>
 
           {/* Brand Info Tab */}
           {editTab === "info" && (
             <form onSubmit={handleUpdateBrand} className="space-y-4 my-6">
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                <Label size="small" className="text-ui-fg-base mb-1 block">
                   Brand Name *
-                </label>
+                </Label>
                 <Input
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
@@ -834,9 +821,9 @@ const BrandsAdminPage = () => {
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                <Label size="small" className="text-ui-fg-base mb-1 block">
                   Handle
-                </label>
+                </Label>
                 <Input
                   value={formHandle}
                   onChange={(e) => setFormHandle(e.target.value)}
@@ -852,34 +839,31 @@ const BrandsAdminPage = () => {
               />
 
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                <Label size="small" className="text-ui-fg-base mb-1 block">
                   Website URL
-                </label>
+                </Label>
                 <Input
                   value={formWebsite}
                   onChange={(e) => setFormWebsite(e.target.value)}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+                <Label size="small" className="text-ui-fg-base mb-1 block">
                   Description
-                </label>
-                <textarea
+                </Label>
+                <Textarea
                   rows={3}
-                  className="w-full bg-ui-bg-base border border-ui-border-base rounded-lg p-2.5 text-xs text-ui-fg-base focus:outline-none focus:border-ui-border-interactive"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                 />
               </div>
               <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="is_active_edit"
                   checked={formIsActive}
-                  onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="rounded border-ui-border-base text-ui-fg-interactive"
+                  onCheckedChange={(checked) => setFormIsActive(!!checked)}
                 />
-                <label htmlFor="is_active_edit" className="text-xs text-ui-fg-base">
+                <label htmlFor="is_active_edit" className="text-xs text-ui-fg-base cursor-pointer">
                   Active Brand (Visible on Storefront)
                 </label>
               </div>

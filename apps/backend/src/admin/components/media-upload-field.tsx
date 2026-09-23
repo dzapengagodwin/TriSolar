@@ -1,5 +1,5 @@
-import { Button, Input, Label, Text, toast, clx } from "@medusajs/ui"
-import { ArrowUpTray, Photo, Trash, XMarkMini } from "@medusajs/icons"
+import { Button, IconButton, Input, Label, Text, toast, clx } from "@medusajs/ui"
+import { ArrowUpTray, Photo, Trash, XMarkMini, Spinner } from "@medusajs/icons"
 import { useState, useRef } from "react"
 
 export type MediaUploadFieldProps = {
@@ -96,7 +96,7 @@ export const MediaUploadField = ({
       <div className="flex items-center justify-between">
         <div>
           {label && (
-            <Label className="text-xs font-semibold text-ui-fg-base block">
+            <Label size="small">
               {label}
             </Label>
           )}
@@ -107,31 +107,25 @@ export const MediaUploadField = ({
           )}
         </div>
 
-        <div className="flex items-center gap-1 bg-ui-bg-subtle p-0.5 rounded-lg border border-ui-border-base text-[11px]">
-          <button
+        <div className="flex items-center gap-1 bg-ui-bg-subtle p-0.5 rounded-lg border border-ui-border-base">
+          <Button
             type="button"
+            variant={mode === "upload" ? "secondary" : "transparent"}
+            size="small"
             onClick={() => setMode("upload")}
-            className={clx(
-              "px-2.5 py-0.5 rounded-md font-medium transition-colors",
-              mode === "upload"
-                ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-                : "text-ui-fg-muted hover:text-ui-fg-base"
-            )}
+            className="text-xs"
           >
             Upload File
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant={mode === "url" ? "secondary" : "transparent"}
+            size="small"
             onClick={() => setMode("url")}
-            className={clx(
-              "px-2.5 py-0.5 rounded-md font-medium transition-colors",
-              mode === "url"
-                ? "bg-ui-bg-base text-ui-fg-base shadow-xs"
-                : "text-ui-fg-muted hover:text-ui-fg-base"
-            )}
+            className="text-xs"
           >
             Image URL
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -161,7 +155,7 @@ export const MediaUploadField = ({
           >
             <div className="w-8 h-8 rounded-full bg-ui-bg-subtle flex items-center justify-center text-ui-fg-subtle border border-ui-border-base">
               {uploading ? (
-                <div className="w-4 h-4 border-2 border-ui-fg-interactive border-t-transparent rounded-full animate-spin" />
+                <Spinner className="w-4 h-4 text-ui-fg-interactive" />
               ) : (
                 <ArrowUpTray className="w-4 h-4" />
               )}
@@ -185,7 +179,7 @@ export const MediaUploadField = ({
             className="text-xs"
           />
           {value && (
-            <Button
+            <IconButton
               type="button"
               variant="secondary"
               size="small"
@@ -193,7 +187,7 @@ export const MediaUploadField = ({
               className="shrink-0"
             >
               <XMarkMini className="w-4 h-4" />
-            </Button>
+            </IconButton>
           )}
         </div>
       )}
@@ -227,7 +221,7 @@ export const MediaUploadField = ({
             </div>
           </div>
 
-          <Button
+          <IconButton
             type="button"
             variant="transparent"
             size="small"
@@ -235,7 +229,7 @@ export const MediaUploadField = ({
             className="text-ui-fg-muted hover:text-ui-fg-danger shrink-0"
           >
             <Trash className="w-3.5 h-3.5" />
-          </Button>
+          </IconButton>
         </div>
       )}
     </div>

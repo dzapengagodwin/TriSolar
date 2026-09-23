@@ -4,15 +4,20 @@ import {
   Heading,
   Text,
   Button,
+  IconButton,
   Table,
   Badge,
   StatusBadge,
   Drawer,
   Input,
   Select,
+  Switch,
+  Label,
+  Prompt,
   toast,
   clx,
 } from "@medusajs/ui"
+import { TriangleUpMini, TriangleDownMini } from "@medusajs/icons"
 import { useState, useEffect, useCallback, useMemo } from "react"
 
 type ProductRecommendationsWidgetProps = {
@@ -55,6 +60,8 @@ const ProductRecommendationsWidget = ({
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingRec, setEditingRec] = useState<any | null>(null)
   const [saving, setSaving] = useState(false)
+  const [recToDelete, setRecToDelete] = useState<any | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   // Search products in Drawer
   const [catalogProducts, setCatalogProducts] = useState<any[]>([])
@@ -260,18 +267,13 @@ const ProductRecommendationsWidget = ({
     }
   }
 
-  const handleDeleteRecommendation = async (rec: any) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to remove recommendation for "${rec.recommended_product?.title || rec.recommended_product_id}"?`
-      )
-    ) {
-      return
-    }
+  const confirmDeleteRecommendation = async () => {
+    if (!recToDelete) return
+    setDeleting(true)
 
     try {
       const res = await fetch(
-        `/admin/products/${data.id}/recommendations/${rec.id}`,
+        `/admin/products/${data.id}/recommendations/${recToDelete.id}`,
         {
           method: "DELETE",
           credentials: "include",
@@ -283,9 +285,12 @@ const ProductRecommendationsWidget = ({
       toast.success("Removed", {
         description: "Recommendation unlinked successfully",
       })
+      setRecToDelete(null)
       fetchRecommendations()
     } catch (err: any) {
       toast.error("Delete Failed", { description: err.message })
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -341,34 +346,28 @@ const ProductRecommendationsWidget = ({
 
       {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-ui-border-base pb-2 overflow-x-auto">
-        <button
+        <Button
+          variant={activeTab === "all" ? "secondary" : "transparent"}
+          size="small"
           type="button"
           onClick={() => setActiveTab("all")}
-          className={clx(
-            "px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
-            activeTab === "all"
-              ? "bg-ui-bg-subtle text-ui-fg-base font-semibold border border-ui-border-base"
-              : "text-ui-fg-muted hover:text-ui-fg-base"
-          )}
+          className="text-xs"
         >
           All ({recommendations.length})
-        </button>
+        </Button>
         {TYPE_OPTIONS.map((opt) => {
           const count = recommendations.filter((r) => r.type === opt.value).length
           return (
-            <button
+            <Button
               key={opt.value}
+              variant={activeTab === opt.value ? "secondary" : "transparent"}
+              size="small"
               type="button"
               onClick={() => setActiveTab(opt.value)}
-              className={clx(
-                "px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
-                activeTab === opt.value
-                  ? "bg-ui-bg-subtle text-ui-fg-base font-semibold border border-ui-border-base"
-                  : "text-ui-fg-muted hover:text-ui-fg-base"
-              )}
+              className="text-xs"
             >
               {opt.label} ({count})
-            </button>
+            </Button>
           )
         })}
       </div>
@@ -413,27 +412,29 @@ const ProductRecommendationsWidget = ({
                     {/* Position & Move */}
                     <Table.Cell className="text-center">
                       <div className="flex flex-col items-center justify-center gap-0.5">
-                        <button
+                        <IconButton
+                          variant="transparent"
+                          size="2xsmall"
                           type="button"
                           disabled={index === 0}
                           onClick={() => handleMovePosition(index, "up")}
-                          className="text-[10px] text-ui-fg-muted hover:text-ui-fg-base disabled:opacity-30"
                           title="Move Up"
                         >
-                          ▲
-                        </button>
+                          <TriangleUpMini className="w-3.5 h-3.5 text-ui-fg-muted" />
+                        </IconButton>
                         <span className="text-xs font-mono text-ui-fg-muted">
                           {rec.position ?? index}
                         </span>
-                        <button
+                        <IconButton
+                          variant="transparent"
+                          size="2xsmall"
                           type="button"
                           disabled={index === filteredRecommendations.length - 1}
                           onClick={() => handleMovePosition(index, "down")}
-                          className="text-[10px] text-ui-fg-muted hover:text-ui-fg-base disabled:opacity-30"
                           title="Move Down"
                         >
-                          ▼
-                        </button>
+                          <TriangleDownMini className="w-3.5 h-3.5 text-ui-fg-muted" />
+                        </IconButton>
                       </div>
                     </Table.Cell>
 
@@ -447,12 +448,12 @@ const ProductRecommendationsWidget = ({
                             className="w-9 h-9 rounded object-cover border border-ui-border-base bg-white shrink-0"
                           />
                         ) : (
-                          <div className="w-9 h-9 rounded bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center text-xs text-ui-fg-muted shrink-0 font-bold">
+                          <div className="w-9 h-9 rounded bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center text-xs text-ui-fg-muted shrink-0 font-medium">
                             P
                           </div>
                         )}
                         <div className="min-w-0">
-                          <p className="font-semibold text-xs text-ui-fg-base truncate">
+                          <p className="font-medium text-xs text-ui-fg-base truncate">
                             {prod?.title || rec.recommended_product_id}
                           </p>
                           <p className="text-[11px] text-ui-fg-muted font-mono truncate">
@@ -481,15 +482,16 @@ const ProductRecommendationsWidget = ({
 
                     {/* Status */}
                     <Table.Cell>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleActive(rec)}
-                        className="cursor-pointer"
-                      >
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          size="small"
+                          checked={rec.is_active}
+                          onCheckedChange={() => handleToggleActive(rec)}
+                        />
                         <StatusBadge color={rec.is_active ? "green" : "grey"}>
                           {rec.is_active ? "Active" : "Disabled"}
                         </StatusBadge>
-                      </button>
+                      </div>
                     </Table.Cell>
 
                     {/* Schedule */}
@@ -532,7 +534,7 @@ const ProductRecommendationsWidget = ({
                         variant="transparent"
                         size="small"
                         className="text-xs text-ui-fg-danger hover:text-ui-fg-danger-hover"
-                        onClick={() => handleDeleteRecommendation(rec)}
+                        onClick={() => setRecToDelete(rec)}
                       >
                         Remove
                       </Button>
@@ -561,27 +563,28 @@ const ProductRecommendationsWidget = ({
           >
             {/* Recommendation Type */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+              <Label size="small" className="block mb-1">
                 Recommendation Type *
-              </label>
-              <select
-                value={formType}
-                onChange={(e) => setFormType(e.target.value)}
-                className="w-full bg-ui-bg-base border border-ui-border-base rounded-md p-2 text-xs text-ui-fg-base"
-              >
-                {TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              </Label>
+              <Select value={formType} onValueChange={setFormType}>
+                <Select.Trigger>
+                  <Select.Value placeholder="Select type" />
+                </Select.Trigger>
+                <Select.Content>
+                  {TYPE_OPTIONS.map((opt) => (
+                    <Select.Item key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
             </div>
 
             {/* Target Product Search & Selection */}
             <div className="flex-1 flex flex-col min-h-0 space-y-2">
-              <label className="text-xs font-semibold text-ui-fg-base block">
+              <Label size="small" className="block">
                 Target Recommended Product *
-              </label>
+              </Label>
               <Input
                 placeholder="Search catalog products..."
                 value={productSearchQuery}
@@ -622,12 +625,12 @@ const ProductRecommendationsWidget = ({
                               className="w-7 h-7 rounded object-cover border border-ui-border-base bg-white shrink-0"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded bg-ui-bg-base border border-ui-border-base flex items-center justify-center text-xs font-bold text-ui-fg-muted shrink-0">
+                            <div className="w-7 h-7 rounded bg-ui-bg-base border border-ui-border-base flex items-center justify-center text-xs font-medium text-ui-fg-muted shrink-0">
                               P
                             </div>
                           )}
                           <div className="min-w-0">
-                            <p className="truncate font-semibold text-xs text-ui-fg-base">
+                            <p className="truncate font-medium text-xs text-ui-fg-base">
                               {p.title}
                             </p>
                             <p className="truncate text-[10px] text-ui-fg-muted font-mono">
@@ -648,9 +651,9 @@ const ProductRecommendationsWidget = ({
             {/* Priority & Status Row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   Priority Weight
-                </label>
+                </Label>
                 <Input
                   type="number"
                   placeholder="0"
@@ -660,25 +663,23 @@ const ProductRecommendationsWidget = ({
               </div>
 
               <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
+                <Switch
                   id="form_active_add"
                   checked={formIsActive}
-                  onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="rounded border-ui-border-base text-ui-fg-interactive"
+                  onCheckedChange={setFormIsActive}
                 />
-                <label htmlFor="form_active_add" className="text-xs text-ui-fg-base">
+                <Label htmlFor="form_active_add" className="text-xs text-ui-fg-base cursor-pointer font-normal">
                   Active (Live)
-                </label>
+                </Label>
               </div>
             </div>
 
             {/* Date Scheduling */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   Start Date (Optional)
-                </label>
+                </Label>
                 <Input
                   type="datetime-local"
                   value={formStartAt}
@@ -686,9 +687,9 @@ const ProductRecommendationsWidget = ({
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   End Date (Optional)
-                </label>
+                </Label>
                 <Input
                   type="datetime-local"
                   value={formEndAt}
@@ -730,27 +731,28 @@ const ProductRecommendationsWidget = ({
 
           <form onSubmit={handleUpdateRecommendation} className="space-y-4 my-6">
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+              <Label size="small" className="block mb-1">
                 Recommendation Type *
-              </label>
-              <select
-                value={formType}
-                onChange={(e) => setFormType(e.target.value)}
-                className="w-full bg-ui-bg-base border border-ui-border-base rounded-md p-2 text-xs text-ui-fg-base"
-              >
-                {TYPE_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              </Label>
+              <Select value={formType} onValueChange={setFormType}>
+                <Select.Trigger>
+                  <Select.Value placeholder="Select type" />
+                </Select.Trigger>
+                <Select.Content>
+                  {TYPE_OPTIONS.map((opt) => (
+                    <Select.Item key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   Priority Weight
-                </label>
+                </Label>
                 <Input
                   type="number"
                   value={formPriority}
@@ -759,24 +761,22 @@ const ProductRecommendationsWidget = ({
               </div>
 
               <div className="flex items-center gap-2 pt-6">
-                <input
-                  type="checkbox"
+                <Switch
                   id="form_active_edit"
                   checked={formIsActive}
-                  onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="rounded border-ui-border-base text-ui-fg-interactive"
+                  onCheckedChange={setFormIsActive}
                 />
-                <label htmlFor="form_active_edit" className="text-xs text-ui-fg-base">
+                <Label htmlFor="form_active_edit" className="text-xs text-ui-fg-base cursor-pointer font-normal">
                   Active (Live)
-                </label>
+                </Label>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   Start Date
-                </label>
+                </Label>
                 <Input
                   type="datetime-local"
                   value={formStartAt}
@@ -784,9 +784,9 @@ const ProductRecommendationsWidget = ({
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-ui-fg-base block mb-1">
+                <Label size="small" className="block mb-1">
                   End Date
-                </label>
+                </Label>
                 <Input
                   type="datetime-local"
                   value={formEndAt}
@@ -810,6 +810,24 @@ const ProductRecommendationsWidget = ({
           </form>
         </Drawer.Content>
       </Drawer>
+
+      {/* Delete Confirmation Prompt */}
+      <Prompt open={!!recToDelete} onOpenChange={(open) => !open && setRecToDelete(null)}>
+        <Prompt.Content>
+          <Prompt.Header>
+            <Prompt.Title>Remove Recommendation</Prompt.Title>
+            <Prompt.Description>
+              Are you sure you want to remove the recommendation for &quot;{recToDelete?.recommended_product?.title || recToDelete?.recommended_product_id}&quot;?
+            </Prompt.Description>
+          </Prompt.Header>
+          <Prompt.Footer>
+            <Prompt.Cancel disabled={deleting}>Cancel</Prompt.Cancel>
+            <Prompt.Action onClick={confirmDeleteRecommendation} disabled={deleting}>
+              {deleting ? "Removing..." : "Remove"}
+            </Prompt.Action>
+          </Prompt.Footer>
+        </Prompt.Content>
+      </Prompt>
     </Container>
   )
 }

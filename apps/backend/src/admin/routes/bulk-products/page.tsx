@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { SquareTwoStack, Spinner } from "@medusajs/icons"
 import {
   Container,
   Heading,
@@ -9,8 +10,11 @@ import {
   Input,
   Drawer,
   StatusBadge,
+  CommandBar,
   toast,
   clx,
+  Select,
+  Checkbox,
 } from "@medusajs/ui"
 import { useState, useEffect, useCallback, useRef } from "react"
 
@@ -241,6 +245,7 @@ const BulkProductsPage = () => {
 
   // Toggle select page
   const isAllSelectedOnPage = products.length > 0 && products.every((p) => selectedIds.has(p.id))
+  const isSomeSelectedOnPage = products.length > 0 && products.some((p) => selectedIds.has(p.id)) && !isAllSelectedOnPage
   const toggleSelectPage = () => {
     const next = new Set(selectedIds)
     if (isAllSelectedOnPage) {
@@ -399,7 +404,7 @@ const BulkProductsPage = () => {
     <Container className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <Heading level="h1" className="text-xl font-bold">
+          <Heading level="h1">
             Bulk Operations Workspace
           </Heading>
           <Text className="text-xs text-ui-fg-subtle">
@@ -429,10 +434,7 @@ const BulkProductsPage = () => {
         <Container className="mb-6 p-4 border border-ui-border-interactive bg-ui-bg-subtle rounded-xl flex flex-col gap-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <svg className="w-5 h-5 animate-spin text-[#FF9F0D]" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
+              <Spinner className="w-5 h-5 text-ui-fg-interactive" />
               <Heading level="h3" className="text-sm font-semibold">
                 Bulk operation: <Badge variant="info">{activeOperation.action}</Badge>
               </Heading>
@@ -451,7 +453,7 @@ const BulkProductsPage = () => {
 
           <div className="w-full bg-ui-bg-base rounded-full h-2 overflow-hidden border border-ui-border-base">
             <div
-              className="bg-[#FF9F0D] h-2 transition-all duration-300"
+              className="bg-ui-button-inverted h-2 transition-all duration-300"
               style={{
                 width: `${
                   activeOperation.total > 0
@@ -484,7 +486,7 @@ const BulkProductsPage = () => {
             <Button
               variant="transparent"
               size="small"
-              className="text-xs text-[#FF9F0D] hover:underline p-0 self-start text-left"
+              className="text-xs text-ui-fg-interactive hover:underline p-0 self-start text-left"
               onClick={fetchFailedItems}
             >
               View Failure Logs ({activeOperation.failed} errors)
@@ -507,69 +509,93 @@ const BulkProductsPage = () => {
               }}
               className="col-span-1 border-ui-border-base"
             />
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="col-span-1 rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
-            >
-              <option value="">Status (All)</option>
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-              <option value="proposed">Proposed</option>
-            </select>
-            <select
-              value={brandFilter}
-              onChange={(e) => {
-                setBrandFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="col-span-1 rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
-            >
-              <option value="">Brand (All)</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>
-            <select
-              value={collectionFilter}
-              onChange={(e) => {
-                setCollectionFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="col-span-1 rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
-            >
-              <option value="">Collection (All)</option>
-              {collections.map((col) => (
-                <option key={col.id} value={col.id}>
-                  {col.title}
-                </option>
-              ))}
-            </select>
-            <select
-              value={categoryFilter}
-              onChange={(e) => {
-                setCategoryFilter(e.target.value)
-                setOffset(0)
-              }}
-              className="col-span-1 rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
-            >
-              <option value="">Category (All)</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            <div className="col-span-1">
+              <Select
+                value={statusFilter || "all"}
+                onValueChange={(val) => {
+                  setStatusFilter(val === "all" ? "" : val)
+                  setOffset(0)
+                }}
+              >
+                <Select.Trigger size="small">
+                  <Select.Value placeholder="Status (All)" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">Status (All)</Select.Item>
+                  <Select.Item value="published">Published</Select.Item>
+                  <Select.Item value="draft">Draft</Select.Item>
+                  <Select.Item value="proposed">Proposed</Select.Item>
+                </Select.Content>
+              </Select>
+            </div>
+            <div className="col-span-1">
+              <Select
+                value={brandFilter || "all"}
+                onValueChange={(val) => {
+                  setBrandFilter(val === "all" ? "" : val)
+                  setOffset(0)
+                }}
+              >
+                <Select.Trigger size="small">
+                  <Select.Value placeholder="Brand (All)" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">Brand (All)</Select.Item>
+                  {brands.map((b) => (
+                    <Select.Item key={b.id} value={b.id}>
+                      {b.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+            </div>
+            <div className="col-span-1">
+              <Select
+                value={collectionFilter || "all"}
+                onValueChange={(val) => {
+                  setCollectionFilter(val === "all" ? "" : val)
+                  setOffset(0)
+                }}
+              >
+                <Select.Trigger size="small">
+                  <Select.Value placeholder="Collection (All)" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">Collection (All)</Select.Item>
+                  {collections.map((col) => (
+                    <Select.Item key={col.id} value={col.id}>
+                      {col.title}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+            </div>
+            <div className="col-span-1">
+              <Select
+                value={categoryFilter || "all"}
+                onValueChange={(val) => {
+                  setCategoryFilter(val === "all" ? "" : val)
+                  setOffset(0)
+                }}
+              >
+                <Select.Trigger size="small">
+                  <Select.Value placeholder="Category (All)" />
+                </Select.Trigger>
+                <Select.Content>
+                  <Select.Item value="all">Category (All)</Select.Item>
+                  {categories.map((cat) => (
+                    <Select.Item key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select>
+            </div>
           </div>
 
           {/* Select all matching banner */}
           {isAllSelectedOnPage && totalCount > products.length && (
-            <div className="bg-ui-bg-highlight border border-[#FF9F0D]/20 rounded-md p-3 mb-4 flex items-center justify-between text-xs">
+            <div className="bg-ui-bg-highlight border border-ui-border-interactive rounded-md p-3 mb-4 flex items-center justify-between text-xs">
               <span className="text-ui-fg-base">
                 {selectAllMatching
                   ? `All ${totalCount} matching products in catalog selected.`
@@ -579,7 +605,7 @@ const BulkProductsPage = () => {
                 <Button
                   variant="transparent"
                   size="small"
-                  className="text-[#FF9F0D] hover:underline"
+                  className="text-ui-fg-interactive hover:underline"
                   onClick={() => setSelectAllMatching(true)}
                 >
                   Select all {totalCount} matching catalog products
@@ -588,7 +614,7 @@ const BulkProductsPage = () => {
                 <Button
                   variant="transparent"
                   size="small"
-                  className="text-[#FF9F0D] hover:underline"
+                  className="text-ui-fg-interactive hover:underline"
                   onClick={() => setSelectAllMatching(false)}
                 >
                   Clear Selection
@@ -603,11 +629,9 @@ const BulkProductsPage = () => {
               <Table.Header>
                 <Table.Row>
                   <Table.HeaderCell className="w-[40px] pl-4">
-                    <input
-                      type="checkbox"
-                      checked={isAllSelectedOnPage}
-                      onChange={toggleSelectPage}
-                      className="rounded border-ui-border-base text-[#FF9F0D]"
+                    <Checkbox
+                      checked={isAllSelectedOnPage ? true : isSomeSelectedOnPage ? "indeterminate" : false}
+                      onCheckedChange={toggleSelectPage}
                     />
                   </Table.HeaderCell>
                   <Table.HeaderCell>Product</Table.HeaderCell>
@@ -639,22 +663,30 @@ const BulkProductsPage = () => {
                         className={clx({ "bg-ui-bg-highlight-subtle": isChecked })}
                       >
                         <Table.Cell className="pl-4">
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={isChecked}
-                            onChange={() => toggleSelectItem(product.id)}
-                            className="rounded border-ui-border-base text-[#FF9F0D]"
+                            onCheckedChange={() => toggleSelectItem(product.id)}
                           />
                         </Table.Cell>
-                        <Table.Cell className="font-semibold text-ui-fg-base">
+                        <Table.Cell className="font-medium text-ui-fg-base text-xs">
                           {product.title}
                         </Table.Cell>
                         <Table.Cell>
-                          <Badge size="small">{product.status}</Badge>
+                          <StatusBadge
+                            color={
+                              product.status === "published"
+                                ? "green"
+                                : product.status === "draft"
+                                ? "grey"
+                                : "orange"
+                            }
+                          >
+                            {product.status ? product.status.charAt(0).toUpperCase() + product.status.slice(1) : "-"}
+                          </StatusBadge>
                         </Table.Cell>
-                        <Table.Cell>{product.brand?.name || "-"}</Table.Cell>
-                        <Table.Cell>{product.collection?.title || "-"}</Table.Cell>
-                        <Table.Cell>
+                        <Table.Cell className="text-xs text-ui-fg-subtle">{product.brand?.name || "-"}</Table.Cell>
+                        <Table.Cell className="text-xs text-ui-fg-subtle">{product.collection?.title || "-"}</Table.Cell>
+                        <Table.Cell className="text-xs text-ui-fg-subtle">
                           {product.categories?.map((c: any) => c.name).join(", ") || "-"}
                         </Table.Cell>
                       </Table.Row>
@@ -688,37 +720,45 @@ const BulkProductsPage = () => {
             </div>
           </div>
 
-          {/* Floating Actions Toolbar */}
-          {selectedIds.size > 0 && (
-            <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-ui-bg-base border border-ui-border-base shadow-lg rounded-full py-3 px-6 flex items-center gap-4 z-50">
-              <span className="text-xs font-semibold text-ui-fg-base">
-                {selectAllMatching ? `${totalCount} (All)` : selectedIds.size} Selected
-              </span>
-              <div className="h-4 w-[1px] bg-ui-border-base" />
-              <Button variant="secondary" size="small" onClick={() => openActionDrawer("status")}>
-                Status
-              </Button>
-              <Button variant="secondary" size="small" onClick={() => openActionDrawer("brand")}>
-                Brand
-              </Button>
-              <Button variant="secondary" size="small" onClick={() => openActionDrawer("category")}>
-                Category
-              </Button>
-              <Button variant="secondary" size="small" onClick={() => openActionDrawer("collection")}>
-                Collection
-              </Button>
-              <Button variant="secondary" size="small" onClick={() => openActionDrawer("metadata")}>
-                Metadata
-              </Button>
-              <Button variant="danger" size="small" onClick={() => openActionDrawer("delete")}>
-                Delete
-              </Button>
-              <div className="h-4 w-[1px] bg-ui-border-base" />
-              <Button variant="transparent" size="small" onClick={clearSelection}>
-                Clear
-              </Button>
-            </div>
-          )}
+          {/* Bulk Actions CommandBar */}
+          <CommandBar open={selectedIds.size > 0}>
+            <CommandBar.Bar>
+              <CommandBar.Value>
+                {selectAllMatching ? `${totalCount} (All)` : selectedIds.size} selected
+              </CommandBar.Value>
+              <CommandBar.Seperator />
+              <CommandBar.Command
+                action={() => openActionDrawer("status")}
+                label="Status"
+                shortcut="s"
+              />
+              <CommandBar.Command
+                action={() => openActionDrawer("brand")}
+                label="Brand"
+                shortcut="b"
+              />
+              <CommandBar.Command
+                action={() => openActionDrawer("category")}
+                label="Category"
+                shortcut="c"
+              />
+              <CommandBar.Command
+                action={() => openActionDrawer("collection")}
+                label="Collection"
+                shortcut="l"
+              />
+              <CommandBar.Command
+                action={() => openActionDrawer("metadata")}
+                label="Metadata"
+                shortcut="m"
+              />
+              <CommandBar.Command
+                action={() => openActionDrawer("delete")}
+                label="Delete"
+                shortcut="d"
+              />
+            </CommandBar.Bar>
+          </CommandBar>
 
           {/* ACTION MODAL DRAWERS */}
           <Drawer open={!!activeDrawer} onOpenChange={() => setActiveDrawer(null)}>
@@ -732,51 +772,60 @@ const BulkProductsPage = () => {
                 {activeDrawer === "status" && (
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-medium text-ui-fg-base">Target Status</label>
-                    <select
-                      value={targetStatus}
-                      onChange={(e) => setTargetStatus(e.target.value)}
-                      className="rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
-                    >
-                      <option value="published">Published</option>
-                      <option value="draft">Draft</option>
-                      <option value="proposed">Proposed</option>
-                    </select>
+                    <Select value={targetStatus} onValueChange={setTargetStatus}>
+                      <Select.Trigger>
+                        <Select.Value placeholder="Target Status" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="published">Published</Select.Item>
+                        <Select.Item value="draft">Draft</Select.Item>
+                        <Select.Item value="proposed">Proposed</Select.Item>
+                      </Select.Content>
+                    </Select>
                   </div>
                 )}
 
                 {activeDrawer === "brand" && (
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-medium text-ui-fg-base">Assign Brand</label>
-                    <select
-                      value={targetBrandId}
-                      onChange={(e) => setTargetBrandId(e.target.value)}
-                      className="rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
+                    <Select
+                      value={targetBrandId || "none"}
+                      onValueChange={(val) => setTargetBrandId(val === "none" ? "" : val)}
                     >
-                      <option value="">No Brand (Unlink)</option>
-                      {brands.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.name}
-                        </option>
-                      ))}
-                    </select>
+                      <Select.Trigger>
+                        <Select.Value placeholder="Select Brand" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="none">No Brand (Unlink)</Select.Item>
+                        {brands.map((b) => (
+                          <Select.Item key={b.id} value={b.id}>
+                            {b.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
                   </div>
                 )}
 
                 {activeDrawer === "collection" && (
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-medium text-ui-fg-base">Assign Collection</label>
-                    <select
-                      value={targetCollectionId}
-                      onChange={(e) => setTargetCollectionId(e.target.value)}
-                      className="rounded border border-ui-border-base bg-ui-bg-field text-xs px-2 py-1"
+                    <Select
+                      value={targetCollectionId || "none"}
+                      onValueChange={(val) => setTargetCollectionId(val === "none" ? "" : val)}
                     >
-                      <option value="">No Collection</option>
-                      {collections.map((col) => (
-                        <option key={col.id} value={col.id}>
-                          {col.title}
-                        </option>
-                      ))}
-                    </select>
+                      <Select.Trigger>
+                        <Select.Value placeholder="Select Collection" />
+                      </Select.Trigger>
+                      <Select.Content>
+                        <Select.Item value="none">No Collection</Select.Item>
+                        {collections.map((col) => (
+                          <Select.Item key={col.id} value={col.id}>
+                            {col.title}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select>
                   </div>
                 )}
 
@@ -787,20 +836,18 @@ const BulkProductsPage = () => {
                       {categories.map((cat) => {
                         const isChecked = targetCategoryIds.includes(cat.id)
                         return (
-                          <label key={cat.id} className="flex items-center gap-2 text-xs">
-                            <input
-                              type="checkbox"
+                          <label key={cat.id} className="flex items-center gap-2 text-xs cursor-pointer">
+                            <Checkbox
                               checked={isChecked}
-                              onChange={() => {
+                              onCheckedChange={() => {
                                 if (isChecked) {
                                   setTargetCategoryIds(targetCategoryIds.filter((cid) => cid !== cat.id))
                                 } else {
                                   setTargetCategoryIds([...targetCategoryIds, cat.id])
                                 }
                               }}
-                              className="rounded border-ui-border-base"
                             />
-                            {cat.name}
+                            <span className="text-ui-fg-base">{cat.name}</span>
                           </label>
                         )
                       })}
@@ -833,16 +880,16 @@ const BulkProductsPage = () => {
 
                 {activeDrawer === "delete" && (
                   <div className="flex flex-col gap-3 bg-ui-bg-error-subtle p-3 rounded-lg border border-ui-border-error">
-                    <Heading level="h4" className="text-xs font-bold text-ui-fg-error">
-                      WARNING: DANGEROUS ACTION
+                    <Heading level="h3" className="text-xs text-ui-fg-error">
+                      Warning: Dangerous Action
                     </Heading>
                     <Text className="text-xs text-ui-fg-subtle">
                       This will permanently delete {selectAllMatching ? totalCount : selectedIds.size} products from your store database. This action cannot be undone.
                     </Text>
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs font-semibold text-ui-fg-base">
-                        Type <span className="font-bold text-ui-fg-error">DELETE</span> to confirm
-                      </label>
+                      <Label size="small" className="text-ui-fg-base">
+                        Type <span className="font-medium text-ui-fg-error">DELETE</span> to confirm
+                      </Label>
                       <Input
                         placeholder="DELETE"
                         value={deleteConfirmText}
@@ -967,22 +1014,7 @@ const BulkProductsPage = () => {
 
 export const config = defineRouteConfig({
   label: "Bulk Workspace",
-  icon: () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-5 h-5"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
-      />
-    </svg>
-  ),
+  icon: SquareTwoStack,
 })
 
 export default BulkProductsPage

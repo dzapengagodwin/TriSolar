@@ -7,6 +7,7 @@ import {
   Table,
   Badge,
   Input,
+  Label,
   Drawer,
   toast,
   clx,
@@ -670,7 +671,7 @@ const HomeShowcasePage = () => {
                     {/* Category Link */}
                     <Table.Cell>
                       {categoryHandle ? (
-                        <Badge size="small" color="green" className="gap-1">
+                        <Badge size="small" color="grey" className="gap-1">
                           <Tag className="w-3 h-3" />
                           <span>{categoryHandle}</span>
                         </Badge>
@@ -737,9 +738,9 @@ const HomeShowcasePage = () => {
           <form onSubmit={handleSaveEdit} className="space-y-5 my-6">
             {/* Display Title */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Showcase Display Title
-              </label>
+              </Label>
               <Input
                 placeholder="e.g. Gaming Gear & High-End Laptops"
                 value={formDisplayTitle}
@@ -752,9 +753,9 @@ const HomeShowcasePage = () => {
 
             {/* Collection Base Title */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Collection Name (Admin Internal)
-              </label>
+              </Label>
               <Input
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
@@ -764,9 +765,9 @@ const HomeShowcasePage = () => {
 
             {/* Priority Number */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Homepage Priority (Sort Order)
-              </label>
+              </Label>
               <Input
                 type="number"
                 min="1"
@@ -792,9 +793,9 @@ const HomeShowcasePage = () => {
 
             {/* Category Selector */}
             <div className="pt-2 border-t border-ui-border-base">
-              <label className="text-xs font-semibold text-ui-fg-base mb-1.5 block">
+              <Label size="small" className="mb-1.5 block">
                 Linked Store Category
-              </label>
+              </Label>
               <SearchableCategorySelect
                 categories={categories}
                 value={formCategoryHandle}
@@ -807,9 +808,9 @@ const HomeShowcasePage = () => {
 
             {/* Custom View All Link */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 &quot;View All&quot; Destination URL
-              </label>
+              </Label>
               <Input
                 placeholder="/categories/laptops"
                 value={formViewAllHref}
@@ -852,9 +853,9 @@ const HomeShowcasePage = () => {
           <form onSubmit={handleCreateShowcase} className="space-y-5 my-6">
             {/* Collection Title */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Collection Title *
-              </label>
+              </Label>
               <Input
                 placeholder="e.g. Ultrawide Monitors"
                 value={formTitle}
@@ -876,9 +877,9 @@ const HomeShowcasePage = () => {
 
             {/* Handle */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Handle (Must start with <code className="font-mono text-ui-fg-interactive">home-</code>)
-              </label>
+              </Label>
               <Input
                 placeholder="home-monitors"
                 value={formHandle}
@@ -892,9 +893,9 @@ const HomeShowcasePage = () => {
 
             {/* Display Title */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Headline / Display Title
-              </label>
+              </Label>
               <Input
                 placeholder="e.g. Ultrawide Gaming & Productivity Monitors"
                 value={formDisplayTitle}
@@ -904,9 +905,9 @@ const HomeShowcasePage = () => {
 
             {/* Priority Number */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 Priority Rank
-              </label>
+              </Label>
               <Input
                 type="number"
                 min="1"
@@ -928,9 +929,9 @@ const HomeShowcasePage = () => {
 
             {/* Category Selector */}
             <div className="pt-2 border-t border-ui-border-base">
-              <label className="text-xs font-semibold text-ui-fg-base mb-1.5 block">
+              <Label size="small" className="mb-1.5 block">
                 Linked Store Category
-              </label>
+              </Label>
               <SearchableCategorySelect
                 categories={categories}
                 value={formCategoryHandle}
@@ -940,9 +941,9 @@ const HomeShowcasePage = () => {
 
             {/* Custom View All Link */}
             <div>
-              <label className="text-xs font-semibold text-ui-fg-base mb-1 block">
+              <Label size="small" className="mb-1 block">
                 &quot;View All&quot; Link URL
-              </label>
+              </Label>
               <Input
                 placeholder="/categories/monitors"
                 value={formViewAllHref}

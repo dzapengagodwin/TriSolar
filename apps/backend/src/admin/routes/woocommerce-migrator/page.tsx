@@ -10,6 +10,7 @@ import {
   Select,
   Switch,
   Badge,
+  StatusBadge,
   Table,
   toast,
   clx,
@@ -275,13 +276,12 @@ const WooCommerceMigratorPage = () => {
           </div>
           <div className="flex items-center gap-x-2">
             {importResult && (
-              <Badge
+              <StatusBadge
                 color={importResult.failedProducts > 0 ? "orange" : "green"}
-                size="small"
               >
                 {importResult.importedProducts} / {importResult.totalProducts}{" "}
                 imported
-              </Badge>
+              </StatusBadge>
             )}
             {!deleteConfirming ? (
               <Button
@@ -400,14 +400,14 @@ const WooCommerceMigratorPage = () => {
                   : "Test Connection"}
               </Button>
               {connectionStatus === "connected" && (
-                <Badge color="green" size="small">
+                <StatusBadge color="green">
                   Connected
-                </Badge>
+                </StatusBadge>
               )}
               {connectionStatus === "failed" && (
-                <Badge color="red" size="small">
+                <StatusBadge color="red">
                   Failed
-                </Badge>
+                </StatusBadge>
               )}
               {connectionMessage && (
                 <Text size="small" className="text-ui-fg-subtle">
@@ -706,14 +706,13 @@ const WooCommerceMigratorPage = () => {
                       </Table.Cell>
                       <Table.Cell>{product.variantsCount}</Table.Cell>
                       <Table.Cell>
-                        <Badge
+                        <StatusBadge
                           color={
                             product.status === "success" ? "green" : "red"
                           }
-                          size="small"
                         >
                           {product.status}
-                        </Badge>
+                        </StatusBadge>
                         {product.error && (
                           <Text
                             size="small"

@@ -5,7 +5,9 @@ import {
   Text,
   Button,
   Badge,
+  StatusBadge,
   Input,
+  Label,
   Textarea,
   Checkbox,
   toast,
@@ -176,24 +178,24 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
   const titleLength = form.meta_title.length
   const descLength = form.meta_description.length
 
-  const scoreColor = useMemo(() => {
-    if (!analysis) return "bg-gray-100 text-gray-700 border-gray-300"
-    if (analysis.score >= 80) return "bg-emerald-50 text-emerald-700 border-emerald-200"
-    if (analysis.score >= 60) return "bg-amber-50 text-amber-700 border-amber-200"
-    return "bg-rose-50 text-rose-700 border-rose-200"
+  const scoreBadgeColor = useMemo((): "green" | "orange" | "red" | "grey" => {
+    if (!analysis) return "grey"
+    if (analysis.score >= 80) return "green"
+    if (analysis.score >= 60) return "orange"
+    return "red"
   }, [analysis])
 
   return (
-    <Container className="divide-y divide-gray-100 p-0 overflow-hidden shadow-xs border border-gray-200 rounded-xl bg-white mb-6">
+    <Container className="divide-y divide-ui-border-base p-0 overflow-hidden shadow-xs border border-ui-border-base rounded-xl bg-ui-bg-base mb-6">
       {/* 1. Header Bar */}
-      <div className="flex items-center justify-between p-6 bg-gray-50/50">
+      <div className="flex items-center justify-between p-6 bg-ui-bg-subtle">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-blue-600/10 text-blue-600 flex items-center justify-center font-black text-sm">
+          <div className="w-8 h-8 rounded-md bg-ui-bg-base border border-ui-border-base text-ui-fg-interactive flex items-center justify-center font-medium text-xs">
             SEO
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <Heading level="h2" className="text-base font-bold text-gray-900">
+              <Heading level="h2">
                 SEO Manager & Search Snippet
               </Heading>
               {hasUnsavedChanges && (
@@ -202,30 +204,29 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                 </Badge>
               )}
             </div>
-            <Text className="text-xs text-gray-500">
+            <Text className="text-xs text-ui-fg-subtle mt-0.5">
               Manage Google search rankings, meta tags, and structured data readiness
             </Text>
           </div>
         </div>
 
         {analysis && (
-          <div className={clx("flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold", scoreColor)}>
-            <span>SEO Score:</span>
-            <span className="text-sm font-black">{analysis.score} / 100</span>
-          </div>
+          <Badge color={scoreBadgeColor} size="small">
+            SEO Score: {analysis.score} / 100
+          </Badge>
         )}
       </div>
 
       {loading ? (
-        <div className="p-8 text-center text-sm text-gray-400">Loading SEO metadata...</div>
+        <div className="p-8 text-center text-sm text-ui-fg-muted">Loading SEO metadata...</div>
       ) : (
         <div className="p-6 space-y-6">
           {/* 2. SEO Readiness Scorecard */}
           {analysis && (
-            <div className="bg-gray-50/70 border border-gray-200/80 rounded-xl p-4 space-y-3">
+            <div className="bg-ui-bg-subtle border border-ui-border-base rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-xs font-semibold">
-                  <span className="text-gray-900 font-bold">SEO Readiness:</span>
+                <div className="flex items-center gap-4 text-xs font-medium">
+                  <span className="text-ui-fg-base">SEO Readiness:</span>
                   <span className="text-emerald-700 flex items-center gap-1">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -239,7 +240,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                     {analysis.warningCount} Warnings
                   </span>
                   {analysis.criticalCount > 0 && (
-                    <span className="text-rose-600 font-bold flex items-center gap-1">
+                    <span className="text-rose-600 flex items-center gap-1">
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                       </svg>
@@ -252,14 +253,14 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   variant="transparent"
                   size="small"
                   onClick={() => setShowAllChecks(!showAllChecks)}
-                  className="text-xs text-blue-600 font-bold"
+                  className="text-xs text-ui-fg-interactive"
                 >
                   {showAllChecks ? "Hide Checklist" : "View Checklist Details"}
                 </Button>
               </div>
 
               {/* Score Progress Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-ui-bg-component rounded-full h-2 overflow-hidden">
                 <div
                   className={clx(
                     "h-2 transition-all duration-300 rounded-full",
@@ -271,7 +272,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
 
               {/* Expandable Checks List */}
               {showAllChecks && (
-                <div className="pt-3 border-t border-gray-200/60 space-y-2 max-h-64 overflow-y-auto pr-1">
+                <div className="pt-3 border-t border-ui-border-base space-y-2 max-h-64 overflow-y-auto pr-1">
                   {analysis.checks.map((check) => (
                     <div
                       key={check.id}
@@ -285,7 +286,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                       )}
                     >
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-2 font-bold">
+                        <div className="flex items-center gap-2 font-medium">
                           {check.status === "pass" ? (
                             <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
@@ -303,10 +304,10 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                         </div>
                         <p className="text-[11px] opacity-85">{check.message}</p>
                         {check.recommendation && (
-                          <p className="text-[10px] text-blue-700 font-medium">Tip: {check.recommendation}</p>
+                          <p className="text-[10px] text-ui-fg-interactive font-medium">Tip: {check.recommendation}</p>
                         )}
                       </div>
-                      <span className="font-bold text-[10px] opacity-75">
+                      <span className="font-medium text-[10px] text-ui-fg-subtle">
                         {check.score}/{check.maxScore} pts
                       </span>
                     </div>
@@ -319,30 +320,28 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
           {/* 3. Live Google Search Preview */}
           <div className="border border-ui-border-base rounded-xl p-4 bg-ui-bg-base space-y-3">
             <div className="flex items-center justify-between border-b border-ui-border-base pb-2">
-              <span className="text-xs font-semibold uppercase tracking-wider text-ui-fg-subtle">
+              <Text size="xsmall" weight="plus" className="uppercase tracking-wider text-ui-fg-subtle">
                 Google Search Snippet Preview
-              </span>
-              <div className="flex items-center gap-1 bg-ui-bg-subtle p-0.5 rounded-lg border border-ui-border-base text-[11px]">
-                <button
+              </Text>
+              <div className="flex items-center gap-1 bg-ui-bg-subtle p-0.5 rounded-lg border border-ui-border-base">
+                <Button
                   type="button"
+                  variant={previewTab === "desktop" ? "secondary" : "transparent"}
+                  size="small"
                   onClick={() => setPreviewTab("desktop")}
-                  className={clx(
-                    "px-2.5 py-1 rounded-md font-medium transition-colors",
-                    previewTab === "desktop" ? "bg-ui-bg-base text-ui-fg-base shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
-                  )}
+                  className="text-xs"
                 >
                   Desktop View
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
+                  variant={previewTab === "mobile" ? "secondary" : "transparent"}
+                  size="small"
                   onClick={() => setPreviewTab("mobile")}
-                  className={clx(
-                    "px-2.5 py-1 rounded-md font-medium transition-colors",
-                    previewTab === "mobile" ? "bg-ui-bg-base text-ui-fg-base shadow-xs" : "text-ui-fg-muted hover:text-ui-fg-base"
-                  )}
+                  className="text-xs"
                 >
                   Mobile View
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -353,7 +352,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
               )}
             >
               <div className="flex items-center gap-2 mb-1">
-                <div className="w-4 h-4 rounded-full bg-ui-fg-interactive flex items-center justify-center text-[9px] text-white font-bold">
+                <div className="w-4 h-4 rounded-full bg-ui-fg-interactive flex items-center justify-center text-[9px] text-white font-medium">
                   LZ
                 </div>
                 <div className="text-[11px] text-ui-fg-subtle leading-tight">
@@ -377,10 +376,10 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
           <div className="space-y-4">
             {/* Focus Keyphrase */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-700 flex items-center justify-between">
-                <span>Focus Keyphrase</span>
-                <span className="text-[10px] text-gray-400 font-normal">Primary search term to optimize for</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <Label size="small">Focus Keyphrase</Label>
+                <Text size="xsmall" className="text-ui-fg-muted">Primary search term to optimize for</Text>
+              </div>
               <Input
                 placeholder="e.g. Lenovo ThinkPad E14 Gen 6"
                 value={form.focus_keyphrase}
@@ -391,16 +390,16 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
             {/* SEO Title */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-gray-700">SEO Meta Title</label>
+                <Label size="small">SEO Meta Title</Label>
                 <div className="flex items-center gap-2 text-[10px]">
                   <span
                     className={clx(
-                      "font-bold",
+                      "font-medium",
                       titleLength >= 40 && titleLength <= 60
                         ? "text-emerald-600"
                         : titleLength > 60
                         ? "text-amber-600"
-                        : "text-gray-400"
+                        : "text-ui-fg-muted"
                     )}
                   >
                     {titleLength} / 60 characters
@@ -417,16 +416,16 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
             {/* Meta Description */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-gray-700">Meta Description</label>
+                <Label size="small">Meta Description</Label>
                 <div className="flex items-center gap-2 text-[10px]">
                   <span
                     className={clx(
-                      "font-bold",
+                      "font-medium",
                       descLength >= 120 && descLength <= 160
                         ? "text-emerald-600"
                         : descLength > 160
                         ? "text-amber-600"
-                        : "text-gray-400"
+                        : "text-ui-fg-muted"
                     )}
                   >
                     {descLength} / 160 characters
@@ -443,10 +442,10 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
 
             {/* Canonical URL */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-gray-700 flex items-center justify-between">
-                <span>Canonical URL</span>
-                <span className="text-[10px] text-gray-400 font-normal">Optional override (default is automatic)</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <Label size="small">Canonical URL</Label>
+                <Text size="xsmall" className="text-ui-fg-muted">Optional override (default is automatic)</Text>
+              </div>
               <Input
                 placeholder="https://laptopzone.co.zw/zw/products/..."
                 value={form.canonical_url}
@@ -456,7 +455,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
 
             {/* Robots Configuration */}
             <div className="pt-2 flex flex-wrap items-center gap-6">
-              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-normal text-ui-fg-base">
                 <Checkbox
                   checked={form.robots_index}
                   onCheckedChange={(checked) => handleFieldChange("robots_index", !!checked)}
@@ -464,7 +463,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                 <span>Allow Search Engines to Index (Index)</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer text-xs font-medium text-gray-700">
+              <label className="flex items-center gap-2 cursor-pointer text-xs font-normal text-ui-fg-base">
                 <Checkbox
                   checked={form.robots_follow}
                   onCheckedChange={(checked) => handleFieldChange("robots_follow", !!checked)}
@@ -474,15 +473,15 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
             </div>
 
             {/* 5. Image SEO & Media Readiness */}
-            <div className="p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl space-y-2">
+            <div className="p-3.5 bg-ui-bg-subtle border border-ui-border-base rounded-xl space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-blue-900 flex items-center gap-1.5">
-                  <svg className="w-4 h-4 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <span className="text-xs font-medium text-ui-fg-base flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-ui-fg-interactive" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                   </svg>
                   Image SEO & Media Discovery
                 </span>
-                <span className="text-[11px] font-semibold text-blue-700 flex items-center gap-1">
+                <span className="text-xs font-medium text-ui-fg-subtle flex items-center gap-1">
                   {data.thumbnail ? (
                     <>
                       <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -493,15 +492,15 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   ) : (
                     <>
                       <svg className="w-3.5 h-3.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
                       </svg>
                       Missing Thumbnail
                     </>
                   )}
                 </span>
               </div>
-              <p className="text-[11px] text-blue-800 leading-relaxed">
-                Descriptive alt text, Schema.org image arrays, and Google Image Sitemap (<code className="font-mono text-[10px] bg-white px-1 py-0.5 rounded border border-blue-200">/image-sitemap.xml</code>) are generated dynamically for search crawlers.
+              <p className="text-xs text-ui-fg-subtle leading-relaxed">
+                Descriptive alt text, Schema.org image arrays, and Google Image Sitemap (<code className="font-mono text-[10px] bg-ui-bg-base px-1 py-0.5 rounded border border-ui-border-base">/image-sitemap.xml</code>) are generated dynamically for search crawlers.
               </p>
             </div>
 
@@ -511,15 +510,15 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                 variant="transparent"
                 size="small"
                 onClick={() => setShowSocial(!showSocial)}
-                className="text-xs text-blue-600 font-bold p-0 flex items-center gap-1.5"
+                className="text-xs text-ui-fg-interactive flex items-center gap-1.5"
               >
                 <span>{showSocial ? "▲ Hide" : "▼ Show"} Social Media (OpenGraph / Facebook / Twitter) Overrides</span>
               </Button>
 
               {showSocial && (
-                <div className="mt-3 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                <div className="mt-3 p-4 bg-ui-bg-subtle rounded-xl border border-ui-border-base space-y-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">OG Title</label>
+                    <Label size="small">OG Title</Label>
                     <Input
                       placeholder="Title for social media sharing"
                       value={form.og_title}
@@ -528,7 +527,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">OG Description</label>
+                    <Label size="small">OG Description</Label>
                     <Textarea
                       rows={2}
                       placeholder="Description for social media shares"
@@ -538,7 +537,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-700">OG Image URL</label>
+                    <Label size="small">OG Image URL</Label>
                     <Input
                       placeholder="https://.../preview.jpg"
                       value={form.og_image}
@@ -551,7 +550,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
           </div>
 
           {/* 6. Action Footer */}
-          <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-ui-border-base flex items-center justify-between">
             <Button
               variant="secondary"
               size="small"

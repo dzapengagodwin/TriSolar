@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   Badge,
+  StatusBadge,
   Drawer,
   Input,
   toast,
@@ -175,12 +176,12 @@ const ProductBrandWidget = ({ data }: ProductBrandWidgetProps) => {
                 className="w-9 h-9 rounded-md object-contain border border-ui-border-base bg-white p-1"
               />
             ) : (
-              <div className="w-9 h-9 rounded-md bg-ui-bg-base border border-ui-border-base flex items-center justify-center font-bold text-xs text-ui-fg-muted">
+              <div className="w-9 h-9 rounded-md bg-ui-bg-base border border-ui-border-base flex items-center justify-center font-medium text-xs text-ui-fg-muted">
                 {currentBrand.name?.slice(0, 2).toUpperCase()}
               </div>
             )}
             <div>
-              <Text size="base" className="font-semibold text-ui-fg-base">
+              <Text size="base" className="font-medium text-ui-fg-base">
                 {currentBrand.name}
               </Text>
               <code className="text-xs text-ui-fg-muted bg-ui-bg-base px-1.5 py-0.5 rounded border border-ui-border-base">
@@ -188,9 +189,9 @@ const ProductBrandWidget = ({ data }: ProductBrandWidgetProps) => {
               </code>
             </div>
           </div>
-          <Badge color={currentBrand.is_active ? "green" : "grey"}>
+          <StatusBadge color={currentBrand.is_active ? "green" : "grey"}>
             {currentBrand.is_active ? "Active" : "Disabled"}
-          </Badge>
+          </StatusBadge>
         </div>
       ) : (
         <div className="text-center py-4 border border-dashed border-ui-border-base rounded-lg">
@@ -234,7 +235,7 @@ const ProductBrandWidget = ({ data }: ProductBrandWidgetProps) => {
                 )}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center text-xs text-ui-fg-muted font-bold">
+                  <div className="w-7 h-7 rounded bg-ui-bg-subtle border border-ui-border-base flex items-center justify-center text-xs text-ui-fg-muted font-medium">
                     ∅
                   </div>
                   <span>No Brand (Unassigned)</span>
@@ -266,12 +267,12 @@ const ProductBrandWidget = ({ data }: ProductBrandWidgetProps) => {
                           className="w-7 h-7 rounded object-contain border border-ui-border-base bg-white p-0.5"
                         />
                       ) : (
-                        <div className="w-7 h-7 rounded bg-ui-bg-base border border-ui-border-base flex items-center justify-center text-xs font-bold text-ui-fg-muted shrink-0">
+                        <div className="w-7 h-7 rounded bg-ui-bg-base border border-ui-border-base flex items-center justify-center text-xs font-medium text-ui-fg-muted shrink-0">
                           {b.name?.slice(0, 2).toUpperCase()}
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="truncate font-semibold text-xs text-ui-fg-base">
+                        <p className="truncate font-medium text-xs text-ui-fg-base">
                           {b.name}
                         </p>
                         <p className="truncate text-[11px] text-ui-fg-muted font-mono">

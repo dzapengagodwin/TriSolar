@@ -13,6 +13,7 @@ import {
   Input,
   Label,
   Badge,
+  StatusBadge,
   toast,
   clx,
 } from "@medusajs/ui"
@@ -153,7 +154,7 @@ const OrderNotificationsPage = () => {
         <div>
           <div className="flex items-center gap-2">
             <Mailbox className="text-ui-fg-subtle" />
-            <Heading level="h1" className="text-2xl font-bold">
+            <Heading level="h1">
               Order Notifications
             </Heading>
           </div>
@@ -164,18 +165,17 @@ const OrderNotificationsPage = () => {
 
         <div>
           {isConfigured ? (
-            <Badge color="green" className="px-3 py-1">
+            <StatusBadge color="green">
               Active ({savedEmails.length} recipient{savedEmails.length !== 1 ? "s" : ""})
-            </Badge>
+            </StatusBadge>
           ) : fallbackEmail ? (
-            <Badge color="blue" className="flex items-center gap-1.5 px-3 py-1">
-              <InformationCircle className="w-3.5 h-3.5" />
+            <StatusBadge color="blue">
               Fallback ({fallbackEmail})
-            </Badge>
+            </StatusBadge>
           ) : (
-            <Badge color="grey" className="px-3 py-1">
+            <StatusBadge color="grey">
               Not Configured
-            </Badge>
+            </StatusBadge>
           )}
         </div>
       </div>
@@ -184,7 +184,7 @@ const OrderNotificationsPage = () => {
       <Container className="p-6">
         <div className="flex flex-col gap-y-6">
           <div>
-            <Heading level="h2" className="text-base font-semibold">
+            <Heading level="h2" className="text-base font-medium">
               Notification Recipients
             </Heading>
             <Text className="text-ui-fg-subtle text-sm mt-1">
@@ -193,7 +193,7 @@ const OrderNotificationsPage = () => {
           </div>
 
           <div className="flex flex-col gap-y-2">
-            <Label htmlFor="notification-emails" className="text-sm font-medium">
+            <Label size="small" htmlFor="notification-emails">
               Notification Email(s)
             </Label>
             <Input
@@ -219,7 +219,7 @@ const OrderNotificationsPage = () => {
               </Text>
               <div className="flex flex-wrap gap-2">
                 {validTypedEmails.map((email) => (
-                  <Badge key={email} color="green" className="text-xs font-mono">
+                  <Badge key={email} color="grey" className="text-xs font-mono">
                     {email}
                   </Badge>
                 ))}
@@ -236,7 +236,7 @@ const OrderNotificationsPage = () => {
           <div className="bg-ui-bg-subtle p-4 rounded-lg flex items-start gap-3 border border-ui-border-base">
             <InformationCircle className="w-5 h-5 text-ui-fg-muted flex-shrink-0 mt-0.5" />
             <div className="text-xs text-ui-fg-subtle space-y-1">
-              <p className="font-semibold text-ui-fg-base">
+              <p className="font-medium text-ui-fg-base">
                 How Order Notifications Work:
               </p>
               <ul className="list-disc list-inside space-y-0.5">
