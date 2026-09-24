@@ -19,11 +19,11 @@ export default async function Profile() {
 
   return (
     <div className="w-full space-y-6" data-testid="profile-page-wrapper">
-      <div className="pb-5 border-b border-gray-100">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+      <div className="pb-4 border-b border-gray-100">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
           Profile & Security
         </h1>
-        <p className="text-xs sm:text-sm text-gray-500 mt-1">
+        <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
           Manage your personal details, contact preferences, and default billing address.
         </p>
       </div>

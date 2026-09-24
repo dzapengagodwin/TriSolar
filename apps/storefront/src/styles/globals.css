@@ -26,11 +26,7 @@
 
   input:focus ~ label,
   input:not(:placeholder-shown) ~ label {
-    @apply -translate-y-2 text-xsmall-regular;
-  }
-
-  input:focus ~ label {
-    @apply left-0;
+    @apply -translate-y-2 text-xsmall-regular left-0;
   }
 
   input:-webkit-autofill,

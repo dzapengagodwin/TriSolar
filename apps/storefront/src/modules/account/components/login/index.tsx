@@ -19,7 +19,7 @@ const Login = ({ setCurrentView }: Props) => {
     >
       <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+        Sign in to track your orders, manage delivery addresses, and view your purchase history.
       </p>
       {message?.state === "verification_required" && (
         <div
@@ -59,13 +59,13 @@ const Login = ({ setCurrentView }: Props) => {
         </SubmitButton>
       </form>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Not a member?{" "}
+        Don&apos;t have an account?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
+          className="underline font-semibold"
           data-testid="register-button"
         >
-          Join us
+          Create one
         </button>
         .
       </span>

@@ -79,7 +79,7 @@ const AccountNav = ({
                 href={item.href}
                 data-testid={item.testId}
                 className={clx(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150",
+                  "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-150",
                   active
                     ? "bg-gray-900 text-white shadow-xs"
                     : "bg-gray-50 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -94,7 +94,7 @@ const AccountNav = ({
             type="button"
             onClick={handleLogout}
             data-testid="logout-button"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-150 text-gray-500 hover:text-red-600 hover:bg-red-50 ml-auto"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-150 text-gray-500 hover:text-red-600 hover:bg-red-50 ml-auto"
           >
             <ArrowRightOnRectangle className="w-3.5 h-3.5" />
             <span>Sign out</span>
@@ -104,12 +104,12 @@ const AccountNav = ({
 
       {/* Desktop Vertical Sidebar Navigation */}
       <div className="hidden md:block" data-testid="account-nav">
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2.5 px-3">
-              Navigation
+            <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-2 px-3">
+              Account
             </h3>
-            <nav className="flex flex-col gap-y-1">
+            <nav className="flex flex-col gap-y-0.5">
               {navItems.map((item) => {
                 const Icon = item.icon
                 const active = isItemActive(item.href, item.exact)
@@ -119,7 +119,7 @@ const AccountNav = ({
                     href={item.href}
                     data-testid={item.testId}
                     className={clx(
-                      "flex items-center gap-x-3 py-2.5 px-3.5 rounded-xl transition-all duration-150 text-xs font-semibold",
+                      "flex items-center gap-x-3 py-2 px-3 rounded-lg transition-all duration-150 text-sm font-medium",
                       active
                         ? "bg-primary/10 text-primary"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
@@ -133,12 +133,12 @@ const AccountNav = ({
             </nav>
           </div>
 
-          <div className="pt-3 border-t border-gray-100">
+          <div className="pt-2 border-t border-gray-100">
             <button
               type="button"
               onClick={handleLogout}
               data-testid="logout-button"
-              className="flex items-center gap-x-3 py-2.5 px-3.5 rounded-xl transition-all duration-150 text-xs font-semibold text-gray-500 hover:bg-red-50 hover:text-red-600 w-full text-left"
+              className="flex items-center gap-x-3 py-2 px-3 rounded-lg transition-all duration-150 text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 w-full text-left"
             >
               <ArrowRightOnRectangle className="w-4 h-4" />
               <span>Sign out</span>

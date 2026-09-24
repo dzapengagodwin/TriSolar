@@ -23,9 +23,8 @@ const Register = ({ setCurrentView }: Props) => {
       <h1 className="text-large-semi uppercase mb-6">
         Create your Laptopzone account
       </h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        Create your Laptopzone profile, and get access to an enhanced
-        shopping experience.
+      <p className="text-center text-base-regular text-ui-fg-base mb-6">
+        Create an account to track orders, save delivery addresses, and enjoy faster checkout.
       </p>
       {message?.state === "verification_required" && (
         <div
@@ -98,14 +97,14 @@ const Register = ({ setCurrentView }: Props) => {
           .
         </span>
         <SubmitButton className="w-full mt-6" data-testid="register-button">
-          Join
+          Create account
         </SubmitButton>
       </form>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
-        Already a member?{" "}
+        Already have an account?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="underline"
+          className="underline font-semibold"
         >
           Sign in
         </button>

@@ -129,7 +129,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ customer, regions }) => {
               className="bg-gray-50 text-gray-500 cursor-not-allowed"
               data-testid="email-input"
             />
-            <p className="text-[11px] text-gray-400 mt-1">
+            <p className="text-[11px] text-gray-400 mt-1.5">
               Email is tied to your login account and cannot be modified.
             </p>
           </div>

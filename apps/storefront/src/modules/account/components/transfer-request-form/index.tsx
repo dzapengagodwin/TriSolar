@@ -23,10 +23,10 @@ export default function TransferRequestForm() {
   }, [state.success, state.order])
 
   return (
-    <div className="bg-gray-50/50 border border-gray-100 rounded-2xl p-5 sm:p-6 flex flex-col gap-y-4 w-full">
-      <div className="grid sm:grid-cols-2 items-center gap-x-8 gap-y-4 w-full">
+    <div className="bg-gray-50/50 border border-gray-100 rounded-xl p-4 sm:p-5 flex flex-col gap-y-3.5 w-full">
+      <div className="grid sm:grid-cols-2 items-center gap-x-6 gap-y-3.5 w-full">
         <div className="flex flex-col gap-y-1">
-          <Heading level="h3" className="!text-sm font-bold text-gray-900">
+          <Heading level="h3" className="!text-sm font-semibold text-gray-900">
             Order transfers
           </Heading>
           <p className="text-xs text-gray-500 leading-relaxed">
@@ -46,7 +46,7 @@ export default function TransferRequestForm() {
             <SubmitButton
               variant="secondary"
               size="small"
-              className="w-full sm:w-auto text-xs font-semibold py-2 px-4 whitespace-nowrap cursor-pointer"
+              className="w-full sm:w-auto text-xs font-medium py-1.5 px-3.5 rounded-lg whitespace-nowrap cursor-pointer"
             >
               Request transfer
             </SubmitButton>
@@ -63,7 +63,7 @@ export default function TransferRequestForm() {
           <div className="flex gap-x-2 items-center">
             <CheckCircleMiniSolid className="w-4 h-4 text-emerald-500" />
             <div className="flex flex-col gap-y-1">
-              <Text className="text-medim-pl text-neutral-950">
+              <Text className="text-sm font-semibold text-neutral-950">
                 Transfer for order {state.order?.id} requested
               </Text>
               <Text className="text-base-regular text-neutral-600">
