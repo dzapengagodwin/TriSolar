@@ -1,9 +1,7 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { importYoastSeoWorkflow } from "../../../../workflows/import-yoast-seo"
 
-export const AUTHENTICATE = false
-
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   try {
     const {
       wooUrl,

@@ -33,6 +33,31 @@ describe("SeoModuleService Unit Tests", () => {
       expect(defaults.robots_index).toBe(true)
       expect(defaults.robots_follow).toBe(true)
     })
+
+    it("should generate sensible fallback metadata for a category", async () => {
+      const mockCategory = {
+        id: "pcat_gaming",
+        name: "Gaming Laptops",
+        handle: "gaming-laptops",
+        description: "<p>High performance gaming laptops with RTX graphics.</p>",
+      }
+
+      const defaults = await service.getDefaults("category", mockCategory, {
+        storefrontUrl: "https://laptopzone.co.zw",
+        countryCode: "zw",
+      })
+
+      expect(defaults.meta_title).toBe("Gaming Laptops | LaptopZone")
+      expect(defaults.meta_description).toBe(
+        "High performance gaming laptops with RTX graphics."
+      )
+      expect(defaults.focus_keyphrase).toBe("Gaming Laptops")
+      expect(defaults.canonical_url).toBe(
+        "https://laptopzone.co.zw/zw/categories/gaming-laptops"
+      )
+      expect(defaults.robots_index).toBe(true)
+      expect(defaults.robots_follow).toBe(true)
+    })
   })
 
   describe("retrieveForEntity and upsertForEntity safety", () => {

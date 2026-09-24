@@ -1,9 +1,39 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { importWooCommerceProductsWorkflow } from "../../../../workflows/import-woocommerce-products"
 
-export const AUTHENTICATE = false
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+interface ImportRequestBody {
+  wooUrl?: string
+  consumerKey?: string
+  consumerSecret?: string
+  currencyCode?: string
+  importCategories?: boolean
+  importTags?: boolean
+  publishProducts?: boolean
+  createPriceList?: boolean
+  skipVariants?: boolean
+  createdAfter?: string
+  createdBefore?: string
+  jsonData?: {
+    products?: any[]
+    categories?: any[]
+    tags?: any[]
+  } | any[]
+}
+
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   try {
+    const body = req.body as ImportRequestBody
+    
+    if (!body.jsonData) {
+      if (!body.wooUrl || !body.consumerKey || !body.consumerSecret) {
+        return res.status(400).json({ error: "wooUrl, consumerKey, and consumerSecret are required when jsonData is not provided" })
+      }
+    }
+    
+    if (body.currencyCode && !/^[a-z]{3}$/.test(body.currencyCode)) {
+      return res.status(400).json({ error: "currencyCode must be a lowercase 3-letter string" })
+    }
+
     const {
       wooUrl,
       consumerKey,
@@ -17,7 +47,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       createdAfter,
       createdBefore,
       jsonData,
-    } = req.body as any
+    } = body
 
     const { result } = await importWooCommerceProductsWorkflow(req.scope).run({
       input: {

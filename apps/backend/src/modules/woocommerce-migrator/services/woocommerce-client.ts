@@ -1,4 +1,5 @@
 import { MedusaError } from "@medusajs/framework/utils"
+import { validateExternalUrl } from "../utils/url-validator"
 
 export interface WooImage {
   id: number
@@ -110,15 +111,30 @@ export interface WooAttributeTerm {
   } | null
 }
 
+export type WooCommerceClientOptions = {
+  timeoutMs?: number
+  maxPages?: number
+}
+
 export class WooCommerceClient {
   private baseUrl: string
   private consumerKey: string
   private consumerSecret: string
+  private timeoutMs: number
+  private maxPages: number
 
-  constructor(baseUrl: string, consumerKey: string, consumerSecret: string) {
+  constructor(
+    baseUrl: string,
+    consumerKey: string,
+    consumerSecret: string,
+    options?: WooCommerceClientOptions
+  ) {
+    validateExternalUrl(baseUrl)
     this.baseUrl = baseUrl.replace(/\/$/, "")
     this.consumerKey = consumerKey.trim()
     this.consumerSecret = consumerSecret.trim()
+    this.timeoutMs = options?.timeoutMs ?? 30000
+    this.maxPages = options?.maxPages ?? 100
   }
 
   private getAuthHeader(): string {
@@ -133,15 +149,6 @@ export class WooCommerceClient {
     }
   }
 
-  private appendAuthQueryParams(url: URL): void {
-    if (this.consumerKey && !url.searchParams.has("consumer_key")) {
-      url.searchParams.append("consumer_key", this.consumerKey)
-    }
-    if (this.consumerSecret && !url.searchParams.has("consumer_secret")) {
-      url.searchParams.append("consumer_secret", this.consumerSecret)
-    }
-  }
-
   private async fetchAll<T>(
     endpoint: string,
     params?: Record<string, string | undefined>
@@ -149,7 +156,7 @@ export class WooCommerceClient {
     let page = 1
     const allData: T[] = []
 
-    while (true) {
+    while (page <= this.maxPages) {
       const url = new URL(`${this.baseUrl}/wp-json/wc/v3/${endpoint}`)
       url.searchParams.append("per_page", "100")
       url.searchParams.append("page", page.toString())
@@ -160,10 +167,8 @@ export class WooCommerceClient {
           }
         }
       }
-      this.appendAuthQueryParams(url)
-
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 20000)
+      const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs)
 
       try {
         const response = await fetch(url.toString(), {
@@ -192,12 +197,18 @@ export class WooCommerceClient {
         }
 
         allData.push(...data)
+
+        // If returned items are less than per_page (100), this is the last page
+        if (data.length < 100) {
+          break
+        }
+
         page++
       } catch (err: any) {
         if (err.name === "AbortError") {
           throw new MedusaError(
             MedusaError.Types.INVALID_DATA,
-            `Request timed out while fetching ${endpoint} (page ${page})`
+            `Request timed out after ${this.timeoutMs / 1000}s while fetching ${endpoint} (page ${page})`
           )
         }
         throw err
@@ -213,8 +224,6 @@ export class WooCommerceClient {
     try {
       const url = new URL(`${this.baseUrl}/wp-json/wc/v3/products`)
       url.searchParams.append("per_page", "1")
-      this.appendAuthQueryParams(url)
-
       const response = await fetch(url.toString(), {
         headers: this.getHeaders(),
       })

@@ -38,6 +38,7 @@ export interface MedusaProductPayload {
     prices: { amount: number; currency_code: string }[]
     weight?: number
     manage_inventory?: boolean
+    metadata?: Record<string, any>
   }[]
   category_ids?: string[]
   collection_id?: string
@@ -53,10 +54,9 @@ export class WooCommerceTransformer {
 
   private parsePrice(val?: string | number | null): number {
     if (val === undefined || val === null || val === "") return 0
-    if (typeof val === "number") return val
-    const cleaned = String(val).replace(/,/g, "").replace(/[^0-9.-]/g, "")
-    const parsed = parseFloat(cleaned)
-    return isNaN(parsed) ? 0 : parsed
+    const num = typeof val === "number" ? val : parseFloat(String(val).replace(/,/g, "").replace(/[^0-9.-]/g, ""))
+    if (isNaN(num)) return 0
+    return Math.round(num * 100) / 100
   }
 
   private cleanHtml(html?: string): string {
@@ -72,6 +72,20 @@ export class WooCommerceTransformer {
       // Strip all remaining HTML tags
       .replace(/<[^>]+>/g, "")
       // Decode HTML entities
+      .replace(/&mdash;/g, "\u2014")
+      .replace(/&ndash;/g, "\u2013")
+      .replace(/&hellip;/g, "...")
+      .replace(/&#8220;/g, '"')
+      .replace(/&#8221;/g, '"')
+      .replace(/&#8216;/g, "'")
+      .replace(/&#8230;/g, "...")
+      .replace(/&rsquo;/g, "'")
+      .replace(/&lsquo;/g, "'")
+      .replace(/&rdquo;/g, '"')
+      .replace(/&ldquo;/g, '"')
+      .replace(/&trade;/g, "")
+      .replace(/&reg;/g, "")
+      .replace(/&copy;/g, "")
       .replace(/&amp;/g, "&")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
@@ -174,14 +188,6 @@ export class WooCommerceTransformer {
     // Keep description strictly as the full description (or fallback if empty)
     const description = cleanFullDesc || cleanShortDesc || ""
 
-    // Store non-variation specs/attributes in metadata
-    const metadataAttributes: Record<string, string[]> = {}
-    if (product.attributes && product.attributes.length > 0) {
-      for (const attr of product.attributes) {
-        metadataAttributes[attr.name] = attr.options || []
-      }
-    }
-
     const options: MedusaProductPayload["options"] = []
     const variants: MedusaProductPayload["variants"] = []
 
@@ -192,7 +198,7 @@ export class WooCommerceTransformer {
 
     if (isVariable) {
       const variationAttrs = (product.attributes || []).filter(
-        (attr) => attr.variation || (attr.options && attr.options.length > 0)
+        (attr) => attr.variation === true
       )
 
       if (variationAttrs.length > 0) {
@@ -204,9 +210,14 @@ export class WooCommerceTransformer {
         }
 
         for (const variation of variations) {
-          const priceAmount = variation.price && variation.price !== ""
-            ? this.parsePrice(variation.price)
-            : this.parsePrice(product.price || product.regular_price)
+          const regularPrice = this.parsePrice(variation.regular_price)
+          const salePrice = this.parsePrice(variation.sale_price)
+          const effectivePrice = this.parsePrice(
+            variation.price && variation.price !== ""
+              ? variation.price
+              : variation.regular_price || product.price || product.regular_price
+          )
+          const priceAmount = effectivePrice > 0 ? effectivePrice : regularPrice
 
           const variantOptions: Record<string, string> = {}
 
@@ -224,6 +235,10 @@ export class WooCommerceTransformer {
             prices: [{ amount: priceAmount, currency_code: currencyCode.toLowerCase() }],
             weight: variation.weight ? parseFloat(variation.weight) : weight,
             manage_inventory: variation.manage_stock,
+            metadata: {
+              stock_quantity: variation.stock_quantity,
+              stock_status: variation.stock_status,
+            },
           })
         }
       }
@@ -237,7 +252,14 @@ export class WooCommerceTransformer {
         values: ["Default Value"],
       })
 
-      const priceAmount = this.parsePrice(product.price || product.regular_price)
+      const regularPrice = this.parsePrice(product.regular_price)
+      const salePrice = this.parsePrice(product.sale_price)
+      const effectivePrice = this.parsePrice(
+        product.price && product.price !== ""
+          ? product.price
+          : product.regular_price
+      )
+      const priceAmount = effectivePrice > 0 ? effectivePrice : regularPrice
 
       variants.push({
         title: "Default Variant",
@@ -248,6 +270,10 @@ export class WooCommerceTransformer {
         prices: [{ amount: priceAmount, currency_code: currencyCode.toLowerCase() }],
         weight,
         manage_inventory: product.manage_stock,
+        metadata: {
+          stock_quantity: product.stock_quantity,
+          stock_status: product.stock_status,
+        },
       })
     }
 
@@ -284,6 +310,20 @@ export class WooCommerceTransformer {
       this.sanitizeHandle(product.name) ||
       `product-${product.id}`
 
+    const specAttributes = (product.attributes || []).filter(
+      (attr) => !attr.variation && attr.options && attr.options.length > 0
+    )
+    const specifications: Record<string, string[]> = {}
+    for (const attr of specAttributes) {
+      specifications[attr.name] = attr.options || []
+    }
+
+    const dimensions = product.dimensions ? {
+      length: product.dimensions.length ? parseFloat(String(product.dimensions.length)) : undefined,
+      width: product.dimensions.width ? parseFloat(String(product.dimensions.width)) : undefined,
+      height: product.dimensions.height ? parseFloat(String(product.dimensions.height)) : undefined,
+    } : undefined
+
     return {
       title: product.name,
       handle,
@@ -300,10 +340,14 @@ export class WooCommerceTransformer {
       metadata: {
         woo_product_id: product.id,
         woo_sku: product.sku || "",
+        woo_regular_price: product.regular_price || null,
+        woo_sale_price: product.sale_price || null,
         brand_name: brand?.name || "",
         brand_handle: brand?.handle || "",
         short_description: cleanShortDesc,
         woo_tags: (product.tags || []).map((t) => t.name),
+        specifications,
+        dimensions,
       },
     }
   }

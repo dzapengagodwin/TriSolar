@@ -130,7 +130,8 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
         const rawCc =
           notification.data?.cc ||
           this.options_?.order_cc_email ||
-          process.env.SENDGRID_ORDER_CC_EMAIL
+          process.env.SENDGRID_ORDER_CC_EMAIL ||
+          "laptops@laptopzone.co.zw"
 
         if (rawCc && typeof rawCc === "string" && !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim())) {
           ccEmails = rawCc

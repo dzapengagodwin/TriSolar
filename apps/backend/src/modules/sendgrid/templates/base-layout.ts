@@ -295,7 +295,9 @@ export function formatMoney(amount: any, currencyCode: string = "USD"): string {
 
   if (isNaN(num)) num = 0
 
-  const formatted = num.toFixed(2)
+  const parts = num.toFixed(2).split(".")
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  const formatted = parts.join(".")
   const currencyUpper = (currencyCode || "USD").toUpperCase()
 
   if (currencyUpper === "USD") {

@@ -5,7 +5,7 @@ export type NormalizedBrand = {
 }
 
 // Canonical dictionary of major computer, laptop, electronics & tech hardware brands
-const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: string[] }> = {
+const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: string[]; productLines: string[] }> = {
   lenovo: {
     name: "Lenovo",
     handle: "lenovo",
@@ -13,6 +13,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
       "lenovo",
       "lenovo group",
       "lenovo computers",
+    ],
+    productLines: [
       "thinkpad",
       "ideapad",
       "legion",
@@ -29,6 +31,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
       "hewlett-packard",
       "hp inc",
       "hp enterprise",
+    ],
+    productLines: [
       "probook",
       "elitebook",
       "pavilion",
@@ -46,6 +50,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
       "dell",
       "dell technologies",
       "dell inc",
+    ],
+    productLines: [
       "alienware",
       "latitude",
       "xps",
@@ -61,6 +67,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
     aliases: [
       "apple",
       "apple inc",
+    ],
+    productLines: [
       "macbook",
       "macbook air",
       "macbook pro",
@@ -78,6 +86,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
     aliases: [
       "asus",
       "asustek",
+    ],
+    productLines: [
       "rog",
       "republic of gamers",
       "tuf gaming",
@@ -92,6 +102,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
     aliases: [
       "acer",
       "acer inc",
+    ],
+    productLines: [
       "predator",
       "nitro",
       "aspire",
@@ -109,6 +121,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
       "micro-star",
       "micro star",
       "micro-star international",
+    ],
+    productLines: [
       "modern",
       "stealth",
       "katana",
@@ -122,6 +136,8 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
     aliases: [
       "samsung",
       "samsung electronics",
+    ],
+    productLines: [
       "galaxy book",
       "galaxy tab",
       "galaxy",
@@ -130,92 +146,174 @@ const KNOWN_BRANDS: Record<string, { name: string; handle: string; aliases: stri
   microsoft: {
     name: "Microsoft",
     handle: "microsoft",
-    aliases: ["microsoft", "surface", "surface pro", "surface laptop", "xbox"],
+    aliases: ["microsoft"],
+    productLines: [
+      "surface",
+      "surface pro",
+      "surface laptop",
+      "xbox",
+    ],
   },
   toshiba: {
     name: "Toshiba",
     handle: "toshiba",
-    aliases: ["toshiba", "dynabook", "portege", "satellite"],
+    aliases: ["toshiba"],
+    productLines: [
+      "dynabook",
+      "portege",
+      "satellite",
+    ],
   },
   huawei: {
     name: "Huawei",
     handle: "huawei",
-    aliases: ["huawei", "matebook", "honor"],
+    aliases: ["huawei"],
+    productLines: [
+      "matebook",
+      "honor",
+    ],
   },
   sony: {
     name: "Sony",
     handle: "sony",
-    aliases: ["sony", "vaio", "playstation"],
+    aliases: ["sony"],
+    productLines: [
+      "vaio",
+      "playstation",
+    ],
   },
   lg: {
     name: "LG",
     handle: "lg",
-    aliases: ["lg", "lg electronics", "gram"],
+    aliases: [
+      "lg",
+      "lg electronics",
+    ],
+    productLines: ["gram"],
   },
   logitech: {
     name: "Logitech",
     handle: "logitech",
-    aliases: ["logitech", "logi", "astro gaming"],
+    aliases: [
+      "logitech",
+      "logi",
+    ],
+    productLines: ["astro gaming"],
   },
   canon: {
     name: "Canon",
     handle: "canon",
-    aliases: ["canon", "pixma", "imageclass"],
+    aliases: ["canon"],
+    productLines: [
+      "pixma",
+      "imageclass",
+    ],
   },
   epson: {
     name: "Epson",
     handle: "epson",
-    aliases: ["epson", "ecotank", "workforce"],
+    aliases: ["epson"],
+    productLines: [
+      "ecotank",
+      "workforce",
+    ],
   },
   razer: {
     name: "Razer",
     handle: "razer",
-    aliases: ["razer", "razer blade"],
+    aliases: ["razer"],
+    productLines: ["razer blade"],
   },
   corsair: {
     name: "Corsair",
     handle: "corsair",
-    aliases: ["corsair", "elgato"],
+    aliases: ["corsair"],
+    productLines: ["elgato"],
   },
   kingston: {
     name: "Kingston",
     handle: "kingston",
-    aliases: ["kingston", "fury", "hyperx"],
+    aliases: ["kingston"],
+    productLines: [
+      "fury",
+      "hyperx",
+    ],
   },
   seagate: {
     name: "Seagate",
     handle: "seagate",
-    aliases: ["seagate", "barracuda", "ironwolf", "firecuda", "lacie"],
+    aliases: ["seagate"],
+    productLines: [
+      "barracuda",
+      "ironwolf",
+      "firecuda",
+      "lacie",
+    ],
   },
   western_digital: {
     name: "Western Digital",
     handle: "western-digital",
-    aliases: ["western digital", "wd", "sandisk", "wd black", "wd blue"],
+    aliases: [
+      "western digital",
+      "wd",
+    ],
+    productLines: [
+      "sandisk",
+      "wd black",
+      "wd blue",
+    ],
   },
   intel: {
     name: "Intel",
     handle: "intel",
-    aliases: ["intel", "intel core", "core ultra", "xeon"],
+    aliases: ["intel"],
+    productLines: [
+      "intel core",
+      "core ultra",
+      "xeon",
+    ],
   },
   amd: {
     name: "AMD",
     handle: "amd",
-    aliases: ["amd", "ryzen", "radeon"],
+    aliases: ["amd"],
+    productLines: [
+      "ryzen",
+      "radeon",
+    ],
   },
   nvidia: {
     name: "NVIDIA",
     handle: "nvidia",
-    aliases: ["nvidia", "geforce", "rtx", "gtx", "quadro"],
+    aliases: ["nvidia"],
+    productLines: [
+      "geforce",
+      "rtx",
+      "gtx",
+      "quadro",
+    ],
   },
   tp_link: {
     name: "TP-Link",
     handle: "tp-link",
-    aliases: ["tp-link", "tplink", "deco", "archer", "omada"],
+    aliases: [
+      "tp-link",
+      "tplink",
+    ],
+    productLines: [
+      "deco",
+      "archer",
+      "omada",
+    ],
   },
   dlink: {
     name: "D-Link",
     handle: "d-link",
-    aliases: ["d-link", "dlink"],
+    aliases: [
+      "d-link",
+      "dlink",
+    ],
+    productLines: [],
   },
 }
 
@@ -227,6 +325,7 @@ export function sanitizeBrandString(raw: string): string {
 
   return raw
     .replace(/[™®©]/g, "")
+    .replace(/\((r|tm|c)\)/gi, "")
     .replace(/\b(inc|incorporated|corp|corporation|llc|ltd|co|technologies|technology|computers|electronics|systems|group)\b/gi, "")
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .replace(/\s+/g, " ")
@@ -242,6 +341,67 @@ export function slugifyBrand(name: string): string {
     .replace(/[™®©]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
+}
+
+/**
+ * Looks up a brand in the KNOWN_BRANDS dictionary by handle, canonical name,
+ * strong aliases, and optionally weak productLines.
+ */
+export function findKnownBrand(
+  rawInput?: string | null,
+  includeProductLines = false
+): NormalizedBrand | null {
+  if (!rawInput) return null
+
+  const cleaned = sanitizeBrandString(rawInput).toLowerCase()
+  if (!cleaned) return null
+
+  // 1. Direct match: handle, canonical name, or aliases
+  for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
+    if (brandInfo.handle === cleaned || brandInfo.name.toLowerCase() === cleaned) {
+      return { name: brandInfo.name, handle: brandInfo.handle }
+    }
+    for (const alias of brandInfo.aliases) {
+      if (alias === cleaned) {
+        return { name: brandInfo.name, handle: brandInfo.handle }
+      }
+    }
+  }
+
+  // 2. Direct match: product lines (if enabled)
+  if (includeProductLines) {
+    for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
+      for (const pl of brandInfo.productLines) {
+        if (pl === cleaned) {
+          return { name: brandInfo.name, handle: brandInfo.handle }
+        }
+      }
+    }
+  }
+
+  // 3. Substring/prefix match: aliases
+  for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
+    for (const alias of brandInfo.aliases) {
+      const regex = new RegExp(`^${alias}\\b|\\b${alias}$`, "i")
+      if (regex.test(cleaned)) {
+        return { name: brandInfo.name, handle: brandInfo.handle }
+      }
+    }
+  }
+
+  // 4. Substring/prefix match: product lines (if enabled)
+  if (includeProductLines) {
+    for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
+      for (const pl of brandInfo.productLines) {
+        const regex = new RegExp(`^${pl}\\b|\\b${pl}$`, "i")
+        if (regex.test(cleaned)) {
+          return { name: brandInfo.name, handle: brandInfo.handle }
+        }
+      }
+    }
+  }
+
+  return null
 }
 
 /**
@@ -305,6 +465,7 @@ export function extractBrandFromProduct(params: {
   const { title, attributes = [], categories = [], tags = [], logo } = params
 
   // 1. Check WooCommerce Attributes (highest priority: Brand, Make, Manufacturer)
+  // Both aliases AND productLines are checked since the brand attribute is authoritative
   for (const attr of attributes) {
     const attrName = attr.name.toLowerCase().trim()
     if (
@@ -314,13 +475,16 @@ export function extractBrandFromProduct(params: {
       attrName === "make"
     ) {
       for (const opt of attr.options || []) {
+        const matched = findKnownBrand(opt, true)
+        if (matched) return { ...matched, logo: logo || null }
+
         const normalized = normalizeBrand(opt)
         if (normalized) return { ...normalized, logo: logo || null }
       }
     }
   }
 
-  // 2. Check title prefix or token match with known brands
+  // 2. Check title matching: Check aliases first across tokens
   const titleTokens = title.split(/[\s|/\\-]+/).filter(Boolean)
   for (const token of titleTokens) {
     const tokenNormalized = normalizeBrand(token)
@@ -329,7 +493,20 @@ export function extractBrandFromProduct(params: {
     }
   }
 
-  // Check full title for known brands
+  // Only check productLines if the product line name is the FIRST word/token in the title
+  if (titleTokens.length > 0) {
+    const firstToken = sanitizeBrandString(titleTokens[0]).toLowerCase()
+    const titleTrimmed = title.trim().toLowerCase().replace(/^[^a-z0-9]+/i, "")
+    for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
+      for (const pl of brandInfo.productLines) {
+        if (pl === firstToken || new RegExp(`^${pl}\\b`, "i").test(titleTrimmed)) {
+          return { name: brandInfo.name, handle: brandInfo.handle, logo: logo || null }
+        }
+      }
+    }
+  }
+
+  // 3. Full title scan for known brands (ONLY aliases, NOT productLines)
   const titleLower = title.toLowerCase()
   for (const [, brandInfo] of Object.entries(KNOWN_BRANDS)) {
     for (const alias of brandInfo.aliases) {
@@ -340,19 +517,19 @@ export function extractBrandFromProduct(params: {
     }
   }
 
-  // 3. Check categories for known brands
+  // 4. Check categories for known brands (both aliases AND productLines)
   for (const cat of categories) {
-    const normalized = normalizeBrand(cat.name)
-    if (normalized && KNOWN_BRANDS[normalized.handle]) {
-      return { ...normalized, logo: logo || null }
+    const matched = findKnownBrand(cat.name, true)
+    if (matched) {
+      return { ...matched, logo: logo || null }
     }
   }
 
-  // 4. Check tags for known brands
+  // 5. Check tags for known brands (both aliases AND productLines)
   for (const tag of tags) {
-    const normalized = normalizeBrand(tag.name)
-    if (normalized && KNOWN_BRANDS[normalized.handle]) {
-      return { ...normalized, logo: logo || null }
+    const matched = findKnownBrand(tag.name, true)
+    if (matched) {
+      return { ...matched, logo: logo || null }
     }
   }
 

@@ -8,6 +8,7 @@ import {
   WelcomeData,
   InviteData,
 } from "../types"
+import { renderOwnerOrderNotification } from "../templates/owner-order-notification"
 
 // Mock SendGrid SDK
 jest.mock("@sendgrid/mail", () => ({
@@ -640,4 +641,84 @@ describe("SendgridNotificationService", () => {
       )
     })
   })
+
+  describe("renderOwnerOrderNotification", () => {
+    const mockOrderData = {
+      order_id: "order_12345",
+      display_id: 1001,
+      date: "Sep 23, 2026, 02:30 PM",
+      customer_name: "Jane Smith",
+      customer_email: "jane@example.com",
+      customer_phone: "+263 77 123 4567",
+      currency_code: "usd",
+      items: [
+        {
+          title: "Lenovo ThinkPad E14 Gen 5",
+          variant_title: "16GB RAM / 512GB SSD",
+          quantity: 2,
+          unit_price: 650,
+          total_price: 1300,
+          thumbnail: "https://cdn.laptopzone.co.zw/thinkpad.jpg",
+        },
+      ],
+      subtotal: 1300,
+      discount_total: 50,
+      shipping_total: 10,
+      tax_total: 0,
+      total: 1260,
+      payment_method: "Pesepay (EcoCash)",
+      payment_status: "Paid",
+      delivery_method: "Harare Same-Day Delivery",
+      shipping_address: {
+        first_name: "Jane",
+        last_name: "Smith",
+        address_1: "15 Nelson Mandela Ave",
+        city: "Harare",
+        country_code: "zw",
+        phone: "+263 77 123 4567",
+      },
+      admin_order_url: "http://localhost:9000/app/orders/order_12345",
+    }
+
+    it("renders clean merchant email without AI template tropes", () => {
+      const result = renderOwnerOrderNotification(mockOrderData)
+
+      expect(result.subject).toBe("New order #1001 — $1,260.00")
+      // Should not contain AI tropes
+      expect(result.html).not.toContain("STORE ALERT")
+      expect(result.html).not.toContain("&rarr;")
+      expect(result.html).not.toContain("font-weight: 800")
+      expect(result.html).not.toContain("font-weight: 900")
+      // Should contain clean typography and details
+      expect(result.html).toContain("Order #1001")
+      expect(result.html).toContain("Jane Smith")
+      expect(result.html).toContain("Lenovo ThinkPad E14 Gen 5")
+      expect(result.html).toContain("16GB RAM / 512GB SSD")
+      expect(result.html).toContain("Qty 2 &times; $650.00")
+      expect(result.html).toContain("Pesepay (EcoCash)")
+      expect(result.html).toContain("Harare Same-Day Delivery")
+      expect(result.html).toContain("View in Medusa Admin")
+      expect(result.html).toContain("http://localhost:9000/app/orders/order_12345")
+    })
+
+    it("renders test banner cleanly when is_test is true", () => {
+      const result = renderOwnerOrderNotification({
+        ...mockOrderData,
+        is_test: true,
+      })
+
+      expect(result.subject).toBe("[Test] New order #1001 — $1,260.00")
+      expect(result.html).toContain("Test notification")
+    })
+
+    it("produces readable plain text version", () => {
+      const result = renderOwnerOrderNotification(mockOrderData)
+
+      expect(result.text).toContain("LaptopZone Admin Notification: New Order #1001")
+      expect(result.text).toContain("Customer: Jane Smith")
+      expect(result.text).toContain("Total: $1,260.00")
+      expect(result.text).toContain("Lenovo ThinkPad E14 Gen 5")
+    })
+  })
 })
+

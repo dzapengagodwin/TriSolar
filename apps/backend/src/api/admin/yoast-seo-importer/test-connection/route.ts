@@ -1,13 +1,11 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { YoastSeoClient } from "../../../../modules/woocommerce-migrator/services/yoast-seo-client"
-
-export const AUTHENTICATE = false
 
 /**
  * POST /admin/yoast-seo-importer/test-connection
  * Tests connectivity to the WordPress REST API and detects Yoast SEO fields.
  */
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   try {
     const { wooUrl, consumerKey, consumerSecret } = req.body as any
 

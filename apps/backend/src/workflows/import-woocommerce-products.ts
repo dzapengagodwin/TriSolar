@@ -9,17 +9,18 @@ import {
   createProductsWorkflow,
   createPriceListsWorkflow,
   createSalesChannelsWorkflow,
+  createInventoryLevelsWorkflow,
 } from "@medusajs/medusa/core-flows"
-import { ContainerRegistrationKeys, Modules } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, MedusaError, Modules } from "@medusajs/framework/utils"
 import { WooCommerceClient } from "../modules/woocommerce-migrator/services/woocommerce-client"
 import { WooCommerceTransformer } from "../modules/woocommerce-migrator/services/woocommerce-transformer"
 import type { WooVariation } from "../modules/woocommerce-migrator/services/woocommerce-client"
 import { BRAND_MODULE } from "../modules/brand"
 
 export type ImportWooCommerceInput = {
-  wooUrl: string
-  consumerKey: string
-  consumerSecret: string
+  wooUrl?: string
+  consumerKey?: string
+  consumerSecret?: string
   currencyCode: string
   importCategories: boolean
   importTags: boolean
@@ -32,7 +33,7 @@ export type ImportWooCommerceInput = {
     products?: any[]
     categories?: any[]
     tags?: any[]
-  }
+  } | any[]
 }
 
 export type ImportedProductDetail = {
@@ -107,6 +108,13 @@ export const importWooCommerceStep = createStep(
         }
       }
     } else {
+      if (!input.wooUrl || !input.consumerKey || !input.consumerSecret) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          "wooUrl, consumerKey, and consumerSecret are required when jsonData is not provided"
+        )
+      }
+
       const client = new WooCommerceClient(
         input.wooUrl,
         input.consumerKey,
@@ -277,6 +285,21 @@ export const importWooCommerceStep = createStep(
       }
     }
 
+    // Resolve default stock location for inventory management
+    let defaultStockLocationId: string | undefined
+    try {
+      const { data: stockLocations } = await query.graph({
+        entity: "stock_location",
+        fields: ["id", "name"],
+      })
+      if (stockLocations && stockLocations.length > 0) {
+        defaultStockLocationId = stockLocations[0].id
+        logger.info(`Using default stock location: ${stockLocations[0].name} (${defaultStockLocationId})`)
+      }
+    } catch (err: any) {
+      logger.warn(`Could not fetch stock locations: ${err.message}`)
+    }
+
     // Fetch existing categories to prevent duplicates
     let existingCategories: any[] = []
     try {
@@ -371,18 +394,9 @@ export const importWooCommerceStep = createStep(
       }
     }
 
-    // Fetch existing collections to prevent duplicates
-    // Fetch existing products to prevent unique constraint handle failures
-    let existingProducts: any[] = []
-    try {
-      const { data } = await query.graph({
-        entity: "product",
-        fields: ["id", "handle", "metadata"],
-      })
-      existingProducts = data || []
-    } catch (err: any) {
-      logger.warn(`Failed to fetch existing products: ${err.message}`)
-    }
+    // Track known handles to prevent unique constraint collisions
+    // Instead of loading ALL products into memory, we query per-batch
+    const knownHandles = new Set<string>()
 
     // Import products in batches
     logger.info(`Transforming and importing ${wooProducts.length} products`)
@@ -398,15 +412,35 @@ export const importWooCommerceStep = createStep(
       const skippedProductsInBatch: ImportedProductDetail[] = []
       const productsToTransform: any[] = []
 
+      // Build batch handles for targeted duplicate lookup
+      const batchHandles = batch.map((p: any) =>
+        transformer.sanitizeHandle(p.slug) ||
+        transformer.sanitizeHandle(p.name) ||
+        `product-${p.id}`
+      )
+
+      // Query only the handles in this batch to check for duplicates
+      let existingInBatch: any[] = []
+      try {
+        const { data } = await query.graph({
+          entity: "product",
+          fields: ["id", "handle", "metadata"],
+          filters: { handle: batchHandles },
+        })
+        existingInBatch = data || []
+      } catch (err: any) {
+        logger.warn(`Failed to check existing products for batch: ${err.message}`)
+      }
+
       for (const wcProduct of batch) {
         const transformedHandle =
           transformer.sanitizeHandle(wcProduct.slug) ||
           transformer.sanitizeHandle(wcProduct.name) ||
           `product-${wcProduct.id}`
 
-        // Check if product already exists by WooCommerce ID in metadata or matching handle
-        const matchedProduct = existingProducts.find(
-          (ep) =>
+        // Check if product already exists by matching handle or WooCommerce ID in metadata
+        const matchedProduct = existingInBatch.find(
+          (ep: any) =>
             ep.metadata?.woo_product_id === wcProduct.id ||
             ep.handle === transformedHandle
         )
@@ -443,14 +477,15 @@ export const importWooCommerceStep = createStep(
       })
 
       // Ensure handles are unique within the batch and not colliding with existing products
+      const existingHandleSet = new Set(existingInBatch.map((ep: any) => ep.handle))
       for (const p of productsPayload) {
         let baseHandle = p.handle
         let handleCounter = 1
-        while (existingProducts.some((ep) => ep.handle === p.handle)) {
+        while (existingHandleSet.has(p.handle) || knownHandles.has(p.handle)) {
           handleCounter++
           p.handle = `${baseHandle}-${handleCounter}`
         }
-        existingProducts.push({ handle: p.handle })
+        knownHandles.add(p.handle)
       }
 
       // Create any missing brands for this batch; back-fill logo on existing brands that lack one
@@ -520,20 +555,18 @@ export const importWooCommerceStep = createStep(
         }
       }
 
-      try {
-        const productsResult = await createProductsWorkflow(container).run({
-          input: {
-            products: productsPayload,
-          },
-        })
-
-        const createdProducts = productsResult.result
-
-        // Link created products to their brands
+      // Helper to process successfully created products
+      const processCreatedProducts = async (
+        wcProducts: any[],
+        payloads: any[],
+        createdProducts: any[]
+      ) => {
         const linksToCreate: any[] = []
-        for (let j = 0; j < productsToTransform.length; j++) {
+        const variantQtyMap = new Map<string, number>()
+
+        for (let j = 0; j < wcProducts.length; j++) {
           const medusaProduct = createdProducts[j]
-          const payloadBrand = productsPayload[j]?.brand
+          const payloadBrand = payloads[j]?.brand
 
           if (medusaProduct && payloadBrand) {
             const brandId = brandMap.get(payloadBrand.handle)
@@ -548,67 +581,122 @@ export const importWooCommerceStep = createStep(
               })
             }
           }
-        }
-
-        if (linksToCreate.length > 0) {
-          try {
-            const link = container.resolve(ContainerRegistrationKeys.LINK)
-            await link.create(linksToCreate)
-            logger.info(`Linked ${linksToCreate.length} products to brands in batch ${batchNum}`)
-          } catch (linkErr: any) {
-            logger.warn(`Failed to link products to brands: ${linkErr.message}`)
-          }
-        }
-
-        for (let j = 0; j < productsToTransform.length; j++) {
-          const wcProduct = productsToTransform[j]
-          const medusaProduct = createdProducts[j]
 
           if (medusaProduct) {
             result.importedProducts++
             result.importedProductDetails.push({
-              wcId: wcProduct.id,
-              wcTitle: wcProduct.name,
+              wcId: wcProducts[j].id,
+              wcTitle: wcProducts[j].name,
               medusaId: medusaProduct.id,
               variantsCount: medusaProduct.variants?.length || 0,
               status: "success",
             })
 
-            if (input.createPriceList && medusaProduct.variants) {
-              const payloadProduct = productsPayload[j]
+            const payloadProduct = payloads[j]
+            if (medusaProduct.variants) {
               for (let k = 0; k < medusaProduct.variants.length; k++) {
                 const variant = medusaProduct.variants[k]
-                const payloadVariant = payloadProduct.variants?.[k]
-                const payloadPrice = payloadVariant?.prices?.[0]
-                if (payloadPrice) {
-                  importedVariantsPrices.push({
-                    variantId: variant.id,
-                    amount: payloadPrice.amount,
-                    currencyCode: payloadPrice.currency_code || input.currencyCode.toLowerCase(),
-                  })
+                const payloadVariant = payloadProduct?.variants?.[k]
+
+                // Track inventory stock quantities from variant metadata
+                const stockQty = payloadVariant?.metadata?.stock_quantity
+                if (typeof stockQty === "number" && stockQty >= 0) {
+                  variantQtyMap.set(variant.id, stockQty)
+                }
+
+                // Track prices for optional price list
+                if (input.createPriceList) {
+                  const payloadPrice = payloadVariant?.prices?.[0]
+                  if (payloadPrice) {
+                    importedVariantsPrices.push({
+                      variantId: variant.id,
+                      amount: payloadPrice.amount,
+                      currencyCode: payloadPrice.currency_code || input.currencyCode.toLowerCase(),
+                    })
+                  }
                 }
               }
             }
           }
         }
 
-        // Add the skipped ones to detail list
-        result.importedProductDetails.push(...skippedProductsInBatch)
-      } catch (error: any) {
-        logger.error(`Failed to import batch ${batchNum}: ${error.message}`)
-        for (const wcProduct of productsToTransform) {
-          result.failedProducts++
-          result.errors.push(
-            `Product "${wcProduct.name}" (ID: ${wcProduct.id}) failed: ${error.message}`
-          )
-          result.importedProductDetails.push({
-            wcId: wcProduct.id,
-            wcTitle: wcProduct.name,
-            medusaId: "",
-            variantsCount: 0,
-            status: "failed",
-            error: error.message,
+        if (linksToCreate.length > 0) {
+          const link = container.resolve(ContainerRegistrationKeys.LINK)
+          link.create(linksToCreate).catch((linkErr: any) => {
+            logger.warn(`Failed to link products to brands: ${linkErr.message}`)
           })
+        }
+
+        // Set inventory levels if default stock location exists and stock quantities were captured
+        if (defaultStockLocationId && variantQtyMap.size > 0) {
+          try {
+            const { data: variantDetails } = await query.graph({
+              entity: "product_variant",
+              fields: ["id", "inventory_items.inventory_item_id"],
+              filters: { id: Array.from(variantQtyMap.keys()) },
+            })
+
+            const inventoryLevels: any[] = []
+            for (const vd of variantDetails || []) {
+              const desiredQty = variantQtyMap.get(vd.id)
+              const inventoryItemId = vd.inventory_items?.[0]?.inventory_item_id
+              if (inventoryItemId && typeof desiredQty === "number") {
+                inventoryLevels.push({
+                  location_id: defaultStockLocationId,
+                  inventory_item_id: inventoryItemId,
+                  stocked_quantity: desiredQty,
+                })
+              }
+            }
+
+            if (inventoryLevels.length > 0) {
+              await createInventoryLevelsWorkflow(container).run({
+                input: { inventory_levels: inventoryLevels },
+              })
+              logger.info(`Set inventory levels for ${inventoryLevels.length} items in batch ${batchNum}`)
+            }
+          } catch (invErr: any) {
+            logger.warn(`Failed to set inventory levels in batch ${batchNum}: ${invErr.message}`)
+          }
+        }
+      }
+
+      // Batch-then-retry: try full batch first, retry individually on failure
+      try {
+        const productsResult = await createProductsWorkflow(container).run({
+          input: { products: productsPayload },
+        })
+        await processCreatedProducts(productsToTransform, productsPayload, productsResult.result)
+        result.importedProductDetails.push(...skippedProductsInBatch)
+      } catch (batchError: any) {
+        logger.warn(
+          `Batch ${batchNum} failed (${batchError.message}), retrying products individually...`
+        )
+
+        // Retry each product individually to isolate the bad one
+        for (let j = 0; j < productsToTransform.length; j++) {
+          const wcProduct = productsToTransform[j]
+          const payload = productsPayload[j]
+
+          try {
+            const singleResult = await createProductsWorkflow(container).run({
+              input: { products: [payload] },
+            })
+            await processCreatedProducts([wcProduct], [payload], singleResult.result)
+          } catch (productError: any) {
+            result.failedProducts++
+            result.errors.push(
+              `Product "${wcProduct.name}" (ID: ${wcProduct.id}) failed: ${productError.message}`
+            )
+            result.importedProductDetails.push({
+              wcId: wcProduct.id,
+              wcTitle: wcProduct.name,
+              medusaId: "",
+              variantsCount: 0,
+              status: "failed",
+              error: productError.message,
+            })
+          }
         }
         result.importedProductDetails.push(...skippedProductsInBatch)
       }

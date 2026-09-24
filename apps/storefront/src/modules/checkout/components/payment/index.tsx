@@ -1,7 +1,8 @@
 "use client"
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
+import { isManual, isStripeLike, paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
+import { isPickupShippingOption } from "@lib/util/fulfillment"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer, {
@@ -10,7 +11,7 @@ import PaymentContainer, {
 import { Button, Container, clx } from "@modules/common/components/ui"
 import { HttpTypes } from "@medusajs/types"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 const Payment = ({
   cart,
@@ -19,6 +20,20 @@ const Payment = ({
   cart: HttpTypes.StoreCart
   availablePaymentMethods: { id: string }[]
 }) => {
+  const isPickup = isPickupShippingOption(
+    cart.shipping_methods?.at(-1)
+  )
+
+  const displayedPaymentMethods = useMemo(() => {
+    if (isPickup) {
+      return availablePaymentMethods
+    }
+    const onlineMethods = availablePaymentMethods.filter(
+      (pm) => !isManual(pm.id) && pm.id !== "pp_system_default"
+    )
+    return onlineMethods.length > 0 ? onlineMethods : availablePaymentMethods
+  }, [isPickup, availablePaymentMethods])
+
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
   )
@@ -68,14 +83,12 @@ const Payment = ({
     setSelectedPaymentMethod(method)
     if (isStripeLike(method)) {
       await initializePayment(method, false)
-    } else if (availablePaymentMethods.length === 1) {
+    } else if (displayedPaymentMethods.length === 1) {
       await initializePayment(method, true)
     }
   }
 
-  const paidByGiftcard = !!(
-    (cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0
-  )
+  const paidByGiftcard = !((cart as unknown as Record<string, unknown>)?.gift_cards && ((cart as unknown as Record<string, unknown>)?.gift_cards as unknown[])?.length > 0 && cart?.total === 0)
 
   const paymentReady =
     (activeSession && (cart?.shipping_methods?.length ?? 0) !== 0) || paidByGiftcard
@@ -96,19 +109,30 @@ const Payment = ({
       paidByGiftcard ||
       isLoading ||
       selectedPaymentMethod ||
-      availablePaymentMethods.length !== 1
+      displayedPaymentMethods.length !== 1
     ) {
       return
     }
 
-    void setPaymentMethod(availablePaymentMethods[0].id)
+    void setPaymentMethod(displayedPaymentMethods[0].id)
   }, [
-    availablePaymentMethods,
+    displayedPaymentMethods,
     isLoading,
     isOpen,
     paidByGiftcard,
     selectedPaymentMethod,
   ])
+
+  // Ensure selectedPaymentMethod is valid among displayedPaymentMethods
+  useEffect(() => {
+    if (
+      selectedPaymentMethod &&
+      displayedPaymentMethods.length > 0 &&
+      !displayedPaymentMethods.some((pm) => pm.id === selectedPaymentMethod)
+    ) {
+      setSelectedPaymentMethod(displayedPaymentMethods[0].id)
+    }
+  }, [displayedPaymentMethods, selectedPaymentMethod])
 
   const handleEdit = () => {
     router.push(pathname + "?" + createQueryString("step", "payment"), {
@@ -191,13 +215,13 @@ const Payment = ({
 
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+          {!paidByGiftcard && displayedPaymentMethods?.length && (
             <RadioGroup
               value={selectedPaymentMethod}
               onChange={(value: string) => setPaymentMethod(value)}
               className="grid gap-y-3"
             >
-              {availablePaymentMethods.map((paymentMethod) => (
+              {displayedPaymentMethods.map((paymentMethod) => (
                 <div key={paymentMethod.id}>
                   {isStripeLike(paymentMethod.id) ? (
                     <StripeCardContainer

@@ -206,6 +206,34 @@ class SeoModuleService extends MedusaService({
       }
     }
 
+    if (entityType === "category") {
+      const name = entity.name || "Category"
+      const title = `${name} | LaptopZone`
+      const rawDesc = entity.description || ""
+      const cleanDesc = rawDesc
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+      const desc =
+        cleanDesc ||
+        `Shop warranty-backed ${name.toLowerCase()} and computer hardware at LaptopZone Zimbabwe. Fast nationwide delivery and authentic products.`
+      const canonicalUrl = entity.handle
+        ? `${storefrontUrl}/${countryCode}/categories/${entity.handle}`
+        : null
+
+      return {
+        meta_title: title,
+        meta_description: desc,
+        focus_keyphrase: name,
+        canonical_url: canonicalUrl,
+        og_title: title,
+        og_description: desc,
+        og_image: null,
+        robots_index: true,
+        robots_follow: true,
+      }
+    }
+
     return {
       meta_title: entity.name || entity.title || "LaptopZone",
       meta_description: entity.description || null,

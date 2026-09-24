@@ -3,6 +3,7 @@
 import { isManual, isPesepay, isStripeLike } from "@lib/constants"
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { isPickupShippingOption } from "@lib/util/fulfillment"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -464,6 +465,20 @@ export async function placeOrder(cartId?: string) {
     ...(await getAuthHeaders()),
   }
 
+  const currentCart = await retrieveCart(id)
+  if (currentCart) {
+    const isManualSession = currentCart.payment_collection?.payment_sessions?.some(
+      (s) => isManual(s.provider_id) || s.provider_id === "pp_system_default"
+    )
+    const selectedShipping = currentCart.shipping_methods?.at(-1)
+    if (isManualSession && selectedShipping && !isPickupShippingOption(selectedShipping)) {
+      return {
+        error:
+          "Pay on Collection is only available for in-store pickup orders. Please select an online payment method for delivery.",
+      }
+    }
+  }
+
   let cartRes
   try {
     cartRes = await sdk.store.cart.complete(id, {}, headers)
@@ -661,7 +676,10 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
     try {
       paymentSessionRes = await sdk.store.payment.initiatePaymentSession(
         freshCart,
-        { provider_id: data.payment_provider_id },
+        {
+          provider_id: data.payment_provider_id,
+          data: { cart_id: freshCart.id },
+        },
         {},
         headers
       )
@@ -713,6 +731,14 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
       isManual(data.payment_provider_id) ||
       data.payment_provider_id === "pp_system_default"
     ) {
+      const selectedShipping = freshCart.shipping_methods?.at(-1)
+      if (selectedShipping && !isPickupShippingOption(selectedShipping)) {
+        return {
+          error:
+            "Pay on Collection is only available for in-store pickup orders. Please select an online payment method for delivery.",
+        }
+      }
+
       const completeRes = await sdk.store.cart.complete(cartId, {}, headers)
       if (completeRes?.type === "order" && completeRes.order) {
         const orderCacheTag = await getCacheTag("orders")

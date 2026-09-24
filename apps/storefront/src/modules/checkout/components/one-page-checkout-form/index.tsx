@@ -90,24 +90,23 @@ const OnePageCheckoutForm = ({
   // Is pickup selected either because store is in pickup-only mode OR customer chose in-store pickup
   const isPickupSelected = isPickupOnly || isPickupShippingOption(selectedShippingOption)
 
-  // Displayed payment methods (in pickup mode, only show Pay On Collection / manual, hide Pesepay)
+  // Displayed payment methods:
+  // - In pickup mode: allow ALL payment methods (both Pay On Collection and online payments like Pesepay)
+  // - In shipping/delivery mode: hide Pay On Collection (only show Pesepay / online payments)
   const displayedPaymentMethods = useMemo(() => {
     if (isPickupSelected) {
-      return availablePaymentMethods.filter(
-        (pm) => isManual(pm.id) || pm.id === "pp_system_default"
-      )
+      return availablePaymentMethods
     }
-    return availablePaymentMethods
+    // If shipping is defined (delivery is selected / not pickup), hide Pay on Collection
+    const onlineMethods = availablePaymentMethods.filter(
+      (pm) => !isManual(pm.id) && pm.id !== "pp_system_default"
+    )
+    return onlineMethods.length > 0 ? onlineMethods : availablePaymentMethods
   }, [isPickupSelected, availablePaymentMethods])
-
-  // Active payment session on cart if any
-  const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
-  )
 
   const defaultPaymentId = isPickupSelected
     ? (displayedPaymentMethods.find((pm) => isManual(pm.id) || pm.id === "pp_system_default")?.id || displayedPaymentMethods[0]?.id || "pp_system_default")
-    : (activeSession?.provider_id || availablePaymentMethods[0]?.id || "")
+    : (displayedPaymentMethods.find((pm) => !isManual(pm.id) && pm.id !== "pp_system_default")?.id || displayedPaymentMethods[0]?.id || "")
 
   // Selected payment
   const [paymentProviderId, setPaymentProviderId] = useState<string>(defaultPaymentId)
@@ -275,13 +274,18 @@ const OnePageCheckoutForm = ({
       const selectedOption = displayedShippingMethods.find((sm) => sm.id === id)
       const isClickedPickup = isPickupOnly || isPickupShippingOption(selectedOption)
 
-      // If user selected pickup, immediately ensure payment is switched to Pay On Collection / manual
-      if (isClickedPickup) {
-        const manualPm = availablePaymentMethods.find(
-          (pm) => isManual(pm.id) || pm.id === "pp_system_default"
-        )
-        if (manualPm) {
-          setPaymentProviderId(manualPm.id)
+      // If user selected shipping/delivery, immediately ensure payment is switched to online payment
+      // because Pay on Collection is only allowed for in-store pickup orders
+      if (!isClickedPickup) {
+        const isCurrentManual =
+          isManual(paymentProviderId) || paymentProviderId === "pp_system_default"
+        if (isCurrentManual) {
+          const onlinePm = availablePaymentMethods.find(
+            (pm) => !isManual(pm.id) && pm.id !== "pp_system_default"
+          )
+          if (onlinePm) {
+            setPaymentProviderId(onlinePm.id)
+          }
         }
       }
 
@@ -314,23 +318,30 @@ const OnePageCheckoutForm = ({
       displayedShippingMethods,
       isPickupOnly,
       availablePaymentMethods,
+      paymentProviderId,
       fieldErrors,
       router,
     ]
   )
 
   // Auto-switch payment method if current selection is not valid in displayedPaymentMethods
-  // (e.g. user selected Shop Pickup -> Pesepay is hidden -> automatically switch to Pay On Collection)
+  // (e.g. user selected Shop Pickup -> Pesepay is hidden -> automatically switch to Pay On Collection
+  //  or user selected Shipping -> Pay On Collection is hidden -> automatically switch to Pesepay / online)
   useEffect(() => {
-    if (isPickupSelected) {
-      const isCurrentValid = displayedPaymentMethods.some(
-        (pm) => pm.id === paymentProviderId
-      )
-      if (!isCurrentValid && displayedPaymentMethods.length > 0) {
+    const isCurrentValid = displayedPaymentMethods.some(
+      (pm) => pm.id === paymentProviderId
+    )
+    if (!isCurrentValid && displayedPaymentMethods.length > 0) {
+      if (isPickupSelected) {
         const manualPm = displayedPaymentMethods.find(
           (pm) => isManual(pm.id) || pm.id === "pp_system_default"
         )
         setPaymentProviderId(manualPm?.id || displayedPaymentMethods[0].id)
+      } else {
+        const onlinePm = displayedPaymentMethods.find(
+          (pm) => !isManual(pm.id) && pm.id !== "pp_system_default"
+        )
+        setPaymentProviderId(onlinePm?.id || displayedPaymentMethods[0].id)
       }
     }
   }, [isPickupSelected, displayedPaymentMethods, paymentProviderId])
@@ -564,20 +575,20 @@ const OnePageCheckoutForm = ({
       return "Processing Order..."
     }
 
-    if (isPickupSelected) {
-      return "Confirm Pickup Order"
-    }
-
     if (isPesepay(paymentProviderId)) {
       return "Pay with Pesepay"
     }
 
-    if (isManual(paymentProviderId) || paymentProviderId === "pp_system_default") {
-      return "Place Order"
-    }
-
     if (isStripeLike(paymentProviderId)) {
       return "Pay with Card"
+    }
+
+    if (isPickupSelected) {
+      return "Confirm Pickup Order"
+    }
+
+    if (isManual(paymentProviderId) || paymentProviderId === "pp_system_default") {
+      return "Place Order"
     }
 
     return "Place Order"
@@ -1005,9 +1016,7 @@ const OnePageCheckoutForm = ({
 
           {displayedPaymentMethods.length === 0 ? (
             <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
-              {isPickupSelected
-                ? "No payment method available for collection."
-                : "No payment methods available for this region."}
+              No payment methods available for this region.
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3">
@@ -1057,9 +1066,7 @@ const OnePageCheckoutForm = ({
                         )}
                         {isManualMethod && (
                           <span className="text-xs text-gray-500 block mt-0.5">
-                            {isPickupSelected
-                              ? "Cash or card swipe in store upon collection"
-                              : "Cash or card swipe upon delivery or collection"}
+                            Cash or card swipe in store upon collection
                           </span>
                         )}
                       </div>

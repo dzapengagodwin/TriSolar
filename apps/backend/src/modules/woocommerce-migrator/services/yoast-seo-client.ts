@@ -1,4 +1,5 @@
 import { MedusaError } from "@medusajs/framework/utils"
+import { validateExternalUrl } from "../utils/url-validator"
 
 // -------------------------------------------------------------------
 // Types returned from the WordPress REST API with Yoast SEO active
@@ -97,6 +98,7 @@ export class YoastSeoClient {
   private consumerSecret: string
 
   constructor(baseUrl: string, consumerKey: string, consumerSecret: string) {
+    validateExternalUrl(baseUrl)
     this.baseUrl = baseUrl.replace(/\/+$/, "")
     this.consumerKey = consumerKey.trim()
     this.consumerSecret = consumerSecret.trim()
@@ -120,14 +122,7 @@ export class YoastSeoClient {
     }
   }
 
-  private appendAuth(url: URL): void {
-    if (!url.searchParams.has("consumer_key")) {
-      url.searchParams.set("consumer_key", this.consumerKey)
-    }
-    if (!url.searchParams.has("consumer_secret")) {
-      url.searchParams.set("consumer_secret", this.consumerSecret)
-    }
-  }
+
 
   private async fetchAllWcV3<T>(
     endpoint: string,
@@ -143,8 +138,6 @@ export class YoastSeoClient {
       if (extra) {
         for (const [k, v] of Object.entries(extra)) url.searchParams.set(k, v)
       }
-      this.appendAuth(url)
-
       const ctrl = new AbortController()
       const timer = setTimeout(() => ctrl.abort(), 25000)
       try {
@@ -183,8 +176,6 @@ export class YoastSeoClient {
       if (extra) {
         for (const [k, v] of Object.entries(extra)) url.searchParams.set(k, v)
       }
-      this.appendAuth(url)
-
       const ctrl = new AbortController()
       const timer = setTimeout(() => ctrl.abort(), 25000)
       try {
@@ -215,8 +206,6 @@ export class YoastSeoClient {
       const url = new URL(`${this.baseUrl}/wp-json/wc/v3/products`)
       url.searchParams.set("per_page", "1")
       url.searchParams.set("_fields", "id,slug,yoast_head_json")
-      this.appendAuth(url)
-
       const ctrl = new AbortController()
       setTimeout(() => ctrl.abort(), 10000)
       const res = await fetch(url.toString(), { headers: this.getHeaders() })

@@ -1,7 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 
 export const isPickupShippingOption = (
-  option?: HttpTypes.StoreCartShippingOption | null
+  option?: HttpTypes.StoreCartShippingOption | HttpTypes.StoreCartShippingMethod | null
 ): boolean => {
   if (!option) return false
   const raw = option as unknown as {
@@ -37,7 +37,7 @@ export const isPickupShippingOption = (
 }
 
 export const isDeliveryShippingOption = (
-  option?: HttpTypes.StoreCartShippingOption | null
+  option?: HttpTypes.StoreCartShippingOption | HttpTypes.StoreCartShippingMethod | null
 ): boolean => {
   if (!option) return false
   const raw = option as unknown as {

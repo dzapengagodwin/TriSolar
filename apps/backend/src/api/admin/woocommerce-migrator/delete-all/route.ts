@@ -1,10 +1,8 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { deleteProductsWorkflow, deleteReservationsWorkflow } from "@medusajs/medusa/core-flows"
 
-export const AUTHENTICATE = false
-
-export const DELETE = async (req: MedusaRequest, res: MedusaResponse) => {
+export const DELETE = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
 

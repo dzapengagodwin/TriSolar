@@ -1,7 +1,5 @@
-import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import { AuthenticatedMedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { importYoastSeoWorkflow } from "../../../../workflows/import-yoast-seo"
-
-export const AUTHENTICATE = false
 
 /**
  * POST /admin/yoast-seo-importer/preview
@@ -9,7 +7,7 @@ export const AUTHENTICATE = false
  * but does NOT write anything to the database.
  * Returns a preview table for user review before running the real import.
  */
-export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
+export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
   try {
     const {
       wooUrl,
