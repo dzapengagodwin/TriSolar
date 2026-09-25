@@ -1,5 +1,6 @@
 import { WooCommerceTransformer } from "../services/woocommerce-transformer"
 import { WooProduct, WooVariation } from "../services/woocommerce-client"
+import { ProductStatus } from "@medusajs/framework/utils"
 
 function createMockProduct(overrides: Partial<WooProduct> = {}): WooProduct {
   return {
@@ -296,6 +297,155 @@ describe("WooCommerceTransformer Unit Tests", () => {
       expect(result.description).toContain("• 32GB LPDDR5x RAM")
       expect(result.description).toContain("• 1TB NVMe Gen4 SSD")
       expect(result.description).toBe("• Intel Core Ultra 7\n• 32GB LPDDR5x RAM\n• 1TB NVMe Gen4 SSD")
+    })
+  })
+
+  describe("Dimensions & Weight Mapping", () => {
+    it("should map dimensions and weight to product top-level fields and metadata", () => {
+      const product = createMockProduct({
+        weight: "2.35",
+        dimensions: {
+          length: "35.8",
+          width: "24.2",
+          height: "1.99",
+        },
+      })
+
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.weight).toBe(2.35)
+      expect(result.length).toBe(35.8)
+      expect(result.width).toBe(24.2)
+      expect(result.height).toBe(1.99)
+
+      expect(result.variants[0].weight).toBe(2.35)
+      expect(result.variants[0].length).toBe(35.8)
+      expect(result.variants[0].width).toBe(24.2)
+      expect(result.variants[0].height).toBe(1.99)
+
+      expect(result.metadata?.dimensions).toEqual({
+        length: 35.8,
+        width: 24.2,
+        height: 1.99,
+      })
+    })
+
+    it("should handle empty or invalid dimensions gracefully", () => {
+      const product = createMockProduct({
+        weight: "",
+        dimensions: {
+          length: "",
+          width: "0",
+          height: "-5",
+        },
+      })
+
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.weight).toBeUndefined()
+      expect(result.length).toBeUndefined()
+      expect(result.width).toBeUndefined()
+      expect(result.height).toBeUndefined()
+      expect(result.metadata?.dimensions).toBeUndefined()
+    })
+
+    it("should map variation-specific dimensions when provided or inherit from product", () => {
+      const product = createMockProduct({
+        type: "variable",
+        weight: "1.5",
+        dimensions: { length: "30", width: "20", height: "2" },
+        attributes: [
+          {
+            id: 1,
+            name: "Size",
+            position: 0,
+            visible: true,
+            variation: true,
+            options: ["Small", "Large"],
+          },
+        ],
+      })
+
+      const variations: WooVariation[] = [
+        createMockVariation({
+          id: 601,
+          sku: "VAR-SMALL",
+          attributes: [{ id: 1, name: "Size", option: "Small" }],
+          weight: "1.2",
+          dimensions: { length: "25", width: "18", height: "1.5" },
+        }),
+        createMockVariation({
+          id: 602,
+          sku: "VAR-LARGE",
+          attributes: [{ id: 1, name: "Size", option: "Large" }],
+          weight: "", // empty, should inherit from product
+          dimensions: undefined, // undefined, should inherit from product
+        }),
+      ]
+
+      const result = transformer.transformProduct(product, variations, "usd", emptyCategoryMap)
+
+      expect(result.variants).toHaveLength(2)
+      // Variation 1 with its own dimensions
+      expect(result.variants[0].weight).toBe(1.2)
+      expect(result.variants[0].length).toBe(25)
+      expect(result.variants[0].width).toBe(18)
+      expect(result.variants[0].height).toBe(1.5)
+
+      // Variation 2 inherits product dimensions
+      expect(result.variants[1].weight).toBe(1.5)
+      expect(result.variants[1].length).toBe(30)
+      expect(result.variants[1].width).toBe(20)
+      expect(result.variants[1].height).toBe(2)
+    })
+  })
+
+  describe("Publish Status Mapping", () => {
+    it("should map WooCommerce 'publish' status to ProductStatus.PUBLISHED", () => {
+      const product = createMockProduct({ status: "publish" })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.PUBLISHED)
+      expect(result.metadata?.woo_status).toBe("publish")
+    })
+
+    it("should map case-insensitive 'Publish' with spaces to ProductStatus.PUBLISHED", () => {
+      const product = createMockProduct({ status: "  Publish  " as any })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.PUBLISHED)
+    })
+
+    it("should map WooCommerce 'draft' status to ProductStatus.DRAFT", () => {
+      const product = createMockProduct({ status: "draft" })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.DRAFT)
+      expect(result.metadata?.woo_status).toBe("draft")
+    })
+
+    it("should map WooCommerce 'private' status to ProductStatus.DRAFT", () => {
+      const product = createMockProduct({ status: "private" })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.DRAFT)
+      expect(result.metadata?.woo_status).toBe("private")
+    })
+
+    it("should map WooCommerce 'pending' status to ProductStatus.DRAFT", () => {
+      const product = createMockProduct({ status: "pending" })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.DRAFT)
+      expect(result.metadata?.woo_status).toBe("pending")
+    })
+
+    it("should map WooCommerce 'trash' status to ProductStatus.DRAFT", () => {
+      const product = createMockProduct({ status: "trash" as any })
+      const result = transformer.transformProduct(product, [], "usd", emptyCategoryMap)
+
+      expect(result.status).toBe(ProductStatus.DRAFT)
+      expect(result.metadata?.woo_status).toBe("trash")
     })
   })
 })

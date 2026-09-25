@@ -53,7 +53,7 @@ const WooCommerceMigratorPage = () => {
   const [currencyCode, setCurrencyCode] = useState("usd")
   const [importCategories, setImportCategories] = useState(true)
   const [importTags, setImportTags] = useState(false)
-  const [publishProducts, setPublishProducts] = useState(false)
+  const [publishProducts, setPublishProducts] = useState(true)
   const [createPriceList, setCreatePriceList] = useState(false)
   const [skipVariants, setSkipVariants] = useState(true)
   const [createdAfter, setCreatedAfter] = useState("")
@@ -458,7 +458,12 @@ const WooCommerceMigratorPage = () => {
                 checked={publishProducts}
                 onCheckedChange={setPublishProducts}
               />
-              <Label>Publish products immediately</Label>
+              <div>
+                <Label>Publish products (matches WooCommerce status)</Label>
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Only products published in WooCommerce will be published. Drafts and private items will always remain as drafts.
+                </Text>
+              </div>
             </div>
             <div className="flex items-center gap-x-3">
               <Switch

@@ -11,7 +11,7 @@ import {
   createSalesChannelsWorkflow,
   createInventoryLevelsWorkflow,
 } from "@medusajs/medusa/core-flows"
-import { ContainerRegistrationKeys, MedusaError, Modules } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, MedusaError, Modules, ProductStatus } from "@medusajs/framework/utils"
 import { WooCommerceClient } from "../modules/woocommerce-migrator/services/woocommerce-client"
 import { WooCommerceTransformer } from "../modules/woocommerce-migrator/services/woocommerce-transformer"
 import type { WooVariation } from "../modules/woocommerce-migrator/services/woocommerce-client"
@@ -543,10 +543,19 @@ export const importWooCommerceStep = createStep(
         }
       }
 
-      // Override status if publishProducts is set
-      if (input.publishProducts) {
-        for (const p of productsPayload) {
-          p.status = "published" as any
+      // Determine publish status:
+      // ONLY publish products if they were published in WooCommerce ("publish").
+      // If a product was draft, pending, private, or trashed in WooCommerce, it MUST remain DRAFT.
+      // Furthermore, if input.publishProducts is explicitly false, all products import as DRAFT.
+      for (let j = 0; j < productsPayload.length; j++) {
+        const p = productsPayload[j]
+        const wcProduct = productsToTransform[j]
+        const isWooPublished = (wcProduct?.status || "").toLowerCase().trim() === "publish"
+
+        if (input.publishProducts !== false && isWooPublished) {
+          p.status = ProductStatus.PUBLISHED
+        } else {
+          p.status = ProductStatus.DRAFT
         }
       }
       if (webSalesChannelId) {

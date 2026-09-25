@@ -9,7 +9,7 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
   let key = ""
   let secret = ""
   let currency = "usd"
-  let publish = false
+  let publish = true
   let importCategories = true
   let importTags = false
   let skipVariants = true
@@ -24,6 +24,7 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
     if (arg.startsWith("--after=")) createdAfter = arg.split("=").slice(1).join("=")
     if (arg.startsWith("--before=")) createdBefore = arg.split("=").slice(1).join("=")
     if (arg === "--publish") publish = true
+    if (arg === "--draft" || arg === "--no-publish") publish = false
     if (arg === "--no-categories") importCategories = false
     if (arg === "--no-tags") importTags = false
     if (arg === "--include-variants") skipVariants = false
@@ -32,7 +33,7 @@ export default async function importWooCommerce({ container, args }: ExecArgs) {
 
   if (!url || !key || !secret) {
     logger.error("Missing required arguments.")
-    logger.error("Usage: npx medusa exec ./src/scripts/import-woocommerce.ts --url=<wc-url> --key=<ck_...> --secret=<cs_...> [--currency=usd] [--after=YYYY-MM-DD] [--before=YYYY-MM-DD] [--include-variants] [--publish] [--no-categories] [--no-tags]")
+    logger.error("Usage: npx medusa exec ./src/scripts/import-woocommerce.ts --url=<wc-url> --key=<ck_...> --secret=<cs_...> [--currency=usd] [--after=YYYY-MM-DD] [--before=YYYY-MM-DD] [--include-variants] [--draft] [--no-categories] [--no-tags]")
     return
   }
 

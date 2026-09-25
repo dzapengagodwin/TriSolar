@@ -156,7 +156,7 @@ export default async function fixInflatedPrices({ container, args }: ExecArgs) {
   for (let i = 0; i < pricesToUpdate.length; i += batchSize) {
     const chunk = pricesToUpdate.slice(i, i + batchSize)
     try {
-      await pricingModule.updatePrices(
+      await (pricingModule as any).updatePrices(
         chunk.map((p) => ({
           id: p.id,
           amount: p.amount,

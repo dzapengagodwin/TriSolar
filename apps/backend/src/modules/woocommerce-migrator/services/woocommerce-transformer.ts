@@ -28,6 +28,9 @@ export interface MedusaProductPayload {
   description?: string
   status: ProductStatus
   weight?: number
+  length?: number
+  width?: number
+  height?: number
   thumbnail?: string
   images?: { url: string }[]
   options: { title: string; values: string[] }[]
@@ -37,6 +40,9 @@ export interface MedusaProductPayload {
     options: Record<string, string>
     prices: { amount: number; currency_code: string }[]
     weight?: number
+    length?: number
+    width?: number
+    height?: number
     manage_inventory?: boolean
     metadata?: Record<string, any>
   }[]
@@ -57,6 +63,20 @@ export class WooCommerceTransformer {
     const num = typeof val === "number" ? val : parseFloat(String(val).replace(/,/g, "").replace(/[^0-9.-]/g, ""))
     if (isNaN(num)) return 0
     return Math.round(num * 100) / 100
+  }
+
+  private parseDimension(val?: string | number | null): number | undefined {
+    if (val === undefined || val === null || val === "") return undefined
+    const num = typeof val === "number" ? val : parseFloat(String(val).replace(/,/g, "").trim())
+    if (isNaN(num) || num <= 0) return undefined
+    return num
+  }
+
+  private parseWeight(val?: string | number | null): number | undefined {
+    if (val === undefined || val === null || val === "") return undefined
+    const num = typeof val === "number" ? val : parseFloat(String(val).replace(/,/g, "").trim())
+    if (isNaN(num) || num <= 0) return undefined
+    return num
   }
 
   private cleanHtml(html?: string): string {
@@ -169,13 +189,17 @@ export class WooCommerceTransformer {
     categoryMap: Map<number, string>,
     brandImageMap: Map<string, string> = new Map()
   ): MedusaProductPayload {
-    const status = product.status === "publish" ? ProductStatus.PUBLISHED : ProductStatus.DRAFT
+    const isWooPublished = (product.status || "").toLowerCase().trim() === "publish"
+    const status = isWooPublished ? ProductStatus.PUBLISHED : ProductStatus.DRAFT
 
     const images = (product.images || []).map((img) => ({
       url: this.formatImageUrl(img.src),
     }))
     const thumbnail = images.length > 0 ? images[0].url : undefined
-    const weight = product.weight ? parseFloat(product.weight) : undefined
+    const weight = this.parseWeight(product.weight)
+    const length = this.parseDimension(product.dimensions?.length)
+    const width = this.parseDimension(product.dimensions?.width)
+    const height = this.parseDimension(product.dimensions?.height)
 
     const category_ids = (product.categories || [])
       .map((cat) => categoryMap.get(cat.id))
@@ -228,12 +252,20 @@ export class WooCommerceTransformer {
             variantOptions[opt.title] = matchedAttr?.option || opt.values[0] || "Default"
           }
 
+          const varWeight = this.parseWeight(variation.weight) ?? weight
+          const varLength = this.parseDimension(variation.dimensions?.length) ?? length
+          const varWidth = this.parseDimension(variation.dimensions?.width) ?? width
+          const varHeight = this.parseDimension(variation.dimensions?.height) ?? height
+
           variants.push({
             title: Object.values(variantOptions).join(" / ") || "Variant",
             sku: variation.sku || undefined,
             options: variantOptions,
             prices: [{ amount: priceAmount, currency_code: currencyCode.toLowerCase() }],
-            weight: variation.weight ? parseFloat(variation.weight) : weight,
+            weight: varWeight,
+            length: varLength,
+            width: varWidth,
+            height: varHeight,
             manage_inventory: variation.manage_stock,
             metadata: {
               stock_quantity: variation.stock_quantity,
@@ -269,6 +301,9 @@ export class WooCommerceTransformer {
         },
         prices: [{ amount: priceAmount, currency_code: currencyCode.toLowerCase() }],
         weight,
+        length,
+        width,
+        height,
         manage_inventory: product.manage_stock,
         metadata: {
           stock_quantity: product.stock_quantity,
@@ -318,10 +353,10 @@ export class WooCommerceTransformer {
       specifications[attr.name] = attr.options || []
     }
 
-    const dimensions = product.dimensions ? {
-      length: product.dimensions.length ? parseFloat(String(product.dimensions.length)) : undefined,
-      width: product.dimensions.width ? parseFloat(String(product.dimensions.width)) : undefined,
-      height: product.dimensions.height ? parseFloat(String(product.dimensions.height)) : undefined,
+    const dimensions = (length !== undefined || width !== undefined || height !== undefined) ? {
+      length,
+      width,
+      height,
     } : undefined
 
     return {
@@ -331,6 +366,9 @@ export class WooCommerceTransformer {
       description,
       status,
       weight,
+      length,
+      width,
+      height,
       thumbnail,
       images,
       options,
@@ -340,6 +378,7 @@ export class WooCommerceTransformer {
       metadata: {
         woo_product_id: product.id,
         woo_sku: product.sku || "",
+        woo_status: product.status || "draft",
         woo_regular_price: product.regular_price || null,
         woo_sale_price: product.sale_price || null,
         brand_name: brand?.name || "",

@@ -41,7 +41,7 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
       currencyCode = "usd",
       importCategories = true,
       importTags = false,
-      publishProducts = false,
+      publishProducts = true,
       createPriceList = false,
       skipVariants = true,
       createdAfter,
