@@ -1,6 +1,5 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
-import { ArrowRight } from "@medusajs/icons"
 
 export default function GamingSection() {
   return (
@@ -41,9 +40,8 @@ export default function GamingSection() {
     </div> 
  
     <div className="pt-6"> 
-      <span className="inline-flex items-center gap-2 bg-primary group-hover:bg-primary-hover text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
+      <span className="inline-flex items-center bg-primary group-hover:bg-primary-hover text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
         <span>Shop Now</span> 
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" /> 
       </span> 
     </div> 
   </div> 
@@ -92,9 +90,8 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
+                  <span className="inline-flex items-center border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>
@@ -138,9 +135,8 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
+                  <span className="inline-flex items-center border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>
@@ -184,9 +180,8 @@ export default function GamingSection() {
                 </div>
 
                 <div className="pt-2">
-                  <span className="inline-flex items-center gap-1.5 border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
+                  <span className="inline-flex items-center border border-white text-white bg-transparent group-hover:bg-white group-hover:text-black font-semibold text-xs px-3.5 py-1.5 rounded-full transition-all duration-300 shadow-xs">
                     <span>Shop Now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </div>
               </div>
