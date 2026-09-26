@@ -126,7 +126,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
 
   const handleResetToDefaults = () => {
     setForm({
-      meta_title: defaults.meta_title || (data.title ? `${data.title} | LaptopZone` : ""),
+      meta_title: defaults.meta_title || (data.title ? `${data.title} | Laptopzone` : ""),
       meta_description: defaults.meta_description || "",
       focus_keyphrase: defaults.focus_keyphrase || data.title || "",
       canonical_url: defaults.canonical_url || "",
@@ -168,7 +168,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
   }
 
   // Live snippet display values
-  const previewTitle = form.meta_title || defaults.meta_title || data.title || "Product Title | LaptopZone"
+  const previewTitle = form.meta_title || defaults.meta_title || data.title || "Product Title | Laptopzone"
   const previewSlug = data.handle || "product-url"
   const previewDesc =
     form.meta_description ||
@@ -356,7 +356,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                   LZ
                 </div>
                 <div className="text-[11px] text-ui-fg-subtle leading-tight">
-                  <span className="font-medium text-ui-fg-base">LaptopZone</span>
+                  <span className="font-medium text-ui-fg-base">Laptopzone</span>
                   <span className="text-ui-fg-muted mx-1">›</span>
                   <span className="text-ui-fg-muted text-[10px]">products › {previewSlug}</span>
                 </div>

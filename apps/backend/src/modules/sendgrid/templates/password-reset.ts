@@ -16,7 +16,7 @@ export function renderPasswordReset(
         Reset Your Password
       </h1>
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">
-        We received a request to reset the password for your LaptopZone account.
+        We received a request to reset the password for your Laptopzone account.
       </p>
     </div>
 
@@ -43,10 +43,10 @@ export function renderPasswordReset(
     </p>
   `
 
-  const subject = "Reset Your LaptopZone Password"
+  const subject = "Reset Your Laptopzone Password"
   const html = renderBaseLayout({
     title: subject,
-    previewText: "Follow this link to reset your LaptopZone account password.",
+    previewText: "Follow this link to reset your Laptopzone account password.",
     content,
   })
 
@@ -54,14 +54,14 @@ export function renderPasswordReset(
 
 Hello ${customerName},
 
-We received a request to reset your LaptopZone account password.
+We received a request to reset your Laptopzone account password.
 
 To set a new password, click the link below (valid for ${expiresIn} hours):
 ${data.reset_url}
 
 If you did not request this change, please ignore this email.
 
-LaptopZone Zimbabwe`
+Laptopzone Zimbabwe`
 
   return { subject, html, text }
 }

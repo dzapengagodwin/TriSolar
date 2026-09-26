@@ -156,7 +156,7 @@ export function renderBaseLayout({
                 <tr>
                   <td align="left" style="vertical-align: middle;">
                     <a href="${escapeHtml(storefrontUrl)}" style="text-decoration: none; display: inline-block;">
-                      <img src="https://cdn.laptopzone.co.zw/logo.png" alt="LaptopZone" width="140" class="mobile-logo" style="display: block; height: auto; border: 0; max-height: 40px; object-fit: contain;" />
+                      <img src="https://cdn.laptopzone.co.zw/logo.png" alt="Laptopzone" width="140" class="mobile-logo" style="display: block; height: auto; border: 0; max-height: 40px; object-fit: contain;" />
                     </a>
                   </td>
                   <td align="right" style="vertical-align: middle;">

@@ -159,7 +159,7 @@ const OrderNotificationsPage = () => {
             </Heading>
           </div>
           <Text className="text-ui-fg-subtle text-sm mt-1">
-            Receive dedicated email alerts whenever a customer places an order on LaptopZone.
+            Receive dedicated email alerts whenever a customer places an order on Laptopzone.
           </Text>
         </div>
 

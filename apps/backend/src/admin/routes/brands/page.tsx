@@ -103,7 +103,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
 
   const handleReset = () => {
     setForm({
-      meta_title: defaults.meta_title || `${brand?.name ?? ""} | LaptopZone`,
+      meta_title: defaults.meta_title || `${brand?.name ?? ""} | Laptopzone`,
       meta_description: defaults.meta_description || "",
       focus_keyphrase: defaults.focus_keyphrase || brand?.name || "",
       canonical_url: defaults.canonical_url || "",
@@ -140,12 +140,12 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
     }
   }
 
-  const previewTitle = form.meta_title || defaults.meta_title || `${brand?.name ?? ""} | LaptopZone`
+  const previewTitle = form.meta_title || defaults.meta_title || `${brand?.name ?? ""} | Laptopzone`
   const previewSlug = brand?.handle || "brand-url"
   const previewDesc =
     form.meta_description ||
     defaults.meta_description ||
-    "Shop original products at LaptopZone. Official warranty, fast delivery across Zimbabwe."
+    "Shop original products at Laptopzone. Official warranty, fast delivery across Zimbabwe."
 
   const titleLength = form.meta_title.length
   const descLength = form.meta_description.length
@@ -206,7 +206,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
               LZ
             </div>
             <div className="text-[11px] text-gray-700 leading-tight">
-              <span className="font-medium text-gray-900">LaptopZone</span>
+              <span className="font-medium text-gray-900">Laptopzone</span>
               <span className="text-gray-400 mx-1">›</span>
               <span className="text-gray-500 text-[10px]">brands › {previewSlug}</span>
             </div>
@@ -253,7 +253,7 @@ const BrandSeoPanel = ({ brand, open }: BrandSeoProps) => {
             </span>
           </div>
           <Input
-            placeholder={`${brand?.name ?? "Brand"} Laptops & Tech | LaptopZone`}
+            placeholder={`${brand?.name ?? "Brand"} Laptops & Tech | Laptopzone`}
             value={form.meta_title}
             onChange={(e) => handleChange("meta_title", e.target.value)}
           />

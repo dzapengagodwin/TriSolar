@@ -122,7 +122,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
 
   const handleResetToDefaults = () => {
     setForm({
-      meta_title: defaults.meta_title || (categoryName ? `${categoryName} | LaptopZone` : ""),
+      meta_title: defaults.meta_title || (categoryName ? `${categoryName} | Laptopzone` : ""),
       meta_description: defaults.meta_description || "",
       focus_keyphrase: defaults.focus_keyphrase || categoryName || "",
       canonical_url: defaults.canonical_url || "",
@@ -162,7 +162,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
   }
 
   // Live snippet preview values
-  const previewTitle = form.meta_title || defaults.meta_title || (categoryName ? `${categoryName} | LaptopZone` : "Category Title | LaptopZone")
+  const previewTitle = form.meta_title || defaults.meta_title || (categoryName ? `${categoryName} | Laptopzone` : "Category Title | Laptopzone")
   const previewSlug = categoryHandle || "category-slug"
   const previewDesc =
     form.meta_description ||
@@ -538,7 +538,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
                   LZ
                 </div>
                 <div className="text-[11px] text-ui-fg-subtle leading-tight">
-                  <span className="font-medium text-ui-fg-base">LaptopZone</span>
+                  <span className="font-medium text-ui-fg-base">Laptopzone</span>
                   <span className="text-ui-fg-muted mx-1">›</span>
                   <span className="text-ui-fg-muted text-[10px]">categories › {previewSlug}</span>
                 </div>

@@ -10,7 +10,7 @@ function makeRecord(overrides: Partial<YoastSeoRecord["yoast"]> = {}, slug = "te
     yoast: {
       title: "%%title%% %%sep%% %%sitename%%",
       description: "A great laptop by HP.",
-      og_title: "%%title%% on LaptopZone",
+      og_title: "%%title%% on Laptopzone",
       og_description: "Buy %%title%% at the best price.",
       og_image: [{ url: "https://cdn.laptopzone.co.zw/img/hp-840.jpg", width: 1200, height: 630 }],
       robots: { index: "index", follow: "follow" },
@@ -23,7 +23,7 @@ function makeRecord(overrides: Partial<YoastSeoRecord["yoast"]> = {}, slug = "te
 describe("Yoast SEO Transformer", () => {
   it("resolves %%title%% %%sep%% %%sitename%% tokens correctly", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.meta_title).toBe("HP EliteBook 840 | LaptopZone")
+    expect(result.meta_title).toBe("HP EliteBook 840 | Laptopzone")
   })
 
   it("strips double separator artifacts from empty tokens", () => {
@@ -34,7 +34,7 @@ describe("Yoast SEO Transformer", () => {
 
   it("resolves og_title tokens correctly", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.og_title).toBe("HP EliteBook 840 on LaptopZone")
+    expect(result.og_title).toBe("HP EliteBook 840 on Laptopzone")
   })
 
   it("extracts og_image url from yoast og_image array", () => {
@@ -88,11 +88,11 @@ describe("Yoast SEO Transformer", () => {
       entityType: "brand",
       yoast: {
         title: "%%title%% Laptops %%sep%% %%sitename%%",
-        description: "Official Lenovo range at LaptopZone.",
+        description: "Official Lenovo range at Laptopzone.",
         robots: { index: "index", follow: "follow" },
       },
     }
     const result = transformYoastRecord(record)
-    expect(result.meta_title).toBe("Lenovo Laptops | LaptopZone")
+    expect(result.meta_title).toBe("Lenovo Laptops | Laptopzone")
   })
 })

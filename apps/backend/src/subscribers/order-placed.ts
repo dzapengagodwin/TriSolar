@@ -303,7 +303,7 @@ export default async function orderPlacedHandler({
             to: recipientEmail,
             from: {
               email: orderFromEmail,
-              name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
+              name: process.env.SENDGRID_FROM_NAME || "Laptopzone",
             },
             subject: rendered.subject,
             html: rendered.html,
@@ -387,7 +387,7 @@ export default async function orderPlacedHandler({
                     to: ownerEmail,
                     from: {
                       email: orderFromEmail,
-                      name: process.env.SENDGRID_FROM_NAME || "LaptopZone",
+                      name: process.env.SENDGRID_FROM_NAME || "Laptopzone",
                     },
                     subject: renderedOwner.subject,
                     html: renderedOwner.html,

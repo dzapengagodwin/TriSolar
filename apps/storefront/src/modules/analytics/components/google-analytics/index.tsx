@@ -27,7 +27,7 @@ export default function GoogleAnalytics() {
               'ad_personalization': 'denied'
             });
 
-            // Check existing user preference from LaptopZone cookie consent
+            // Check existing user preference from Laptopzone cookie consent
             try {
               var storedConsent = localStorage.getItem('cookie-consent-accepted');
               if (storedConsent === 'true') {

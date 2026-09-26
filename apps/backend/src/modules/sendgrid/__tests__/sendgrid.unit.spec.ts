@@ -47,7 +47,7 @@ describe("SendgridNotificationService", () => {
         {
           api_key: "SG.test_key_12345",
           from: "orders@laptopzone.co.zw",
-          from_name: "LaptopZone",
+          from_name: "Laptopzone",
         }
       )
 
@@ -116,7 +116,7 @@ describe("SendgridNotificationService", () => {
         {
           api_key: "SG.test_key_live",
           from: "orders@laptopzone.co.zw",
-          from_name: "LaptopZone",
+          from_name: "Laptopzone",
           sandbox: false,
         }
       )
@@ -134,7 +134,7 @@ describe("SendgridNotificationService", () => {
           to: "john@example.com",
           from: {
             email: "orders@laptopzone.co.zw",
-            name: "LaptopZone",
+            name: "Laptopzone",
           },
           subject: expect.stringContaining("#1001"),
           text: expect.stringContaining("HP EliteBook 840 G8"),
@@ -287,7 +287,7 @@ describe("SendgridNotificationService", () => {
         {
           api_key: "SG.test_key_live",
           from: "orders@laptopzone.co.zw",
-          from_name: "LaptopZone",
+          from_name: "Laptopzone",
           sandbox: false,
         }
       )
@@ -384,7 +384,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "jane@example.com",
-          subject: "Reset Your LaptopZone Password",
+          subject: "Reset Your Laptopzone Password",
           html: expect.stringContaining("secret_reset_token_123"),
         })
       )
@@ -418,8 +418,8 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "jane@example.com",
-          subject: expect.stringContaining("Welcome to LaptopZone"),
-          html: expect.stringContaining("Welcome to LaptopZone!"),
+          subject: expect.stringContaining("Welcome to Laptopzone"),
+          html: expect.stringContaining("Welcome to Laptopzone!"),
         })
       )
     })
@@ -453,7 +453,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "staff@laptopzone.co.zw",
-          subject: "Invitation to Join LaptopZone Admin",
+          subject: "Invitation to Join Laptopzone Admin",
           html: expect.stringContaining("invite_token_456"),
         })
       )
@@ -714,7 +714,7 @@ describe("SendgridNotificationService", () => {
     it("produces readable plain text version", () => {
       const result = renderOwnerOrderNotification(mockOrderData)
 
-      expect(result.text).toContain("LaptopZone Admin Notification: New Order #1001")
+      expect(result.text).toContain("Laptopzone Admin Notification: New Order #1001")
       expect(result.text).toContain("Customer: Jane Smith")
       expect(result.text).toContain("Total: $1,260.00")
       expect(result.text).toContain("Lenovo ThinkPad E14 Gen 5")

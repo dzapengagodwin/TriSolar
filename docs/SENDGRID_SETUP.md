@@ -1,10 +1,10 @@
-# SendGrid Email Integration Guide for LaptopZone (MedusaJS v2)
+# SendGrid Email Integration Guide for Laptopzone (MedusaJS v2)
 
-This document provides complete instructions for setting up, configuring, testing, and deploying **SendGrid Transactional Emails** in the LaptopZone MedusaJS v2 backend.
+This document provides complete instructions for setting up, configuring, testing, and deploying **SendGrid Transactional Emails** in the Laptopzone MedusaJS v2 backend.
 
 ---
 
-## 1. How SendGrid Works in LaptopZone
+## 1. How SendGrid Works in Laptopzone
 
 Our implementation uses MedusaJS v2's native event-driven notification architecture:
 
@@ -19,7 +19,7 @@ Our implementation uses MedusaJS v2's native event-driven notification architect
        │
        ▼
 [ SendGrid Provider ] (apps/backend/src/modules/sendgrid)
-       │ (Renders responsive LaptopZone-branded HTML + plain-text fallback)
+       │ (Renders responsive Laptopzone-branded HTML + plain-text fallback)
        ▼
 [ SendGrid Mail API ] (@sendgrid/mail)
        │
@@ -47,7 +47,7 @@ To ensure high deliverability and prevent emails from landing in spam:
 
 ### Step 3: Create a Dedicated API Key
 1. Go to **Settings** $\rightarrow$ **API Keys** $\rightarrow$ **Create API Key**.
-2. Name the key: `LaptopZone-Medusa-Backend`.
+2. Name the key: `Laptopzone-Medusa-Backend`.
 3. Set permissions to **Restricted Access** and grant **Full Access** to **Mail Send** only (for optimal security).
 4. Copy the API key (starts with `SG.`) immediately.
 
@@ -63,7 +63,7 @@ SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 SENDGRID_FROM_EMAIL=orders@laptopzone.co.zw
 SENDGRID_ORDER_FROM_EMAIL=orders@laptopzone.co.zw
 SENDGRID_ACCOUNT_FROM_EMAIL=noreply@laptopzone.co.zw
-SENDGRID_FROM_NAME=LaptopZone
+SENDGRID_FROM_NAME=Laptopzone
 SENDGRID_SANDBOX=false
 
 # Storefront & Admin URLs (used in email buttons)
@@ -89,7 +89,7 @@ ADMIN_URL=http://localhost:9000/app
 | **Payment Receipt** | `orders@laptopzone.co.zw` | `order.payment_captured` | Payment confirmation showing amount paid, currency, payment date, and transaction status. |
 | **Shipment Notification** | `orders@laptopzone.co.zw` | `order.fulfillment_created` | Dispatch notification with tracking number, carrier, items in shipment, and tracking link. |
 | **Password Reset** | `noreply@laptopzone.co.zw` | `auth.password_reset` | Secure password reset email containing a tokenized link with 24-hour expiration. |
-| **Welcome Email** | `noreply@laptopzone.co.zw` | `customer.created` | Friendly welcome email introducing LaptopZone perks and store link. |
+| **Welcome Email** | `noreply@laptopzone.co.zw` | `customer.created` | Friendly welcome email introducing Laptopzone perks and store link. |
 | **Admin Invite** | `noreply@laptopzone.co.zw` | `invite.created` / `invite.resent` | Staff invitation email with a secure token to join the admin dashboard. |
 
 ---
@@ -141,7 +141,7 @@ $env:TEST_TYPE="unit"; npx jest src/modules/sendgrid/__tests__/sendgrid.unit.spe
    ```env
    SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxx
    SENDGRID_FROM_EMAIL=orders@laptopzone.co.zw
-   SENDGRID_FROM_NAME=LaptopZone
+   SENDGRID_FROM_NAME=Laptopzone
    SENDGRID_SANDBOX=false
    STOREFRONT_URL=https://laptopzone.co.zw
    ADMIN_URL=https://admin.laptopzone.co.zw/app

@@ -194,7 +194,7 @@ const YoastSeoImporterPage = () => {
             Yoast SEO Importer
           </Heading>
           <Text className="text-sm text-ui-fg-subtle mt-1">
-            Import Yoast SEO metadata (titles, descriptions, OpenGraph, robots) from your old WordPress site into LaptopZone.
+            Import Yoast SEO metadata (titles, descriptions, OpenGraph, robots) from your old WordPress site into Laptopzone.
           </Text>
         </div>
         {importResult && (

@@ -117,7 +117,7 @@ export class YoastSeoClient {
     return {
       Authorization: this.getAuthHeader(),
       "User-Agent":
-        "Mozilla/5.0 (compatible; LaptopZone-SEO-Migrator/1.0)",
+        "Mozilla/5.0 (compatible; Laptopzone-SEO-Migrator/1.0)",
       Accept: "application/json",
     }
   }

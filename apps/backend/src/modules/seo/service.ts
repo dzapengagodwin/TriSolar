@@ -178,7 +178,7 @@ class SeoModuleService extends MedusaService({
     const countryCode = (options.countryCode || "zw").toLowerCase()
 
     if (entityType === "product") {
-      const title = entity.title ? `${entity.title} | LaptopZone` : "LaptopZone"
+      const title = entity.title ? `${entity.title} | Laptopzone` : "Laptopzone"
       const rawDesc = entity.description || entity.subtitle || ""
       const cleanDesc = rawDesc
         .replace(/<[^>]+>/g, " ")
@@ -208,7 +208,7 @@ class SeoModuleService extends MedusaService({
 
     if (entityType === "category") {
       const name = entity.name || "Category"
-      const title = `${name} | LaptopZone`
+      const title = `${name} | Laptopzone`
       const rawDesc = entity.description || ""
       const cleanDesc = rawDesc
         .replace(/<[^>]+>/g, " ")
@@ -216,7 +216,7 @@ class SeoModuleService extends MedusaService({
         .trim()
       const desc =
         cleanDesc ||
-        `Shop warranty-backed ${name.toLowerCase()} and computer hardware at LaptopZone Zimbabwe. Fast nationwide delivery and authentic products.`
+        `Shop warranty-backed ${name.toLowerCase()} and computer hardware at Laptopzone Zimbabwe. Fast nationwide delivery and authentic products.`
       const canonicalUrl = entity.handle
         ? `${storefrontUrl}/${countryCode}/categories/${entity.handle}`
         : null
@@ -235,7 +235,7 @@ class SeoModuleService extends MedusaService({
     }
 
     return {
-      meta_title: entity.name || entity.title || "LaptopZone",
+      meta_title: entity.name || entity.title || "Laptopzone",
       meta_description: entity.description || null,
       robots_index: true,
       robots_follow: true,

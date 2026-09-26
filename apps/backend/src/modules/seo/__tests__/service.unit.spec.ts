@@ -23,7 +23,7 @@ describe("SeoModuleService Unit Tests", () => {
         countryCode: "zw",
       })
 
-      expect(defaults.meta_title).toBe("Dell XPS 15 9530 | LaptopZone")
+      expect(defaults.meta_title).toBe("Dell XPS 15 9530 | Laptopzone")
       expect(defaults.meta_description).toBe("Dell XPS 15 with 3.5K OLED touchscreen display.")
       expect(defaults.focus_keyphrase).toBe("Dell XPS 15 9530")
       expect(defaults.canonical_url).toBe(
@@ -47,7 +47,7 @@ describe("SeoModuleService Unit Tests", () => {
         countryCode: "zw",
       })
 
-      expect(defaults.meta_title).toBe("Gaming Laptops | LaptopZone")
+      expect(defaults.meta_title).toBe("Gaming Laptops | Laptopzone")
       expect(defaults.meta_description).toBe(
         "High performance gaming laptops with RTX graphics."
       )

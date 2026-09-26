@@ -38,7 +38,7 @@ export function analyzeProductSeo(
   const checks: SeoCheck[] = []
 
   const baseTitle = product.title || ""
-  const effectiveTitle = seo?.meta_title || (baseTitle ? `${baseTitle} | LaptopZone` : "")
+  const effectiveTitle = seo?.meta_title || (baseTitle ? `${baseTitle} | Laptopzone` : "")
 
   const baseDescription = cleanText(product.description || product.subtitle)
   const effectiveDescription = cleanText(seo?.meta_description) || baseDescription

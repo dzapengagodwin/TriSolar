@@ -121,7 +121,7 @@ export function renderOwnerOrderNotification(
                 <tr>
                   <td align="left" style="vertical-align: middle;">
                     <a href="${escapeHtml(adminBaseUrl)}" style="text-decoration: none; display: inline-block;">
-                      <img src="https://cdn.laptopzone.co.zw/logo.png" alt="LaptopZone" width="120" style="display: block; height: auto; border: 0; max-height: 28px; object-fit: contain;" />
+                      <img src="https://cdn.laptopzone.co.zw/logo.png" alt="Laptopzone" width="120" style="display: block; height: auto; border: 0; max-height: 28px; object-fit: contain;" />
                     </a>
                   </td>
                   <td align="right" style="vertical-align: middle;">
@@ -242,7 +242,7 @@ export function renderOwnerOrderNotification(
           <tr>
             <td style="background-color: #fafafa; border-top: 1px solid #f3f4f6; padding: 16px 24px; text-align: center;">
               <div style="font-size: 11px; color: #9ca3af;">
-                LaptopZone Admin Notification &bull; Harare, Zimbabwe
+                Laptopzone Admin Notification &bull; Harare, Zimbabwe
               </div>
             </td>
           </tr>
@@ -255,7 +255,7 @@ export function renderOwnerOrderNotification(
 </html>`
 
   const textLines = [
-    `LaptopZone Admin Notification: New Order #${orderNumber}`,
+    `Laptopzone Admin Notification: New Order #${orderNumber}`,
     `Total: ${totalFormatted}`,
     "",
     `Customer: ${customerName}`,

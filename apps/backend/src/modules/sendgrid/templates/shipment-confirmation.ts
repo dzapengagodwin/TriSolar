@@ -93,7 +93,7 @@ export function renderShipmentConfirmation(
     ${viewOrderBtnHtml}
   `
 
-  const subject = `Your Order #${orderNumber} Has Been Dispatched! - LaptopZone`
+  const subject = `Your Order #${orderNumber} Has Been Dispatched! - Laptopzone`
   const html = renderBaseLayout({
     title: subject,
     previewText: `Great news! Items from Order #${orderNumber} are on their way to you.`,
@@ -112,7 +112,7 @@ ITEMS SHIPPED:
 ${(data.items || []).map((i) => `- ${i.title} (Qty: ${i.quantity})`).join("\n")}
 
 ${data.view_order_url ? `View your order details: ${data.view_order_url}\n` : ""}
-LaptopZone Zimbabwe
+Laptopzone Zimbabwe
 Authentic Hardware, Zimbabwe`
 
   return { subject, html, text }

@@ -26,7 +26,7 @@ describe("Image SEO Tests", () => {
     const cleanBrand = (brand || "").trim()
 
     if (!cleanTitle) {
-      return `${cleanBrand ? cleanBrand + " " : ""}Product Image | LaptopZone`
+      return `${cleanBrand ? cleanBrand + " " : ""}Product Image | Laptopzone`
     }
 
     let displayTitle = cleanTitle

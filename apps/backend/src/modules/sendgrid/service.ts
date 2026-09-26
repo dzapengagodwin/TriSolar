@@ -58,7 +58,7 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
     super()
     this.logger_ = logger
     this.options_ = {
-      from_name: "LaptopZone",
+      from_name: "Laptopzone",
       ...options,
     }
 
@@ -121,7 +121,7 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
         : this.options_?.account_from_email || this.options_?.from || process.env.SENDGRID_ACCOUNT_FROM_EMAIL || "noreply@laptopzone.co.zw"
 
       const fromEmail = notification.from || defaultFrom || "orders@laptopzone.co.zw"
-      const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "LaptopZone"
+      const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "Laptopzone"
       const templateData = (notification.data || {}) as Record<string, any>
 
       // Resolve CC email for order notifications if explicitly configured

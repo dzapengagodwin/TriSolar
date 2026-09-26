@@ -32,9 +32,9 @@ describe("SEO Analyzer Unit Tests", () => {
     const analysis = analyzeProductSeo({
       product: sampleProduct,
       seo: {
-        meta_title: "Lenovo ThinkPad E14 Gen 6 Laptop | LaptopZone",
+        meta_title: "Lenovo ThinkPad E14 Gen 6 Laptop | Laptopzone",
         meta_description:
-          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 and 16GB RAM online at LaptopZone. Fast shipping & official warranty in Zimbabwe.",
+          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 and 16GB RAM online at Laptopzone. Fast shipping & official warranty in Zimbabwe.",
         focus_keyphrase: "Lenovo ThinkPad E14 Gen 6",
         canonical_url:
           "https://laptopzone.co.zw/zw/products/lenovo-thinkpad-e14-gen-6",
@@ -109,9 +109,9 @@ describe("SEO Analyzer Unit Tests", () => {
     const analysis = analyzeProductSeo({
       product: sampleProduct,
       seo: {
-        meta_title: "Lenovo ThinkPad E14 Gen 6 | LaptopZone",
+        meta_title: "Lenovo ThinkPad E14 Gen 6 | Laptopzone",
         meta_description:
-          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 online at LaptopZone Zimbabwe.",
+          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 online at Laptopzone Zimbabwe.",
         robots_index: false,
       },
     })

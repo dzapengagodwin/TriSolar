@@ -9,8 +9,8 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
     country_code: "ZW",
     currency_code: "USD",
     storefront_url: "https://laptopzone.co.zw",
-    feed_title: "LaptopZone Feed",
-    feed_description: "LaptopZone Product Feed",
+    feed_title: "Laptopzone Feed",
+    feed_description: "Laptopzone Product Feed",
   }
 
   describe("getProductBrand", () => {

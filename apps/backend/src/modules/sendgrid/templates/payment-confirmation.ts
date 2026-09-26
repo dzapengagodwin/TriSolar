@@ -4,7 +4,7 @@ import { escapeHtml, formatMoney, renderBaseLayout } from "./base-layout"
 export function renderPaymentConfirmation(
   data: PaymentConfirmationData
 ): SendgridTemplateResult {
-  const brandName = process.env.SENDGRID_FROM_NAME || "LaptopZone"
+  const brandName = process.env.SENDGRID_FROM_NAME || "Laptopzone"
   const currency = data.currency_code || "USD"
   const orderNumber = data.display_id || data.order_id
   const safeOrderNumber = escapeHtml(String(orderNumber))
