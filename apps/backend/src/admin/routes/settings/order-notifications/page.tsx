@@ -38,17 +38,32 @@ const OrderNotificationsPage = () => {
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
 
+  const parseJsonSafe = async (res: Response) => {
+    const contentType = res.headers.get("content-type") || ""
+    if (contentType.includes("application/json")) {
+      return await res.json()
+    }
+    const text = await res.text()
+    return {
+      error: `Server returned HTTP ${res.status}: ${text.includes("<!DOCTYPE") ? "Endpoint not found (HTML 404). Ensure backend is rebuilt on the VPS and restarted." : text.slice(0, 150)}`,
+    }
+  }
+
   const fetchSettings = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch("/admin/notification-settings")
+      const res = await fetch("/admin/notification-settings", {
+        credentials: "include",
+      })
       if (res.ok) {
-        const data: NotificationSettingsResponse = await res.json()
-        setEmailsInput(data.order_notification_emails || "")
-        setSavedEmails(data.valid_emails || [])
-        setFallbackEmail(data.fallback_email || "")
-        setIsConfigured(data.is_configured)
-        setHasDbRecord(data.has_db_record)
+        const data = await parseJsonSafe(res)
+        if (data.order_notification_emails !== undefined) {
+          setEmailsInput(data.order_notification_emails || "")
+          setSavedEmails(data.valid_emails || [])
+          setFallbackEmail(data.fallback_email || "")
+          setIsConfigured(data.is_configured)
+          setHasDbRecord(data.has_db_record)
+        }
       }
     } catch (err: any) {
       console.error("Failed to load notification settings:", err)
@@ -80,6 +95,7 @@ const OrderNotificationsPage = () => {
     try {
       const res = await fetch("/admin/notification-settings", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -88,7 +104,7 @@ const OrderNotificationsPage = () => {
         }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       if (res.ok) {
         setEmailsInput(data.order_notification_emails || "")
@@ -97,7 +113,7 @@ const OrderNotificationsPage = () => {
         setHasDbRecord(true)
         toast.success("Settings Saved", {
           description:
-            data.valid_emails.length > 0
+            data.valid_emails?.length > 0
               ? `Notifications will be delivered to ${data.valid_emails.length} recipient(s).`
               : "Cleared database override. Using default fallback if configured.",
         })
@@ -120,6 +136,7 @@ const OrderNotificationsPage = () => {
     try {
       const res = await fetch("/admin/notification-settings/test", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -128,7 +145,7 @@ const OrderNotificationsPage = () => {
         }),
       })
 
-      const data = await res.json()
+      const data = await parseJsonSafe(res)
 
       if (res.ok) {
         toast.success("Test Email Sent", {
