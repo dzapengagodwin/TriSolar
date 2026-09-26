@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import ContactForm from "./contact-form"
 
 export const metadata: Metadata = {
-  title: "Contact Us | Laptopzone",
+  title: "Contact Us",
   description: "Get in touch with our customer support team for inquiries, orders, and tech assistance.",
 }
 
