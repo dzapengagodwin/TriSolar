@@ -3,24 +3,15 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { CACHE_TAGS, collectionTag } from "@lib/cache-tags"
-import { getCacheOptions } from "./cookies"
 
 export const retrieveCollection = async (id: string) => {
-  const sessionNext = await getCacheOptions("collections")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.collections,
-      collectionTag(id),
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.collections, collectionTag(id)]
 
   return await sdk.client
     .fetch<{ collection: HttpTypes.StoreCollection }>(
       `/store/collections/${id}`,
       {
         next: {
-          ...sessionNext,
           tags,
           revalidate: 3600,
         },
@@ -32,13 +23,7 @@ export const retrieveCollection = async (id: string) => {
 export const listCollections = async (
   queryParams: Record<string, string> = {}
 ): Promise<{ collections: HttpTypes.StoreCollection[]; count: number }> => {
-  const sessionNext = await getCacheOptions("collections")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.collections,
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.collections]
 
   queryParams.limit = queryParams.limit || "100"
   queryParams.offset = queryParams.offset || "0"
@@ -49,7 +34,6 @@ export const listCollections = async (
       {
         query: queryParams,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 3600,
         },
@@ -61,20 +45,12 @@ export const listCollections = async (
 export const getCollectionByHandle = async (
   handle: string
 ): Promise<HttpTypes.StoreCollection | null> => {
-  const sessionNext = await getCacheOptions("collections")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.collections,
-      collectionTag(handle),
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.collections, collectionTag(handle)]
 
   return await sdk.client
     .fetch<HttpTypes.StoreCollectionListResponse>(`/store/collections`, {
       query: { handle, fields: "*products" },
       next: {
-        ...sessionNext,
         tags,
         revalidate: 3600,
       },
@@ -109,14 +85,7 @@ export type ParsedHomeCollection = {
  * Sorts them by metadata.priority ascending (lower numbers first), with unprioritized collections placed last.
  */
 export const getHomeFeaturedCollections = async (): Promise<ParsedHomeCollection[]> => {
-  const sessionNext = await getCacheOptions("collections")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.collections,
-      CACHE_TAGS.homepage,
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.collections, CACHE_TAGS.homepage]
 
   return await sdk.client
     .fetch<{ collections: HttpTypes.StoreCollection[]; count: number }>(
@@ -127,7 +96,6 @@ export const getHomeFeaturedCollections = async (): Promise<ParsedHomeCollection
           fields: "id,handle,title,metadata",
         },
         next: {
-          ...sessionNext,
           tags,
           revalidate: 300,
         },

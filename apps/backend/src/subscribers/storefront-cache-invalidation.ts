@@ -106,6 +106,11 @@ export const config: SubscriberConfig = {
     "product-collection.created",
     "product-collection.updated",
     "product-collection.deleted",
+    "inventory-item.updated",
+    "inventory-level.updated",
+    "price-list.created",
+    "price-list.updated",
+    "price-list.deleted",
   ],
 }
 

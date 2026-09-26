@@ -1,7 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import {
   CACHE_TAGS,
   productTag,
@@ -39,15 +39,11 @@ export async function getProductSeo(
       ...(await getAuthHeaders()),
     }
 
-    const sessionNext = await getCacheOptions("products")
-    const tags = Array.from(
-      new Set([
-        CACHE_TAGS.products,
-        productTag(productIdOrHandle),
-        productHandleTag(productIdOrHandle),
-        ...(sessionNext.tags || []),
-      ])
-    )
+    const tags = [
+      CACHE_TAGS.products,
+      productTag(productIdOrHandle),
+      productHandleTag(productIdOrHandle),
+    ]
 
     const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
       `/store/products/${productIdOrHandle}/seo`,
@@ -55,7 +51,6 @@ export async function getProductSeo(
         method: "GET",
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 300,
         },
@@ -82,14 +77,10 @@ export async function getCategorySeo(
       ...(await getAuthHeaders()),
     }
 
-    const sessionNext = await getCacheOptions("categories")
-    const tags = Array.from(
-      new Set([
-        CACHE_TAGS.categories,
-        categoryTag(categoryId),
-        ...(sessionNext.tags || []),
-      ])
-    )
+    const tags = [
+      CACHE_TAGS.categories,
+      categoryTag(categoryId),
+    ]
 
     const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
       `/store/categories/${categoryId}/seo`,
@@ -97,7 +88,6 @@ export async function getCategorySeo(
         method: "GET",
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 3600,
         },
@@ -124,14 +114,10 @@ export async function getBrandSeo(
       ...(await getAuthHeaders()),
     }
 
-    const sessionNext = await getCacheOptions("brands")
-    const tags = Array.from(
-      new Set([
-        CACHE_TAGS.brands,
-        brandTag(brandHandle),
-        ...(sessionNext.tags || []),
-      ])
-    )
+    const tags = [
+      CACHE_TAGS.brands,
+      brandTag(brandHandle),
+    ]
 
     const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
       `/store/brands/${brandHandle}/seo`,
@@ -139,7 +125,6 @@ export async function getBrandSeo(
         method: "GET",
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 3600,
         },

@@ -12,7 +12,6 @@ import {
   getCategoryCanonicalUrl,
   getProductCanonicalUrl,
 } from "@lib/seo/canonical"
-import { HttpTypes } from "@medusajs/types"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -61,23 +60,6 @@ export async function generateStaticParams() {
   }
 }
 
-function getImagesForVariant(
-  product: HttpTypes.StoreProduct,
-  selectedVariantId?: string
-) {
-  if (!selectedVariantId || !product.variants) {
-    return product.images
-  }
-
-  const variant = product.variants.find((v) => v.id === selectedVariantId)
-  if (!variant || !variant.images?.length) {
-    return product.images
-  }
-
-  const imageIdsMap = new Map(variant.images.map((i) => [i.id, true]))
-  return product.images?.filter((i) => imageIdsMap.has(i.id)) ?? null
-}
-
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
   const { handle, countryCode } = params
@@ -105,9 +87,6 @@ export default async function ProductPage(props: Props) {
   const params = await props.params
   const { countryCode, handle } = params
   const region = await getRegion(countryCode)
-  const searchParams = await props.searchParams
-
-  const selectedVariantId = searchParams.v_id
 
   if (!region) {
     notFound()
@@ -125,7 +104,7 @@ export default async function ProductPage(props: Props) {
     notFound()
   }
 
-  const images = getImagesForVariant(pricedProduct, selectedVariantId)
+  const images = pricedProduct.images ?? []
 
   // Construct Breadcrumb navigation hierarchy
   const primaryCategory = pricedProduct.categories?.[0]

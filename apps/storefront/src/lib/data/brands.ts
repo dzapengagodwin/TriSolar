@@ -1,5 +1,4 @@
 import { sdk } from "@lib/config"
-import { getCacheOptions } from "./cookies"
 import { CACHE_TAGS, brandTag } from "@lib/cache-tags"
 import type { StoreBrand } from "@lib/constants/brands"
 import { STATIC_BRANDS } from "@lib/constants/brands"
@@ -42,13 +41,7 @@ export const listBrands = async (query?: {
   limit?: number
   offset?: number
 }): Promise<StoreBrand[]> => {
-  const sessionNext = await getCacheOptions("brands")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.brands,
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.brands]
 
   const limit = query?.limit || 100
   const offset = query?.offset || 0
@@ -60,7 +53,6 @@ export const listBrands = async (query?: {
         offset,
       },
       next: {
-        ...sessionNext,
         tags,
         revalidate: 3600,
       },
@@ -80,19 +72,11 @@ export const listBrands = async (query?: {
 export const getBrandByHandle = async (
   handle: string
 ): Promise<StoreBrand | null> => {
-  const sessionNext = await getCacheOptions("brands")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.brands,
-      brandTag(handle),
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.brands, brandTag(handle)]
 
   return sdk.client
     .fetch<{ brand: StoreBrand }>(`/store/brands/${handle}`, {
       next: {
-        ...sessionNext,
         tags,
         revalidate: 3600,
       },

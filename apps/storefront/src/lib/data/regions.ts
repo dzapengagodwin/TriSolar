@@ -3,17 +3,8 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { CACHE_TAGS, regionTag } from "@lib/cache-tags"
-import { getCacheOptions } from "./cookies"
 
 export const listRegions = async () => {
-  const sessionNext = await getCacheOptions("regions")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.regions,
-      ...(sessionNext.tags || []),
-    ])
-  )
-
   return await sdk.client
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
@@ -21,8 +12,7 @@ export const listRegions = async () => {
         fields: "*countries",
       },
       next: {
-        ...sessionNext,
-        tags,
+        tags: [CACHE_TAGS.regions],
         revalidate: 3600,
       },
     })
@@ -30,21 +20,11 @@ export const listRegions = async () => {
 }
 
 export const retrieveRegion = async (id: string) => {
-  const sessionNext = await getCacheOptions(["regions", id].join("-"))
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.regions,
-      regionTag(id),
-      ...(sessionNext.tags || []),
-    ])
-  )
-
   return await sdk.client
     .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
       method: "GET",
       next: {
-        ...sessionNext,
-        tags,
+        tags: [CACHE_TAGS.regions, regionTag(id)],
         revalidate: 3600,
       },
     })

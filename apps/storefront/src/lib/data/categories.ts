@@ -2,7 +2,6 @@
 
 import { HttpTypes } from "@medusajs/types"
 import { sdk } from "@lib/config"
-import { getCacheOptions } from "@lib/data/cookies"
 import { CACHE_TAGS, categoryTag } from "@lib/cache-tags"
 import { CATEGORY_IMAGE_MAP } from "@lib/constants/categories"
 
@@ -37,16 +36,8 @@ function enrichCategory(
 export const listCategories = async (
   query?: Record<string, unknown>
 ): Promise<HttpTypes.StoreProductCategory[]> => {
-  const sessionNext = await getCacheOptions("categories")
-
   const limit = (query?.limit as number) || 100
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.categories,
-      CACHE_TAGS.navigation,
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.categories, CACHE_TAGS.navigation]
 
   return sdk.client
     .fetch<{ product_categories: HttpTypes.StoreProductCategory[]; count: number }>(
@@ -60,7 +51,6 @@ export const listCategories = async (
           ...query,
         },
         next: {
-          ...sessionNext,
           tags,
           revalidate: 3600,
         },
@@ -88,15 +78,11 @@ export const getCategoryByHandle = async (
   const lastHandle =
     categoryHandle[categoryHandle.length - 1]?.toLowerCase() || fullHandle
 
-  const sessionNext = await getCacheOptions("categories")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.categories,
-      categoryTag(lastHandle),
-      categoryTag(fullHandle),
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [
+    CACHE_TAGS.categories,
+    categoryTag(lastHandle),
+    categoryTag(fullHandle),
+  ]
 
   // 1. Try querying backend directly for this handle
   try {

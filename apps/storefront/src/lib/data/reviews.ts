@@ -1,7 +1,9 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { revalidateTag } from "next/cache"
+import { CACHE_TAGS, reviewsTag, productTag } from "@lib/cache-tags"
+import { getAuthHeaders } from "./cookies"
 
 export type StoreReview = {
   id: string
@@ -27,17 +29,15 @@ export type ReviewEligibility = {
 export const listProductReviews = async (
   productId: string
 ): Promise<{ reviews: StoreReview[]; count: number; average_rating: number }> => {
-  const next = {
-    ...(await getCacheOptions("reviews")),
-    tags: [`reviews-${productId}`],
-  }
-
   return sdk.client
     .fetch<{ reviews: StoreReview[]; count: number; average_rating: number }>(
       `/store/products/${productId}/reviews`,
       {
         method: "GET",
-        next,
+        next: {
+          tags: [reviewsTag(productId), CACHE_TAGS.reviews],
+          revalidate: 300,
+        },
         cache: "force-cache",
       }
     )
@@ -73,7 +73,7 @@ export const submitReview = async (
 ): Promise<{ review: StoreReview }> => {
   const authHeaders = await getAuthHeaders()
 
-  return sdk.client.fetch<{ review: StoreReview }>(
+  const result = await sdk.client.fetch<{ review: StoreReview }>(
     `/store/products/${productId}/reviews`,
     {
       method: "POST",
@@ -82,6 +82,11 @@ export const submitReview = async (
       cache: "no-store",
     }
   )
+
+  revalidateTag(reviewsTag(productId))
+  revalidateTag(productTag(productId))
+
+  return result
 }
 
 export const deleteReview = async (
@@ -98,4 +103,7 @@ export const deleteReview = async (
       cache: "no-store",
     }
   )
+
+  revalidateTag(reviewsTag(productId))
+  revalidateTag(productTag(productId))
 }

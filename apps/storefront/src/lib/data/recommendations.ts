@@ -1,7 +1,7 @@
 "use server"
 
 import { sdk } from "@lib/config"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { CACHE_TAGS, productTag } from "@lib/cache-tags"
 import { HttpTypes } from "@medusajs/types"
 
@@ -24,14 +24,7 @@ export async function getProductRecommendations({
       ...(await getAuthHeaders()),
     }
 
-    const sessionNext = await getCacheOptions("products")
-    const tags = Array.from(
-      new Set([
-        CACHE_TAGS.products,
-        productTag(productId),
-        ...(sessionNext.tags || []),
-      ])
-    )
+    const tags = [CACHE_TAGS.products, productTag(productId)]
 
     const res = await sdk.client.fetch<{ products: HttpTypes.StoreProduct[] }>(
       `/store/products/${productId}/recommendations`,
@@ -43,7 +36,6 @@ export async function getProductRecommendations({
         },
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 300,
         },

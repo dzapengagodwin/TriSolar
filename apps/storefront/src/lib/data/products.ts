@@ -12,7 +12,7 @@ import {
   categoryTag,
   collectionTag,
 } from "@lib/cache-tags"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getAuthHeaders } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
 type ProductListQueryParams = (HttpTypes.FindParams &
@@ -63,8 +63,6 @@ export const listProducts = async ({
     ...(await getAuthHeaders()),
   }
 
-  const sessionNext = await getCacheOptions("products")
-
   const extraTags: string[] = []
   if (queryParams?.category_id) {
     const catIds = Array.isArray(queryParams.category_id)
@@ -89,7 +87,6 @@ export const listProducts = async ({
   const tags = Array.from(
     new Set([
       CACHE_TAGS.products,
-      ...(sessionNext.tags || []),
       ...extraTags,
     ])
   )
@@ -109,7 +106,6 @@ export const listProducts = async ({
         },
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 300,
         },
@@ -240,14 +236,7 @@ export async function getProductRecommendations({
     ...(await getAuthHeaders()),
   }
 
-  const sessionNext = await getCacheOptions("products")
-  const tags = Array.from(
-    new Set([
-      CACHE_TAGS.products,
-      productTag(productId),
-      ...(sessionNext.tags || []),
-    ])
-  )
+  const tags = [CACHE_TAGS.products, productTag(productId)]
 
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[] }>(
@@ -260,7 +249,6 @@ export async function getProductRecommendations({
         },
         headers,
         next: {
-          ...sessionNext,
           tags,
           revalidate: 300,
         },

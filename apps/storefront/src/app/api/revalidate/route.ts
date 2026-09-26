@@ -6,6 +6,8 @@ import {
   productHandleTag,
   categoryTag,
   collectionTag,
+  brandTag,
+  reviewsTag,
 } from "@lib/cache-tags"
 
 type RevalidationPayload = {
@@ -131,6 +133,28 @@ export async function POST(request: NextRequest) {
     if (collectionId) {
       tagsToInvalidate.add(collectionTag(collectionId))
     }
+  } else if (event.startsWith("product-review.") || event.startsWith("review.")) {
+    tagsToInvalidate.add(CACHE_TAGS.reviews)
+    if (productId) {
+      tagsToInvalidate.add(reviewsTag(productId))
+      tagsToInvalidate.add(productTag(productId))
+    }
+  } else if (event.startsWith("brand.")) {
+    tagsToInvalidate.add(CACHE_TAGS.brands)
+    tagsToInvalidate.add(CACHE_TAGS.products)
+    tagsToInvalidate.add(CACHE_TAGS.homepage)
+    if (handle) {
+      tagsToInvalidate.add(brandTag(handle))
+    }
+  } else if (event.startsWith("inventory-item.") || event.startsWith("inventory-level.") || event.startsWith("inventory.")) {
+    tagsToInvalidate.add(CACHE_TAGS.products)
+    tagsToInvalidate.add(CACHE_TAGS.homepage)
+    if (productId) {
+      tagsToInvalidate.add(productTag(productId))
+    }
+  } else if (event.startsWith("price-list.") || event.startsWith("pricing.")) {
+    tagsToInvalidate.add(CACHE_TAGS.products)
+    tagsToInvalidate.add(CACHE_TAGS.homepage)
   } else if (event === "all") {
     Object.values(CACHE_TAGS).forEach((tag) => tagsToInvalidate.add(tag))
   } else {

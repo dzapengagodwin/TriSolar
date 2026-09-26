@@ -10,6 +10,7 @@ export const CACHE_TAGS = {
   regions: "regions",
   homepage: "homepage",
   navigation: "navigation",
+  reviews: "reviews",
 } as const
 
 export const productTag = (id: string) => `product:${id}`
@@ -18,4 +19,5 @@ export const categoryTag = (idOrHandle: string) => `category:${idOrHandle}`
 export const collectionTag = (idOrHandle: string) => `collection:${idOrHandle}`
 export const brandTag = (idOrHandle: string) => `brand:${idOrHandle}`
 export const regionTag = (idOrCode: string) => `region:${idOrCode}`
+export const reviewsTag = (productId: string) => `reviews-${productId}`
 
