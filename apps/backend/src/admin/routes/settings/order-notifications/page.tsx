@@ -134,7 +134,7 @@ const OrderNotificationsPage = () => {
     setTesting(true)
 
     try {
-      const res = await fetch("/admin/notification-settings/test", {
+      const res = await fetch("/admin/notification-settings/send-test", {
         method: "POST",
         credentials: "include",
         headers: {
