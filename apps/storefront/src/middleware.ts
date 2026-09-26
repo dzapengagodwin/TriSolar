@@ -10,7 +10,7 @@ const regionMapCache = {
   regionMapUpdated: Date.now(),
 }
 
-async function getRegionMap() {
+async function getRegionMap(cacheId: string) {
   const { regionMap, regionMapUpdated } = regionMapCache
 
   if (!BACKEND_URL) {
@@ -108,7 +108,7 @@ export async function middleware(request: NextRequest) {
   const cacheIdCookie = request.cookies.get("_medusa_cache_id")
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
-  const regionMap = await getRegionMap()
+  const regionMap = await getRegionMap(cacheId)
   const countryCode = await getCountryCode(request, regionMap)
 
   // if the country code is available, use it, otherwise use the default region

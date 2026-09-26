@@ -12,6 +12,7 @@ import {
   getCategoryCanonicalUrl,
   getProductCanonicalUrl,
 } from "@lib/seo/canonical"
+import { HttpTypes } from "@medusajs/types"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
