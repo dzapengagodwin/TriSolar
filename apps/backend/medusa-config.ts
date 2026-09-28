@@ -31,6 +31,7 @@ export default defineConfig({
   },
   admin: {
     disable: false,
+    maxUploadFileSize: 50 * 1024 * 1024,
     vite: () => {
       let reactPath: string
       let reactDomPath: string
@@ -52,6 +53,9 @@ export default defineConfig({
       }
 
       return {
+        define: {
+          __MAX_UPLOAD_FILE_SIZE__: JSON.stringify(50 * 1024 * 1024),
+        },
         resolve: {
           alias: [
             { find: /^react$/, replacement: reactPath },
