@@ -17,6 +17,11 @@ const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http:/
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
+  },
   logging: {
     fetches: {
       fullUrl: true,

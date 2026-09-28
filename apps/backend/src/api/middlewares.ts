@@ -3,10 +3,15 @@ import { defineMiddlewares } from "@medusajs/framework/http"
 export default defineMiddlewares({
   routes: [
     {
-      matcher: "/admin/woocommerce-migrator/*",
-      method: ["POST"],
+      matcher: "/admin/*",
       bodyParser: {
         sizeLimit: "50mb",
+      },
+    },
+    {
+      matcher: "/store/*",
+      bodyParser: {
+        sizeLimit: "20mb",
       },
     },
     {
