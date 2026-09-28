@@ -1,5 +1,5 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { SquareTwoStack, Spinner, MagnifyingGlass, ArrowPath, ChevronDown, ChevronUp } from "@medusajs/icons"
+import { SquareTwoStack, Spinner, MagnifyingGlass, ArrowPath, ChevronDownMini, ChevronUpMini } from "@medusajs/icons"
 import {
   Container,
   Heading,
@@ -203,12 +203,12 @@ const ProductListBulkWidget = () => {
           >
             {isExpanded ? (
               <>
-                <ChevronUp className="w-4 h-4" />
+                <ChevronUpMini className="w-4 h-4" />
                 Hide Bulk Table
               </>
             ) : (
               <>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDownMini className="w-4 h-4" />
                 Open Bulk Table
               </>
             )}
