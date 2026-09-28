@@ -97,7 +97,6 @@ export const getCategoryByHandle = async (
         limit: 5,
       },
       next: {
-        ...sessionNext,
         tags,
         revalidate: 3600,
       },
