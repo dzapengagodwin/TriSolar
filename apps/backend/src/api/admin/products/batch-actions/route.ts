@@ -194,23 +194,37 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
           filters: { id: product_ids },
         })
 
-        const priceUpdates: Array<{
-          id?: string
-          variant_id: string
-          amount: number
-          currency_code: string
-        }> = []
+        const variantPricesMap = new Map<
+          string,
+          {
+            variant_id: string
+            product_id: string
+            prices: Array<{
+              id?: string
+              amount: number
+              currency_code: string
+            }>
+          }
+        >()
+
+        let totalPricesUpdated = 0
 
         for (const product of products) {
           const variants = (product as any).variants || []
           for (const variant of variants) {
             const prices = variant.prices || []
+            const updatedForVariant: Array<{
+              id?: string
+              amount: number
+              currency_code: string
+            }> = []
+
             for (const price of prices) {
               if (pricing.currency_code && price.currency_code?.toLowerCase() !== pricing.currency_code.toLowerCase()) {
                 continue
               }
 
-              let currentAmount = Number(price.amount)
+              const currentAmount = Number(price.amount)
               let newAmount = currentAmount
 
               if (pricing.type === "percentage") {
@@ -232,21 +246,32 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
               }
 
               if (newAmount !== currentAmount) {
-                priceUpdates.push({
+                updatedForVariant.push({
                   id: price.id,
-                  variant_id: variant.id,
                   amount: newAmount,
                   currency_code: price.currency_code,
                 })
+                totalPricesUpdated++
               }
+            }
+
+            if (updatedForVariant.length > 0) {
+              variantPricesMap.set(variant.id, {
+                variant_id: variant.id,
+                product_id: (product as any).id,
+                prices: updatedForVariant,
+              })
             }
           }
         }
 
-        if (priceUpdates.length > 0) {
+        const variantPrices = Array.from(variantPricesMap.values())
+
+        if (variantPrices.length > 0) {
           await upsertVariantPricesWorkflow(req.scope).run({
             input: {
-              prices: priceUpdates,
+              variantPrices,
+              previousVariantIds: [],
             },
           })
         }
@@ -254,9 +279,9 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
         return res.status(200).json({
           success: true,
           count: product_ids.length,
-          variants_updated: priceUpdates.length,
+          variants_updated: totalPricesUpdated,
           action,
-          message: `Successfully adjusted ${priceUpdates.length} price entries across ${product_ids.length} products`,
+          message: `Successfully adjusted ${totalPricesUpdated} price entries across ${product_ids.length} products`,
         })
       }
 
