@@ -1,21 +1,24 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { Container, Button, Heading } from "@medusajs/ui"
+import { Container, Button, Heading, Badge } from "@medusajs/ui"
 import { Link } from "react-router-dom"
 
 const BulkProductsButtonWidget = () => {
   return (
     <Container className="mb-4 flex items-center justify-between p-4 bg-ui-bg-subtle border border-ui-border-base rounded-lg">
       <div className="flex flex-col gap-1">
-        <Heading level="h2" className="text-base font-semibold">
-          Bulk Operations Workspace
-        </Heading>
+        <div className="flex items-center gap-2">
+          <Heading level="h2" className="text-base font-semibold">
+            In-Table Bulk Operations Workspace
+          </Heading>
+          <Badge color="blue" size="small">WooCommerce Style</Badge>
+        </div>
         <p className="text-xs text-ui-fg-subtle">
-          Perform batch updates on status, brand, categories, collections, and metadata across your catalog.
+          Batch edit prices (+/- % or $), sale prices, stock status, quantities, quick edit rows, status, categories, and brands.
         </p>
       </div>
       <Link to="/bulk-products">
         <Button variant="primary" size="small">
-          Open Bulk Workspace
+          Open In-Table Bulk Workspace
         </Button>
       </Link>
     </Container>
