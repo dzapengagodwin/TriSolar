@@ -86,9 +86,6 @@ export default defineConfig({
   },
   modules: [
     {
-      resolve: "./src/modules/bulk-operation",
-    },
-    {
       resolve: "./src/modules/brand",
     },
     {
