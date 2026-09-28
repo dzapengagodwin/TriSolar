@@ -39,7 +39,7 @@ export default async function ProductRail({
   // Execute query if filter is present
   if (categoryId || collectionId) {
     const res = await listProducts({
-      regionId: region.id,
+      region,
       queryParams,
     }).catch(() => null)
 

@@ -1,10 +1,11 @@
 "use server"
 
+import { cache } from "react"
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { CACHE_TAGS, regionTag } from "@lib/cache-tags"
 
-export const listRegions = async () => {
+export const listRegions = cache(async () => {
   return await sdk.client
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
@@ -17,9 +18,9 @@ export const listRegions = async () => {
       },
     })
     .then(({ regions }) => regions)
-}
+})
 
-export const retrieveRegion = async (id: string) => {
+export const retrieveRegion = cache(async (id: string) => {
   return await sdk.client
     .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
       method: "GET",
@@ -29,11 +30,9 @@ export const retrieveRegion = async (id: string) => {
       },
     })
     .then(({ region }) => region)
-}
+})
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
-
-export const getRegion = async (countryCode: string) => {
+export const getRegion = cache(async (countryCode: string) => {
   const code = countryCode?.toLowerCase()
 
   const regions = await listRegions()
@@ -42,7 +41,7 @@ export const getRegion = async (countryCode: string) => {
     return null
   }
 
-  regionMap.clear()
+  const regionMap = new Map<string, HttpTypes.StoreRegion>()
   regions.forEach((region) => {
     region.countries?.forEach((c) => {
       if (c?.iso_2) {
@@ -56,4 +55,4 @@ export const getRegion = async (countryCode: string) => {
     : regionMap.get("us") || regions[0]
 
   return region || regions[0] || null
-}
+})

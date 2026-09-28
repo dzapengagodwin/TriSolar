@@ -5,7 +5,7 @@ import { listCollections } from "@lib/data/collections"
 
 export default async function Footer() {
   const [categories, { collections }] = await Promise.all([
-    listCategories({ limit: 50 }).catch(() => []),
+    listCategories().catch(() => []),
     listCollections({ limit: "10" }).catch(() => ({ collections: [] })),
   ])
 

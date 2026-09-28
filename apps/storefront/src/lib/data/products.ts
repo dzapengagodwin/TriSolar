@@ -26,30 +26,34 @@ export const listProducts = async ({
   queryParams,
   countryCode,
   regionId,
+  region: passedRegion,
 }: {
   pageParam?: number
   queryParams?: ProductListQueryParams
   countryCode?: string
   regionId?: string
+  region?: HttpTypes.StoreRegion
 }): Promise<{
   response: { products: HttpTypes.StoreProduct[]; count: number }
   nextPage: number | null
   queryParams?: ProductListQueryParams
 }> => {
-  if (!countryCode && !regionId) {
-    throw new Error("Country code or region ID is required")
+  if (!passedRegion && !countryCode && !regionId) {
+    throw new Error("Country code, region ID, or region object is required")
   }
 
   const limit = queryParams?.limit || 12
   const _pageParam = Math.max(pageParam, 1)
   const offset = _pageParam === 1 ? 0 : (_pageParam - 1) * limit
 
-  let region: HttpTypes.StoreRegion | undefined | null
+  let region: HttpTypes.StoreRegion | undefined | null = passedRegion
 
-  if (countryCode) {
-    region = await getRegion(countryCode)
-  } else {
-    region = await retrieveRegion(regionId!)
+  if (!region) {
+    if (countryCode) {
+      region = await getRegion(countryCode)
+    } else {
+      region = await retrieveRegion(regionId!)
+    }
   }
 
   if (!region) {

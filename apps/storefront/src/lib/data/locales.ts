@@ -1,7 +1,5 @@
 "use server"
 
-import { sdk } from "@lib/config"
-import { getCacheOptions } from "./cookies"
 
 export type Locale = {
   code: string
@@ -10,19 +8,12 @@ export type Locale = {
 
 /**
  * Fetches available locales from the backend.
- * Returns null if the endpoint returns 404 (locales not configured).
+ * Returns null if the endpoint is not configured.
+ * To enable, set up a custom /store/locales route in the backend
+ * and remove the early return below.
  */
 export const listLocales = async (): Promise<Locale[] | null> => {
-  const next = {
-    ...(await getCacheOptions("locales")),
-  }
-
-  return sdk.client
-    .fetch<{ locales: Locale[] }>(`/store/locales`, {
-      method: "GET",
-      next,
-      cache: "force-cache",
-    })
-    .then(({ locales }) => locales)
-    .catch(() => null)
+  // No /store/locales endpoint is configured in the backend.
+  // Return null to avoid a 404 request on every page load (~2s wasted).
+  return null
 }
