@@ -120,3 +120,4 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
     return res.status(500).json({ error: message })
   }
 }
+

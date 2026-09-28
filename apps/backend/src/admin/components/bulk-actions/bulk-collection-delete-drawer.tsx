@@ -95,3 +95,4 @@ export const BulkCollectionDeleteDrawer = ({
     </Drawer>
   )
 }
+
