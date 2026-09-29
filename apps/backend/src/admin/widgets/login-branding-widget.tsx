@@ -15,11 +15,21 @@ const LoginBrandingWidget = () => {
   const widgetRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setImgError(false)
+  }, [branding?.logo_url])
+
+  useEffect(() => {
     let isMounted = true
 
     const fetchBranding = async () => {
       try {
-        const res = await fetch("/admin/branding/public")
+        const res = await fetch("/admin/branding/public", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
+          },
+        })
         if (res.ok) {
           const data = await res.json()
           if (isMounted && data) {
@@ -30,7 +40,6 @@ const LoginBrandingWidget = () => {
           }
         }
       } catch (err) {
-        // Silently fallback to default Medusa appearance
         console.error("Failed to load login branding:", err)
       }
     }
@@ -97,7 +106,12 @@ const LoginBrandingWidget = () => {
             src={branding.logo_url}
             alt={branding.app_name || "Store Logo"}
             className="max-h-16 max-w-[240px] object-contain rounded-md"
-            onError={() => setImgError(true)}
+            loading="eager"
+            decoding="async"
+            onError={(e) => {
+              console.error("Failed to render branding logo:", branding.logo_url, e)
+              setImgError(true)
+            }}
           />
         </div>
       ) : (
@@ -124,4 +138,3 @@ export const config = defineWidgetConfig({
 })
 
 export default LoginBrandingWidget
-

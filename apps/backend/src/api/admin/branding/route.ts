@@ -10,6 +10,10 @@ export type UpdateBrandingBody = {
 }
 
 export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
+  res.setHeader("Pragma", "no-cache")
+  res.setHeader("Expires", "0")
+
   try {
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
     const { data: stores } = await query.graph({
@@ -58,7 +62,7 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
     }
 
     const currentMetadata = (store.metadata as Record<string, unknown>) || {}
-    const newAppName = body.app_name && body.app_name.trim() !== ""
+    const newAppName = body.app_name !== undefined && body.app_name.trim() !== ""
       ? body.app_name.trim()
       : (currentMetadata.admin_app_name as string) || store.name
 
@@ -66,13 +70,13 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
       ? (body.logo_url && body.logo_url.trim() ? body.logo_url.trim() : null)
       : (currentMetadata.admin_logo_url as string | null) ?? null
 
-    const targetWelcomeTitle = body.welcome_title !== undefined
-      ? (body.welcome_title && body.welcome_title.trim() ? body.welcome_title.trim() : null)
-      : (currentMetadata.admin_welcome_title as string | null) ?? `Welcome to ${newAppName}`
+    const targetWelcomeTitle = body.welcome_title != null && body.welcome_title.trim() !== ""
+      ? body.welcome_title.trim()
+      : (currentMetadata.admin_welcome_title as string) || `Welcome to ${newAppName}`
 
-    const targetWelcomeSubtitle = body.welcome_subtitle !== undefined
-      ? (body.welcome_subtitle && body.welcome_subtitle.trim() ? body.welcome_subtitle.trim() : null)
-      : (currentMetadata.admin_welcome_subtitle as string | null) ?? "Sign in to access your admin dashboard"
+    const targetWelcomeSubtitle = body.welcome_subtitle != null && body.welcome_subtitle.trim() !== ""
+      ? body.welcome_subtitle.trim()
+      : (currentMetadata.admin_welcome_subtitle as string) || "Sign in to access your admin dashboard"
 
     const updatedMetadata = {
       ...currentMetadata,

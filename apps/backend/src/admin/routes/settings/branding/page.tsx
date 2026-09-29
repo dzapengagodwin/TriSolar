@@ -27,7 +27,11 @@ const BrandingSettingsPage = () => {
   const fetchBranding = useCallback(async () => {
     try {
       setLoading(true)
-      const res = await fetch("/admin/branding", { credentials: "include" })
+      const res = await fetch("/admin/branding", {
+        credentials: "include",
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      })
       if (res.ok) {
         const data = await res.json()
         const branding = data.branding || {}
