@@ -14,7 +14,7 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
     const { data: stores } = await query.graph({
       entity: "store",
-      fields: ["id", "name", "metadata.*"],
+      fields: ["id", "name", "metadata"],
     })
 
     const store = stores?.[0]
@@ -49,7 +49,7 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
     const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
     const { data: stores } = await query.graph({
       entity: "store",
-      fields: ["id", "name", "metadata.*"],
+      fields: ["id", "name", "metadata"],
     })
 
     const store = stores?.[0]
@@ -58,14 +58,28 @@ export const POST = async (req: AuthenticatedMedusaRequest, res: MedusaResponse)
     }
 
     const currentMetadata = (store.metadata as Record<string, unknown>) || {}
-    const newAppName = body.app_name !== undefined ? body.app_name.trim() : (currentMetadata.admin_app_name as string) || store.name
+    const newAppName = body.app_name && body.app_name.trim() !== ""
+      ? body.app_name.trim()
+      : (currentMetadata.admin_app_name as string) || store.name
+
+    const targetLogoUrl = body.logo_url !== undefined
+      ? (body.logo_url && body.logo_url.trim() ? body.logo_url.trim() : null)
+      : (currentMetadata.admin_logo_url as string | null) ?? null
+
+    const targetWelcomeTitle = body.welcome_title !== undefined
+      ? (body.welcome_title && body.welcome_title.trim() ? body.welcome_title.trim() : null)
+      : (currentMetadata.admin_welcome_title as string | null) ?? `Welcome to ${newAppName}`
+
+    const targetWelcomeSubtitle = body.welcome_subtitle !== undefined
+      ? (body.welcome_subtitle && body.welcome_subtitle.trim() ? body.welcome_subtitle.trim() : null)
+      : (currentMetadata.admin_welcome_subtitle as string | null) ?? "Sign in to access your admin dashboard"
 
     const updatedMetadata = {
       ...currentMetadata,
-      admin_logo_url: body.logo_url !== undefined ? body.logo_url : currentMetadata.admin_logo_url ?? null,
+      admin_logo_url: targetLogoUrl,
       admin_app_name: newAppName,
-      admin_welcome_title: body.welcome_title !== undefined ? body.welcome_title : currentMetadata.admin_welcome_title ?? `Welcome to ${newAppName}`,
-      admin_welcome_subtitle: body.welcome_subtitle !== undefined ? body.welcome_subtitle : currentMetadata.admin_welcome_subtitle ?? "Sign in to access your admin dashboard",
+      admin_welcome_title: targetWelcomeTitle,
+      admin_welcome_subtitle: targetWelcomeSubtitle,
     }
 
     await updateStoresWorkflow(req.scope).run({

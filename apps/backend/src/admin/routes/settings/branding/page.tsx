@@ -49,6 +49,61 @@ const BrandingSettingsPage = () => {
     fetchBranding()
   }, [fetchBranding])
 
+  const saveBrandingData = async (overrides?: {
+    logo_url?: string | null
+    app_name?: string
+    welcome_title?: string | null
+    welcome_subtitle?: string | null
+  }) => {
+    setSaving(true)
+    try {
+      const payload = {
+        logo_url: overrides && "logo_url" in overrides
+          ? overrides.logo_url
+          : (logoUrl.trim() || null),
+        app_name: overrides && "app_name" in overrides
+          ? overrides.app_name
+          : (appName.trim() || "LaptopZone"),
+        welcome_title: overrides && "welcome_title" in overrides
+          ? overrides.welcome_title
+          : (welcomeTitle.trim() || `Welcome to ${appName.trim() || "LaptopZone"}`),
+        welcome_subtitle: overrides && "welcome_subtitle" in overrides
+          ? overrides.welcome_subtitle
+          : (welcomeSubtitle.trim() || "Sign in to access your admin dashboard"),
+      }
+
+      const res = await fetch("/admin/branding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.message || err.error || "Failed to save branding")
+      }
+
+      const data = await res.json()
+      if (data.branding) {
+        setLogoUrl(data.branding.logo_url || "")
+        setAppName(data.branding.app_name || "")
+        setWelcomeTitle(data.branding.welcome_title || "")
+        setWelcomeSubtitle(data.branding.welcome_subtitle || "")
+      }
+
+      toast.success("Branding Saved", {
+        description: "Login page logo, welcome app name, and admin header updated.",
+      })
+      return data.branding
+    } catch (err: any) {
+      toast.error("Save Failed", { description: err.message })
+      throw err
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -73,9 +128,8 @@ const BrandingSettingsPage = () => {
       const uploadedUrl = data.files?.[0]?.url
       if (uploadedUrl) {
         setLogoUrl(uploadedUrl)
-        toast.success("Logo uploaded successfully", {
-          description: "Click 'Save Changes' to apply the new logo.",
-        })
+        // Automatically persist the uploaded logo immediately
+        await saveBrandingData({ logo_url: uploadedUrl })
       }
     } catch (err: any) {
       toast.error("Upload Failed", { description: err.message })
@@ -88,34 +142,12 @@ const BrandingSettingsPage = () => {
   }
 
   const handleSave = async () => {
-    setSaving(true)
-    try {
-      const res = await fetch("/admin/branding", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          logo_url: logoUrl.trim() || null,
-          app_name: appName.trim() || "LaptopZone",
-          welcome_title: welcomeTitle.trim() || `Welcome to ${appName.trim() || "LaptopZone"}`,
-          welcome_subtitle: welcomeSubtitle.trim() || "Sign in to access your admin dashboard",
-        }),
-      })
+    await saveBrandingData()
+  }
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        throw new Error(err.message || "Failed to save branding")
-      }
-
-      toast.success("Branding Saved", {
-        description: "Login page logo, welcome app name, and admin header updated.",
-      })
-      fetchBranding()
-    } catch (err: any) {
-      toast.error("Save Failed", { description: err.message })
-    } finally {
-      setSaving(false)
-    }
+  const handleRemoveLogo = async () => {
+    setLogoUrl("")
+    await saveBrandingData({ logo_url: null })
   }
 
   const handleResetDefaults = () => {
@@ -223,7 +255,8 @@ const BrandingSettingsPage = () => {
                       variant="transparent"
                       size="small"
                       className="text-ui-fg-error hover:text-ui-fg-error-hover"
-                      onClick={() => setLogoUrl("")}
+                      onClick={handleRemoveLogo}
+                      disabled={saving}
                     >
                       <Trash className="w-4 h-4 mr-1" />
                       Remove

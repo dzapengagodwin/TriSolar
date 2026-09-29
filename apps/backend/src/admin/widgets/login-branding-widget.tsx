@@ -124,3 +124,4 @@ export const config = defineWidgetConfig({
 })
 
 export default LoginBrandingWidget
+
