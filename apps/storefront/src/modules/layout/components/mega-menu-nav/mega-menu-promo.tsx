@@ -20,14 +20,14 @@ export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
           {promo.eyebrow}
         </span>
 
-        <h3 className="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-white pt-0.5">
+        <p className="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-white pt-0.5">
           {promo.title.map((line, idx) => (
             <React.Fragment key={idx}>
               {line}
               {idx < promo.title.length - 1 && <br />}
             </React.Fragment>
           ))}
-        </h3>
+        </p>
 
         <p className="text-xs font-medium text-gray-400 pt-1 line-clamp-2">
           {promo.description}

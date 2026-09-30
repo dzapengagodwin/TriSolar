@@ -31,16 +31,16 @@ export default function GamingSection() {
       <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest"> 
         Premium Laptops 
       </span> 
-      <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight"> 
+      <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight"> 
         Professional Performance. Refined. 
-      </h2> 
+      </h1> 
       <p className="text-xs sm:text-sm text-gray-400 font-normal leading-relaxed hidden sm:block pt-1 max-w-sm lg:max-w-md"> 
         Powerful, beautifully engineered laptops built for demanding professionals, creators, and modern work. 
       </p> 
     </div> 
  
     <div className="pt-6"> 
-      <span className="inline-flex items-center bg-primary group-hover:bg-primary-hover text-white font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
+      <span className="inline-flex items-center bg-white text-gray-950 group-hover:bg-gray-100 font-semibold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-all duration-300 shadow-sm"> 
         <span>Shop Now</span> 
       </span> 
     </div> 
@@ -85,9 +85,9 @@ export default function GamingSection() {
                   <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                     Printers & Scanners
                   </span>
-                  <h3 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
+                  <h2 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
                     Business & Home Printers
-                  </h3>
+                  </h2>
                 </div>
 
                 <div className="pt-2">
@@ -130,9 +130,9 @@ export default function GamingSection() {
                   <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                     Everyday & Education
                   </span>
-                  <h3 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
+                  <h2 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
                     Home & Student Laptops
-                  </h3>
+                  </h2>
                 </div>
 
                 <div className="pt-2">
@@ -175,9 +175,9 @@ export default function GamingSection() {
                   <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                     Displays & Monitors
                   </span>
-                  <h3 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
+                  <h2 className="text-lg sm:text-xl lg:text-sm xl:text-base 2xl:text-lg font-bold tracking-tight text-white leading-snug">
                     Professional & Gaming Displays
-                  </h3>
+                  </h2>
                 </div>
 
                 <div className="pt-2">

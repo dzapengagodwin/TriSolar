@@ -72,7 +72,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
           {/* Column 2: Main Categories (Hover to reveal column 3) */}
           <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#d1d5db_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
             <div className="px-4 pb-2 border-b border-gray-50 mb-2">
-              <h4 className="text-[11px] font-bold text-gray-400">All Products</h4>
+              <span className="block text-[11px] font-bold text-gray-400">All Products</span>
             </div>
             {displayCategories.length > 0 ? (
               <ul className="space-y-0.5 px-2">
@@ -118,7 +118,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
               <div className="space-y-6">
                 {/* Active Category Header */}
                 <div className="pb-3 border-b border-gray-100">
-                  <h3 className="text-sm font-bold text-gray-900">{activeCategory.name}</h3>
+                  <span className="block text-sm font-bold text-gray-900">{activeCategory.name}</span>
                 </div>
 
                 {/* Subcategories list */}

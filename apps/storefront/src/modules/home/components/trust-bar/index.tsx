@@ -41,9 +41,9 @@ export default function TrustBar() {
             <div key={idx} className="flex items-center justify-center sm:justify-start gap-x-4">
               {item.icon}
               <div>
-                <h4 className="text-xs font-bold text-gray-900">
+                <h3 className="text-xs font-bold text-gray-900">
                   {item.title}
-                </h4>
+                </h3>
                 <p className="text-[11px] text-gray-500 font-normal mt-0.5">
                   {item.description}
                 </p>

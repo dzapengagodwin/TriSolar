@@ -159,9 +159,9 @@ export default function MegaMenuNav() {
                 key={idx}
                 className="col-span-12 sm:col-span-6 lg:col-span-2 space-y-3"
               >
-                <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                <span className="block text-xs font-bold text-gray-900 uppercase tracking-wider">
                   {section.title}
-                </h4>
+                </span>
                 <ul className="space-y-2 text-xs font-medium text-gray-600">
                   {section.items.map((item, itemIdx) => (
                     <li key={itemIdx}>

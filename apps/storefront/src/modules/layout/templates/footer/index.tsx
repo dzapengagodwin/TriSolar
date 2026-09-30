@@ -106,9 +106,9 @@ export default async function Footer() {
 
             {/* Contact Info */}
             <div className="space-y-1.5 pt-1">
-              <h4 className="text-white font-bold text-xs tracking-wide">
+              <h3 className="text-white font-bold text-xs tracking-wide">
                 Contact Info
-              </h4>
+              </h3>
               <p className="text-gray-400 text-xs leading-relaxed max-w-sm">
                 64 Ridgeway, Harare, Borrowdale, Zimbabwe
               </p>
@@ -191,9 +191,9 @@ export default async function Footer() {
             >
               {/* Product Categories Sub-column */}
               <div className="space-y-4">
-                <h4 className="text-white font-bold text-sm tracking-wide">
+                <h3 className="text-white font-bold text-sm tracking-wide">
                   Categories
-                </h4>
+                </h3>
                 <ul className="space-y-2.5 text-gray-400 pt-1">
                   {topCategories.map((cat) => (
                     <li key={cat.id}>
@@ -210,9 +210,9 @@ export default async function Footer() {
 
               {/* Collections & Store Links Sub-column */}
               <div className="space-y-4">
-                <h4 className="text-white font-bold text-sm tracking-wide">
+                <h3 className="text-white font-bold text-sm tracking-wide">
                   Featured
-                </h4>
+                </h3>
                 <ul className="space-y-2.5 text-gray-400 pt-1">
                   {topCollections.map((col) => (
                     <li key={col.id}>
@@ -247,9 +247,9 @@ export default async function Footer() {
 
           {/* Column 4: "Customer Care" (3 cols on lg) */}
           <div className="lg:col-span-3 space-y-4" suppressHydrationWarning>
-            <h4 className="text-white font-bold text-sm tracking-wide">
+            <h3 className="text-white font-bold text-sm tracking-wide">
               Customer Care
-            </h4>
+            </h3>
 
             <ul className="space-y-2.5 text-gray-400 pt-1">
               <li>

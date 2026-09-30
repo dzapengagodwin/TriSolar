@@ -181,9 +181,9 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-gray-800 truncate">
+                      <span className="block text-xs font-bold text-gray-800 truncate">
                         {product.title}
-                      </h4>
+                      </span>
                       <p className="text-[11px] text-gray-500 truncate">
                         {product.subtitle || product.collection?.title || "Product"}
                       </p>
