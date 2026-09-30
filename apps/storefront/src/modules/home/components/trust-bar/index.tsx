@@ -24,12 +24,12 @@ export default function TrustBar() {
     },
     {
       icon: (
-        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center border border-amber-100 shrink-0">
-          <TruckFast className="w-6 h-6 text-amber-600" />
+        <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center border border-primary/20 shrink-0">
+          <TruckFast className="w-6 h-6 text-primary" />
         </div>
       ),
       title: "Fast & Free Shipping",
-      description: "Free shipping on orders over $100",
+      description: "Free shipping on orders over $500",
     },
   ]
 
