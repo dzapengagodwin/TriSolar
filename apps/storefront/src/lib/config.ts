@@ -8,9 +8,12 @@ if (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL) {
   MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 }
 
+const isDev = process.env.NODE_ENV === "development"
+const isServer = typeof window === "undefined"
+
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
-  debug: false,
+  debug: isDev && isServer,
   publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
 })
 

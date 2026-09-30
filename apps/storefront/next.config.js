@@ -11,6 +11,8 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const MEDUSA_PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const MEDUSA_BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
 
+const isDev = process.env.NODE_ENV === "development"
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -22,6 +24,15 @@ const nextConfig = {
       bodySizeLimit: "20mb",
     },
   },
+  ...(isDev
+    ? {
+        logging: {
+          fetches: {
+            fullUrl: true,
+          },
+        },
+      }
+    : {}),
   eslint: {
     ignoreDuringBuilds: true,
   },
