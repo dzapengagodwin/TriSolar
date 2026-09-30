@@ -22,11 +22,6 @@ const nextConfig = {
       bodySizeLimit: "20mb",
     },
   },
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
