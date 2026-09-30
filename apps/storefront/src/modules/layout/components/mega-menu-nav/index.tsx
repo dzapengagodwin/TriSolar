@@ -78,66 +78,70 @@ export default function MegaMenuNav() {
       onMouseLeave={handleMouseLeave}
       onMouseEnter={clearCloseTimeout}
       onBlur={handleFocusOut}
-      className="flex items-center gap-0.5 font-semibold text-xs"
+      className="flex-1 flex items-center justify-between gap-0.5 font-semibold text-xs"
     >
       {/* Dynamic Department Tabs */}
-      {MEGA_MENUS.map((menu) => {
-        const isOpen = activeMenu === menu.id
+      <div className="flex items-center gap-0.5">
+        {MEGA_MENUS.map((menu) => {
+          const isOpen = activeMenu === menu.id
 
-        return (
-          <button
-            key={menu.id}
-            type="button"
-            onMouseEnter={() => handleMouseEnter(menu.id)}
-            onClick={() => {
-              clearCloseTimeout()
-              setActiveMenu(isOpen ? null : menu.id)
-            }}
-            aria-expanded={isOpen}
-            aria-controls={menuPanelId}
-            className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-semibold cursor-pointer rounded-md ${
-              isOpen ? "bg-gray-800" : "hover:bg-gray-800"
-            }`}
-          >
-            <span>{menu.label}</span>
-            <svg
-              className={`w-3 h-3 transition-transform duration-200 ${
-                isOpen ? "rotate-180" : ""
+          return (
+            <button
+              key={menu.id}
+              type="button"
+              onMouseEnter={() => handleMouseEnter(menu.id)}
+              onClick={() => {
+                clearCloseTimeout()
+                setActiveMenu(isOpen ? null : menu.id)
+              }}
+              aria-expanded={isOpen}
+              aria-controls={menuPanelId}
+              className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-semibold cursor-pointer rounded-md ${
+                isOpen ? "bg-gray-800" : "hover:bg-gray-800"
               }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2.5}
-              stroke="currentColor"
-              aria-hidden="true"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-              />
-            </svg>
-          </button>
-        )
-      })}
+              <span>{menu.label}</span>
+              <svg
+                className={`w-3 h-3 transition-transform duration-200 ${
+                  isOpen ? "rotate-180" : ""
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2.5}
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+                />
+              </svg>
+            </button>
+          )
+        })}
+      </div>
 
       {/* Hot Deals Link */}
       <LocalizedClientLink
         href="/store"
         onClick={closeMenu}
-        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold ml-1 rounded-md"
+        onMouseEnter={closeMenu}
+        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold rounded-md ml-auto shrink-0"
       >
         <span>Hot Deals</span>
-       <svg className="w-3.5 h-3.5"
-  fill="currentColor"
-  viewBox="0 0 24 24"
-  aria-hidden="true"
->
-  <path
-    fillRule="evenodd"
-    clipRule="evenodd"
-    d="M12 22c4 0 7-2.8 7-6.5 0-2.8-1.7-5-4.2-6.5.3 2.1-1 3.5-2.3 4.2.2-3.4-1.5-6.5-4.5-9.2.2 3.2-1.6 5.4-2.6 7.2C4.5 12.7 5 15 5 15.5 5 19.2 8 22 12 22Z"
-  />
-</svg>
+        <svg
+          className="w-3.5 h-3.5"
+          fill="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            fillRule="evenodd"
+            clipRule="evenodd"
+            d="M12 22c4 0 7-2.8 7-6.5 0-2.8-1.7-5-4.2-6.5.3 2.1-1 3.5-2.3 4.2.2-3.4-1.5-6.5-4.5-9.2.2 3.2-1.6 5.4-2.6 7.2C4.5 12.7 5 15 5 15.5 5 19.2 8 22 12 22Z"
+          />
+        </svg>
       </LocalizedClientLink>
 
       {/* Unified Data-Driven Mega Dropdown Panel */}

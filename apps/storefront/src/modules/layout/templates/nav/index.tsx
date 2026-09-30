@@ -184,7 +184,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
         {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
         <nav className="bg-black  border-black-300 hidden small:block text-white">
           <div className="content-container flex items-center justify-between text-xs font-semibold py-1 relative">
-            <div className="flex items-center gap-x-2">
+            <div className="flex items-center gap-x-2 flex-1">
               {/* Browse All Categories Button */}
               <CategoryDropdown categories={categories} />
 
