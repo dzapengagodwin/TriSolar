@@ -4,9 +4,9 @@ import { placeOrder } from "@lib/data/cart"
 import Spinner from "@modules/common/icons/spinner"
 import Link from "next/link"
 import { useSearchParams, useParams } from "next/navigation"
-import { useEffect, useState, useTransition } from "react"
+import { useEffect, useState, useTransition, Suspense } from "react"
 
-export default function PaymentCallbackPage() {
+function PaymentCallbackContent() {
   const params = useParams()
   const searchParams = useSearchParams()
   const countryCode = (params?.countryCode as string) || "us"
@@ -108,5 +108,19 @@ export default function PaymentCallbackPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function PaymentCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
+          <Spinner size="32" className="text-primary" />
+        </div>
+      }
+    >
+      <PaymentCallbackContent />
+    </Suspense>
   )
 }
