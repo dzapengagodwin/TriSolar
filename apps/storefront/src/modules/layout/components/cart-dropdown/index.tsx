@@ -571,7 +571,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                 </div>
               ) : (
                 <Image
-                  src="/payment-methods.png"
+                  src="/payment-methods.webp"
                   alt="Accepted Payment Methods - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
                   width={260}
                   height={28}

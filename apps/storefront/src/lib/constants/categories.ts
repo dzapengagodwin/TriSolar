@@ -18,7 +18,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.716Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/monitors.png",
+      image: "/top-categories/monitors.webp",
       product_count: 3,
     },
   },
@@ -36,7 +36,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/keyboards.png",
+      image: "/top-categories/keyboards.webp",
       product_count: 1,
     },
   },
@@ -54,7 +54,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/laptops.png",
+      image: "/top-categories/laptops.webp",
       product_count: 61,
     },
   },
@@ -72,7 +72,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.716Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/computer-mouse.png",
+      image: "/top-categories/computer-mouse.webp",
       product_count: 2,
     },
   },
@@ -90,7 +90,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/ink.png",
+      image: "/top-categories/ink.webp",
       product_count: 1,
     },
   },
@@ -108,7 +108,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/networking.png",
+      image: "/top-categories/networking.webp",
       product_count: 0,
     },
   },
@@ -126,7 +126,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-       image: "/top-categories/software.png",
+       image: "/top-categories/software.webp",
       product_count: 0,
     },
   },
@@ -144,7 +144,7 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
     updated_at: "2026-08-18T12:04:49.718Z",
     deleted_at: null,
     metadata: {
-      image: "/top-categories/gaming.png",
+      image: "/top-categories/gaming.webp",
       product_count: 1,
     },
   },
@@ -152,15 +152,15 @@ export const HOMEPAGE_FEATURED_CATEGORIES: HttpTypes.StoreProductCategory[] = [
 
 // Fallback image map to enrich dynamic categories from the database with icons
 export const CATEGORY_IMAGE_MAP: Record<string, string> = {
-  laptops: "/top-categories/laptops.png",
-  "gaming-laptops": "/gaming/gaming-laptops.png",
-  "home-student": "/gaming/home-student-laptops.png",
-  monitors: "/top-categories/monitors.png",
-  desktops: "/gaming/gaming-pcs.png",
-  "keyboard_-mouse": "/top-categories/keyboards.png",
-  "computer-accessories": "/top-categories/computer-mouse.png",
-  "ink-toners": "/top-categories/printers.png",
-  gaming: "/top-categories/gaming.png",
+  laptops: "/top-categories/laptops.webp",
+  "gaming-laptops": "/gaming/gaming-laptops.webp",
+  "home-student": "/gaming/home-student-laptops.webp",
+  monitors: "/top-categories/monitors.webp",
+  desktops: "/gaming/gaming-pcs.webp",
+  "keyboard_-mouse": "/top-categories/keyboards.webp",
+  "computer-accessories": "/top-categories/computer-mouse.webp",
+  "ink-toners": "/top-categories/printers.webp",
+  gaming: "/top-categories/gaming.webp",
 }
 
 export const STATIC_CATEGORIES = HOMEPAGE_FEATURED_CATEGORIES

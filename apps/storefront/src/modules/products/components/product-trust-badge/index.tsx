@@ -54,7 +54,7 @@ export default function ProductTrustBadge() {
 
         <div className="border border-gray-200 bg-white rounded-lg p-3 sm:p-4 flex items-center justify-center shadow-2xs">
           <Image
-            src="/payment-methods.png"
+            src="/payment-methods.webp"
             alt="Guaranteed Safe Checkout - Visa, Mastercard, ZimSwitch, EcoCash, InnBucks"
             width={400}
             height={50}

@@ -7,10 +7,10 @@ export type { StoreBrand }
 export { STATIC_BRANDS }
 
 const LOCAL_BRAND_LOGOS: Record<string, string> = {
-  apple: "/top-brands/apple.png",
-  hp: "/top-brands/hp.png",
-  dell: "/top-brands/dell.png",
-  lenovo: "/top-brands/lenovo.png",
+  apple: "/top-brands/apple.webp",
+  hp: "/top-brands/hp.webp",
+  dell: "/top-brands/dell.webp",
+  lenovo: "/top-brands/lenovo.webp",
   asus: "/brands/asus.svg",
   amd: "/brands/amd.svg",
   intel: "/brands/intel.svg",
@@ -24,8 +24,8 @@ const LOCAL_BRAND_LOGOS: Record<string, string> = {
   huawei: "/brands/huawei.svg",
   jbl: "/brands/jbl.svg",
   epson: "/brands/epson.svg",
-  canon: "/top-brands/canon.png",
-  brother: "/top-brands/brother.png",
+  canon: "/top-brands/canon.webp",
+  brother: "/top-brands/brother.webp",
   sony: "/brands/sony.svg",
 }
 

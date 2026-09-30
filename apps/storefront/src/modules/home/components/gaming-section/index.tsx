@@ -48,7 +48,7 @@ export default function GamingSection() {
  
   <div className="absolute right-20 bottom-20 w-[55%] lg:w-[50%] xl:w-[52%] h-[85%] lg:h-[90%] -z-0 flex items-end justify-end p-2 sm:p-4"> 
     <Image 
-      src="/hero-laptops.png" 
+      src="/hero-laptops.webp" 
       alt="Premium Professional Laptops" 
       fill 
       priority 
@@ -98,7 +98,7 @@ export default function GamingSection() {
 
               <div className="absolute right-0 bottom-0 w-[54%] sm:w-[58%] lg:w-[52%] xl:w-[54%] h-[92%] sm:h-[96%] lg:h-[98%] -z-0 flex items-end justify-end pr-1 pb-1 sm:pr-2 sm:pb-2">
                 <Image
-                  src="/printer.png"
+                  src="/printer.webp"
                   alt="Gaming Laptops"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 33vw"
@@ -143,7 +143,7 @@ export default function GamingSection() {
 
               <div className="absolute right-0 bottom-0 w-[54%] sm:w-[58%] lg:w-[52%] xl:w-[54%] h-[92%] sm:h-[96%] lg:h-[98%] -z-0 flex items-end justify-end pr-1 pb-1 sm:pr-2 sm:pb-2">
                 <Image
-                  src="/laptop.png"
+                  src="/laptop.webp"
                   alt="Home and Student Laptops"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 33vw"
@@ -188,7 +188,7 @@ export default function GamingSection() {
 
               <div className="absolute right-0 bottom-0 w-[54%] sm:w-[58%] lg:w-[52%] xl:w-[54%] h-[92%] sm:h-[96%] lg:h-[98%] -z-0 flex items-end justify-end pr-1 pb-1 sm:pr-2 sm:pb-2">
                 <Image
-                  src="/hero-monitor.png"
+                  src="/hero-monitor.webp"
                   alt="Gaming Monitors"
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 33vw"

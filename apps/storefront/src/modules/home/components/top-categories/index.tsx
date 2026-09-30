@@ -63,7 +63,7 @@ export default function TopCategories({
             {displayCategories.map((cat) => {
               const imageSrc =
                 (cat.metadata?.image as string) ||
-                `/top-categories/${cat.handle}.png`
+                `/top-categories/${cat.handle}.webp`
 
               return (
                 <LocalizedClientLink

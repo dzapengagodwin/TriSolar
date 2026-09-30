@@ -18,7 +18,7 @@ export default function PromoCardsRow() {
         <div className="relative w-full h-44 flex items-center justify-center pt-4">
           <div className="relative w-36 h-36 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
             <Image
-              src="/hero-laptops.png"
+              src="/hero-laptops.webp"
               alt="Catalogue Feature"
               fill
               className="object-contain drop-shadow-xl"
@@ -46,7 +46,7 @@ export default function PromoCardsRow() {
           </div>
           <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
             <Image
-              src="/hero-phone.png"
+              src="/hero-phone.webp"
               alt="Clearance RedStar Deals"
               fill
               className="object-contain drop-shadow-2xl"
@@ -71,7 +71,7 @@ export default function PromoCardsRow() {
           </div>
           <div className="relative w-32 h-28 transform hover:scale-105 transition-transform duration-300">
             <Image
-              src="/omen-laptop.png"
+              src="/omen-laptop.webp"
               alt="Flash Sale Laptops & Tech"
               fill
               className="object-contain drop-shadow-2xl"
@@ -96,7 +96,7 @@ export default function PromoCardsRow() {
           </span>
           <div className="relative w-28 h-28 transform hover:scale-105 transition-transform duration-300">
             <Image
-              src="/hero-phone.png"
+              src="/hero-phone.webp"
               alt="Samsung Galaxy Z8 Series"
               fill
               className="object-contain drop-shadow-2xl"
@@ -118,7 +118,7 @@ export default function PromoCardsRow() {
         <div className="relative w-full h-44 flex items-center justify-center pt-4">
           <div className="relative w-36 h-28 transform hover:scale-105 transition-transform duration-300">
             <Image
-              src="/hero-monitor.png"
+              src="/hero-monitor.webp"
               alt="Smart Air Care & Displays"
               fill
               className="object-contain drop-shadow-2xl"

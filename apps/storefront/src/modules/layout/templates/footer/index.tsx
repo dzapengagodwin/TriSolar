@@ -349,7 +349,7 @@ export default async function Footer() {
           <div className="flex items-center gap-3 shrink-0">
             <div className="px-3 py-1 flex items-center justify-center">
               <Image
-                src="/payment-methods.png"
+                src="/payment-methods.webp"
                 alt="Accepted Payment Methods - Visa, Mastercard, PayPal, EcoCash, Pesepay"
                 width={280}
                 height={32}

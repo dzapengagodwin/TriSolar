@@ -45,7 +45,7 @@ export default function AppBanner() {
               <div className="w-12 h-3 bg-black rounded-full mt-1"></div>
               <div className="w-full flex-1 my-2 bg-gradient-to-b from-gray-900 to-black rounded-[1.8rem] flex flex-col items-center justify-center p-4 text-center">
                 <Image
-                  src="/logo.png"
+                  src="/logo.webp"
                   alt="Laptopzone App"
                   width={140}
                   height={50}
