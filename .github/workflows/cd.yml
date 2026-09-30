@@ -18,19 +18,29 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
 
           script: |
+            set -e
+
             cd /my-medusa-store
 
+            echo "Pulling latest code..."
             git fetch origin
             git reset --hard origin/main
 
+            echo "Installing dependencies..."
             npm ci
 
+            echo "Building application..."
             npm run build
 
-            # Run Medusa migrations
-            npm run db:migrate
-
+            echo "Restarting services..."
             sudo systemctl restart medusa
             sudo systemctl restart laptopzone-storefront
 
+            echo "Checking services..."
+            sudo systemctl is-active --quiet medusa
+            sudo systemctl is-active --quiet laptopzone-storefront
+
+            echo "Running health check..."
             curl -f https://dev.laptopzone.co.zw
+
+            echo "Deployment successful."
