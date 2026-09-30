@@ -419,9 +419,11 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                         {/* Accessory Image */}
                         <div className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 overflow-hidden p-0.5">
                           {accessory.thumbnail ? (
-                            <img
+                            <Image
                               src={accessory.thumbnail}
                               alt={accessory.title || "Accessory"}
+                              width={48}
+                              height={48}
                               className="w-full h-full object-contain"
                             />
                           ) : (

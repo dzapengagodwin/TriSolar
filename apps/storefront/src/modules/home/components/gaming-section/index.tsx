@@ -52,6 +52,7 @@ export default function GamingSection() {
       alt="Premium Professional Laptops" 
       fill 
       priority 
+      fetchPriority="high"
       sizes="(max-width: 1024px) 100vw, 67vw" 
       className="object-contain object-right-bottom transition-transform duration-500 group-hover:scale-104 drop-shadow-2xl" 
     /> 

@@ -8,6 +8,7 @@ type LogoProps = {
 
 export default function Logo({ size = "md", className }: LogoProps) {
   const height = size === "sm" ? 28 : size === "lg" ? 48 : 36
+  const width = Math.round(height * (414 / 169))
 
   return (
     <LocalizedClientLink
@@ -15,13 +16,16 @@ export default function Logo({ size = "md", className }: LogoProps) {
       className={`flex items-center gap-x-2 group shrink-0 ${className || ""}`}
       data-testid="store-logo-link"
     >
-      <div className="relative flex items-center justify-center">
+      <div
+        className="relative flex items-center justify-center shrink-0"
+        style={{ width: `${width}px`, height: `${height}px` }}
+      >
         <Image
           src="/logo.webp"
           alt="Laptopzone Logo"
-          width={height * 3.5}
+          width={width}
           height={height}
-          className="object-contain h-auto w-auto max-h-7 sm:max-h-9 md:max-h-11"
+          className="object-contain w-full h-full"
           priority
         />
       </div>
