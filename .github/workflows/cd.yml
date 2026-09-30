@@ -20,27 +20,29 @@ jobs:
           script: |
             set -e
 
-            cd /my-medusa-store
+            cd /root/my-medusa-store
 
-            echo "Pulling latest code..."
+            echo "=== Updating source ==="
             git fetch origin
             git reset --hard origin/main
 
-            echo "Installing dependencies..."
+            echo "=== Installing dependencies ==="
             npm ci
 
-            echo "Building application..."
+            echo "=== Building applications ==="
             npm run build
 
-            echo "Restarting services..."
+            echo "=== Restarting Medusa ==="
             sudo systemctl restart medusa
+
+            echo "=== Restarting Storefront ==="
             sudo systemctl restart laptopzone-storefront
 
-            echo "Checking services..."
+            echo "=== Checking services ==="
             sudo systemctl is-active --quiet medusa
             sudo systemctl is-active --quiet laptopzone-storefront
 
-            echo "Running health check..."
+            echo "=== Health check ==="
             curl -f https://dev.laptopzone.co.zw
 
-            echo "Deployment successful."
+            echo "=== Deployment successful ==="
