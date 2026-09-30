@@ -97,14 +97,15 @@ export default async function BrandTemplate({
               </div>
 
               {brand.description && (
-                <p className="text-xs sm:text-sm text-gray-500 max-w-2xl font-normal leading-relaxed line-clamp-2">
+                <p className="text-xs sm:text-sm text-gray-600 max-w-2xl font-normal leading-relaxed line-clamp-2">
                   {brand.description}
                 </p>
               )}
 
               <div className="flex items-center gap-4 text-xs pt-1">
-                <span className="font-bold text-gray-600">
-                  {totalProductsCount} {totalProductsCount === 1 ? "Product" : "Products"} Available
+                <span className="text-gray-500 font-normal">
+                  <span className="font-semibold text-gray-800">{totalProductsCount}</span>{" "}
+                  {totalProductsCount === 1 ? "Product" : "Products"} Available
                 </span>
                 {brand.website && (
                   <a

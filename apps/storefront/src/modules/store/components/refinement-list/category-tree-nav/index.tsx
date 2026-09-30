@@ -150,8 +150,8 @@ export default function CategoryTreeNav({
                 className={clsx(
                   "flex items-center justify-between py-1 px-1 rounded-md transition-colors group cursor-pointer",
                   {
-                    "text-primary font-bold bg-primary/5": isRootActive,
-                    "text-gray-900 hover:text-primary": !isRootActive,
+                    "text-primary font-semibold bg-primary/5": isRootActive,
+                    "text-gray-700 hover:text-primary": !isRootActive,
                   }
                 )}
               >
@@ -159,10 +159,17 @@ export default function CategoryTreeNav({
                   href={`/categories/${rootCat.handle}`}
                   className="flex-1 flex items-center justify-between pr-1 min-w-0"
                 >
-                  <span className="font-bold text-xs sm:text-[13px] text-gray-900 group-hover:text-primary transition-colors truncate">
+                  <span
+                    className={clsx(
+                      "text-xs sm:text-[13px] transition-colors truncate",
+                      isRootActive
+                        ? "font-semibold text-primary"
+                        : "font-medium text-gray-700 group-hover:text-primary"
+                    )}
+                  >
                     {rootCat.name}
                   </span>
-                  <span className="text-xs text-[#7b91a8] font-normal ml-2 shrink-0">
+                  <span className="text-xs text-gray-400 font-normal ml-2 shrink-0">
                     ({productCount})
                   </span>
                 </LocalizedClientLink>
@@ -202,15 +209,15 @@ export default function CategoryTreeNav({
                         className={clsx(
                           "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs",
                           {
-                            "text-primary font-bold": isChildActive,
-                            "text-gray-600 hover:text-gray-900": !isChildActive,
+                            "text-primary font-semibold": isChildActive,
+                            "text-gray-600 hover:text-primary": !isChildActive,
                           }
                         )}
                       >
                         <span className="truncate group-hover:underline">
                           {childCat.name}
                         </span>
-                        <span className="text-[11px] text-[#7b91a8] ml-1.5 shrink-0">
+                        <span className="text-[11px] text-gray-400 ml-1.5 shrink-0">
                           ({childCount})
                         </span>
                       </LocalizedClientLink>

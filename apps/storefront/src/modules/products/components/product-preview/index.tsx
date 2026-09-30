@@ -80,13 +80,13 @@ export default function ProductPreview({
 
         {/* Center: Info, Category, Title, Short Description */}
         <div className="flex-1 space-y-2 min-w-0">
-          <div className="text-[11px] font-medium text-gray-400">
+          <div className="text-[11px] font-medium text-gray-500">
             {categoriesString}
           </div>
 
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}
@@ -166,13 +166,13 @@ export default function ProductPreview({
       <div className="flex-1 flex flex-col justify-between">
         {/* Category Subtitle & Product Title */}
         <div className="space-y-1">
-          <div className="text-[11px] font-medium text-gray-400 line-clamp-1">
+          <div className="text-[11px] font-medium text-gray-500 line-clamp-1">
             {categoriesString}
           </div>
 
           <LocalizedClientLink href={`/products/${product.handle}`}>
             <h3
-              className="text-[13px] sm:text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="text-[13px] sm:text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
               {product.title}

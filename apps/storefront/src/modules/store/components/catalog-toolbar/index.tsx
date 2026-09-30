@@ -58,11 +58,12 @@ export default function CatalogToolbar({
         {/* Left: Result Count & Breadcrumb */}
         <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-xs text-gray-600 font-medium">
           {totalCount > 0 ? (
-            <span className="text-gray-900 font-bold">
-              {startItem}-{endItem} of {totalCount}
+            <span className="text-gray-500 font-normal">
+              <span className="text-gray-900 font-semibold">{startItem}–{endItem}</span> of{" "}
+              <span className="text-gray-900 font-semibold">{totalCount}</span>
             </span>
           ) : (
-            <span className="text-gray-500">0 products</span>
+            <span className="text-gray-500 font-normal">0 products</span>
           )}
 
           {/* Breadcrumb Path */}
@@ -85,7 +86,7 @@ export default function CatalogToolbar({
                     {crumb.name}
                   </LocalizedClientLink>
                 ) : (
-                  <span className="text-gray-800 font-bold bg-gray-100 px-1.5 py-0.5 rounded">
+                  <span className="text-gray-800 font-semibold bg-gray-100 px-2 py-0.5 rounded">
                     {crumb.name}
                   </span>
                 )}

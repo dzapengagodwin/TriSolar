@@ -85,7 +85,7 @@ const OptionsPicker = ({
               <Accordion.Header>
                 <Accordion.Trigger className="flex w-full items-center justify-between py-2.5 text-left group">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-900 group-hover:text-primary transition-colors">
+                    <span className="text-xs font-semibold text-gray-900 group-hover:text-primary transition-colors">
                       {option.title}
                     </span>
                     {selectedCount > 0 && (
