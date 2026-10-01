@@ -76,9 +76,9 @@ const RefinementList = ({
 
   return (
     <aside className="flex flex-col gap-y-6 py-2 mb-8 w-full small:w-[240px] medium:w-[260px] shrink-0 small:pr-6">
-      {/* Category Tree Navigation with counts */}
+      {/* Category Tree Navigation with counts (hidden on mobile) */}
       {!hideCategoryTree && categories.length > 0 && (
-        <div className="border-b border-gray-100 pb-5">
+        <div className="hidden small:block border-b border-gray-100 pb-5">
           <CategoryTreeNav
             categories={categories}
             activeCategoryHandle={activeCategoryHandle}
