@@ -19,6 +19,7 @@ const isDev = process.env.NODE_ENV === "development"
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
+  transpilePackages: ["@swc/helpers"],
   experimental: {
     serverActions: {
       bodySizeLimit: "20mb",
