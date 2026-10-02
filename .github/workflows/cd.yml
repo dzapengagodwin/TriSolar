@@ -23,6 +23,7 @@ jobs:
             cd /root/my-medusa-store
 
             echo "=== Updating source ==="
+            git config --global url."https://${{ secrets.TOKEN }}@github.com/".insteadOf "https://github.com/"
             git fetch origin
             git reset --hard origin/main
 
