@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation"
 import { Heart } from "@medusajs/icons"
 import Spinner from "@modules/common/icons/spinner"
 import ProductTrustBadge from "../product-trust-badge"
+import WhatsAppOrderButton from "../whatsapp-order-button"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -254,9 +255,9 @@ export default function ProductActions({
         <ProductPrice product={product} variant={selectedVariant} />
 
         {/* 3-Element Horizontal Buy Actions Row matching reference image */}
-        <div className="flex items-center gap-3 pt-2">
+        <div className="flex items-center gap-2 sm:gap-2.5 pt-2">
           {/* 1. Quantity Selector Pill */}
-          <div className="flex items-center justify-between bg-gray-50 border border-gray-200/90 rounded-full p-1 h-12 w-28 sm:w-32 shrink-0 shadow-2xs">
+          <div className="flex items-center justify-between bg-gray-50 border border-gray-200/90 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
             <button
               type="button"
               onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
@@ -280,7 +281,7 @@ export default function ProductActions({
             </button>
           </div>
 
-          {/* 2. Main Add to Cart Pill Button (Green) */}
+          {/* 2. Main Add to Cart Pill Button */}
           <button
             type="button"
             onClick={handleAddToCart}
@@ -292,14 +293,14 @@ export default function ProductActions({
               isAddingToWishlist ||
               !isValidVariant
             }
-            className="flex-1 h-12 rounded-full bg-primary hover:bg-orange-400 active:scale-[0.99] text-white font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="flex-1 min-w-0 h-12 rounded-full bg-primary hover:bg-orange-400 active:scale-[0.99] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 px-2.5 sm:px-3 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap overflow-hidden"
             data-testid="add-product-button"
           >
             {isAdding ? (
-              <Spinner className="w-4 h-4 animate-spin text-white" />
+              <Spinner className="w-4 h-4 animate-spin text-white shrink-0" />
             ) : (
               <>
-                <span>
+                <span className="truncate">
                   {!selectedVariant
                     ? "Select variant"
                     : !inStock || !isValidVariant
@@ -307,7 +308,7 @@ export default function ProductActions({
                     : "Add to Cart"}
                 </span>
                 <svg
-                  className="w-4 h-4 text-white"
+                  className="w-4 h-4 text-white shrink-0 hidden 2xl:inline"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -323,7 +324,15 @@ export default function ProductActions({
             )}
           </button>
 
-          {/* 3. Circular Wishlist Button */}
+          {/* 3. Order on WhatsApp Pill Button */}
+          <WhatsAppOrderButton
+            productTitle={product.title}
+            variantTitle={selectedVariant?.title}
+            size="full"
+            className="flex-1 min-w-0"
+          />
+
+          {/* 4. Circular Wishlist Button */}
           <button
             type="button"
             onClick={handleAddToWishlist}

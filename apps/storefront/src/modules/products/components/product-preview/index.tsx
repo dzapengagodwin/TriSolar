@@ -5,6 +5,7 @@ import { getProductImageAlt } from "@lib/seo"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import QuickAddToCart from "../quick-add-to-cart"
+import WhatsAppOrderButton from "../whatsapp-order-button"
 
 export default function ProductPreview({
   product,
@@ -118,11 +119,17 @@ export default function ProductPreview({
         <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
-          <QuickAddToCart
-            product={product}
-            size="lg"
-            viewMode="list"
-          />
+          <div className="w-full space-y-1.5">
+            <QuickAddToCart
+              product={product}
+              size="lg"
+              viewMode="list"
+            />
+            <WhatsAppOrderButton
+              productTitle={product.title}
+              size="lg"
+            />
+          </div>
         </div>
       </div>
     )
@@ -184,11 +191,15 @@ export default function ProductPreview({
         <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
-          <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+          <div className="space-y-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
             <QuickAddToCart
               product={product}
               size="md"
               viewMode="grid"
+            />
+            <WhatsAppOrderButton
+              productTitle={product.title}
+              size="md"
             />
           </div>
         </div>

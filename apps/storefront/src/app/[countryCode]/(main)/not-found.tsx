@@ -1,20 +1,40 @@
 import { Metadata } from "next"
-
-import InteractiveLink from "@modules/common/components/interactive-link"
+import { getRegion } from "@lib/data/regions"
+import { listProducts } from "@lib/data/products"
+import { HttpTypes } from "@medusajs/types"
+import NotFoundTemplate from "@modules/not-found/templates"
 
 export const metadata: Metadata = {
-  title: "404",
-  description: "Something went wrong",
+  title: "404 - Page Not Found | Laptopzone",
+  description:
+    "The page you are looking for could not be found. Discover popular laptops, gaming PCs, and tech accessories at Laptopzone.",
 }
 
-export default function NotFound() {
+export default async function NotFound() {
+  const region =
+    (await getRegion("zw").catch(() => null)) ||
+    (await getRegion("").catch(() => null))
+
+  let recommendedProducts: HttpTypes.StoreProduct[] = []
+
+  if (region?.id) {
+    const productsRes = await listProducts({
+      regionId: region.id,
+      queryParams: {
+        limit: 4,
+        fields: "*variants.calculated_price,*categories",
+      },
+    }).catch(() => ({ response: { products: [] } }))
+
+    recommendedProducts = productsRes.response?.products || []
+  }
+
   return (
-    <div className="flex flex-col gap-4 items-center justify-center min-h-[calc(100vh-64px)]">
-      <h1 className="text-2xl-semi text-ui-fg-base">Page not found</h1>
-      <p className="text-small-regular text-ui-fg-base">
-        The page you tried to access does not exist.
-      </p>
-      <InteractiveLink href="/">Go to frontpage</InteractiveLink>
-    </div>
+    <NotFoundTemplate
+      recommendedProducts={recommendedProducts}
+      region={region}
+      countryCode="zw"
+    />
   )
 }
+
