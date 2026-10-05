@@ -56,7 +56,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     }
 
     res.setHeader("Content-Type", "application/xml; charset=utf-8")
-    res.setHeader("Cache-Control", "public, max-age=3600, s-maxage=3600")
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate")
     return res.status(200).send(result.xml)
   } catch (error: any) {
     console.error("Failed to generate Google product feed:", error)

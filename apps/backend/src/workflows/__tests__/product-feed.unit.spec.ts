@@ -109,6 +109,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         metadata: {
           google_merchant: {
             google_product_category: "1294",
+            gtin: "0711719561012",
             product_type: "Ignored historical override",
             title: "Sony PlayStation 5 1TB Console",
             description: "Sony PlayStation 5 1TB console with 4K gaming.",
@@ -129,6 +130,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.title).toBe("Sony PlayStation 5 1TB Console")
       expect(item.description).toBe("Long generic copy")
       expect(item.google_product_category).toBe("1294")
+      expect(item.gtin).toBe("0711719561012")
       expect(item.product_type).toBe("Gaming Consoles")
       expect(item.mpn).toBeUndefined()
     })
@@ -223,6 +225,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
           item_group_id: "prod_legion",
           condition: "new",
           brand: "Lenovo",
+          gtin: "0193638987654",
           mpn: "LEGION-5-PRO",
           identifier_exists: "yes",
           google_product_category: "Electronics > Computers > Laptops",
@@ -240,8 +243,12 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(xml).toContain("<g:sale_price>1350.00 USD</g:sale_price>")
       expect(xml).toContain("<g:item_group_id>prod_legion</g:item_group_id>")
       expect(xml).toContain("<g:brand><![CDATA[Lenovo]]></g:brand>")
+      expect(xml).toContain("<g:gtin>0193638987654</g:gtin>")
       expect(xml).toContain("<g:mpn>LEGION-5-PRO</g:mpn>")
       expect(xml).toContain("<g:identifier_exists>yes</g:identifier_exists>")
+      expect(xml).toContain(
+        "<g:google_product_category><![CDATA[Electronics > Computers > Laptops]]></g:google_product_category>"
+      )
       expect(xml).toContain("</rss>")
     })
   })

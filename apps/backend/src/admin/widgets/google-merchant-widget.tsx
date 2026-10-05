@@ -15,6 +15,7 @@ type Product = {
 type MerchantFields = {
   google_product_category: string
   title: string
+  gtin: string
   mpn: string
   identifier_exists: "" | "yes" | "no"
   excluded: boolean
@@ -23,6 +24,7 @@ type MerchantFields = {
 const emptyFields: MerchantFields = {
   google_product_category: "",
   title: "",
+  gtin: "",
   mpn: "",
   identifier_exists: "",
   excluded: false,
@@ -54,6 +56,7 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
     setFields({
       google_product_category: taxonomyCategory?.[0] || savedCategory,
       title: merchant.title || "",
+      gtin: merchant.gtin || (metadata.gtin as string) || "",
       mpn: merchant.mpn || (metadata.manufacturer_mpn as string) || "",
       identifier_exists:
         merchant.identifier_exists === "yes" || merchant.identifier_exists === "no"
@@ -186,6 +189,14 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
           )}
         </div>
         <div className="grid gap-2"><Label size="small">Feed title override</Label><Input value={fields.title} placeholder="Uses product and variant title" onChange={(event) => set("title", event.target.value)} /></div>
+        <div className="grid gap-2">
+          <Label size="small">Global Trade Item Number (GTIN)</Label>
+          <Input
+            value={fields.gtin}
+            placeholder="Enter the manufacturer-assigned GTIN"
+            onChange={(event) => set("gtin", event.target.value)}
+          />
+        </div>
         <div className="grid gap-2"><Label size="small">Manufacturer part number (MPN)</Label><Input value={fields.mpn} onChange={(event) => set("mpn", event.target.value)} /></div>
         <div className="grid gap-2">
           <Label size="small">Identifier exists</Label>

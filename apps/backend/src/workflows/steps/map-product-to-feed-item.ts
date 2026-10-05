@@ -161,8 +161,11 @@ export function mapProductToFeedItem(
     (variant.barcode as string) ||
     (variant.ean as string) ||
     (variant.upc as string) ||
+    (variantMerchant.gtin as string) ||
     (variant.metadata?.gtin as string) ||
-    (variant.metadata?.barcode as string)
+    (variant.metadata?.barcode as string) ||
+    (merchant.gtin as string) ||
+    (product.metadata?.gtin as string)
 
   const mpn =
     (variantMerchant.mpn as string) ||
