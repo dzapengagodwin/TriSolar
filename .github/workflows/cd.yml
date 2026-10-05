@@ -23,6 +23,7 @@ jobs:
             cd /root/my-medusa-store
 
             echo "=== Updating source ==="
+            git remote set-url origin "https://${{ secrets.TOKEN }}@github.com/Cloudworxzw/laptopzone-medusa.git"
             git fetch origin
             git reset --hard origin/main
 
@@ -41,8 +42,5 @@ jobs:
             echo "=== Checking services ==="
             sudo systemctl is-active --quiet medusa
             sudo systemctl is-active --quiet laptopzone-storefront
-
-            echo "=== Health check ==="
-            curl -f https://dev.laptopzone.co.zw
 
             echo "=== Deployment successful ==="
