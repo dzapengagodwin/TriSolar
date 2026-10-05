@@ -85,7 +85,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.item_group_id).toBe("prod_thinkpad")
       expect(item.title).toBe("Lenovo ThinkPad E14 - 16GB RAM / 512GB SSD")
       expect(item.description).toBe("Powerful AMD Ryzen laptop with FHD display.")
-      expect(item.link).toBe("https://laptopzone.co.zw/zw/products/lenovo-thinkpad-e14?variant=variant_16_512")
+      expect(item.link).toBe("https://laptopzone.co.zw/products/lenovo-thinkpad-e14")
       expect(item.image_link).toBe("https://laptopzone.co.zw/images/thinkpad.jpg")
       expect(item.additional_image_link).toEqual(["https://laptopzone.co.zw/images/thinkpad-side.jpg"])
       expect(item.availability).toBe("in_stock")
@@ -93,10 +93,44 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.sale_price).toBe("850.00 USD")
       expect(item.brand).toBe("Lenovo")
       expect(item.gtin).toBe("195477889900")
-      expect(item.mpn).toBe("E14-16-512")
+      expect(item.mpn).toBeUndefined()
       expect(item.identifier_exists).toBe("yes")
       expect(item.product_type).toBe("Laptops")
+      expect(item.google_product_category).toBeUndefined()
       expect(item.custom_label_0).toBe("Business Laptops")
+    })
+
+    it("uses explicit Merchant overrides and never exports an unverified SKU as MPN", () => {
+      const product = {
+        id: "prod_ps5",
+        title: "Sony PlayStation 5 1TB Console",
+        handle: "sony-playstation-5-1tb-console",
+        description: "Long generic copy",
+        metadata: {
+          google_merchant: {
+            google_product_category: "1294",
+            product_type: "Gaming Consoles > PlayStation 5",
+            title: "Sony PlayStation 5 1TB Console",
+            description: "Sony PlayStation 5 1TB console with 4K gaming.",
+          },
+        },
+        categories: [{ name: "Gaming Consoles" }],
+      }
+      const variant = {
+        id: "variant_ps5",
+        title: "Default Value",
+        sku: "PS5-1000",
+        manage_inventory: false,
+        prices: [{ amount: 995, currency_code: "USD" }],
+      }
+
+      const item = mapProductToFeedItem(product, variant, sampleConfig)
+
+      expect(item.title).toBe("Sony PlayStation 5 1TB Console")
+      expect(item.description).toBe("Sony PlayStation 5 1TB console with 4K gaming.")
+      expect(item.google_product_category).toBe("1294")
+      expect(item.product_type).toBe("Gaming Consoles > PlayStation 5")
+      expect(item.mpn).toBeUndefined()
     })
   })
 

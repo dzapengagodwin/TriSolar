@@ -1,0 +1,205 @@
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import { Button, Checkbox, Container, Input, Label, Text, Textarea, toast } from "@medusajs/ui"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useEffect, useMemo, useState } from "react"
+import googleProductTaxonomy from "../data/google-product-taxonomy.json"
+import { sdk } from "../lib/sdk"
+
+const taxonomy = googleProductTaxonomy as [string, string][]
+
+type Product = {
+  id: string
+  metadata?: Record<string, unknown> | null
+}
+
+type MerchantFields = {
+  google_product_category: string
+  product_type: string
+  title: string
+  description: string
+  mpn: string
+  manufacturer_mpn_verified: boolean
+  identifier_exists: "" | "yes" | "no"
+  excluded: boolean
+}
+
+const emptyFields: MerchantFields = {
+  google_product_category: "",
+  product_type: "",
+  title: "",
+  description: "",
+  mpn: "",
+  manufacturer_mpn_verified: false,
+  identifier_exists: "",
+  excluded: false,
+}
+
+const selectClassName = "bg-ui-bg-field shadow-buttons-neutral text-ui-fg-base focus-visible:shadow-borders-interactive-with-active flex h-8 w-full rounded-md border border-ui-border-base px-2 text-sm outline-none"
+
+const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
+  const queryClient = useQueryClient()
+  const [fields, setFields] = useState<MerchantFields>(emptyFields)
+  const [categorySearch, setCategorySearch] = useState("")
+  const [categorySearchOpen, setCategorySearchOpen] = useState(false)
+
+  const { data: response, isLoading, isError } = useQuery({
+    queryKey: ["google-merchant-product", data.id],
+    queryFn: () => sdk.admin.product.retrieve(data.id, { fields: "+metadata" }),
+  })
+
+  const product = response?.product as Product | undefined
+  useEffect(() => {
+    const metadata = product?.metadata || {}
+    const merchant = (metadata.google_merchant || {}) as Partial<MerchantFields>
+    const savedCategory =
+      merchant.google_product_category || (metadata.google_product_category as string) || ""
+    const taxonomyCategory = taxonomy.find(
+      ([id, path]) => id === savedCategory || path === savedCategory
+    )
+
+    setFields({
+      ...emptyFields,
+      ...merchant,
+      google_product_category: taxonomyCategory?.[0] || savedCategory,
+      mpn: merchant.mpn || (metadata.manufacturer_mpn as string) || "",
+      manufacturer_mpn_verified:
+        merchant.manufacturer_mpn_verified === true || metadata.manufacturer_mpn_verified === true,
+    })
+  }, [product])
+
+  const selectedCategory = taxonomy.find(
+    ([id]) => id === fields.google_product_category
+  )
+  const categoryResults = useMemo(() => {
+    const search = categorySearch.trim().toLocaleLowerCase()
+    if (search.length === 0) return []
+
+    return taxonomy
+      .filter(([id, path]) => `${id} ${path}`.toLocaleLowerCase().includes(search))
+      .slice(0, 50)
+  }, [categorySearch])
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!product) throw new Error("Product data is not loaded")
+      const existing = product.metadata || {}
+      const remaining = Object.fromEntries(
+        Object.entries(existing).filter(
+          ([key]) =>
+            ![
+              "google_product_category",
+              "manufacturer_mpn",
+              "manufacturer_mpn_verified",
+              "mpn",
+            ].includes(key)
+        )
+      )
+      const google_merchant = Object.fromEntries(
+        Object.entries(fields).filter(([, value]) => value !== "" && value !== false)
+      )
+      return sdk.admin.product.update(data.id, {
+        metadata: { ...remaining, google_merchant },
+      })
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["google-merchant-product", data.id] })
+      await queryClient.invalidateQueries({ queryKey: ["product", data.id] })
+      toast.success("Google Merchant settings saved")
+    },
+    onError: (error) => toast.error(error.message || "Could not save Google Merchant settings"),
+  })
+
+  const set = <K extends keyof MerchantFields>(key: K, value: MerchantFields[K]) =>
+    setFields((current) => ({ ...current, [key]: value }))
+
+  if (isLoading) return <Container><Text>Loading Google Merchant settings…</Text></Container>
+  if (isError || !product) return <Container><Text>Google Merchant settings could not be loaded.</Text></Container>
+
+  return (
+    <Container className="divide-y p-0">
+      <div className="px-6 py-4">
+        <Text size="small" leading="compact" weight="plus">Google Merchant</Text>
+        <Text size="small" className="text-ui-fg-subtle">Set a predefined Google category for this product. Unset categories are omitted from the feed.</Text>
+      </div>
+      <div className="grid gap-4 px-6 py-4">
+        <div className="grid gap-2">
+          <Label size="small">Google product category</Label>
+          <Text size="small" className="text-ui-fg-subtle">
+            {selectedCategory
+              ? `${selectedCategory[1]} (ID: ${selectedCategory[0]})`
+              : fields.google_product_category || "No category selected"}
+          </Text>
+          <Input
+            value={categorySearch}
+            placeholder={`Search all ${taxonomy.length.toLocaleString()} Google categories by name or ID`}
+            onFocus={() => setCategorySearchOpen(true)}
+            onChange={(event) => {
+              setCategorySearch(event.target.value)
+              setCategorySearchOpen(true)
+            }}
+          />
+          {categorySearchOpen && categorySearch.trim().length > 0 && (
+            <div
+              className="max-h-64 overflow-y-auto rounded-md border border-ui-border-base bg-ui-bg-base"
+              role="listbox"
+              aria-label="Google product categories"
+            >
+              {categoryResults.length > 0 ? (
+                categoryResults.map(([id, path]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className="block w-full px-3 py-2 text-left text-sm hover:bg-ui-bg-base-hover"
+                    onClick={() => {
+                      set("google_product_category", id)
+                      setCategorySearch("")
+                      setCategorySearchOpen(false)
+                    }}
+                    role="option"
+                    aria-selected={fields.google_product_category === id}
+                  >
+                    {path} <span className="text-ui-fg-subtle">({id})</span>
+                  </button>
+                ))
+              ) : (
+                <Text size="small" className="block px-3 py-2 text-ui-fg-subtle">
+                  No matching Google categories
+                </Text>
+              )}
+            </div>
+          )}
+          {fields.google_product_category && (
+            <Button
+              size="small"
+              variant="secondary"
+              onClick={() => set("google_product_category", "")}
+            >
+              Clear category
+            </Button>
+          )}
+        </div>
+        <div className="grid gap-2"><Label size="small">Product type (your store taxonomy)</Label><Input value={fields.product_type} placeholder="Gaming Consoles > PlayStation 5" onChange={(event) => set("product_type", event.target.value)} /></div>
+        <div className="grid gap-2"><Label size="small">Feed title override</Label><Input value={fields.title} placeholder="Uses product and variant title" onChange={(event) => set("title", event.target.value)} /></div>
+        <div className="grid gap-2"><Label size="small">Feed description override</Label><Textarea value={fields.description} placeholder="Uses product description" onChange={(event) => set("description", event.target.value)} /></div>
+        <div className="grid gap-2"><Label size="small">Manufacturer part number (MPN)</Label><Input value={fields.mpn} onChange={(event) => set("mpn", event.target.value)} /></div>
+        <Checkbox checked={fields.manufacturer_mpn_verified} onCheckedChange={(checked) => set("manufacturer_mpn_verified", checked === true)}>
+          <Text size="small">This MPN was assigned by the manufacturer</Text>
+        </Checkbox>
+        <div className="grid gap-2">
+          <Label size="small">Identifier exists</Label>
+          <select className={selectClassName} value={fields.identifier_exists} onChange={(event) => set("identifier_exists", event.target.value as MerchantFields["identifier_exists"])}>
+            <option value="">Determine automatically</option><option value="yes">Yes</option><option value="no">No</option>
+          </select>
+        </div>
+        <Checkbox checked={fields.excluded} onCheckedChange={(checked) => set("excluded", checked === true)}>
+          <Text size="small">Exclude this product from the Google feed</Text>
+        </Checkbox>
+        <div className="flex justify-end"><Button size="small" onClick={() => save.mutate()} isLoading={save.isPending} disabled={save.isPending}>Save Merchant settings</Button></div>
+      </div>
+    </Container>
+  )
+}
+
+export const config = defineWidgetConfig({ zone: "product.details.after" })
+
+export default GoogleMerchantWidget

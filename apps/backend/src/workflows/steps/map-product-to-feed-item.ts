@@ -28,25 +28,28 @@ export function mapProductToFeedItem(
   config: ProductFeedConfig
 ): ProductFeedItem {
   const currencyUpper = config.currency_code.toUpperCase()
-  const countryLower = config.country_code.toLowerCase()
+  const merchant = (product.metadata?.google_merchant || {}) as Record<string, unknown>
+  const variantMerchant = (variant.metadata?.google_merchant || {}) as Record<string, unknown>
 
   // 1. Title formatting (include variant options if not default)
-  let title = product.title || ""
+  let title = (cleanDescription(merchant.title as string) || product.title || "")
   const isDefaultVariant =
     !variant.title ||
     variant.title.toLowerCase() === "default" ||
-    variant.title.toLowerCase() === "default variant"
+    variant.title.toLowerCase() === "default variant" ||
+    variant.title.toLowerCase() === "default value"
 
-  if (!isDefaultVariant && variant.title) {
+  if (!merchant.title && !isDefaultVariant && variant.title) {
     title = `${product.title} - ${variant.title}`
-  } else if (variant.options && variant.options.length > 0) {
+  } else if (!merchant.title && variant.options && variant.options.length > 0) {
     const optValues = variant.options
       .map((opt: any) => opt.value)
       .filter(
         (val: string) =>
           val &&
           val.toLowerCase() !== "default" &&
-          val.toLowerCase() !== "default variant"
+          val.toLowerCase() !== "default variant" &&
+          val.toLowerCase() !== "default value"
       )
     if (optValues.length > 0) {
       title = `${product.title} - ${optValues.join(" / ")}`
@@ -55,13 +58,14 @@ export function mapProductToFeedItem(
 
   // 2. Clean plain-text description
   const description =
+    cleanDescription(merchant.description as string) ||
     cleanDescription(product.description) ||
     cleanDescription(product.subtitle) ||
     title
 
   // 3. Link generation
   const baseStorefrontUrl = config.storefront_url.replace(/\/+$/, "")
-  const link = `${baseStorefrontUrl}/${countryLower}/products/${product.handle}?variant=${variant.id}`
+  const link = `${baseStorefrontUrl}/products/${product.handle}`
 
   // 4. Primary and additional images
   const primaryImage =
@@ -162,22 +166,22 @@ export function mapProductToFeedItem(
     (variant.metadata?.barcode as string)
 
   const mpn =
-    (variant.sku as string) ||
-    (variant.metadata?.mpn as string) ||
-    (variant.metadata?.part_number as string) ||
-    (product.metadata?.mpn as string)
+    (variantMerchant.manufacturer_mpn_verified === true ? variantMerchant.mpn as string : undefined) ||
+    (variant.metadata?.manufacturer_mpn_verified === true ? variant.metadata?.manufacturer_mpn as string : undefined) ||
+    (merchant.manufacturer_mpn_verified === true ? merchant.mpn as string : undefined) ||
+    (product.metadata?.manufacturer_mpn_verified === true ? product.metadata?.manufacturer_mpn as string : undefined)
 
   // 9. Categories and Product Type
   const categoryNames = (product.categories || []).map((c: any) => c.name)
   const productType =
-    categoryNames.length > 0
+    (cleanDescription(merchant.product_type as string) || undefined) ||
+    (categoryNames.length > 0
       ? categoryNames.join(" > ")
-      : (product.collection?.title as string) || undefined
+      : (product.collection?.title as string) || undefined)
 
   const googleCategory =
-    (product.metadata?.google_product_category as string) ||
-    config.default_category ||
-    "Electronics > Computers > Laptops"
+    (cleanDescription(merchant.google_product_category as string) || undefined) ||
+    (product.metadata?.google_product_category as string)
 
   // 10. Condition
   const condition =
@@ -201,7 +205,11 @@ export function mapProductToFeedItem(
     brand,
     gtin,
     mpn,
-    identifier_exists: gtin || (brand && mpn) ? "yes" : "no",
+    identifier_exists: (variantMerchant.identifier_exists === "yes" || variantMerchant.identifier_exists === "no"
+      ? variantMerchant.identifier_exists
+      : merchant.identifier_exists === "yes" || merchant.identifier_exists === "no"
+        ? merchant.identifier_exists
+        : gtin || (brand && mpn) ? "yes" : "no"),
     google_product_category: googleCategory,
     product_type: productType,
     custom_label_0: product.collection?.title || undefined,

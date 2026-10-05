@@ -12,8 +12,8 @@ import { HttpTypes } from "@medusajs/types"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
 import isEqual from "lodash/isEqual"
-import { useParams, usePathname, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState, Suspense } from "react"
+import { useParams, useSearchParams } from "next/navigation"
+import { Dispatch, SetStateAction, Suspense, useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
@@ -37,33 +37,26 @@ const optionsAsKeymap = (
   }, {})
 }
 
-function VariantUrlSync({
-  selectedVariantId,
-  pathname,
-  router,
+function LegacyVariantInitializer({
+  variants,
+  setOptions,
 }: {
-  selectedVariantId?: string
-  pathname: string
-  router: ReturnType<typeof useRouter>
+  variants?: HttpTypes.StoreProductVariant[]
+  setOptions: Dispatch<SetStateAction<Record<string, string | undefined>>>
 }) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams ? searchParams.toString() : "")
-    const value = selectedVariantId || null
+    const initialVariantId = searchParams.get("v_id")
+    if (!initialVariantId) return
 
-    if (params.get("v_id") === value) {
-      return
+    const initialVariant = variants?.find(
+      (variant) => variant.id === initialVariantId
+    )
+    if (initialVariant) {
+      setOptions(optionsAsKeymap(initialVariant.options) ?? {})
     }
-
-    if (value) {
-      params.set("v_id", value)
-    } else {
-      params.delete("v_id")
-    }
-
-    router.replace(pathname + "?" + params.toString())
-  }, [selectedVariantId, pathname, router, searchParams])
+  }, [searchParams, setOptions, variants])
 
   return null
 }
@@ -73,7 +66,6 @@ export default function ProductActions({
   disabled,
 }: ProductActionsProps) {
   const router = useRouter()
-  const pathname = usePathname()
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [quantity, setQuantity] = useState(1)
@@ -223,10 +215,9 @@ export default function ProductActions({
   return (
     <>
       <Suspense fallback={null}>
-        <VariantUrlSync
-          selectedVariantId={isValidVariant ? selectedVariant?.id : undefined}
-          pathname={pathname}
-          router={router}
+        <LegacyVariantInitializer
+          variants={product.variants}
+          setOptions={setOptions}
         />
       </Suspense>
       <div className="flex flex-col gap-y-3" ref={actionsRef}>

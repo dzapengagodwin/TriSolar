@@ -69,6 +69,11 @@ export const getProductFeedItemsStep = createStep(
     const diagnostics: ProductFeedDiagnostic[] = []
 
     for (const product of products || []) {
+      const merchant = (product.metadata?.google_merchant || {}) as Record<string, unknown>
+      if (merchant.excluded === true) {
+        continue
+      }
+
       const variants = product.variants || []
 
       for (const variant of variants) {

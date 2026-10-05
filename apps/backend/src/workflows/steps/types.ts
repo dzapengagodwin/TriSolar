@@ -31,7 +31,6 @@ export interface ProductFeedConfig {
   sales_channel_id?: string
   feed_title?: string
   feed_description?: string
-  default_category?: string
 }
 
 export interface ProductFeedDiagnostic {

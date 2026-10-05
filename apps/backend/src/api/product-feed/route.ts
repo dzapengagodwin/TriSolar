@@ -37,7 +37,6 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     feed_title: "Laptopzone - Google Merchant Center Product Feed",
     feed_description:
       "Official live product catalog feed for Laptopzone electronics and laptops",
-    default_category: "Electronics > Computers > Laptops",
   }
 
   try {
