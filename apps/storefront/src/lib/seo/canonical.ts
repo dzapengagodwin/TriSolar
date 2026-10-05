@@ -14,17 +14,15 @@ export function getCanonicalUrl(
     cleanPath = `/${cleanPath}`
   }
 
-  // If path doesn't include countryCode, prepend it
   const segments = cleanPath.split("/").filter(Boolean)
   if (segments.length === 0) {
-    return `${baseUrl}/${countryCode.toLowerCase()}`
+    return baseUrl
   }
 
-  if (segments[0] !== countryCode.toLowerCase()) {
-    return `${baseUrl}/${countryCode.toLowerCase()}${cleanPath}`
-  }
-
-  return `${baseUrl}${cleanPath}`
+  const normalizedPath = segments[0] === countryCode.toLowerCase()
+    ? `/${segments.slice(1).join("/")}`
+    : cleanPath
+  return `${baseUrl}${normalizedPath || "/"}`
 }
 
 /**

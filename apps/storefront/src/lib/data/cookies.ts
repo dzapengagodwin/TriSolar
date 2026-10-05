@@ -1,6 +1,27 @@
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 
+export const COUNTRY_CODE_COOKIE_NAME = "_medusa_country_code"
+
+export const getCountryCode = async (): Promise<string> => {
+  try {
+    const cookieStore = await nextCookies()
+    return cookieStore.get(COUNTRY_CODE_COOKIE_NAME)?.value?.toLowerCase() || "zw"
+  } catch {
+    return "zw"
+  }
+}
+
+export const setCountryCode = async (countryCode: string) => {
+  const cookieStore = await nextCookies()
+  cookieStore.set(COUNTRY_CODE_COOKIE_NAME, countryCode.toLowerCase(), {
+    maxAge: 60 * 60 * 24 * 365,
+    httpOnly: false,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+}
+
 export const getAuthHeaders = async (): Promise<
   { authorization: string } | Record<string, never>
 > => {

@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server"
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "dk"
+const DEFAULT_COUNTRY = "zw"
+const COUNTRY_COOKIE = "_medusa_country_code"
 
 const regionMapCache = {
   regionMap: new Map<string, HttpTypes.StoreRegion>(),
@@ -70,9 +72,10 @@ async function getCountryCode(
   request: NextRequest,
   regionMap: Map<string, HttpTypes.StoreRegion | number>
 ) {
-  let countryCode
-
-  const urlCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
+  const cookieCountryCode = request.cookies.get(COUNTRY_COOKIE)?.value?.toLowerCase()
+  if (cookieCountryCode && regionMap.has(cookieCountryCode)) {
+    return cookieCountryCode
+  }
 
   // Cloudflare Workers provides country via request.cf.country
   const cloudflareCountryCode = (request as { cf?: { country?: string } }).cf?.country?.toLowerCase()
@@ -82,19 +85,11 @@ async function getCountryCode(
     .get("x-vercel-ip-country")
     ?.toLowerCase()
 
-  if (urlCountryCode && regionMap.has(urlCountryCode)) {
-    countryCode = urlCountryCode
-  } else if (cloudflareCountryCode && regionMap.has(cloudflareCountryCode)) {
-    countryCode = cloudflareCountryCode
-  } else if (vercelCountryCode && regionMap.has(vercelCountryCode)) {
-    countryCode = vercelCountryCode
-  } else if (regionMap.has(DEFAULT_REGION)) {
-    countryCode = DEFAULT_REGION
-  } else if (regionMap.keys().next().value) {
-    countryCode = regionMap.keys().next().value
-  }
-
-  return countryCode
+  if (cloudflareCountryCode && regionMap.has(cloudflareCountryCode)) return cloudflareCountryCode
+  if (vercelCountryCode && regionMap.has(vercelCountryCode)) return vercelCountryCode
+  if (regionMap.has(DEFAULT_COUNTRY)) return DEFAULT_COUNTRY
+  if (regionMap.has(DEFAULT_REGION)) return DEFAULT_REGION
+  return regionMap.keys().next().value
 }
 
 /**
@@ -109,31 +104,41 @@ export async function middleware(request: NextRequest) {
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
 
   const regionMap = await getRegionMap(cacheId)
-  const countryCode = await getCountryCode(request, regionMap)
+  const pathCountryCode = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
+  const countryCode = pathCountryCode && regionMap.has(pathCountryCode)
+    ? pathCountryCode
+    : (await getCountryCode(request, regionMap)) || DEFAULT_COUNTRY
 
-  // if the country code is available, use it, otherwise use the default region
-  const country = countryCode || DEFAULT_REGION
-  const firstPathSegment = request.nextUrl.pathname.split("/")[1]?.toLowerCase()
-  const urlHasCountry = firstPathSegment === country.toLowerCase()
-
-  if (urlHasCountry) {
-    if (!cacheIdCookie) {
-      const response = NextResponse.next()
-      response.cookies.set("_medusa_cache_id", cacheId, {
-        maxAge: 60 * 60 * 24,
-      })
-      return response
-    }
-    return NextResponse.next()
+  // Permanently remove legacy country prefixes and retain their country choice.
+  if (pathCountryCode && regionMap.has(pathCountryCode)) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = request.nextUrl.pathname.replace(/^\/[a-z]{2}(?=\/|$)/i, "") || "/"
+    const response = NextResponse.redirect(redirectUrl, 308)
+    response.cookies.set(COUNTRY_COOKIE, countryCode, {
+      maxAge: 60 * 60 * 24 * 365,
+      httpOnly: false,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    })
+    if (!cacheIdCookie) response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
+    return response
   }
 
-  // if the url doesn't have the country, redirect to it
-  const redirectPath =
-    request.nextUrl.pathname === "/" ? "" : request.nextUrl.pathname
-  const queryString = request.nextUrl.search || ""
-  const redirectUrl = `${request.nextUrl.origin}/${country}${redirectPath}${queryString}`
-
-  return NextResponse.redirect(redirectUrl, 307)
+  // Keep the route parameter available to the existing Medusa pages while
+  // serving countryless public URLs. This is an internal rewrite, not a URL redirect.
+  const rewriteUrl = request.nextUrl.clone()
+  rewriteUrl.pathname = `/${countryCode}${request.nextUrl.pathname}`
+  const response = NextResponse.rewrite(rewriteUrl)
+  response.cookies.set(COUNTRY_COOKIE, countryCode, {
+    maxAge: 60 * 60 * 24 * 365,
+    httpOnly: false,
+    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+  })
+  if (!cacheIdCookie) {
+    response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
+  }
+  return response
 }
 
 export const config = {
