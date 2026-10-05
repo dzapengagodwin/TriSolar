@@ -58,7 +58,6 @@ export function mapProductToFeedItem(
 
   // 2. Clean plain-text description
   const description =
-    cleanDescription(merchant.description as string) ||
     cleanDescription(product.description) ||
     cleanDescription(product.subtitle) ||
     title
@@ -166,15 +165,17 @@ export function mapProductToFeedItem(
     (variant.metadata?.barcode as string)
 
   const mpn =
-    (variantMerchant.manufacturer_mpn_verified === true ? variantMerchant.mpn as string : undefined) ||
-    (variant.metadata?.manufacturer_mpn_verified === true ? variant.metadata?.manufacturer_mpn as string : undefined) ||
-    (merchant.manufacturer_mpn_verified === true ? merchant.mpn as string : undefined) ||
-    (product.metadata?.manufacturer_mpn_verified === true ? product.metadata?.manufacturer_mpn as string : undefined)
+    (variantMerchant.mpn as string) ||
+    (variant.metadata?.manufacturer_mpn as string) ||
+    (variant.metadata?.mpn as string) ||
+    (variant.metadata?.part_number as string) ||
+    (merchant.mpn as string) ||
+    (product.metadata?.manufacturer_mpn as string) ||
+    (product.metadata?.mpn as string)
 
   // 9. Categories and Product Type
   const categoryNames = (product.categories || []).map((c: any) => c.name)
   const productType =
-    (cleanDescription(merchant.product_type as string) || undefined) ||
     (categoryNames.length > 0
       ? categoryNames.join(" > ")
       : (product.collection?.title as string) || undefined)

@@ -1,5 +1,5 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { Button, Checkbox, Container, Input, Label, Text, Textarea, toast } from "@medusajs/ui"
+import { Button, Checkbox, Container, Input, Label, Text, toast } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useMemo, useState } from "react"
 import googleProductTaxonomy from "../data/google-product-taxonomy.json"
@@ -14,22 +14,16 @@ type Product = {
 
 type MerchantFields = {
   google_product_category: string
-  product_type: string
   title: string
-  description: string
   mpn: string
-  manufacturer_mpn_verified: boolean
   identifier_exists: "" | "yes" | "no"
   excluded: boolean
 }
 
 const emptyFields: MerchantFields = {
   google_product_category: "",
-  product_type: "",
   title: "",
-  description: "",
   mpn: "",
-  manufacturer_mpn_verified: false,
   identifier_exists: "",
   excluded: false,
 }
@@ -58,12 +52,14 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
     )
 
     setFields({
-      ...emptyFields,
-      ...merchant,
       google_product_category: taxonomyCategory?.[0] || savedCategory,
+      title: merchant.title || "",
       mpn: merchant.mpn || (metadata.manufacturer_mpn as string) || "",
-      manufacturer_mpn_verified:
-        merchant.manufacturer_mpn_verified === true || metadata.manufacturer_mpn_verified === true,
+      identifier_exists:
+        merchant.identifier_exists === "yes" || merchant.identifier_exists === "no"
+          ? merchant.identifier_exists
+          : "",
+      excluded: merchant.excluded === true,
     })
   }, [product])
 
@@ -124,11 +120,22 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
       <div className="grid gap-4 px-6 py-4">
         <div className="grid gap-2">
           <Label size="small">Google product category</Label>
-          <Text size="small" className="text-ui-fg-subtle">
-            {selectedCategory
-              ? `${selectedCategory[1]} (ID: ${selectedCategory[0]})`
-              : fields.google_product_category || "No category selected"}
-          </Text>
+          <div className="rounded-md border border-ui-border-base bg-ui-bg-subtle px-3 py-2">
+            {selectedCategory ? (
+              <div className="flex flex-col gap-1">
+                <Text size="small" leading="normal" className="break-words whitespace-normal text-ui-fg-base">
+                  {selectedCategory[1]}
+                </Text>
+                <Text size="xsmall" className="text-ui-fg-subtle">
+                  Google category ID: {selectedCategory[0]}
+                </Text>
+              </div>
+            ) : (
+              <Text size="small" className="text-ui-fg-subtle">
+                {fields.google_product_category || "No category selected"}
+              </Text>
+            )}
+          </div>
           <Input
             value={categorySearch}
             placeholder={`Search all ${taxonomy.length.toLocaleString()} Google categories by name or ID`}
@@ -178,22 +185,27 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
             </Button>
           )}
         </div>
-        <div className="grid gap-2"><Label size="small">Product type (your store taxonomy)</Label><Input value={fields.product_type} placeholder="Gaming Consoles > PlayStation 5" onChange={(event) => set("product_type", event.target.value)} /></div>
         <div className="grid gap-2"><Label size="small">Feed title override</Label><Input value={fields.title} placeholder="Uses product and variant title" onChange={(event) => set("title", event.target.value)} /></div>
-        <div className="grid gap-2"><Label size="small">Feed description override</Label><Textarea value={fields.description} placeholder="Uses product description" onChange={(event) => set("description", event.target.value)} /></div>
         <div className="grid gap-2"><Label size="small">Manufacturer part number (MPN)</Label><Input value={fields.mpn} onChange={(event) => set("mpn", event.target.value)} /></div>
-        <Checkbox checked={fields.manufacturer_mpn_verified} onCheckedChange={(checked) => set("manufacturer_mpn_verified", checked === true)}>
-          <Text size="small">This MPN was assigned by the manufacturer</Text>
-        </Checkbox>
         <div className="grid gap-2">
           <Label size="small">Identifier exists</Label>
           <select className={selectClassName} value={fields.identifier_exists} onChange={(event) => set("identifier_exists", event.target.value as MerchantFields["identifier_exists"])}>
             <option value="">Determine automatically</option><option value="yes">Yes</option><option value="no">No</option>
           </select>
         </div>
-        <Checkbox checked={fields.excluded} onCheckedChange={(checked) => set("excluded", checked === true)}>
-          <Text size="small">Exclude this product from the Google feed</Text>
-        </Checkbox>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="google-merchant-excluded"
+            checked={fields.excluded}
+            onCheckedChange={(checked) => set("excluded", checked === true)}
+          />
+          <Label
+            htmlFor="google-merchant-excluded"
+            className="cursor-pointer text-sm font-normal"
+          >
+            Exclude this product from the Google feed
+          </Label>
+        </div>
         <div className="flex justify-end"><Button size="small" onClick={() => save.mutate()} isLoading={save.isPending} disabled={save.isPending}>Save Merchant settings</Button></div>
       </div>
     </Container>

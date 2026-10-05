@@ -109,7 +109,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         metadata: {
           google_merchant: {
             google_product_category: "1294",
-            product_type: "Gaming Consoles > PlayStation 5",
+            product_type: "Ignored historical override",
             title: "Sony PlayStation 5 1TB Console",
             description: "Sony PlayStation 5 1TB console with 4K gaming.",
           },
@@ -127,10 +127,29 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       const item = mapProductToFeedItem(product, variant, sampleConfig)
 
       expect(item.title).toBe("Sony PlayStation 5 1TB Console")
-      expect(item.description).toBe("Sony PlayStation 5 1TB console with 4K gaming.")
+      expect(item.description).toBe("Long generic copy")
       expect(item.google_product_category).toBe("1294")
-      expect(item.product_type).toBe("Gaming Consoles > PlayStation 5")
+      expect(item.product_type).toBe("Gaming Consoles")
       expect(item.mpn).toBeUndefined()
+    })
+
+    it("exports an MPN as provided without requiring a verification flag", () => {
+      const item = mapProductToFeedItem(
+        {
+          id: "prod_monitor",
+          title: "Dell Monitor",
+          handle: "dell-monitor",
+          metadata: { google_merchant: { mpn: "DELL-P2422H" } },
+        },
+        {
+          id: "variant_monitor",
+          manage_inventory: false,
+          prices: [{ amount: 200, currency_code: "USD" }],
+        },
+        sampleConfig
+      )
+
+      expect(item.mpn).toBe("DELL-P2422H")
     })
   })
 
