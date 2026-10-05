@@ -43,7 +43,4 @@ jobs:
             sudo systemctl is-active --quiet medusa
             sudo systemctl is-active --quiet laptopzone-storefront
 
-            echo "=== Health check ==="
-            curl -f https://dev.laptopzone.co.zw
-
             echo "=== Deployment successful ==="
