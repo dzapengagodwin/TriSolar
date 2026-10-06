@@ -85,7 +85,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.item_group_id).toBe("prod_thinkpad")
       expect(item.title).toBe("Lenovo ThinkPad E14 - 16GB RAM / 512GB SSD")
       expect(item.description).toBe("Powerful AMD Ryzen laptop with FHD display.")
-      expect(item.link).toBe("https://laptopzone.co.zw/products/lenovo-thinkpad-e14")
+      expect(item.link).toBe("https://laptopzone.co.zw/product/lenovo-thinkpad-e14")
       expect(item.image_link).toBe("https://laptopzone.co.zw/images/thinkpad.jpg")
       expect(item.additional_image_link).toEqual(["https://laptopzone.co.zw/images/thinkpad-side.jpg"])
       expect(item.availability).toBe("in_stock")

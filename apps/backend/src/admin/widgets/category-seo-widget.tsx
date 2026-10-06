@@ -184,7 +184,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
         status: "pass",
         score: 15,
         maxScore: 15,
-        message: `/categories/${previewSlug}`,
+        message: `Category canonical URL uses the verified legacy path for ${previewSlug}.`,
       })
     } else {
       list.push({
@@ -629,7 +629,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
                 <Text size="xsmall" className="text-ui-fg-muted">Optional override (default is automatic)</Text>
               </div>
               <Input
-                placeholder="https://laptopzone.co.zw/zw/categories/..."
+                placeholder="https://laptopzone.co.zw/products/..."
                 value={form.canonical_url}
                 onChange={(e) => handleFieldChange("canonical_url", e.target.value)}
               />

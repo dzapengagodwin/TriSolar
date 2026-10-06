@@ -32,22 +32,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-      url: getCanonicalUrl("/store", countryCode),
+      url: getCanonicalUrl("/shop", countryCode),
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
-      url: getCanonicalUrl("/contact", countryCode),
+      url: getCanonicalUrl("/contact-us", countryCode),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
     },
     {
-      url: getCanonicalUrl("/returns", countryCode),
+      url: getCanonicalUrl("/returns-and-refunds", countryCode),
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.4,
+    },
+    {
+      url: getCanonicalUrl("/delivery-terms", countryCode),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: getCanonicalUrl("/terms-and-conditions", countryCode),
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: getCanonicalUrl("/privacy-policy", countryCode),
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: getCanonicalUrl("/faq", countryCode),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: getCanonicalUrl("/track-order", countryCode),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
+    },
+    {
+      url: getCanonicalUrl("/customer-help", countryCode),
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.3,
     },
   ]
 

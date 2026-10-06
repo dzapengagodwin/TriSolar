@@ -3,6 +3,7 @@
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 type SubcategoryCardsProps = {
   category: HttpTypes.StoreProductCategory
@@ -79,7 +80,7 @@ export default function SubcategoryCards({ category }: SubcategoryCardsProps) {
         {items.map((item) => (
           <LocalizedClientLink
             key={item.handle}
-            href={`/categories/${item.handle}`}
+            href={getCategoryPublicPath(item.handle)}
             className="group relative bg-white hover:bg-gray-50/80 border border-gray-200/90 hover:border-primary/60 rounded-xl p-3 flex items-center justify-between gap-2.5 transition-all duration-200 shadow-2xs hover:shadow-sm"
           >
             {/* If an image is explicitly available, display it */}

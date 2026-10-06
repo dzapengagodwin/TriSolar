@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
+import legacyUrlMap from "./lib/seo/legacy-url-map.json"
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
 const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
@@ -109,6 +110,24 @@ export async function middleware(request: NextRequest) {
     ? pathCountryCode
     : (await getCountryCode(request, regionMap)) || DEFAULT_COUNTRY
 
+  const publicPath = request.nextUrl.pathname.replace(/^\/+|\/+$/g, "")
+  const rewriteLegacyPath = (pathname: string, page?: string) => {
+    const rewriteUrl = request.nextUrl.clone()
+    rewriteUrl.pathname = `/${countryCode}${pathname}`
+    if (page) rewriteUrl.searchParams.set("page", page)
+    const response = NextResponse.rewrite(rewriteUrl)
+    response.cookies.set(COUNTRY_COOKIE, countryCode, {
+      maxAge: 60 * 60 * 24 * 365,
+      httpOnly: false,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    })
+    if (!cacheIdCookie) {
+      response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
+    }
+    return response
+  }
+
   // Permanently remove legacy country prefixes and retain their country choice.
   if (pathCountryCode && regionMap.has(pathCountryCode)) {
     const redirectUrl = request.nextUrl.clone()
@@ -123,6 +142,34 @@ export async function middleware(request: NextRequest) {
     if (!cacheIdCookie) response.cookies.set("_medusa_cache_id", cacheId, { maxAge: 60 * 60 * 24 })
     return response
   }
+
+  // Preserve verified WordPress URLs by rewriting them to the existing
+  // Medusa-backed route. These are internal rewrites, not redirects.
+  if (publicPath.startsWith("product/")) {
+    const handle = publicPath.slice("product/".length)
+    if (handle && !handle.includes("/")) return rewriteLegacyPath(`/products/${handle}`)
+  }
+
+  const categoryHandle = legacyUrlMap.categoryPublicPathToHandle[
+    publicPath as keyof typeof legacyUrlMap.categoryPublicPathToHandle
+  ]
+  if (categoryHandle) return rewriteLegacyPath(`/categories/${categoryHandle}`)
+
+  const categoryPageMatch = publicPath.match(/^(products\/.+)\/page\/(\d+)$/)
+  if (categoryPageMatch) {
+    const handle = legacyUrlMap.categoryPublicPathToHandle[
+      categoryPageMatch[1] as keyof typeof legacyUrlMap.categoryPublicPathToHandle
+    ]
+    if (handle) return rewriteLegacyPath(`/categories/${handle}`, categoryPageMatch[2])
+  }
+
+  if (publicPath.startsWith("brand/")) {
+    const handle = publicPath.slice("brand/".length)
+    if (legacyUrlMap.brandHandles.includes(handle)) return rewriteLegacyPath(`/brands/${handle}`)
+  }
+
+  const shopPageMatch = publicPath.match(/^shop\/page\/(\d+)$/)
+  if (shopPageMatch) return rewriteLegacyPath("/store", shopPageMatch[1])
 
   // Keep the route parameter available to the existing Medusa pages while
   // serving countryless public URLs. This is an internal rewrite, not a URL redirect.

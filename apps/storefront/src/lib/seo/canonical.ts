@@ -1,4 +1,5 @@
 import { STORE_URL, DEFAULT_COUNTRY_CODE } from "./constants"
+import legacyUrlMap from "./legacy-url-map.json"
 
 export function stripVariantIdFromUrl(url: string): string {
   const hashIndex = url.indexOf("#")
@@ -48,7 +49,13 @@ export function getProductCanonicalUrl(
   handle: string,
   countryCode: string = DEFAULT_COUNTRY_CODE
 ): string {
-  return getCanonicalUrl(`/products/${handle}`, countryCode)
+  return getCanonicalUrl(`/product/${handle}`, countryCode)
+}
+
+/** Returns the verified legacy public path for a category handle. */
+export function getCategoryPublicPath(handle: string): string {
+  const path = legacyUrlMap.categoryHandleToPublicPath[handle as keyof typeof legacyUrlMap.categoryHandleToPublicPath]
+  return path ? `/${path}` : `/products/${handle}`
 }
 
 /**
@@ -58,7 +65,7 @@ export function getCategoryCanonicalUrl(
   handle: string,
   countryCode: string = DEFAULT_COUNTRY_CODE
 ): string {
-  return getCanonicalUrl(`/categories/${handle}`, countryCode)
+  return getCanonicalUrl(getCategoryPublicPath(handle), countryCode)
 }
 
 /**
@@ -68,7 +75,7 @@ export function getBrandCanonicalUrl(
   handle: string,
   countryCode: string = DEFAULT_COUNTRY_CODE
 ): string {
-  return getCanonicalUrl(`/brands/${handle}`, countryCode)
+  return getCanonicalUrl(`/brand/${handle}`, countryCode)
 }
 
 /**

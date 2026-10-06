@@ -12,6 +12,7 @@ import {
 } from "@lib/util/product-option-filters"
 import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 import SubcategoryCards from "../components/subcategory-cards"
 
 export default async function CategoryTemplate({
@@ -71,7 +72,7 @@ export default async function CategoryTemplate({
   const breadcrumbs = [
     ...parents.map((p) => ({
       name: p.name,
-      href: `/categories/${p.handle}`,
+      href: getCategoryPublicPath(p.handle),
     })),
     { name: category.name },
   ]

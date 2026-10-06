@@ -372,7 +372,7 @@ export default async function OrderCompletedTemplate({
           </LocalizedClientLink>
 
           <LocalizedClientLink
-            href="/contact"
+            href="/contact-us"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3.5 px-8 rounded-full text-sm border border-gray-200 transition-all"
           >
             Need Help?
@@ -383,7 +383,7 @@ export default async function OrderCompletedTemplate({
         <p className="text-center text-[11px] text-gray-300 mt-8">
           A confirmation email has been sent. If you have questions, please{" "}
           <LocalizedClientLink
-            href="/contact"
+            href="/contact-us"
             className="underline hover:text-gray-500"
           >
             contact us

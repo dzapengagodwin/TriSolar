@@ -361,7 +361,7 @@ export default function ProductDetailsTabs({
                       className="group bg-white border border-gray-100 rounded-xl p-3 flex flex-col justify-between hover:shadow-md transition-all duration-200 relative"
                     >
                       <LocalizedClientLink
-                        href={`/products/${accessory.handle}`}
+                        href={`/product/${accessory.handle}`}
                         className="block aspect-square w-full bg-gray-50/50 rounded-lg overflow-hidden flex items-center justify-center p-2 mb-2.5"
                       >
                         {accessory.thumbnail ? (
@@ -376,7 +376,7 @@ export default function ProductDetailsTabs({
                       </LocalizedClientLink>
 
                       <div className="space-y-2">
-                        <LocalizedClientLink href={`/products/${accessory.handle}`}>
+                        <LocalizedClientLink href={`/product/${accessory.handle}`}>
                           <p className="text-xs sm:text-sm font-normal text-gray-800 line-clamp-2 leading-tight hover:text-primary transition-colors">
                             {accessory.title}
                           </p>

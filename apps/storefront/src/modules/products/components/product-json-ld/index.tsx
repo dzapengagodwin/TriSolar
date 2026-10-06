@@ -1,5 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
-import { getProductCanonicalUrl, stripVariantIdFromUrl } from "@lib/seo/canonical"
+import { getProductCanonicalUrl } from "@lib/seo/canonical"
 import { SITE_NAME, DEFAULT_CURRENCY_CODE } from "@lib/seo/constants"
 import { SeoMetadataDTO } from "@lib/data/seo"
 
@@ -48,10 +48,7 @@ export default function ProductJsonLd({
 }: ProductJsonLdProps) {
   if (!product || !product.id) return null
 
-  const canonicalUrl =
-    seo?.canonical_url && seo.canonical_url.trim()
-      ? stripVariantIdFromUrl(seo.canonical_url.trim())
-      : getProductCanonicalUrl(product.handle, countryCode)
+  const canonicalUrl = getProductCanonicalUrl(product.handle, countryCode)
 
   const currencyUpper = currencyCode.toUpperCase()
 

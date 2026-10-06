@@ -160,7 +160,7 @@ function DealProductCard({
       )}
 
       {/* Product image */}
-      <LocalizedClientLink href={`/products/${product.handle}`} className="block mb-3">
+      <LocalizedClientLink href={`/product/${product.handle}`} className="block mb-3">
         <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center h-36 sm:h-44 rounded-xl">
           <Thumbnail
             thumbnail={product.thumbnail}
@@ -178,7 +178,7 @@ function DealProductCard({
           {categoryLabel && (
             <div className="text-[11px] font-medium text-gray-400 line-clamp-1">{categoryLabel}</div>
           )}
-          <LocalizedClientLink href={`/products/${product.handle}`}>
+          <LocalizedClientLink href={`/product/${product.handle}`}>
             <h3 className="text-[13px] sm:text-sm font-normal text-gray-800 group-hover:text-primary transition-colors line-clamp-2 leading-snug mt-0.5">
               {product.title}
             </h3>
@@ -348,7 +348,7 @@ export default function MonthlyDeals({
         {filteredProducts.length > 10 && (
           <div className="text-center pt-2">
             <LocalizedClientLink
-              href="/store"
+              href="/shop"
               className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white transition-colors"
             >
               View all deals

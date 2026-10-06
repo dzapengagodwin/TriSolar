@@ -131,7 +131,7 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
               Explore our store to find laptops, computers, printers, and accessories to add to your list.
             </p>
             <LocalizedClientLink
-              href="/store"
+              href="/shop"
               className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-full font-bold text-xs transition-colors uppercase tracking-wider shadow-sm mt-2"
             >
               Shop Catalog
@@ -160,12 +160,12 @@ export default function WishlistTemplate({ wishlist }: WishlistTemplateProps) {
                   className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex gap-4 items-center justify-between hover:border-gray-200 transition-all"
                 >
                   <div className="flex gap-4 items-center flex-1">
-                    <LocalizedClientLink href={`/products/${product.handle}`} className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
+                    <LocalizedClientLink href={`/product/${product.handle}`} className="w-16 h-16 shrink-0 rounded-xl overflow-hidden border border-gray-100 bg-gray-50">
                       <Thumbnail thumbnail={product.thumbnail} images={product.images} size="square" />
                     </LocalizedClientLink>
                     <div className="flex flex-col gap-0.5">
                       <LocalizedClientLink
-                        href={`/products/${product.handle}`}
+                        href={`/product/${product.handle}`}
                         className="text-sm font-normal text-gray-800 hover:text-primary transition-colors line-clamp-1"
                       >
                         {product.title}

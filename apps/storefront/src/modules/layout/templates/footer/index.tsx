@@ -2,6 +2,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Image from "next/image"
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 export default async function Footer() {
   const [categories, { collections }] = await Promise.all([
@@ -198,7 +199,7 @@ export default async function Footer() {
                   {topCategories.map((cat) => (
                     <li key={cat.id}>
                       <LocalizedClientLink
-                        href={`/categories/${cat.handle}`}
+                        href={getCategoryPublicPath(cat.handle)}
                         className="hover:text-white transition-colors block truncate"
                       >
                         {cat.name}
@@ -234,7 +235,7 @@ export default async function Footer() {
                   </li>
                   <li>
                     <LocalizedClientLink
-                      href="/contact"
+                      href="/contact-us"
                       className="hover:text-white transition-colors block"
                     >
                       Contact Us
@@ -270,7 +271,7 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/contact"
+                  href="/contact-us"
                   className="hover:text-white transition-colors block"
                 >
                   Customer Support
@@ -278,7 +279,7 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/terms"
+                  href="/terms-and-conditions"
                   className="hover:text-white transition-colors block"
                 >
                   Terms &amp; Conditions
@@ -286,7 +287,7 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/privacy"
+                  href="/privacy-policy"
                   className="hover:text-white transition-colors block"
                 >
                   Privacy Policy
@@ -294,7 +295,7 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/returns"
+                  href="/returns-and-refunds"
                   className="hover:text-white transition-colors block"
                 >
                   Returns &amp; Refunds
@@ -310,7 +311,7 @@ export default async function Footer() {
               </li>
               <li>
                 <LocalizedClientLink
-                  href="/shipping"
+                  href="/delivery-terms"
                   className="hover:text-white transition-colors block"
                 >
                   Shipping

@@ -4,6 +4,7 @@ import { HttpTypes } from "@medusajs/types"
 import { useState, useRef, useEffect } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { BarsThree, ChevronDown } from "@medusajs/icons"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 type CategoryDropdownProps = {
   categories?: HttpTypes.StoreProductCategory[]
@@ -128,7 +129,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                     activeCategory.category_children.map((child) => (
                       <LocalizedClientLink
                         key={child.id}
-                        href={`/categories/${child.handle}`}
+                        href={getCategoryPublicPath(child.handle)}
                         onClick={() => setIsOpen(false)}
                         className="text-xs font-medium text-gray-600 hover:text-black transition-colors block"
                       >
@@ -145,7 +146,7 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                 {/* Shop All link */}
                 <div className="pt-4 border-t border-gray-50">
                   <LocalizedClientLink
-                    href={`/categories/${activeCategory.handle}`}
+                    href={getCategoryPublicPath(activeCategory.handle)}
                     onClick={() => setIsOpen(false)}
                     className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover"
                   >

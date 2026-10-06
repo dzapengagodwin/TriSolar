@@ -4,6 +4,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
 import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "@medusajs/icons"
 
@@ -38,7 +39,7 @@ export default function TopCategories({
             TOP CATEGORIES
           </h2>
           <LocalizedClientLink
-            href="/store"
+            href="/shop"
             className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors inline-flex items-center gap-1"
           >
             Browse All →
@@ -68,7 +69,7 @@ export default function TopCategories({
               return (
                 <LocalizedClientLink
                   key={cat.id || cat.handle}
-                  href={`/categories/${cat.handle}`}
+                  href={getCategoryPublicPath(cat.handle)}
                   className="group flex flex-col items-center cursor-pointer transition-transform duration-200 shrink-0 w-28 sm:w-32 md:w-36 text-center"
                 >
                   {/* Circular Avatar Container */}

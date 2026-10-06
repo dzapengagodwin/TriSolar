@@ -33,7 +33,7 @@ function normalizeForSearch(text?: string | null): string {
 export function analyzeProductSeo(
   input: ProductSeoAnalysisInput
 ): SeoAnalysisResult {
-  const { product, seo, storefrontUrl = "https://laptopzone.co.zw", countryCode = "zw" } = input
+  const { product, seo, storefrontUrl = "https://laptopzone.co.zw" } = input
 
   const checks: SeoCheck[] = []
 
@@ -46,8 +46,8 @@ export function analyzeProductSeo(
   const keyphrase = normalizeForSearch(seo?.focus_keyphrase)
   const slug = (product.handle || "").toLowerCase()
 
-  const defaultCanonical = `${storefrontUrl.replace(/\/+$/, "")}/${countryCode.toLowerCase()}/products/${slug}`
-  const effectiveCanonical = seo?.canonical_url || defaultCanonical
+  const defaultCanonical = `${storefrontUrl.replace(/\/+$/, "")}/product/${slug}`
+  const effectiveCanonical = defaultCanonical
 
   const images = (product.images || []).map((i) => i.url)
   if (product.thumbnail && !images.includes(product.thumbnail)) {
@@ -75,7 +75,7 @@ export function analyzeProductSeo(
       status: "pass",
       score: 10,
       maxScore: 10,
-      message: `Clean URL slug: /products/${slug}`,
+      message: `Clean URL slug: /product/${slug}`,
     })
   } else {
     checks.push({

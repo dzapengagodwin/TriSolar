@@ -179,7 +179,7 @@ export default async function WarrantyPage() {
         </p>
         <p>
           Visit our{" "}
-          <LocalizedClientLink href="/contact" className="text-primary font-semibold hover:underline">
+          <LocalizedClientLink href="/contact-us" className="text-primary font-semibold hover:underline">
             Contact Page
           </LocalizedClientLink>{" "}
           to request a repair quote.

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Delivery & Shipping Policy | Laptopzone",
   description:
     "Information on Laptopzone's delivery services, Harare same-day dispatch, nationwide courier shipping across Zimbabwe, pickup points, and delivery tracking.",
+  alternates: { canonical: "/delivery-terms" },
 }
 
 export default async function ShippingPage() {

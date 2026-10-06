@@ -27,7 +27,7 @@ describe("SeoModuleService Unit Tests", () => {
       expect(defaults.meta_description).toBe("Dell XPS 15 with 3.5K OLED touchscreen display.")
       expect(defaults.focus_keyphrase).toBe("Dell XPS 15 9530")
       expect(defaults.canonical_url).toBe(
-        "https://laptopzone.co.zw/zw/products/dell-xps-15-9530"
+        "https://laptopzone.co.zw/product/dell-xps-15-9530"
       )
       expect(defaults.og_image).toBe("https://laptopzone.co.zw/xps.jpg")
       expect(defaults.robots_index).toBe(true)
@@ -52,9 +52,7 @@ describe("SeoModuleService Unit Tests", () => {
         "High performance gaming laptops with RTX graphics."
       )
       expect(defaults.focus_keyphrase).toBe("Gaming Laptops")
-      expect(defaults.canonical_url).toBe(
-        "https://laptopzone.co.zw/zw/categories/gaming-laptops"
-      )
+      expect(defaults.canonical_url).toBeNull()
       expect(defaults.robots_index).toBe(true)
       expect(defaults.robots_follow).toBe(true)
     })

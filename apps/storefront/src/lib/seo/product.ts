@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 import { HttpTypes } from "@medusajs/types"
 import { buildBaseMetadata } from "./metadata"
-import { getProductCanonicalUrl, stripVariantIdFromUrl } from "./canonical"
+import { getProductCanonicalUrl } from "./canonical"
 import { SITE_NAME } from "./constants"
 import { SeoMetadataDTO } from "@lib/data/seo"
 
@@ -47,10 +47,7 @@ export function generateProductMetadata(
   )
 
   // 3. Canonical URL: Custom canonical override -> Standard canonical product URL
-  const canonicalUrl =
-    seo?.canonical_url && seo.canonical_url.trim()
-      ? stripVariantIdFromUrl(seo.canonical_url.trim())
-      : getProductCanonicalUrl(product.handle, countryCode)
+  const canonicalUrl = getProductCanonicalUrl(product.handle, countryCode)
 
   // 4. Primary Image: Custom OG image -> Product thumbnail -> First gallery image
   const imageUrl =

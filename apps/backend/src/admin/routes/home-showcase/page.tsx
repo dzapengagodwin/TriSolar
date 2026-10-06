@@ -336,7 +336,7 @@ const HomeShowcasePage = () => {
     if (handle) {
       // Auto-set viewAllHref if empty or previously pointing to categories
       if (!formViewAllHref || formViewAllHref.startsWith("/categories/")) {
-        setFormViewAllHref(`/categories/${handle}`)
+        setFormViewAllHref(`/products/${handle}`)
       }
     }
   }
@@ -612,7 +612,7 @@ const HomeShowcasePage = () => {
                 const viewAllHref =
                   meta.view_all_href ||
                   (categoryHandle
-                    ? `/categories/${categoryHandle}`
+                    ? `/products/${categoryHandle}`
                     : `/collections/${col.handle}`)
                 const productCount = col.products?.length || 0
 

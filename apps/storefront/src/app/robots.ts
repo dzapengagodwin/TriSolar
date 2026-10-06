@@ -16,6 +16,8 @@ export default function robots(): MetadataRoute.Robots {
           "/*/collections/",
           "/*/store",
           "/products/",
+          "/product/",
+          "/brand/",
           "/categories/",
           "/brands/",
           "/collections/",

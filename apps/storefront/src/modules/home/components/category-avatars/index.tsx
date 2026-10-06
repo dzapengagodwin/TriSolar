@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 export default function CategoryAvatars({
   categories,
@@ -42,7 +43,7 @@ export default function CategoryAvatars({
             return (
               <LocalizedClientLink
                 key={cat.id || idx}
-                href={`/categories/${cat.handle}`}
+                href={getCategoryPublicPath(cat.handle)}
                 className="group flex flex-col items-center gap-3"
               >
                 <div
@@ -76,7 +77,7 @@ export default function CategoryAvatars({
           </div>
 
           <LocalizedClientLink
-            href="/store"
+            href="/shop"
             className="bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-3 rounded-full transition-colors uppercase tracking-wider shadow-md whitespace-nowrap"
           >
             Explore Catalog

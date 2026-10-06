@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Laptopzone",
   description:
     "Learn how Laptopzone collects, uses, and safeguards your personal information in accordance with data privacy laws and cybersecurity standards.",
+  alternates: { canonical: "/privacy-policy" },
 }
 
 export default async function PrivacyPage() {

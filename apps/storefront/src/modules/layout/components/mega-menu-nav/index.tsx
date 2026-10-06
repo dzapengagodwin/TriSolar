@@ -120,11 +120,22 @@ export default function MegaMenuNav() {
             </button>
           )
         })}
+        {MEGA_MENUS.flatMap((menu) => menu.directLinks || []).map((link) => (
+          <LocalizedClientLink
+            key={link.label}
+            href={link.href}
+            onClick={closeMenu}
+            onMouseEnter={closeMenu}
+            className="whitespace-nowrap rounded-md px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+          >
+            {link.label}
+          </LocalizedClientLink>
+        ))}
       </div>
 
       {/* Hot Deals Link */}
       <LocalizedClientLink
-        href="/store"
+        href="/shop"
         onClick={closeMenu}
         onMouseEnter={closeMenu}
         className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold rounded-md ml-auto shrink-0"

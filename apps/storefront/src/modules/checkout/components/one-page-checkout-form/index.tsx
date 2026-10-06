@@ -1105,15 +1105,15 @@ const OnePageCheckoutForm = ({
 
           <p className="text-center text-xs text-gray-400 leading-relaxed">
             By placing your order, you agree to Laptopzone&apos;s{" "}
-            <LocalizedClientLink href="/terms" target="_blank" className="underline hover:text-gray-700">
+            <LocalizedClientLink href="/terms-and-conditions" target="_blank" className="underline hover:text-gray-700">
               Terms &amp; Conditions
             </LocalizedClientLink>
             ,{" "}
-            <LocalizedClientLink href="/privacy" target="_blank" className="underline hover:text-gray-700">
+            <LocalizedClientLink href="/privacy-policy" target="_blank" className="underline hover:text-gray-700">
               Privacy Policy
             </LocalizedClientLink>
             , and{" "}
-            <LocalizedClientLink href="/returns" target="_blank" className="underline hover:text-gray-700">
+            <LocalizedClientLink href="/returns-and-refunds" target="_blank" className="underline hover:text-gray-700">
               Returns Policy
             </LocalizedClientLink>
             .

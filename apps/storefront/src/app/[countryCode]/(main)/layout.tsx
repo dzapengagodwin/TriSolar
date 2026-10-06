@@ -35,7 +35,7 @@ export default async function PageLayout(props: {
   return (
     <>
       <OrganizationJsonLd />
-      <Nav cart={cart} />
+      <Nav cart={cart} shippingOptions={shippingOptions} />
       {customer && cart && (
         <CartMismatchBanner customer={customer} cart={cart} />
       )}

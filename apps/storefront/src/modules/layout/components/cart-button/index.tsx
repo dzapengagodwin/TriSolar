@@ -1,6 +1,5 @@
 import { HttpTypes } from "@medusajs/types"
 import { retrieveCart } from "@lib/data/cart"
-import { listCartShippingMethods } from "@lib/data/fulfillment"
 import {
   isPickupShippingOption,
   isDeliveryShippingOption,
@@ -9,16 +8,17 @@ import CartDropdown from "../cart-dropdown"
 
 export default async function CartButton({
   cart: initialCart,
+  shippingOptions = [],
 }: {
   cart?: HttpTypes.StoreCart | null
+  shippingOptions?: HttpTypes.StoreCartShippingOption[]
 }) {
   const cart = initialCart ?? (await retrieveCart().catch(() => null))
   let isPickupOnly = false
 
-  if (cart?.id) {
-    const shippingMethods = await listCartShippingMethods(cart.id).catch(() => [])
-    const pickupOptions = shippingMethods.filter(isPickupShippingOption)
-    const deliveryOptions = shippingMethods.filter(isDeliveryShippingOption)
+  if (cart?.id && shippingOptions.length) {
+    const pickupOptions = shippingOptions.filter(isPickupShippingOption)
+    const deliveryOptions = shippingOptions.filter(isDeliveryShippingOption)
     isPickupOnly = pickupOptions.length > 0 && deliveryOptions.length === 0
   }
 

@@ -59,7 +59,7 @@ export default function ProductPreview({
               {discountText}
             </span>
           )}
-          <LocalizedClientLink href={`/products/${product.handle}`} className="block w-full">
+          <LocalizedClientLink href={`/product/${product.handle}`} className="block w-full">
             <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
               <Thumbnail
                 thumbnail={product.thumbnail}
@@ -85,7 +85,7 @@ export default function ProductPreview({
             {categoriesString}
           </div>
 
-          <LocalizedClientLink href={`/products/${product.handle}`}>
+          <LocalizedClientLink href={`/product/${product.handle}`}>
             <h3
               className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
@@ -149,7 +149,7 @@ export default function ProductPreview({
           </span>
         )}
 
-        <LocalizedClientLink href={`/products/${product.handle}`} className="block w-full">
+        <LocalizedClientLink href={`/product/${product.handle}`} className="block w-full">
           <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
             <Thumbnail
               thumbnail={product.thumbnail}
@@ -177,7 +177,7 @@ export default function ProductPreview({
             {categoriesString}
           </div>
 
-          <LocalizedClientLink href={`/products/${product.handle}`}>
+          <LocalizedClientLink href={`/product/${product.handle}`}>
             <h3
               className="text-[13px] sm:text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"

@@ -203,7 +203,7 @@ export default async function BrandTemplate({
                     View All Brands
                   </LocalizedClientLink>
                   <LocalizedClientLink
-                    href="/store"
+                    href="/shop"
                     className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shadow-sm"
                   >
                     Browse Full Store

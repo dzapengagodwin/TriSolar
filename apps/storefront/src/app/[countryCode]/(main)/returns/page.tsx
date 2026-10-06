@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Returns & Refunds Policy | Laptopzone",
   description:
     "Review our 7-day defective replacement guarantee, 14-day return conditions, RMA procedure, and refund timelines for laptops and electronics.",
+  alternates: { canonical: "/returns-and-refunds" },
 }
 
 export default async function ReturnsPage() {

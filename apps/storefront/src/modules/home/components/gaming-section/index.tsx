@@ -10,7 +10,7 @@ export default function GamingSection() {
           {/* 1. Left Feature Hero Card (Spans 8 cols on desktop) */}
       
 <LocalizedClientLink 
-  href="/categories/business-laptops" 
+  href="/products/laptops/business-laptops"
   className="group relative isolate overflow-hidden bg-[#0B0D12] border border-gray-800/80 p-7 sm:p-10 transition-all duration-300 hover:border-gray-700 hover:shadow-2xl flex flex-col justify-between min-h-[380px] lg:min-h-0 lg:col-span-8" 
 > 
   {/* Subtle Ambient Background Glow & Background Image */} 
@@ -65,7 +65,7 @@ export default function GamingSection() {
             
             {/* 2. Top Right Card: Gaming Laptops */}
             <LocalizedClientLink
-              href="/categories/gaming-laptops"
+              href="/products/laptops/gaming-laptops"
               className="group relative isolate overflow-hidden bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
             >
               {/* Background Image */}
@@ -110,7 +110,7 @@ export default function GamingSection() {
 
             {/* 3. Middle Right Card: Home and Student Laptops */}
             <LocalizedClientLink
-              href="/categories/home-student"
+              href="/products/laptops/home-student"
               className="group relative isolate overflow-hidden bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
             >
               {/* Background Image */}
@@ -155,7 +155,7 @@ export default function GamingSection() {
 
             {/* 4. Bottom Right Card: Monitors */}
             <LocalizedClientLink
-              href="/categories/monitors"
+              href="/products/monitors"
               className="group relative isolate overflow-hidden bg-[#10131A] border border-gray-800/80 p-5 sm:p-6 lg:p-4 xl:p-5 transition-all duration-300 hover:border-gray-700 hover:shadow-xl flex flex-col justify-between min-h-[190px] sm:min-h-[210px] lg:min-h-0"
             >
               {/* Background Image */}

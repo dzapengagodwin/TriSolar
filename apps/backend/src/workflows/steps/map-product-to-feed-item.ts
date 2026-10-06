@@ -64,7 +64,7 @@ export function mapProductToFeedItem(
 
   // 3. Link generation
   const baseStorefrontUrl = config.storefront_url.replace(/\/+$/, "")
-  const link = `${baseStorefrontUrl}/products/${product.handle}`
+  const link = `${baseStorefrontUrl}/product/${product.handle}`
 
   // 4. Primary and additional images
   const primaryImage =

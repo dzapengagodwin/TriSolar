@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Terms & Conditions | Laptopzone",
   description:
     "Official terms and conditions of sale and website usage for Laptopzone. Read our guidelines on ordering, payments, warranties, and consumer rights.",
+  alternates: { canonical: "/terms-and-conditions" },
 }
 
 export default async function TermsPage() {
@@ -25,11 +26,11 @@ export default async function TermsPage() {
           Welcome to Laptopzone (<span className="font-semibold text-gray-900">&quot;we&quot;</span>,{" "}
           <span className="font-semibold text-gray-900">&quot;our&quot;</span>, or{" "}
           <span className="font-semibold text-gray-900">&quot;us&quot;</span>). By browsing our website, registering an account, or placing an order, you agree to be bound by these Terms &amp; Conditions and our related policies, including our{" "}
-          <LocalizedClientLink href="/privacy" className="text-primary font-semibold hover:underline">
+          <LocalizedClientLink href="/privacy-policy" className="text-primary font-semibold hover:underline">
             Privacy Policy
           </LocalizedClientLink>
           ,{" "}
-          <LocalizedClientLink href="/returns" className="text-primary font-semibold hover:underline">
+          <LocalizedClientLink href="/returns-and-refunds" className="text-primary font-semibold hover:underline">
             Returns &amp; Refunds Policy
           </LocalizedClientLink>
           , and{" "}
@@ -139,7 +140,7 @@ export default async function TermsPage() {
         </p>
         <p>
           Please review our detailed{" "}
-          <LocalizedClientLink href="/shipping" className="text-primary font-semibold hover:underline">
+          <LocalizedClientLink href="/delivery-terms" className="text-primary font-semibold hover:underline">
             Delivery &amp; Shipping Policy
           </LocalizedClientLink>{" "}
           for full details on delivery times, courier coverage across Zimbabwe, and package inspection requirements.
@@ -157,7 +158,7 @@ export default async function TermsPage() {
         <ul className="list-disc pl-5 space-y-1 text-gray-600">
           <li>
             Our return conditions and step-by-step return instructions are set out in our{" "}
-            <LocalizedClientLink href="/returns" className="text-primary font-semibold hover:underline">
+            <LocalizedClientLink href="/returns-and-refunds" className="text-primary font-semibold hover:underline">
               Returns &amp; Refunds Policy
             </LocalizedClientLink>
             .

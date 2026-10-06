@@ -326,7 +326,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                         {/* Title, Price & Quantity Selector in Center */}
                         <div className="flex-1 min-w-0 pr-2">
                           <LocalizedClientLink
-                            href={`/products/${item.product_handle}`}
+                            href={`/product/${item.product_handle}`}
                             onClick={close}
                             className="text-xs sm:text-sm font-semibold text-gray-900 hover:text-primary transition-colors line-clamp-2 leading-snug"
                           >
@@ -372,7 +372,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
 
                         {/* Thumbnail on Far Right */}
                         <LocalizedClientLink
-                          href={`/products/${item.product_handle}`}
+                          href={`/product/${item.product_handle}`}
                           onClick={close}
                           className="w-16 h-16 rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 shadow-2xs"
                         >
@@ -436,7 +436,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                         {/* Accessory Details */}
                         <div className="flex-1 min-w-0">
                           <LocalizedClientLink
-                            href={`/products/${accessory.handle}`}
+                            href={`/product/${accessory.handle}`}
                             onClick={close}
                             className="text-xs font-semibold text-gray-900 hover:text-primary transition-colors truncate block"
                           >
@@ -478,7 +478,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                 </p>
               </div>
               <LocalizedClientLink
-                href="/store"
+                href="/shop"
                 onClick={close}
                 className="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors shadow-sm"
               >

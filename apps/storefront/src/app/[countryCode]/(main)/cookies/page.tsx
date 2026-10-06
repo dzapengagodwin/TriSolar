@@ -163,7 +163,7 @@ export default async function CookiesPage() {
         </p>
         <p>
           For more information on how we handle your personal data, please review our{" "}
-          <LocalizedClientLink href="/privacy" className="text-primary font-semibold hover:underline">
+          <LocalizedClientLink href="/privacy-policy" className="text-primary font-semibold hover:underline">
             Privacy Policy
           </LocalizedClientLink>
           .

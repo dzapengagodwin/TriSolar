@@ -2,6 +2,7 @@ import { HttpTypes } from "@medusajs/types"
 import Link from "next/link"
 import ProductPreview from "@modules/products/components/product-preview"
 import NotFoundIllustration from "../components/not-found-illustration"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 type NotFoundTemplateProps = {
   recommendedProducts?: HttpTypes.StoreProduct[]
@@ -20,7 +21,6 @@ const POPULAR_CATEGORIES = [
 export default function NotFoundTemplate({
   recommendedProducts = [],
   region,
-  countryCode = "zw",
 }: NotFoundTemplateProps) {
   return (
     <div className="bg-white min-h-[calc(100vh-140px)] py-12 sm:py-16 md:py-20">
@@ -48,14 +48,14 @@ export default function NotFoundTemplate({
         {/* Clean Action Buttons */}
         <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
           <Link
-            href={`/${countryCode}/`}
+            href="/"
             className="h-10 px-5 rounded-lg bg-primary hover:bg-primary/90 text-white font-medium text-sm flex items-center justify-center transition-colors"
           >
             Back to homepage
           </Link>
 
           <Link
-            href={`/${countryCode}/store`}
+            href="/shop"
             className="h-10 px-5 rounded-lg bg-gray-50 hover:bg-gray-100 text-gray-800 border border-gray-200 font-medium text-sm flex items-center justify-center transition-colors"
           >
             Explore store
@@ -71,7 +71,7 @@ export default function NotFoundTemplate({
             {POPULAR_CATEGORIES.map((cat) => (
               <Link
                 key={cat.handle}
-                href={`/${countryCode}/categories/${cat.handle}`}
+                href={getCategoryPublicPath(cat.handle)}
                 className="px-3 py-1 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 border border-gray-100 text-xs transition-colors"
               >
                 {cat.name}
@@ -88,7 +88,7 @@ export default function NotFoundTemplate({
                 Recommended products
               </h2>
               <Link
-                href={`/${countryCode}/store`}
+                href="/shop"
                 className="text-xs font-medium text-primary hover:underline"
               >
                 View all &rarr;

@@ -18,7 +18,7 @@ export default function IPhoneBanner() {
 
             <div className="pt-2">
               <LocalizedClientLink
-                href="/store"
+                href="/shop"
                 className="bg-white text-black font-bold text-xs px-6 py-2.5 rounded hover:bg-gray-200 transition-colors inline-block uppercase tracking-wider"
               >
                 Shop Now

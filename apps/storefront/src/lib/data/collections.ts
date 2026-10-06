@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { CACHE_TAGS, collectionTag } from "@lib/cache-tags"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 export const retrieveCollection = async (id: string) => {
   const tags = [CACHE_TAGS.collections, collectionTag(id)]
@@ -122,9 +123,11 @@ export const getHomeFeaturedCollections = async (): Promise<ParsedHomeCollection
           const categoryHandle = (typeof rawCategory === "string" && rawCategory.trim()) ? rawCategory.trim() : null
 
           const rawHref = meta.viewAllHref || meta.view_all_href
-          const viewAllHref = (typeof rawHref === "string" && rawHref.trim())
-            ? rawHref.trim()
-            : (categoryHandle ? `/categories/${categoryHandle}` : `/collections/${c.handle}`)
+          const viewAllHref = categoryHandle
+            ? getCategoryPublicPath(categoryHandle)
+            : (typeof rawHref === "string" && rawHref.trim())
+              ? rawHref.trim()
+              : `/collections/${c.handle}`
 
           let priority = Number.MAX_SAFE_INTEGER
           const rawPriority = meta.priority

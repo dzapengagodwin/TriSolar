@@ -154,7 +154,7 @@ export default function PromoCardsRow() {
                   </p>
                 </div>
 
-                <LocalizedClientLink href="/store" className="block">
+                <LocalizedClientLink href="/shop" className="block">
                   <button
                     className={`w-full bg-white hover:bg-gray-100 ${card.textColor} font-bold text-xs py-2.5 px-4 rounded-full transition-all duration-200 shadow-md hover:shadow-lg text-center truncate`}
                   >
@@ -168,7 +168,7 @@ export default function PromoCardsRow() {
 
         {/* Carousel Next Arrow Navigation */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 hidden lg:flex items-center justify-center z-20">
-          <LocalizedClientLink href="/store">
+          <LocalizedClientLink href="/shop">
             <button
               className="w-11 h-11 bg-white hover:bg-gray-100 text-gray-800 rounded-full shadow-2xl flex items-center justify-center border border-gray-200 transition-transform hover:scale-110"
               aria-label="Next deals"

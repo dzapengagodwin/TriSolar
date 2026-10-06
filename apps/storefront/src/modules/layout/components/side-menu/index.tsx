@@ -11,6 +11,7 @@ import { useState } from "react"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
 import { Locale } from "@lib/data/locales"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 
 const SideMenuItems = {
@@ -62,7 +63,7 @@ const CategoryList = ({
           <li key={category.id}>
             <div className="flex items-center gap-2">
               <LocalizedClientLink
-                href={`/categories/${category.handle}`}
+                href={getCategoryPublicPath(category.handle)}
                 onClick={close}
                 className={clx(
                   "flex-1 text-xl leading-8 hover:text-gray-900",
@@ -233,7 +234,7 @@ const SideMenu = ({
                           })}
                           <li>
                             <LocalizedClientLink
-                              href="/contact"
+                              href="/contact-us"
                               className="block py-1 hover:text-primary"
                               onClick={close}
                               data-testid="customer-help-link"

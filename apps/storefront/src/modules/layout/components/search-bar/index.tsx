@@ -161,7 +161,7 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
                 return (
                   <LocalizedClientLink
                     key={product.id}
-                    href={`/products/${product.handle}`}
+                    href={`/product/${product.handle}`}
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0"
                   >

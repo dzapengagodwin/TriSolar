@@ -558,7 +558,7 @@ export async function listCartOptions() {
   return await sdk.client.fetch<{
     shipping_options: HttpTypes.StoreCartShippingOption[]
   }>("/store/shipping-options", {
-    query: { cart_id: cartId },
+    query: { cart_id: cartId, fields: "*service_zone.fulfillment_set" },
     next,
     headers,
     cache: "force-cache",

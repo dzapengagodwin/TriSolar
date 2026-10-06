@@ -37,7 +37,7 @@ describe("SEO Analyzer Unit Tests", () => {
           "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 and 16GB RAM online at Laptopzone. Fast shipping & official warranty in Zimbabwe.",
         focus_keyphrase: "Lenovo ThinkPad E14 Gen 6",
         canonical_url:
-          "https://laptopzone.co.zw/zw/products/lenovo-thinkpad-e14-gen-6",
+          "https://laptopzone.co.zw/product/lenovo-thinkpad-e14-gen-6",
         robots_index: true,
         robots_follow: true,
       },

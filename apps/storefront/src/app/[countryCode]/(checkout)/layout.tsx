@@ -49,13 +49,13 @@ export default function CheckoutLayout({
       <footer className="border-t border-gray-100 py-6 mt-12 bg-white text-xs text-gray-500">
         <div className="content-container flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-x-6 text-gray-500 font-medium">
-            <LocalizedClientLink href="/terms" className="hover:text-black transition-colors">
+            <LocalizedClientLink href="/terms-and-conditions" className="hover:text-black transition-colors">
               Terms &amp; Conditions
             </LocalizedClientLink>
-            <LocalizedClientLink href="/privacy" className="hover:text-black transition-colors">
+            <LocalizedClientLink href="/privacy-policy" className="hover:text-black transition-colors">
               Privacy Policy
             </LocalizedClientLink>
-            <LocalizedClientLink href="/returns" className="hover:text-black transition-colors">
+            <LocalizedClientLink href="/returns-and-refunds" className="hover:text-black transition-colors">
               Returns Policy
             </LocalizedClientLink>
           </div>

@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { usePathname } from "next/navigation"
 import clsx from "clsx"
 import { ChevronDown } from "@medusajs/icons"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 type CategoryTreeNavProps = {
   categories?: HttpTypes.StoreProductCategory[]
@@ -18,15 +18,10 @@ export default function CategoryTreeNav({
   activeCategoryHandle,
   scopedProducts,
 }: CategoryTreeNavProps) {
-  const pathname = usePathname()
-
   const normalizeHandle = (handle?: string | null) =>
     handle?.trim().toLowerCase().replace(/_/g, "-") || ""
 
   const activeHandle = normalizeHandle(activeCategoryHandle)
-  const categoryPathHandle = normalizeHandle(
-    pathname.split("/categories/")[1]?.split("/")[0]
-  )
 
   // Track expanded state for accordion dropdown per category
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(() => {
@@ -34,23 +29,19 @@ export default function CategoryTreeNav({
     if (activeHandle) {
       initial[activeHandle] = true
     }
-    if (categoryPathHandle) {
-      initial[categoryPathHandle] = true
-    }
     return initial
   })
 
   useEffect(() => {
-    if (!activeHandle && !categoryPathHandle) {
+    if (!activeHandle) {
       return
     }
 
     setExpandedCategories((prev) => ({
       ...prev,
       ...(activeHandle ? { [activeHandle]: true } : {}),
-      ...(categoryPathHandle ? { [categoryPathHandle]: true } : {}),
     }))
-  }, [activeHandle, categoryPathHandle])
+  }, [activeHandle])
 
   if (!categories || categories.length === 0) {
     return null
@@ -107,7 +98,7 @@ export default function CategoryTreeNav({
         </h3>
         {isIndividualCategoryPage && (
           <LocalizedClientLink
-            href="/store"
+            href="/shop"
             className="text-[11px] font-semibold text-gray-500 hover:text-black transition-colors"
           >
             &larr; All
@@ -118,10 +109,7 @@ export default function CategoryTreeNav({
       <nav className="flex flex-col space-y-2 text-xs">
         {displayCategories.map((rootCat) => {
           const handleKey = normalizeHandle(rootCat.handle)
-          const isRootActive =
-            activeHandle === handleKey ||
-            categoryPathHandle === handleKey ||
-            pathname.includes(`/categories/${rootCat.handle}`)
+          const isRootActive = activeHandle === handleKey
 
           const productCount = getCategoryCount(rootCat)
 
@@ -156,7 +144,7 @@ export default function CategoryTreeNav({
                 )}
               >
                 <LocalizedClientLink
-                  href={`/categories/${rootCat.handle}`}
+                  href={getCategoryPublicPath(rootCat.handle)}
                   className="flex-1 flex items-center justify-between pr-1 min-w-0"
                 >
                   <span
@@ -199,13 +187,13 @@ export default function CategoryTreeNav({
                 <div className="pl-3 py-1 space-y-2 border-l-2 border-primary/20 ml-2 mt-1 animate-fade-in">
                   {dbChildren.map((childCat) => {
                     const isChildActive =
-                      pathname.includes(`/categories/${childCat.handle}`)
+                      activeHandle === normalizeHandle(childCat.handle)
                     const childCount = getCategoryCount(childCat)
 
                     return (
                       <LocalizedClientLink
                         key={childCat.id}
-                        href={`/categories/${childCat.handle}`}
+                        href={getCategoryPublicPath(childCat.handle)}
                         className={clsx(
                           "flex items-center justify-between py-0.5 px-1 rounded transition-colors group text-xs",
                           {

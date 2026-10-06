@@ -9,6 +9,7 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 export const metadata: Metadata = {
   title: "Store | Laptopzone",
   description: "Explore all of our products.",
+  alternates: { canonical: "/shop" },
 }
 
 type StorePageSearchParams = Record<string, string | string[] | undefined> & {

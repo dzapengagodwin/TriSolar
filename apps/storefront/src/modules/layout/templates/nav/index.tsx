@@ -22,7 +22,13 @@ import {
 
 import MegaMenuNav from "@modules/layout/components/mega-menu-nav"
 
-export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null }) {
+export default async function Nav({
+  cart,
+  shippingOptions,
+}: {
+  cart?: HttpTypes.StoreCart | null
+  shippingOptions?: HttpTypes.StoreCartShippingOption[]
+}) {
   const [regions, locales, currentLocale, categories, wishlist] = await Promise.all([
     listRegions()
       .then((regions: StoreRegion[]) => regions)
@@ -71,7 +77,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
               {/* Right: Find our Store, Track Your Order, WhatsApp */}
               <div className="flex items-center gap-x-3.5 shrink-0">
                 <LocalizedClientLink
-                  href="/contact"
+                  href="/contact-us"
                   className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
                 >
                   <MapPin size="13" className="text-primary shrink-0" />
@@ -161,7 +167,7 @@ export default async function Nav({ cart }: { cart?: HttpTypes.StoreCart | null 
                     </LocalizedClientLink>
                   }
                 >
-                  <CartButton cart={cart} />
+                  <CartButton cart={cart} shippingOptions={shippingOptions} />
                 </Suspense>
               </div>
 

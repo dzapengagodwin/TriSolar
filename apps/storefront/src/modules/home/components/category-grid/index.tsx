@@ -89,7 +89,7 @@ export default function CategoryGrid() {
             <p className="text-xs text-gray-600">Zimbabwe&apos;s trusted IT inventory listed in USD ($)</p>
           </div>
           <LocalizedClientLink
-            href="/store"
+            href="/shop"
             className="text-xs font-bold text-laptopzone-blue hover:text-laptopzone-blue-dark uppercase tracking-wider flex items-center gap-1"
           >
             View All Products →

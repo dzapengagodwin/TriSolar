@@ -23,7 +23,7 @@ export function generateCategoryMetadata(
 
   const title = seo?.meta_title || fallbackTitle
   const description = seo?.meta_description || fallbackDescription
-  const canonicalUrl = seo?.canonical_url || fallbackCanonicalUrl
+  const canonicalUrl = fallbackCanonicalUrl
   const imageUrl = seo?.og_image || null
 
   const robotsIndex = seo ? seo.robots_index : true

@@ -447,7 +447,7 @@ const ProductSeoWidget = ({ data }: ProductSeoWidgetProps) => {
                 <Text size="xsmall" className="text-ui-fg-muted">Optional override (default is automatic)</Text>
               </div>
               <Input
-                placeholder="https://laptopzone.co.zw/zw/products/..."
+                placeholder="https://laptopzone.co.zw/product/..."
                 value={form.canonical_url}
                 onChange={(e) => handleFieldChange("canonical_url", e.target.value)}
               />

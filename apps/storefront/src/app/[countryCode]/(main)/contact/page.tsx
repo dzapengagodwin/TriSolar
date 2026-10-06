@@ -4,6 +4,7 @@ import ContactForm from "./contact-form"
 export const metadata: Metadata = {
   title: "Contact Us",
   description: "Get in touch with our customer support team for inquiries, orders, and tech assistance.",
+  alternates: { canonical: "/contact-us" },
 }
 
 export default async function ContactPage() {

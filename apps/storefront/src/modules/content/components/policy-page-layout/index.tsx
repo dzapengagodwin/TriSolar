@@ -83,7 +83,7 @@ export default function PolicyPageLayout({
               </p>
             </div>
             <LocalizedClientLink
-              href="/contact"
+              href="/contact-us"
               className="inline-flex items-center justify-center bg-primary hover:bg-primary-hover text-white font-bold text-xs px-6 py-2.5 rounded-full transition-colors shadow-sm self-start sm:self-auto"
             >
               Contact Support

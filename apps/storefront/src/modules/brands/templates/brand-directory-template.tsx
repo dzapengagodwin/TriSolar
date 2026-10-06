@@ -31,7 +31,7 @@ export default function BrandDirectoryTemplate({
             return (
               <LocalizedClientLink
                 key={brand.id}
-                href={`/brands/${brand.handle}`}
+                href={`/brand/${brand.handle}`}
                 className="group bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center transition-all duration-300 shadow-xs hover:shadow-md h-48 sm:h-52"
               >
                 <div className="w-full flex-1 flex items-center justify-center p-2">
@@ -73,7 +73,7 @@ export default function BrandDirectoryTemplate({
             Brand directories are being cataloged. Browse our full store in the meantime.
           </p>
           <LocalizedClientLink
-            href="/store"
+            href="/shop"
             className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-semibold uppercase tracking-wider px-6 py-3 rounded-full transition-colors shadow-sm"
           >
             Browse Store

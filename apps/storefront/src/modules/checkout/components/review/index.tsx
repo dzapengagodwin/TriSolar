@@ -44,15 +44,15 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-6">
             <p className="text-xs text-gray-700 leading-relaxed">
               By clicking <span className="font-bold text-black">Place Order</span>, you confirm that you accept our{" "}
-              <LocalizedClientLink href="/terms" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+              <LocalizedClientLink href="/terms-and-conditions" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
                 Terms &amp; Conditions
               </LocalizedClientLink>{" "}
               and{" "}
-              <LocalizedClientLink href="/returns" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+              <LocalizedClientLink href="/returns-and-refunds" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
                 Returns Policy
               </LocalizedClientLink>
               , and acknowledge Laptopzone&apos;s{" "}
-              <LocalizedClientLink href="/privacy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
+              <LocalizedClientLink href="/privacy-policy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
                 Privacy Policy
               </LocalizedClientLink>
               .
