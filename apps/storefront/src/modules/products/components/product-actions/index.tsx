@@ -319,6 +319,7 @@ export default function ProductActions({
           {/* 3. Order on WhatsApp Pill Button */}
           <WhatsAppOrderButton
             productTitle={product.title}
+            productHandle={product.handle}
             variantTitle={selectedVariant?.title}
             size="full"
             className="flex-1 min-w-0"

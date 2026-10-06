@@ -127,6 +127,7 @@ export default function ProductPreview({
             />
             <WhatsAppOrderButton
               productTitle={product.title}
+              productHandle={product.handle}
               size="lg"
             />
           </div>
@@ -199,6 +200,7 @@ export default function ProductPreview({
             />
             <WhatsAppOrderButton
               productTitle={product.title}
+              productHandle={product.handle}
               size="md"
             />
           </div>

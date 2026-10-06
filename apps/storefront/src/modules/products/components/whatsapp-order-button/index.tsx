@@ -1,7 +1,9 @@
 import React from "react"
+import { getProductCanonicalUrl } from "@lib/seo/canonical"
 
 export type WhatsAppOrderButtonProps = {
   productTitle: string
+  productHandle: string
   variantTitle?: string
   className?: string
   size?: "sm" | "md" | "lg" | "full"
@@ -9,6 +11,7 @@ export type WhatsAppOrderButtonProps = {
 
 export function WhatsAppOrderButton({
   productTitle,
+  productHandle,
   variantTitle,
   className = "",
   size = "md",
@@ -23,7 +26,8 @@ export function WhatsAppOrderButton({
 
   const variantSuffix =
     variantTitle && variantTitle !== "Default Title" ? ` (${variantTitle})` : ""
-  const message = `Hi, I would like to order: ${productTitle}${variantSuffix}`
+  const productUrl = getProductCanonicalUrl(productHandle)
+  const message = `Hi, I would like to order: ${productTitle}${variantSuffix}\n${productUrl}`
   const href = `https://wa.me/263772953946?text=${encodeURIComponent(message)}`
 
   return (

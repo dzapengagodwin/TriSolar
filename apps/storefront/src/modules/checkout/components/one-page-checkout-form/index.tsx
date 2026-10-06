@@ -100,6 +100,8 @@ const OnePageCheckoutForm = ({
 
   // Is pickup selected either because store is in pickup-only mode OR customer chose in-store pickup
   const isPickupSelected = fulfillmentType === "pickup"
+  const paymentModeError =
+    "Pay on Collection is only available for in-store pickup orders. Please select an online payment method for delivery."
 
   // Displayed payment methods:
   // - In pickup mode: allow ALL payment methods (both Pay On Collection and online payments like Pesepay)
@@ -733,7 +735,7 @@ const OnePageCheckoutForm = ({
   return (
     <form onSubmit={handleSubmit} noValidate className="w-full space-y-8">
       {/* Global Error Banner */}
-      {errorMessage && (
+      {errorMessage && !(isPickupSelected && errorMessage === paymentModeError) && (
         <div className="bg-rose-50 border-2 border-rose-200 text-rose-800 p-4 rounded-2xl flex items-start gap-3 shadow-xs">
           <svg
             className="w-5 h-5 text-rose-600 shrink-0 mt-0.5"
