@@ -8,7 +8,7 @@ import {
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
@@ -21,6 +21,11 @@ export default async function Checkout(props: {
 }) {
   const params = await props.params
   const { countryCode } = params
+
+  const customer = await retrieveCustomer()
+  if (!customer) {
+    redirect("/account?return_to=%2Fcheckout")
+  }
 
   const cart = await getOrSetCart(countryCode).catch(async () => {
     return await retrieveCart().catch(() => null)
@@ -40,8 +45,6 @@ export default async function Checkout(props: {
       pickupOptions.some((po) => po.id === sm.shipping_option_id)
     ) ||
     false
-
-  const customer = await retrieveCustomer()
 
   return (
     <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] medium:grid-cols-[1fr_400px] content-container gap-6 sm:gap-8 py-8 sm:py-12 items-start">

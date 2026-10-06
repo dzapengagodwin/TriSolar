@@ -7,10 +7,12 @@ import { CreditCard } from "@medusajs/icons"
 import { convertToLocale } from "@lib/util/money"
 import {
   isPickupShippingOption,
-  isDeliveryShippingOption,
   getPickupLocationAddress,
 } from "@lib/util/fulfillment"
-import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
+import {
+  calculatePriceForShippingOption,
+  updateCheckoutAddressAndListShippingMethods,
+} from "@lib/data/fulfillment"
 import {
   setShippingMethod,
   submitOnePageCheckout,
@@ -53,33 +55,42 @@ const OnePageCheckoutForm = ({
   const [, startTransition] = useTransition()
 
   // Explicitly classify fulfillment options
+  const [shippingMethods, setShippingMethods] = useState(availableShippingMethods)
+  const [shippingOptionsLoaded, setShippingOptionsLoaded] = useState(
+    availableShippingMethods.length > 0
+  )
+  const [isLoadingShippingOptions, setIsLoadingShippingOptions] = useState(false)
+  const [shippingOptionsError, setShippingOptionsError] = useState<string | null>(null)
   const pickupOptions = useMemo(
-    () => availableShippingMethods.filter(isPickupShippingOption),
-    [availableShippingMethods]
+    () => shippingMethods.filter(isPickupShippingOption),
+    [shippingMethods]
   )
   const shippingOptions = useMemo(
-    () => availableShippingMethods.filter(isDeliveryShippingOption),
-    [availableShippingMethods]
+    () => shippingMethods.filter((option) => !isPickupShippingOption(option)),
+    [shippingMethods]
   )
   const pickupEnabled = pickupOptions.length > 0
   const shippingEnabled = shippingOptions.length > 0
-  const isPickupOnly = pickupEnabled && !shippingEnabled
+  const existingShippingOption = shippingMethods.find(
+    (option) => option.id === cart.shipping_methods?.at(-1)?.shipping_option_id
+  )
+  const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup" | null>(
+    existingShippingOption
+      ? isPickupShippingOption(existingShippingOption)
+        ? "pickup"
+        : "delivery"
+      : null
+  )
 
-  // Displayed fulfillment methods (in pickup-only mode, only show pickup options)
   const displayedShippingMethods = useMemo(() => {
-    if (isPickupOnly) {
-      return pickupOptions
-    }
-    return availableShippingMethods
-  }, [isPickupOnly, pickupOptions, availableShippingMethods])
+    if (fulfillmentType === "pickup") return pickupOptions
+    if (fulfillmentType === "delivery") return shippingOptions
+    return []
+  }, [fulfillmentType, pickupOptions, shippingOptions])
 
-  // Default shipping selection
-  const defaultShippingId = isPickupOnly
-    ? (pickupOptions.find((p) => p.id === cart.shipping_methods?.at(-1)?.shipping_option_id)?.id || pickupOptions[0]?.id || "")
-    : (cart.shipping_methods?.at(-1)?.shipping_option_id || availableShippingMethods[0]?.id || "")
-
-  // Selected delivery
-  const [shippingMethodId, setShippingMethodId] = useState<string>(defaultShippingId)
+  const [shippingMethodId, setShippingMethodId] = useState<string>(
+    existingShippingOption?.id || ""
+  )
 
   // Currently selected shipping option
   const selectedShippingOption = useMemo(
@@ -88,7 +99,7 @@ const OnePageCheckoutForm = ({
   )
 
   // Is pickup selected either because store is in pickup-only mode OR customer chose in-store pickup
-  const isPickupSelected = isPickupOnly || isPickupShippingOption(selectedShippingOption)
+  const isPickupSelected = fulfillmentType === "pickup"
 
   // Displayed payment methods:
   // - In pickup mode: allow ALL payment methods (both Pay On Collection and online payments like Pesepay)
@@ -187,7 +198,7 @@ const OnePageCheckoutForm = ({
 
   // Fetch dynamic/calculated shipping prices
   useEffect(() => {
-    const calculatedMethods = availableShippingMethods.filter(
+    const calculatedMethods = displayedShippingMethods.filter(
       (sm) => sm.price_type === "calculated"
     )
     if (calculatedMethods.length) {
@@ -205,8 +216,10 @@ const OnePageCheckoutForm = ({
           })
         setCalculatedPricesMap(prices)
       })
+    } else {
+      setCalculatedPricesMap({})
     }
-  }, [availableShippingMethods, cart.id])
+  }, [displayedShippingMethods, cart.id])
 
   // Handle address input changes
   const handleShippingChange = (
@@ -220,6 +233,141 @@ const OnePageCheckoutForm = ({
         delete copy[name]
         return copy
       })
+    }
+
+    if (
+      fulfillmentType === "delivery" &&
+      name.startsWith("shipping_address.") &&
+      name !== "shipping_address.first_name" &&
+      name !== "shipping_address.last_name" &&
+      name !== "shipping_address.phone" &&
+      shippingOptionsLoaded
+    ) {
+      setShippingMethods([])
+      setShippingOptionsLoaded(false)
+      setShippingMethodId("")
+      setShippingOptionsError(null)
+    }
+  }
+
+  const loadShippingOptions = async (type: "delivery" | "pickup") => {
+    if (type === "delivery") {
+      const errors: Record<string, string> = {}
+      if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        errors.email = "Please enter a valid email address."
+      }
+      if (!formData["shipping_address.first_name"]?.trim()) {
+        errors["shipping_address.first_name"] = "First name is required."
+      }
+      if (!formData["shipping_address.last_name"]?.trim()) {
+        errors["shipping_address.last_name"] = "Last name is required."
+      }
+      if (!formData["shipping_address.phone"]?.trim()) {
+        errors["shipping_address.phone"] = "Phone number is required for delivery contact."
+      }
+      if (!formData["shipping_address.address_1"]?.trim()) {
+        errors["shipping_address.address_1"] = "Street address is required."
+      }
+      if (!formData["shipping_address.city"]?.trim()) {
+        errors["shipping_address.city"] = "City is required."
+      }
+      if (!formData["shipping_address.country_code"]?.trim()) {
+        errors["shipping_address.country_code"] = "Country is required."
+      }
+
+      setFieldErrors((prev) => ({ ...prev, ...errors }))
+      if (Object.keys(errors).length) {
+        setShippingOptionsError("Complete the required delivery details to see available options.")
+        const firstError = document.querySelector(`[name="${Object.keys(errors)[0]}"]`)
+        firstError?.scrollIntoView({ behavior: "smooth", block: "center" })
+        return
+      }
+    }
+
+    setIsLoadingShippingOptions(true)
+    setShippingOptionsError(null)
+
+    const countryCode =
+      formData["shipping_address.country_code"] ||
+      cart.region?.countries?.[0]?.iso_2 ||
+      "zw"
+    const address =
+      type === "pickup"
+        ? {
+            first_name: formData["shipping_address.first_name"] || "Store",
+            last_name: formData["shipping_address.last_name"] || "Pickup",
+            address_1: "64 Ridgeway / Borrowdale",
+            address_2: "In-Store Collection",
+            postal_code: "0000",
+            city: "Harare",
+            country_code: countryCode,
+            province: "",
+            phone: formData["shipping_address.phone"] || "",
+          }
+        : {
+            first_name: formData["shipping_address.first_name"].trim(),
+            last_name: formData["shipping_address.last_name"].trim(),
+            address_1: formData["shipping_address.address_1"].trim(),
+            address_2: formData["shipping_address.address_2"] || "",
+            company: formData["shipping_address.company"] || "",
+            postal_code: formData["shipping_address.postal_code"] || "",
+            city: formData["shipping_address.city"].trim(),
+            country_code,
+            province: formData["shipping_address.province"] || "",
+            phone: formData["shipping_address.phone"].trim(),
+          }
+
+    try {
+      const options = await updateCheckoutAddressAndListShippingMethods({
+        cartId: cart.id,
+        email: email.trim() || undefined,
+        address,
+      })
+      const relevantOptions =
+        type === "pickup"
+          ? options.filter(isPickupShippingOption)
+          : options.filter((option) => !isPickupShippingOption(option))
+
+      setShippingMethods(options)
+      setShippingOptionsLoaded(true)
+      setShippingMethodId((current) =>
+        relevantOptions.some((option) => option.id === current) ? current : ""
+      )
+      setShippingOptionsError(
+        relevantOptions.length
+          ? null
+          : type === "pickup"
+            ? "No pickup locations are available for this cart. Please contact us for help."
+            : "No delivery options are available for this address. Check the address or choose store pickup."
+      )
+    } catch (error) {
+      setShippingOptionsError(
+        error instanceof Error
+          ? error.message
+          : "Could not load shipping options. Please try again."
+      )
+    } finally {
+      setIsLoadingShippingOptions(false)
+    }
+  }
+
+  const handleFulfillmentTypeChange = (type: "delivery" | "pickup") => {
+    if (type !== fulfillmentType) {
+      setShippingMethodId("")
+      setShippingMethods([])
+      setShippingOptionsLoaded(false)
+      setShippingOptionsError(null)
+      setFieldErrors((prev) => {
+        const next = { ...prev }
+        delete next.shipping_method_id
+        return next
+      })
+    }
+
+    setFulfillmentType(type)
+    setErrorMessage(null)
+    if (type === "pickup" && (type !== fulfillmentType || !shippingOptionsLoaded)) {
+      void loadShippingOptions(type)
     }
   }
 
@@ -256,6 +404,12 @@ const OnePageCheckoutForm = ({
         "shipping_address.phone": savedAddress.phone || "",
       }))
       setFieldErrors({})
+      if (fulfillmentType === "delivery") {
+        setShippingMethods([])
+        setShippingOptionsLoaded(false)
+        setShippingMethodId("")
+        setShippingOptionsError(null)
+      }
     }
   }
 
@@ -272,7 +426,7 @@ const OnePageCheckoutForm = ({
       }
 
       const selectedOption = displayedShippingMethods.find((sm) => sm.id === id)
-      const isClickedPickup = isPickupOnly || isPickupShippingOption(selectedOption)
+      const isClickedPickup = isPickupShippingOption(selectedOption)
 
       // If user selected shipping/delivery, immediately ensure payment is switched to online payment
       // because Pay on Collection is only allowed for in-store pickup orders
@@ -316,7 +470,6 @@ const OnePageCheckoutForm = ({
       cart.total,
       cart.currency_code,
       displayedShippingMethods,
-      isPickupOnly,
       availablePaymentMethods,
       paymentProviderId,
       fieldErrors,
@@ -345,23 +498,6 @@ const OnePageCheckoutForm = ({
       }
     }
   }, [isPickupSelected, displayedPaymentMethods, paymentProviderId])
-
-  // Auto-select pickup option when in pickup-only mode
-  useEffect(() => {
-    if (isPickupOnly) {
-      if (
-        pickupOptions.length > 0 &&
-        (!shippingMethodId || !pickupOptions.some((p) => p.id === shippingMethodId))
-      ) {
-        handleSelectShippingMethod(pickupOptions[0].id)
-      }
-    }
-  }, [
-    isPickupOnly,
-    pickupOptions,
-    shippingMethodId,
-    handleSelectShippingMethod,
-  ])
 
   // Handle payment method selection
   const handleSelectPaymentMethod = (providerId: string) => {
@@ -620,13 +756,91 @@ const OnePageCheckoutForm = ({
 
       {/* Unified Checkout Form Card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100 overflow-hidden">
+        <section
+          className="p-6 sm:p-8 space-y-4"
+          aria-labelledby="fulfillment-choice-title"
+        >
+          <div>
+            <h2
+              id="fulfillment-choice-title"
+              className="mt-1 text-lg font-bold text-gray-900"
+            >
+              How would you like to receive your order?
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Choose delivery or store pickup before entering your details.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => handleFulfillmentTypeChange("delivery")}
+              disabled={!shippingEnabled && shippingOptionsLoaded}
+              aria-pressed={fulfillmentType === "delivery"}
+              className={clx(
+                "min-h-24 rounded-xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                fulfillmentType === "delivery"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+              )}
+            >
+              <span className="block text-sm font-bold text-gray-900">Delivery</span>
+              <span className="mt-1 block text-sm text-gray-600">
+                Courier delivery to your address
+              </span>
+              {!shippingEnabled && shippingOptionsLoaded && (
+                <span className="mt-2 block text-xs text-gray-500">
+                  Delivery is unavailable for this cart
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleFulfillmentTypeChange("pickup")}
+              disabled={!pickupEnabled && shippingOptionsLoaded}
+              aria-pressed={fulfillmentType === "pickup"}
+              className={clx(
+                "min-h-24 rounded-xl border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                fulfillmentType === "pickup"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-gray-200 hover:border-gray-400 hover:bg-gray-50"
+              )}
+            >
+              <span className="block text-sm font-bold text-gray-900">
+                Store pickup
+              </span>
+              <span className="mt-1 block text-sm text-gray-600">
+                Collect your order from an available location
+              </span>
+              {!pickupEnabled && shippingOptionsLoaded && (
+                <span className="mt-2 block text-xs text-gray-500">
+                  Pickup is unavailable for this cart
+                </span>
+              )}
+            </button>
+          </div>
+
+          {shippingOptionsLoaded && !pickupEnabled && !shippingEnabled && (
+            <p
+              role="alert"
+              className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800"
+            >
+              No delivery or pickup options are available for this cart. Please contact us for help.
+            </p>
+          )}
+        </section>
+
+        {fulfillmentType && (
+          <>
         {/* SECTION 1: Contact & Delivery / Collector Details */}
         <div className="p-6 sm:p-8 space-y-6">
           <div>
             <h2 className="text-lg font-bold text-gray-900 tracking-tight">
-              {isPickupOnly ? "Contact & Collector Details" : "Contact & Delivery Address"}
+              {isPickupSelected ? "Contact & Collector Details" : "Contact & Delivery Address"}
             </h2>
-            {isPickupOnly && (
+            {isPickupSelected && (
               <p className="text-xs text-gray-500 mt-1">
                 Please provide the contact details of the person collecting this order in store.
               </p>
@@ -634,7 +848,7 @@ const OnePageCheckoutForm = ({
           </div>
 
           {/* Quick select saved customer address if logged in (normal shipping mode only) */}
-          {!isPickupOnly && customer && (addressesInRegion?.length || 0) > 0 && (
+          {!isPickupSelected && customer && (addressesInRegion?.length || 0) > 0 && (
             <div className="p-4 bg-gray-50/80 rounded-xl border border-gray-200">
               <span className="text-xs font-bold text-gray-700 block mb-2">
                 Saved Delivery Addresses:
@@ -677,7 +891,7 @@ const OnePageCheckoutForm = ({
               </div>
               <div>
                 <Input
-                  label={isPickupOnly ? "Collector Phone Number" : "Phone Number"}
+                  label={isPickupSelected ? "Collector Phone Number" : "Phone Number"}
                   name="shipping_address.phone"
                   autoComplete="tel"
                   value={formData["shipping_address.phone"]}
@@ -696,7 +910,7 @@ const OnePageCheckoutForm = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Input
-                  label={isPickupOnly ? "Collector First Name" : "First Name"}
+                  label={isPickupSelected ? "Collector First Name" : "First Name"}
                   name="shipping_address.first_name"
                   autoComplete="given-name"
                   value={formData["shipping_address.first_name"]}
@@ -711,7 +925,7 @@ const OnePageCheckoutForm = ({
               </div>
               <div>
                 <Input
-                  label={isPickupOnly ? "Collector Last Name" : "Last Name"}
+                  label={isPickupSelected ? "Collector Last Name" : "Last Name"}
                   name="shipping_address.last_name"
                   autoComplete="family-name"
                   value={formData["shipping_address.last_name"]}
@@ -726,7 +940,7 @@ const OnePageCheckoutForm = ({
               </div>
             </div>
 
-            {!isPickupOnly && (
+            {!isPickupSelected && (
               <>
                 {/* Street Address */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -907,17 +1121,40 @@ const OnePageCheckoutForm = ({
         {/* SECTION 2: Fulfillment / Collection Location */}
         <div className="p-6 sm:p-8 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-gray-900 tracking-tight">
-              {isPickupOnly ? "Collection Location" : "Delivery Method"}
-            </h2>
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+                {isPickupSelected ? "Pickup Location" : "Delivery Method"}
+              </h2>
+            </div>
             {updatingShipping && <Spinner size="16" />}
           </div>
 
           {displayedShippingMethods.length === 0 ? (
-            <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
-              {isPickupOnly
-                ? "No pickup location available."
-                : "No shipping options available for this destination."}
+            <div className="space-y-3">
+              <div className="p-5 text-center text-sm text-gray-600 bg-gray-50 rounded-xl">
+                {isLoadingShippingOptions
+                  ? isPickupSelected
+                    ? "Finding pickup locations…"
+                    : "Checking delivery options for this address…"
+                  : shippingOptionsLoaded
+                    ? shippingOptionsError ||
+                      (isPickupSelected
+                        ? "No pickup locations are available for this cart."
+                        : "No delivery options are available for this address.")
+                    : isPickupSelected
+                      ? "We’ll show pickup locations in a moment."
+                      : "Enter your delivery details, then check which options are available to your address."}
+              </div>
+              {!isPickupSelected && !shippingOptionsLoaded && (
+                <button
+                  type="button"
+                  onClick={() => void loadShippingOptions("delivery")}
+                  disabled={isLoadingShippingOptions}
+                  className="w-full min-h-11 rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {isLoadingShippingOptions ? "Checking options…" : "Check delivery options"}
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-3">
@@ -975,7 +1212,7 @@ const OnePageCheckoutForm = ({
                                   : `Shop Pickup — ${option.name}`)
                               : option.name}
                           </span>
-                          {isPickup && !isPickupOnly && (
+                          {isPickup && (
                             <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-700 shrink-0">
                               Pickup
                             </span>
@@ -1006,13 +1243,20 @@ const OnePageCheckoutForm = ({
               {fieldErrors["shipping_method_id"]}
             </span>
           )}
+          {shippingOptionsError && displayedShippingMethods.length > 0 && (
+            <p role="alert" className="text-sm text-rose-600">
+              {shippingOptionsError}
+            </p>
+          )}
         </div>
 
         {/* SECTION 3: Payment Method */}
         <div className="p-6 sm:p-8 space-y-4">
-          <h2 className="text-lg font-bold text-gray-900 tracking-tight">
-            Payment Method
-          </h2>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 tracking-tight">
+              Payment Method
+            </h2>
+          </div>
 
           {displayedPaymentMethods.length === 0 ? (
             <div className="p-5 text-center text-xs text-gray-500 bg-gray-50 rounded-xl">
@@ -1119,6 +1363,8 @@ const OnePageCheckoutForm = ({
             .
           </p>
         </div>
+          </>
+        )}
       </div>
     </form>
   )

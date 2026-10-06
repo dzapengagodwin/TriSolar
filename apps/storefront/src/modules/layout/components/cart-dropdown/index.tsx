@@ -34,19 +34,9 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
   const params = useParams()
   const countryCode = (params?.countryCode as string) || "zw"
 
-  const open = () => setIsOpen(true)
-  const close = () => setIsOpen(false)
-
-  // Fetch dynamic accessory recommendations from backend for current cart items
-  useEffect(() => {
-    let isMounted = true
-    const fetchAccessories = async () => {
-      if (!cartState?.items || cartState.items.length === 0) {
-        setAccessories([])
-        return
-      }
-
-      const productIds = cartState.items
+  const cartProductIds = Array.from(
+    new Set(
+      (cartState?.items ?? [])
         .map((item) => {
           const itemRecord = item as unknown as Record<string, unknown>
           const variantRecord = item.variant as unknown as Record<string, unknown> | undefined
@@ -58,15 +48,25 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
             (item.variant?.product?.id as string | undefined)
           )
         })
-        .filter(Boolean) as string[]
+        .filter((id): id is string => Boolean(id))
+    )
+  )
+  const cartProductIdsKey = cartProductIds.join("|")
 
-      if (productIds.length === 0) {
+  const open = () => setIsOpen(true)
+  const close = () => setIsOpen(false)
+
+  // Fetch dynamic accessory recommendations from backend for current cart items
+  useEffect(() => {
+    let isMounted = true
+    const fetchAccessories = async () => {
+      if (!cartProductIdsKey) {
         setAccessories([])
         return
       }
 
       try {
-        const recs = await getCartAccessoryRecommendations(productIds)
+        const recs = await getCartAccessoryRecommendations(cartProductIdsKey.split("|"))
         if (isMounted) {
           setAccessories(recs || [])
         }
@@ -80,7 +80,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
     return () => {
       isMounted = false
     }
-  }, [cartState?.items])
+  }, [cartProductIdsKey])
 
   const handleAddAccessory = (accessory: HttpTypes.StoreProduct) => {
     const variantId = accessory.variants?.[0]?.id

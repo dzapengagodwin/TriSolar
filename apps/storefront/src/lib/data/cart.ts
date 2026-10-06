@@ -594,6 +594,21 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
   }
 
   const headers = await getAuthHeaders()
+  if (!("authorization" in headers)) {
+    return { error: "Please sign in to complete your checkout." }
+  }
+
+  const customer = await sdk.client
+    .fetch<{ customer: HttpTypes.StoreCustomer }>("/store/customers/me", {
+      method: "GET",
+      headers,
+      cache: "no-store",
+    })
+    .catch(() => null)
+
+  if (!customer?.customer) {
+    return { error: "Please sign in to complete your checkout." }
+  }
 
   try {
     const shippingAddress = {

@@ -63,6 +63,7 @@ function LegacyVariantInitializer({
 
 export default function ProductActions({
   product,
+  region,
   disabled,
 }: ProductActionsProps) {
   const router = useRouter()

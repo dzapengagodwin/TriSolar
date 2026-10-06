@@ -7,6 +7,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { signup } from "@lib/data/customer"
+import { useSearchParams } from "next/navigation"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -14,6 +15,7 @@ type Props = {
 
 const Register = ({ setCurrentView }: Props) => {
   const [message, formAction] = useActionState(signup, null)
+  const returnTo = useSearchParams().get("return_to")
 
   return (
     <div
@@ -36,6 +38,7 @@ const Register = ({ setCurrentView }: Props) => {
         </div>
       )}
       <form className="w-full flex flex-col" action={formAction}>
+        {returnTo && <input type="hidden" name="return_to" value={returnTo} />}
         <div className="flex flex-col w-full gap-y-2">
           <Input
             label="First name"

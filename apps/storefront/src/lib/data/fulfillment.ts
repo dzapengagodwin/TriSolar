@@ -2,7 +2,8 @@
 
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { revalidateTag } from "next/cache"
+import { getAuthHeaders, getCacheOptions, getCacheTag, getCartId } from "./cookies"
 
 
 export const listCartShippingMethods = async (cartId: string) => {
@@ -32,6 +33,57 @@ export const listCartShippingMethods = async (cartId: string) => {
     .catch(() => {
       return []
     })
+}
+
+export const updateCheckoutAddressAndListShippingMethods = async ({
+  cartId,
+  email,
+  address,
+}: {
+  cartId: string
+  email?: string
+  address: NonNullable<HttpTypes.StoreUpdateCart["shipping_address"]>
+}) => {
+  const activeCartId = await getCartId()
+  if (!activeCartId || activeCartId !== cartId) {
+    throw new Error("Your cart has changed. Refresh checkout and try again.")
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+  if (!("authorization" in headers)) {
+    throw new Error("Please sign in to view checkout options.")
+  }
+
+  const customer = await sdk.client
+    .fetch<{ customer: HttpTypes.StoreCustomer }>("/store/customers/me", {
+      method: "GET",
+      headers,
+      cache: "no-store",
+    })
+    .catch(() => null)
+
+  if (!customer?.customer) {
+    throw new Error("Please sign in to view checkout options.")
+  }
+
+  await sdk.store.cart.update(
+    cartId,
+    {
+      ...(email ? { email } : {}),
+      shipping_address: address,
+    },
+    {},
+    headers
+  )
+
+  const cartCacheTag = await getCacheTag("carts")
+  if (cartCacheTag) {
+    revalidateTag(cartCacheTag)
+  }
+
+  return listCartShippingMethods(cartId)
 }
 
 export const calculatePriceForShippingOption = async (
