@@ -70,14 +70,27 @@ export function validateFeedItem(item: ProductFeedItem): ValidationResult {
   }
 
   // 10. Unique Product Identifiers (GTIN, MPN, Brand)
-  const hasGtin = !!sanitized.gtin && sanitized.gtin.trim().length >= 8
-  const hasBrand = !!sanitized.brand && sanitized.brand.trim().length > 0
-  const hasMpn = !!sanitized.mpn && sanitized.mpn.trim().length > 0
+  if (sanitized.gtin) {
+    sanitized.gtin = String(sanitized.gtin).trim().replace(/[\s-]/g, "")
+  }
+  if (sanitized.mpn) {
+    sanitized.mpn = String(sanitized.mpn).trim()
+  }
 
-  if (hasGtin || (hasBrand && hasMpn)) {
-    sanitized.identifier_exists = "yes"
-  } else {
-    sanitized.identifier_exists = "no"
+  const hasGtin = !!sanitized.gtin && sanitized.gtin.length >= 8
+  const hasBrand = !!sanitized.brand && String(sanitized.brand).trim().length > 0
+  const hasMpn = !!sanitized.mpn && sanitized.mpn.length > 0
+
+  // Respect explicitly configured identifier_exists override from Merchant settings
+  if (sanitized.identifier_exists !== "yes" && sanitized.identifier_exists !== "no") {
+    if (hasGtin || (hasBrand && hasMpn)) {
+      sanitized.identifier_exists = "yes"
+    } else {
+      sanitized.identifier_exists = "no"
+    }
+  }
+
+  if (sanitized.identifier_exists === "no") {
     if (!hasBrand) {
       warnings.push("Missing brand identifier")
     }

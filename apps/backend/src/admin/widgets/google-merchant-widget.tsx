@@ -37,6 +37,7 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
   const [fields, setFields] = useState<MerchantFields>(emptyFields)
   const [categorySearch, setCategorySearch] = useState("")
   const [categorySearchOpen, setCategorySearchOpen] = useState(false)
+  const [hasInitialized, setHasInitialized] = useState(false)
 
   const { data: response, isLoading, isError } = useQuery({
     queryKey: ["google-merchant-product", data.id],
@@ -45,6 +46,8 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
 
   const product = response?.product as Product | undefined
   useEffect(() => {
+    if (!product || hasInitialized) return
+
     const metadata = product?.metadata || {}
     const merchant = (metadata.google_merchant || {}) as Partial<MerchantFields>
     const savedCategory =
@@ -57,14 +60,15 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
       google_product_category: taxonomyCategory?.[0] || savedCategory,
       title: merchant.title || "",
       gtin: merchant.gtin || (metadata.gtin as string) || "",
-      mpn: merchant.mpn || (metadata.manufacturer_mpn as string) || "",
+      mpn: merchant.mpn || (metadata.manufacturer_mpn as string) || (metadata.mpn as string) || "",
       identifier_exists:
         merchant.identifier_exists === "yes" || merchant.identifier_exists === "no"
           ? merchant.identifier_exists
           : "",
       excluded: merchant.excluded === true,
     })
-  }, [product])
+    setHasInitialized(true)
+  }, [product, hasInitialized])
 
   const selectedCategory = taxonomy.find(
     ([id]) => id === fields.google_product_category
@@ -90,17 +94,43 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
               "manufacturer_mpn",
               "manufacturer_mpn_verified",
               "mpn",
+              "gtin",
             ].includes(key)
         )
       )
+
+      const trimmedGtin = fields.gtin ? fields.gtin.trim() : ""
+      const trimmedMpn = fields.mpn ? fields.mpn.trim() : ""
+      const cleanFields = {
+        ...fields,
+        gtin: trimmedGtin,
+        mpn: trimmedMpn,
+        title: fields.title ? fields.title.trim() : "",
+      }
+
       const google_merchant = Object.fromEntries(
-        Object.entries(fields).filter(([, value]) => value !== "" && value !== false)
+        Object.entries(cleanFields).filter(([, value]) => value !== "" && value !== false)
       )
+
+      const metadataToUpdate: Record<string, unknown> = {
+        ...remaining,
+        google_merchant,
+      }
+
+      if (trimmedGtin) {
+        metadataToUpdate.gtin = trimmedGtin
+      }
+      if (trimmedMpn) {
+        metadataToUpdate.mpn = trimmedMpn
+        metadataToUpdate.manufacturer_mpn = trimmedMpn
+      }
+
       return sdk.admin.product.update(data.id, {
-        metadata: { ...remaining, google_merchant },
+        metadata: metadataToUpdate,
       })
     },
     onSuccess: async () => {
+      setHasInitialized(false)
       await queryClient.invalidateQueries({ queryKey: ["google-merchant-product", data.id] })
       await queryClient.invalidateQueries({ queryKey: ["product", data.id] })
       toast.success("Google Merchant settings saved")
@@ -193,11 +223,24 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
           <Label size="small">Global Trade Item Number (GTIN)</Label>
           <Input
             value={fields.gtin}
-            placeholder="Enter the manufacturer-assigned GTIN"
+            placeholder="Enter the manufacturer-assigned GTIN (e.g. 12 or 13 digits)"
             onChange={(event) => set("gtin", event.target.value)}
           />
+          <Text size="xsmall" className="text-ui-fg-subtle">
+            Maps to &lt;g:gtin&gt; in the product feed. Overrides variant barcode.
+          </Text>
         </div>
-        <div className="grid gap-2"><Label size="small">Manufacturer part number (MPN)</Label><Input value={fields.mpn} onChange={(event) => set("mpn", event.target.value)} /></div>
+        <div className="grid gap-2">
+          <Label size="small">Manufacturer part number (MPN)</Label>
+          <Input
+            value={fields.mpn}
+            placeholder="Enter manufacturer part number (e.g. 15-FD0153WM)"
+            onChange={(event) => set("mpn", event.target.value)}
+          />
+          <Text size="xsmall" className="text-ui-fg-subtle">
+            Maps to &lt;g:mpn&gt; in the product feed. Overrides variant SKU and title part numbers.
+          </Text>
+        </div>
         <div className="grid gap-2">
           <Label size="small">Identifier exists</Label>
           <select className={selectClassName} value={fields.identifier_exists} onChange={(event) => set("identifier_exists", event.target.value as MerchantFields["identifier_exists"])}>

@@ -20,6 +20,42 @@ function cleanDescription(raw?: string | null): string {
 }
 
 /**
+ * Safely converts value to clean trimmed string or undefined
+ */
+function cleanString(val: unknown): string | undefined {
+  if (val === null || val === undefined) return undefined
+  const str = String(val).trim()
+  return str.length > 0 ? str : undefined
+}
+
+/**
+ * Normalizes GTIN by removing spaces and hyphens.
+ * Returns digits-only string if it matches standard GTIN lengths (8 to 14 digits).
+ */
+function normalizeGtin(raw: unknown): string | undefined {
+  const str = cleanString(raw)
+  if (!str) return undefined
+  const digitsOnly = str.replace(/[\s-]/g, "")
+  if (/^\d{8,14}$/.test(digitsOnly)) {
+    return digitsOnly
+  }
+  return undefined
+}
+
+/**
+ * Normalizes MPN by trimming and filtering out placeholder strings.
+ */
+function normalizeMpn(raw: unknown): string | undefined {
+  const str = cleanString(raw)
+  if (!str) return undefined
+  const lower = str.toLowerCase()
+  if (lower === "n/a" || lower === "none" || lower === "null" || lower === "undefined") {
+    return undefined
+  }
+  return str
+}
+
+/**
  * Maps a single Medusa product and variant into a Google Product Feed item
  */
 export function mapProductToFeedItem(
@@ -156,25 +192,48 @@ export function mapProductToFeedItem(
   // 7. Brand Resolution
   const brand = getProductBrand(product)
 
-  // 8. Unique Product Identifiers
+  // 8. Unique Product Identifiers (GTIN & MPN)
   const gtin =
-    (variant.barcode as string) ||
-    (variant.ean as string) ||
-    (variant.upc as string) ||
-    (variantMerchant.gtin as string) ||
-    (variant.metadata?.gtin as string) ||
-    (variant.metadata?.barcode as string) ||
-    (merchant.gtin as string) ||
-    (product.metadata?.gtin as string)
+    normalizeGtin(variantMerchant.gtin) ||
+    normalizeGtin(merchant.gtin) ||
+    normalizeGtin(variant.barcode) ||
+    normalizeGtin(variant.ean) ||
+    normalizeGtin(variant.upc) ||
+    normalizeGtin(variant.metadata?.gtin) ||
+    normalizeGtin(variant.metadata?.barcode) ||
+    normalizeGtin(product.metadata?.gtin) ||
+    normalizeGtin(product.metadata?.barcode) ||
+    normalizeGtin(variant.sku) ||
+    normalizeGtin(product.metadata?.woo_sku)
+
+  // Extract MPN from metadata specifications if available
+  const specs = (product.metadata?.specifications || {}) as Record<string, unknown>
+  const specPartNo = Array.isArray(specs["Part Number"])
+    ? specs["Part Number"][0]
+    : specs["Part Number"]
+  const specModel = Array.isArray(specs["Model"]) ? specs["Model"][0] : specs["Model"]
+
+  // Extract MPN from title if in parentheses (e.g. "HP 250 G7 (6MQ60ES)")
+  let titleMpn: string | undefined
+  const titleMatch = (product.title || "").match(/\(([A-Z0-9#\-_/]{4,})\)/i)
+  if (titleMatch) {
+    titleMpn = titleMatch[1]
+  }
 
   const mpn =
-    (variantMerchant.mpn as string) ||
-    (variant.metadata?.manufacturer_mpn as string) ||
-    (variant.metadata?.mpn as string) ||
-    (variant.metadata?.part_number as string) ||
-    (merchant.mpn as string) ||
-    (product.metadata?.manufacturer_mpn as string) ||
-    (product.metadata?.mpn as string)
+    normalizeMpn(variantMerchant.mpn) ||
+    normalizeMpn(merchant.mpn) ||
+    normalizeMpn(variant.metadata?.mpn) ||
+    normalizeMpn(variant.metadata?.manufacturer_mpn) ||
+    normalizeMpn(variant.metadata?.part_number) ||
+    normalizeMpn(product.metadata?.mpn) ||
+    normalizeMpn(product.metadata?.manufacturer_mpn) ||
+    normalizeMpn(product.metadata?.part_number) ||
+    normalizeMpn(specPartNo) ||
+    normalizeMpn(specModel) ||
+    (gtin !== variant.sku ? normalizeMpn(variant.sku) : undefined) ||
+    (gtin !== product.metadata?.woo_sku ? normalizeMpn(product.metadata?.woo_sku) : undefined) ||
+    normalizeMpn(titleMpn)
 
   // 9. Categories and Product Type
   const categoryNames = (product.categories || []).map((c: any) => c.name)

@@ -97,7 +97,11 @@ async function getCountryCode(
  * Middleware to handle region selection and onboarding status.
  */
 export async function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname.includes(".")) {
+  if (
+    request.nextUrl.pathname.includes(".") ||
+    request.nextUrl.pathname === "/product-feed" ||
+    request.nextUrl.pathname.startsWith("/product-feed/")
+  ) {
     return NextResponse.next()
   }
 

@@ -75,11 +75,11 @@ export function generateGoogleProductFeedXml(
     }
 
     if (item.gtin) {
-      lines.push(`      <g:gtin>${escapeXml(item.gtin)}</g:gtin>`)
+      lines.push(`      <g:gtin>${escapeXml(String(item.gtin))}</g:gtin>`)
     }
 
     if (item.mpn) {
-      lines.push(`      <g:mpn>${escapeXml(item.mpn)}</g:mpn>`)
+      lines.push(`      <g:mpn>${escapeXml(String(item.mpn))}</g:mpn>`)
     }
 
     lines.push(`      <g:identifier_exists>${item.identifier_exists}</g:identifier_exists>`)

@@ -1,15 +1,11 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 import { listCategories } from "@lib/data/categories"
-import { listCollections } from "@lib/data/collections"
 import { getCategoryPublicPath } from "@lib/seo/canonical"
 import FooterDealsBox from "@modules/layout/components/footer-deals-box"
 
 export default async function Footer() {
-  const [categories, { collections }] = await Promise.all([
-    listCategories().catch(() => []),
-    listCollections({ limit: "10" }).catch(() => ({ collections: [] })),
-  ])
+  const categories = await listCategories().catch(() => [])
 
   // Filter root categories for clean category navigation
   const topCategories = categories

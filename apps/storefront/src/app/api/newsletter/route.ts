@@ -45,8 +45,9 @@ export async function POST(request: NextRequest) {
       success: true,
       message: data.message || "Thank you for subscribing to Laptopzone deals!",
     })
-  } catch (error: any) {
-    console.error(`[Newsletter Route Error] ${error.message}`)
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error(`[Newsletter Route Error] ${message}`)
     return NextResponse.json(
       { error: "Unable to connect to newsletter service. Please try again later." },
       { status: 500 }
