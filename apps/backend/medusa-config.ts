@@ -162,6 +162,13 @@ export default defineConfig({
               admin_url: process.env.ADMIN_URL || "http://localhost:9000/app",
             },
           },
+          {
+            resolve: "@medusajs/medusa/notification-local",
+            id: "local-notification-feed",
+            options: {
+              channels: ["feed"],
+            },
+          },
         ],
       },
     },
