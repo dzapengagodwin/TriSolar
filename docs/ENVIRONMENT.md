@@ -39,6 +39,7 @@ This document lists all environment variables used by the **Laptopzone** monorep
 | `SENDGRID_ORDER_NOTIFICATION_EMAIL`| Operational recipient address for new order alerts | Optional | `order-placed.ts` Subscriber | `admin@laptopzone.co.zw` |
 | `SENDGRID_ACCOUNT_FROM_EMAIL`| Sender address for password resets and invites | Optional | SendGrid Module | `noreply@laptopzone.co.zw` |
 | `SENDGRID_SANDBOX` | Toggle SendGrid sandbox mode | Optional (default: `false`) | SendGrid Module | `true` or `false` |
+| `SENDGRID_WEBSITE_LIST_ID` | SendGrid Marketing Contacts List ID for Newsletter Signups | Optional in dev, **Required** for newsletter | SendGrid Contacts API | `<sendgrid-list-id-uuid>` |
 | `MERCHANT_COUNTRY` | Default country for Google Merchant XML feed | Optional (default: `ZW`) | Product Feed API | `ZW` |
 | `MERCHANT_CURRENCY` | Default currency for Google Merchant XML feed | Optional (default: `USD`) | Product Feed API | `USD` |
 
@@ -59,6 +60,8 @@ This document lists all environment variables used by the **Laptopzone** monorep
 | `NEXT_PUBLIC_STRIPE_KEY` | Optional public Stripe publishable key | Optional | Stripe Payment Element | `pk_test_...` |
 | `MEDUSA_CLOUD_S3_HOSTNAME` | Hostname filter for remote Next.js image optimization | Optional | `next.config.js` | `laptopzone-media.s3.amazonaws.com` |
 | `MEDUSA_CLOUD_S3_PATHNAME` | Pathname filter for remote Next.js image optimization | Optional | `next.config.js` | `/**` |
+
+> **Note**: SendGrid configuration (`SENDGRID_API_KEY`, `SENDGRID_WEBSITE_LIST_ID`) is maintained securely on the Medusa backend in `apps/backend/.env`. The storefront delegates newsletter subscriptions to the backend.
 
 ---
 
