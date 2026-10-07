@@ -116,43 +116,7 @@ export default function FooterDealsBox() {
         </form>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-[#333333]" />
-
-      {/* 3. Laptopzone App Section */}
-      <div className="flex items-center gap-3 py-1">
-        <div className="text-primary shrink-0">
-          <svg
-            className="w-8 h-8"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            {/* Phone Body */}
-            <rect x="4" y="2" width="16" height="20" rx="3" />
-            <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2.5" />
-            {/* Tag / Deal Glyph inside Screen */}
-            <path d="M8 7h4l3 3-3 3H8z" fill="currentColor" fillOpacity="0.2" />
-            <circle cx="9.5" cy="8.5" r="0.8" fill="currentColor" />
-          </svg>
-        </div>
-        <div className="leading-tight">
-          <span className="block text-white font-bold text-xs sm:text-sm">
-            Laptopzone app
-          </span>
-          <LocalizedClientLink
-            href="/contact-us"
-            className="inline-flex items-center gap-1 text-primary hover:underline text-[11px] font-semibold mt-0.5"
-          >
-            <span>Learn more</span>
-            <span aria-hidden="true">&rsaquo;</span>
-          </LocalizedClientLink>
-        </div>
-      </div>
-
+  
       {/* Divider */}
       <div className="border-t border-[#333333]" />
 
@@ -174,7 +138,7 @@ export default function FooterDealsBox() {
 
           {/* Instagram */}
           <a
-            href="https://instagram.com"
+            href="https://www.instagram.com/laptopzonezw"
             target="_blank"
             rel="noreferrer"
             aria-label="Instagram"
@@ -200,7 +164,7 @@ export default function FooterDealsBox() {
 
           {/* Facebook */}
           <a
-            href="https://facebook.com"
+            href="https://www.facebook.com/laptopzonezw"
             target="_blank"
             rel="noreferrer"
             aria-label="Facebook"

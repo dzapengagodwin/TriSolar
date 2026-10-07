@@ -3,6 +3,7 @@ import { Metadata } from "next"
 import { Montserrat } from "next/font/google"
 import GoogleAnalytics from "@modules/analytics/components/google-analytics"
 import PageViewTracker from "@modules/analytics/components/page-view-tracker"
+import WhatsAppFAB from "@modules/common/components/whatsapp-fab"
 import "styles/globals.css"
 
 const montserrat = Montserrat({
@@ -29,6 +30,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <GoogleAnalytics />
         <PageViewTracker />
         <main className="relative">{props.children}</main>
+        <WhatsAppFAB />
       </body>
     </html>
   )
