@@ -202,23 +202,7 @@ export function mapProductToFeedItem(
     normalizeGtin(variant.metadata?.gtin) ||
     normalizeGtin(variant.metadata?.barcode) ||
     normalizeGtin(product.metadata?.gtin) ||
-    normalizeGtin(product.metadata?.barcode) ||
-    normalizeGtin(variant.sku) ||
-    normalizeGtin(product.metadata?.woo_sku)
-
-  // Extract MPN from metadata specifications if available
-  const specs = (product.metadata?.specifications || {}) as Record<string, unknown>
-  const specPartNo = Array.isArray(specs["Part Number"])
-    ? specs["Part Number"][0]
-    : specs["Part Number"]
-  const specModel = Array.isArray(specs["Model"]) ? specs["Model"][0] : specs["Model"]
-
-  // Extract MPN from title if in parentheses (e.g. "HP 250 G7 (6MQ60ES)")
-  let titleMpn: string | undefined
-  const titleMatch = (product.title || "").match(/\(([A-Z0-9#\-_/]{4,})\)/i)
-  if (titleMatch) {
-    titleMpn = titleMatch[1]
-  }
+    normalizeGtin(product.metadata?.barcode)
 
   const mpn =
     normalizeMpn(variantMerchant.mpn) ||
@@ -228,12 +212,7 @@ export function mapProductToFeedItem(
     normalizeMpn(variant.metadata?.part_number) ||
     normalizeMpn(product.metadata?.mpn) ||
     normalizeMpn(product.metadata?.manufacturer_mpn) ||
-    normalizeMpn(product.metadata?.part_number) ||
-    normalizeMpn(specPartNo) ||
-    normalizeMpn(specModel) ||
-    (gtin !== variant.sku ? normalizeMpn(variant.sku) : undefined) ||
-    (gtin !== product.metadata?.woo_sku ? normalizeMpn(product.metadata?.woo_sku) : undefined) ||
-    normalizeMpn(titleMpn)
+    normalizeMpn(product.metadata?.part_number)
 
   // 9. Categories and Product Type
   const categoryNames = (product.categories || []).map((c: any) => c.name)

@@ -227,7 +227,7 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
             onChange={(event) => set("gtin", event.target.value)}
           />
           <Text size="xsmall" className="text-ui-fg-subtle">
-            Maps to &lt;g:gtin&gt; in the product feed. Overrides variant barcode.
+            Maps to &lt;g:gtin&gt; in the product feed. Overrides variant barcode. Leave empty if unassigned.
           </Text>
         </div>
         <div className="grid gap-2">
@@ -238,7 +238,7 @@ const GoogleMerchantWidget = ({ data }: { data: { id: string } }) => {
             onChange={(event) => set("mpn", event.target.value)}
           />
           <Text size="xsmall" className="text-ui-fg-subtle">
-            Maps to &lt;g:mpn&gt; in the product feed. Overrides variant SKU and title part numbers.
+            Maps to &lt;g:mpn&gt; in the product feed. Leave empty if unassigned.
           </Text>
         </div>
         <div className="grid gap-2">

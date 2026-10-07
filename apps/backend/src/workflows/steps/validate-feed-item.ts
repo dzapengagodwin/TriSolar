@@ -81,13 +81,14 @@ export function validateFeedItem(item: ProductFeedItem): ValidationResult {
   const hasBrand = !!sanitized.brand && String(sanitized.brand).trim().length > 0
   const hasMpn = !!sanitized.mpn && sanitized.mpn.length > 0
 
-  // Respect explicitly configured identifier_exists override from Merchant settings
-  if (sanitized.identifier_exists !== "yes" && sanitized.identifier_exists !== "no") {
-    if (hasGtin || (hasBrand && hasMpn)) {
-      sanitized.identifier_exists = "yes"
-    } else {
-      sanitized.identifier_exists = "no"
-    }
+  // Google Merchant rules: If no identifiers (GTIN or MPN) exist, identifier_exists MUST be 'no'.
+  // If identifiers do exist, default to 'yes' unless explicitly set to 'no'.
+  const hasIdentifiers = hasGtin || (hasBrand && hasMpn)
+
+  if (!hasIdentifiers) {
+    sanitized.identifier_exists = "no"
+  } else if (sanitized.identifier_exists !== "no") {
+    sanitized.identifier_exists = "yes"
   }
 
   if (sanitized.identifier_exists === "no") {
