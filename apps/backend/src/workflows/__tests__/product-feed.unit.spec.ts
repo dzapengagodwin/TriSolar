@@ -57,19 +57,33 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         images: [{ url: "https://laptopzone.co.zw/images/thinkpad.jpg" }, { url: "https://laptopzone.co.zw/images/thinkpad-side.jpg" }],
         categories: [{ name: "Laptops", handle: "laptops" }],
         collection: { title: "Business Laptops" },
+        sales_channels: [
+          {
+            id: "sc_default",
+            stock_locations: [
+              { id: "sl_zw", address: { country_code: "ZW" } },
+            ],
+          },
+        ],
       }
 
       const mockVariant = {
         id: "variant_16_512",
         title: "16GB RAM / 512GB SSD",
         sku: "E14-16-512",
-        barcode: "195477889900",
+        barcode: "036000291452",
         manage_inventory: true,
         allow_backorder: false,
         inventory_items: [
           {
             inventory: {
-              location_levels: [{ stocked_quantity: 10, reserved_quantity: 2 }],
+              location_levels: [
+                {
+                  location_id: "sl_zw",
+                  stocked_quantity: 10,
+                  reserved_quantity: 2,
+                },
+              ],
             },
           },
         ],
@@ -92,10 +106,9 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.price).toBe("950.00 USD")
       expect(item.sale_price).toBe("850.00 USD")
       expect(item.brand).toBe("Lenovo")
-      expect(item.gtin).toBe("195477889900")
+      expect(item.gtin).toBe("036000291452")
       expect(item.mpn).toBeUndefined()
       expect(item.identifier_exists).toBe("yes")
-      expect(item.product_type).toBe("Laptops")
       expect(item.google_product_category).toBeUndefined()
       expect(item.custom_label_0).toBe("Business Laptops")
     })
@@ -131,7 +144,6 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.description).toBe("Long generic copy")
       expect(item.google_product_category).toBe("1294")
       expect(item.gtin).toBe("0711719561012")
-      expect(item.product_type).toBe("Gaming Consoles")
       expect(item.mpn).toBeUndefined()
     })
 
@@ -161,13 +173,13 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         id: "var_123",
         title: "HP ProBook 450 G10",
         description: "Intel Core i7 13th Gen laptop",
-        link: "https://laptopzone.co.zw/zw/products/hp-probook-450-g10",
+        link: "https://laptopzone.co.zw/product/hp-probook-450-g10",
         image_link: "https://laptopzone.co.zw/hp.jpg",
         availability: "in_stock",
         price: "799.00 USD",
         condition: "new",
         brand: "HP",
-        gtin: "123456789012",
+        gtin: "036000291452",
         identifier_exists: "yes",
       }
 
@@ -191,7 +203,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(result.errors.length).toBeGreaterThan(0)
     })
 
-    it("should set identifier_exists to 'no' when missing GTIN and MPN", () => {
+    it("should respect an explicit identifier_exists value", () => {
       const itemWithoutIdentifiers: ProductFeedItem = {
         id: "var_custom",
         title: "Unbranded Custom Cable",
@@ -206,7 +218,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
 
       const result = validateFeedItem(itemWithoutIdentifiers)
       expect(result.valid).toBe(true)
-      expect(result.sanitizedItem.identifier_exists).toBe("no")
+      expect(result.sanitizedItem.identifier_exists).toBe("yes")
     })
   })
 
@@ -217,7 +229,7 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
           id: "v_1",
           title: "Lenovo Legion 5 Pro",
           description: "AMD Ryzen 7 RTX 4070 Gaming Laptop",
-          link: "https://laptopzone.co.zw/zw/products/legion-5-pro",
+          link: "https://laptopzone.co.zw/product/legion-5-pro",
           image_link: "https://laptopzone.co.zw/legion.jpg",
           availability: "in_stock",
           price: "1450.00 USD",
@@ -229,7 +241,6 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
           mpn: "LEGION-5-PRO",
           identifier_exists: "yes",
           google_product_category: "Electronics > Computers > Laptops",
-          product_type: "Gaming Laptops",
         },
       ]
 

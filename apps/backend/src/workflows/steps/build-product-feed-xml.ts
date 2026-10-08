@@ -6,8 +6,8 @@ import { ProductFeedConfig, ProductFeedItem } from "./types"
  */
 function cdata(text?: string | null): string {
   if (!text) return ""
-  // Escape nested CDATA end tags
-  const sanitized = text.replace(/\]\]>/g, "]]&gt;")
+  // Split CDATA sections without changing the source text.
+  const sanitized = text.replace(/\]\]>/g, "]]]]><![CDATA[>")
   return `<![CDATA[${sanitized}]]>`
 }
 
@@ -58,6 +58,9 @@ export function generateGoogleProductFeedXml(
     }
 
     lines.push(`      <g:availability>${item.availability}</g:availability>`)
+    if (item.availability_date) {
+      lines.push(`      <g:availability_date>${escapeXml(item.availability_date)}</g:availability_date>`)
+    }
     lines.push(`      <g:price>${escapeXml(item.price)}</g:price>`)
 
     if (item.sale_price) {
@@ -90,10 +93,6 @@ export function generateGoogleProductFeedXml(
           item.google_product_category
         )}</g:google_product_category>`
       )
-    }
-
-    if (item.product_type) {
-      lines.push(`      <g:product_type>${cdata(item.product_type)}</g:product_type>`)
     }
 
     if (item.custom_label_0) {
