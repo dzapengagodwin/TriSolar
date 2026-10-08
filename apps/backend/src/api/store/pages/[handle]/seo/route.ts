@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { SEO_MODULE } from "../../../../../modules/seo"
 import SeoModuleService from "../../../../../modules/seo/service"
+import { SeoMetadataDTO } from "../../../../../modules/seo/types"
 import { getPageEntityCandidates } from "../../../../admin/seo/pages/page-registry"
 
 export const AUTHENTICATE = false
@@ -16,7 +17,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
   // Resolve candidate entity IDs in priority order (e.g. "home", then "page_home", "page_laptops-...")
   const candidates = getPageEntityCandidates(handle)
-  let seo = null
+  let seo: SeoMetadataDTO | null = null
   for (const candidateId of candidates) {
     const record = await seoService.retrieveForEntity("page", candidateId)
     if (record) {

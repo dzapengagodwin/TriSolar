@@ -1,5 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, MedusaError } from "@medusajs/framework/utils"
 import { generateProductFeedWorkflow } from "../../workflows/generate-product-feed"
 import { ProductFeedConfig } from "../../workflows/steps/types"
 
@@ -18,7 +18,10 @@ function getStorefrontUrl(): string {
     url.search ||
     url.hash
   ) {
-    throw new Error("STOREFRONT_URL must be a valid http(s) origin or base path")
+    throw new MedusaError(
+      MedusaError.Types.INVALID_DATA,
+      "STOREFRONT_URL must be a valid http(s) origin or base path"
+    )
   }
 
   return url.toString().replace(/\/+$/, "")
