@@ -4,6 +4,7 @@ import {
 } from "@medusajs/framework/http"
 import { SEO_MODULE } from "../../../../modules/seo"
 import SeoModuleService from "../../../../modules/seo/service"
+import { SeoMetadataDTO } from "../../../../modules/seo/types"
 import { STATIC_PAGES, getPageEntityCandidates } from "./page-registry"
 
 export const GET = async (
@@ -15,7 +16,7 @@ export const GET = async (
   const pages = await Promise.all(
     Object.entries(STATIC_PAGES).map(async ([handle, def]) => {
       const candidates = getPageEntityCandidates(handle)
-      let seo = null
+      let seo: SeoMetadataDTO | null = null
       for (const candidateId of candidates) {
         const record = await seoService.retrieveForEntity("page", candidateId)
         if (record) {

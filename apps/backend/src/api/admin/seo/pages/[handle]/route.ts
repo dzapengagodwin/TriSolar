@@ -5,7 +5,7 @@ import {
 import { MedusaError } from "@medusajs/framework/utils"
 import { SEO_MODULE } from "../../../../../modules/seo"
 import SeoModuleService from "../../../../../modules/seo/service"
-import { UpsertSeoMetadataInput } from "../../../../../modules/seo/types"
+import { UpsertSeoMetadataInput, SeoMetadataDTO } from "../../../../../modules/seo/types"
 import { upsertEntitySeoWorkflow } from "../../../../../workflows/upsert-entity-seo"
 import { STATIC_PAGES, getPageEntityCandidates } from "../page-registry"
 
@@ -34,7 +34,7 @@ export const GET = async (
 
   // Search candidate entity IDs in priority order (e.g. "home", then "page_home", "page_laptops-...")
   const candidates = getPageEntityCandidates(handle)
-  let seo = null
+  let seo: SeoMetadataDTO | null = null
   for (const candidateId of candidates) {
     const record = await seoService.retrieveForEntity("page", candidateId)
     if (record) {
