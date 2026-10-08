@@ -10,16 +10,27 @@ import { listProducts } from "@lib/data/products"
 import { STATIC_BRANDS } from "@lib/data/brands"
 import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 import { getRegion } from "@lib/data/regions"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Laptopzone | Laptops, Computers & Tech Store",
-  description:
-    "Laptopzone - Premium Laptops, Computers, Tech & Accessories. High performance e-commerce store.",
+type Props = {
+  params: Promise<{ countryCode: string }>
 }
 
-export default async function Home(props: {
-  params: Promise<{ countryCode: string }>
-}) {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("home")
+
+  return generatePageMetadata(
+    {
+      path: "/",
+    },
+    params.countryCode,
+    seo
+  )
+}
+
+export default async function Home(props: Props) {
   const params = await props.params
 
   const { countryCode } = params

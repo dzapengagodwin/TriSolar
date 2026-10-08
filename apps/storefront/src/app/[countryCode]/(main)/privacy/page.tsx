@@ -1,12 +1,24 @@
 import { Metadata } from "next"
 import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Laptopzone",
-  description:
-    "Learn how Laptopzone collects, uses, and safeguards your personal information in accordance with data privacy laws and cybersecurity standards.",
-  alternates: { canonical: "/privacy-policy" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("privacy-policy")
+
+  return generatePageMetadata(
+    {
+      path: "/privacy-policy",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 export default async function PrivacyPage() {

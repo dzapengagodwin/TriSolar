@@ -1,4 +1,8 @@
-export type ProductFeedAvailability = "in_stock" | "out_of_stock" | "preorder"
+export type ProductFeedAvailability =
+  | "in_stock"
+  | "out_of_stock"
+  | "preorder"
+  | "backorder"
 export type ProductFeedCondition = "new" | "refurbished" | "used"
 
 export interface ProductFeedItem {
@@ -9,6 +13,7 @@ export interface ProductFeedItem {
   image_link: string
   additional_image_link?: string[]
   availability: ProductFeedAvailability
+  availability_date?: string
   price: string
   sale_price?: string
   item_group_id?: string
@@ -18,7 +23,6 @@ export interface ProductFeedItem {
   mpn?: string
   identifier_exists: "yes" | "no"
   google_product_category?: string
-  product_type?: string
   custom_label_0?: string
   custom_label_1?: string
   custom_label_2?: string
@@ -28,7 +32,6 @@ export interface ProductFeedConfig {
   country_code: string
   currency_code: string
   storefront_url: string
-  sales_channel_id?: string
   feed_title?: string
   feed_description?: string
 }

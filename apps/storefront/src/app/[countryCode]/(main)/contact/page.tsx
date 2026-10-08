@@ -1,10 +1,23 @@
-import { Metadata } from "next"
+import type { Metadata } from "next"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 import ContactForm from "./contact-form"
 
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description: "Get in touch with our customer support team for inquiries, orders, and tech assistance.",
-  alternates: { canonical: "/contact-us" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("contact")
+
+  return generatePageMetadata(
+    {
+      path: "/contact",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 export default async function ContactPage() {

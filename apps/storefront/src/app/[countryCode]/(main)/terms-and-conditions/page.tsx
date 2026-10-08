@@ -1,4 +1,4 @@
-import TermsPage, { metadata } from "../terms/page"
+import TermsPage, { generateMetadata } from "../terms/page"
 
-export { metadata }
+export { generateMetadata }
 export default TermsPage
