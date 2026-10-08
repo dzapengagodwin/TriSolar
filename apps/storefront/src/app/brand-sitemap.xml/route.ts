@@ -1,5 +1,5 @@
 import { listBrands } from "@lib/data/brands"
-import { getBrandCanonicalUrl } from "@lib/seo/canonical"
+import { getBrandCanonicalUrl, getCanonicalUrl } from "@lib/seo/canonical"
 import { DEFAULT_COUNTRY_CODE } from "@lib/seo/constants"
 import { buildUrlSetXml, xmlResponse, SitemapEntry } from "@lib/seo/sitemap-helper"
 
@@ -13,12 +13,20 @@ type BrandWithDate = {
 
 /**
  * Dedicated Brand Sitemap (/brand-sitemap.xml)
- * Returns all active brand pages in the store catalog.
+ * Returns the brand directory and all active brand pages under /brands/.
  */
 export async function GET() {
   const countryCode = DEFAULT_COUNTRY_CODE
   const now = new Date()
   const entries: SitemapEntry[] = []
+
+  // Main /brands directory index page
+  entries.push({
+    url: getCanonicalUrl("/brands", countryCode),
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  })
 
   try {
     const brands = await listBrands({ limit: 100 }).catch(() => [])
@@ -40,4 +48,3 @@ export async function GET() {
   const xml = buildUrlSetXml(entries)
   return xmlResponse(xml)
 }
-

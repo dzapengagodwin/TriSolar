@@ -8,7 +8,7 @@ export const revalidate = 3600
  * Master Sitemap Index (/sitemap.xml)
  * Groups and references dedicated sub-sitemaps for search engines:
  *  - /product-sitemap.xml   (Published catalog products)
- *  - /category-sitemap.xml  (Store categories and collections)
+ *  - /category-sitemap.xml  (Store product categories)
  *  - /brand-sitemap.xml     (Hardware & electronics brands)
  *  - /pages-sitemap.xml     (Static content and policy pages)
  *  - /image-sitemap.xml     (Google Image sitemap)
