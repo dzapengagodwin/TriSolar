@@ -251,7 +251,7 @@ class SeoModuleService extends MedusaService({
     }
 
     return {
-      meta_title: entity.name || entity.title || "Laptopzone",
+      meta_title: entity.name || entity.title || null,
       meta_description: entity.description || null,
       robots_index: true,
       robots_follow: true,

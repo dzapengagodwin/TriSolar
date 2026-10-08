@@ -3,7 +3,9 @@ import { listBrands } from "@lib/data/brands"
 import BrandDirectoryTemplate from "@modules/brands/templates/brand-directory-template"
 
 export const metadata: Metadata = {
-  title: "Brand Directory | Laptopzone",
+  title: {
+    absolute: "Brand Directory",
+  },
   description:
     "Explore our complete directory of official hardware, laptop, desktop, and accessory brands.",
 }

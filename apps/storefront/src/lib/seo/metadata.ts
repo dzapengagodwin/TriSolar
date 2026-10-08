@@ -22,6 +22,8 @@ export type BaseMetadataOptions = {
   /** Fine-grained robots control — overrides noIndex/noFollow when provided. */
   robots?: { index: boolean; follow: boolean }
   type?: "website" | "article"
+  /** When true, prevents parent layout template from appending " | Laptopzone" */
+  absoluteTitle?: boolean
 }
 
 /**
@@ -55,7 +57,11 @@ export function buildBaseMetadata(options: BaseMetadataOptions = {}): Metadata {
 
   return {
     metadataBase: new URL(STORE_URL),
-    title: pageTitle
+    title: options.absoluteTitle && pageTitle
+      ? {
+          absolute: pageTitle,
+        }
+      : pageTitle
       ? {
           default: pageTitle,
           template: SITE_TITLE_TEMPLATE,

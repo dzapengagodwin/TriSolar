@@ -1,42 +1,19 @@
 import { sdk } from "@lib/config"
 import { CACHE_TAGS, brandTag } from "@lib/cache-tags"
 import type { StoreBrand } from "@lib/constants/brands"
-import { STATIC_BRANDS } from "@lib/constants/brands"
 
 export type { StoreBrand }
-export { STATIC_BRANDS }
 
-const LOCAL_BRAND_LOGOS: Record<string, string> = {
-  apple: "/top-brands/apple.webp",
-  hp: "/top-brands/hp.webp",
-  dell: "/top-brands/dell.webp",
-  lenovo: "/top-brands/lenovo.webp",
-  asus: "/brands/asus.svg",
-  amd: "/brands/amd.svg",
-  intel: "/brands/intel.svg",
-  msi: "/brands/msi.svg",
-  razer: "/brands/razer.svg",
-  corsair: "/brands/corsair.svg",
-  benq: "/brands/benq.svg",
-  samsung: "/brands/samsung.svg",
-  acer: "/brands/acer.svg",
-  xiaomi: "/brands/xiaomi.svg",
-  huawei: "/brands/huawei.svg",
-  jbl: "/brands/jbl.svg",
-  epson: "/brands/epson.svg",
-  canon: "/top-brands/canon.webp",
-  brother: "/top-brands/brother.webp",
-  sony: "/brands/sony.svg",
-}
-
-function enhanceBrandLogo(brand: StoreBrand): StoreBrand {
-  const localLogo = LOCAL_BRAND_LOGOS[brand.handle?.toLowerCase()]
+function resolveBrandLogo(brand: StoreBrand): StoreBrand {
   return {
     ...brand,
-    logo: localLogo || brand.logo || brand.image || null,
+    logo: brand.logo || brand.image || null,
   }
 }
 
+/**
+ * Fetches all active brands directly from the Medusa backend.
+ */
 export const listBrands = async (query?: {
   limit?: number
   offset?: number
@@ -59,16 +36,19 @@ export const listBrands = async (query?: {
     })
     .then(({ brands }) => {
       if (!brands || brands.length === 0) {
-        return STATIC_BRANDS
+        return []
       }
-      return brands.map(enhanceBrandLogo)
+      return brands.map(resolveBrandLogo)
     })
     .catch((err) => {
-      console.warn("Failed to fetch brands from backend, falling back to static:", err)
-      return STATIC_BRANDS
+      console.error("Failed to fetch brands from backend:", err)
+      return []
     })
 }
 
+/**
+ * Fetches a single brand by its handle directly from the Medusa backend.
+ */
 export const getBrandByHandle = async (
   handle: string
 ): Promise<StoreBrand | null> => {
@@ -83,17 +63,11 @@ export const getBrandByHandle = async (
     })
     .then(({ brand }) => {
       if (!brand) {
-        const fallback = STATIC_BRANDS.find(
-          (b) => b.handle.toLowerCase() === handle.toLowerCase()
-        )
-        return fallback || null
+        return null
       }
-      return enhanceBrandLogo(brand)
+      return resolveBrandLogo(brand)
     })
     .catch(() => {
-      const fallback = STATIC_BRANDS.find(
-        (b) => b.handle.toLowerCase() === handle.toLowerCase()
-      )
-      return fallback || null
+      return null
     })
 }
