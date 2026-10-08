@@ -2,14 +2,16 @@
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
-import { StoreBrand, STATIC_BRANDS } from "@lib/constants/brands"
+import { StoreBrand } from "@lib/constants/brands"
 import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "@medusajs/icons"
 
-export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBrand[] }) {
-  const displayBrands = brands && brands.length > 0 ? brands : STATIC_BRANDS
-
+export default function TopBrands({ brands = [] }: { brands?: StoreBrand[] }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+
+  if (!brands || brands.length === 0) {
+    return null
+  }
 
   const handleScroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -52,20 +54,26 @@ export default function TopBrands({ brands = STATIC_BRANDS }: { brands?: StoreBr
             ref={scrollContainerRef}
             className="flex items-center gap-3 sm:gap-4 md:gap-5 overflow-x-auto no-scrollbar scroll-smooth py-2 px-10"
           >
-            {displayBrands.map((brand) => (
+            {brands.map((brand) => (
               <LocalizedClientLink
                 key={brand.id || brand.handle}
-                href={`/brand/${brand.handle}`}
+                href={`/brands/${brand.handle}`}
                 className="group shrink-0 bg-white hover:bg-gray-50 p-3 sm:p-4 flex items-center justify-center rounded-2xl shadow-2xs hover:shadow-md transition-all duration-300 w-36 sm:w-44 md:w-48 h-24 sm:h-28 md:h-32"
               >
                 <div className="relative w-full h-14 sm:h-18 md:h-20 flex items-center justify-center">
-                  <Image
-                    src={brand.logo as string}
-                    alt={`${brand.name} logo`}
-                    fill
-                    sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 192px"
-                    className="object-contain object-center group-hover:scale-108 transition-transform duration-300"
-                  />
+                  {brand.logo ? (
+                    <Image
+                      src={brand.logo}
+                      alt={`${brand.name} logo`}
+                      fill
+                      sizes="(max-width: 640px) 144px, (max-width: 768px) 176px, 192px"
+                      className="object-contain object-center group-hover:scale-108 transition-transform duration-300"
+                    />
+                  ) : (
+                    <span className="text-xs sm:text-sm font-bold text-gray-800 tracking-tight text-center px-2">
+                      {brand.name}
+                    </span>
+                  )}
                 </div>
               </LocalizedClientLink>
             ))}

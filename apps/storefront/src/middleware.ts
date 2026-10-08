@@ -169,7 +169,7 @@ export async function middleware(request: NextRequest) {
 
   if (publicPath.startsWith("brand/")) {
     const handle = publicPath.slice("brand/".length)
-    if (legacyUrlMap.brandHandles.includes(handle)) return rewriteLegacyPath(`/brands/${handle}`)
+    if (handle && !handle.includes("/")) return rewriteLegacyPath(`/brands/${handle}`)
   }
 
   const shopPageMatch = publicPath.match(/^shop\/page\/(\d+)$/)

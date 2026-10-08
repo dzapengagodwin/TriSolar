@@ -26,9 +26,6 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       "products.handle",
       "products.thumbnail",
       "products.status",
-      "products.variants.id",
-      "products.variants.title",
-      "products.variants.calculated_price.*",
     ],
     filters: {
       handle,

@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import type { StoreBrand } from "@lib/data/brands"
+import { notFound } from "next/navigation"
 import { getBrandByHandle, listBrands } from "@lib/data/brands"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
@@ -26,13 +26,6 @@ type Props = {
 }
 
 export const PRODUCT_LIMIT = 12
-
-function formatBrandName(handle: string): string {
-  return handle
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-}
 
 export async function generateStaticParams() {
   const brands = await listBrands({ limit: 100 }).catch(() => [])
@@ -67,11 +60,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const brand = (await getBrandByHandle(params.handle)) || {
-    id: `brand_${params.handle}`,
-    name: formatBrandName(params.handle),
-    handle: params.handle,
-    description: `Browse authentic products from ${formatBrandName(params.handle)} at Laptopzone.`,
+  const brand = await getBrandByHandle(params.handle)
+  if (!brand) {
+    notFound()
   }
 
   const seo = await getBrandSeo(params.handle)
@@ -84,16 +75,9 @@ export default async function BrandPage(props: Props) {
   const { sortBy, page, minPrice, maxPrice, view } = searchParams
   const optionValueIds = parseOptionValueIds(searchParams)
 
-  const fetchedBrand = await getBrandByHandle(params.handle)
-
-  const brand: StoreBrand = fetchedBrand || {
-    id: `brand_${params.handle}`,
-    name: formatBrandName(params.handle),
-    handle: params.handle,
-    description: `Browse genuine ${formatBrandName(params.handle)} hardware, computers, and accessories.`,
-    products_count: 0,
-    total_products: 0,
-    product_ids: [],
+  const brand = await getBrandByHandle(params.handle)
+  if (!brand) {
+    notFound()
   }
 
   const breadcrumbItems = [
