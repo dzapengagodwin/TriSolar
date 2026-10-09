@@ -26,7 +26,7 @@ const SLIDES: Slide[] = [
     subtitle:
       "Handle massive 3D models, complex engineering simulations, and ultra-high-FPS gaming on one machine.",
     ctaText: "Shop Gaming Laptops",
-    ctaHref: "/store?q=laptop",
+    ctaHref: "/shop?q=laptop",
     imageSrc: "/hero-laptops.webp",
     imageAlt: "Gaming Laptops Showcase - ASUS ROG, HP OMEN, Lenovo Legion",
     bgClass: "from-black via-zinc-950 to-neutral-900",
@@ -39,7 +39,7 @@ const SLIDES: Slide[] = [
     subtitle:
       "Equipped with Intel Core & NVIDIA RTX GPUs. 100% authentic devices with manufacturer warranty.",
     ctaText: "Explore Workstations",
-    ctaHref: "/store?q=workstation",
+    ctaHref: "/shop?q=workstation",
     imageSrc: "/omen-laptop.webp",
     imageAlt: "HP OMEN 16 High Performance Laptop",
     bgClass: "from-[#0f172a] via-[#1e1b4b] to-[#020617]",
@@ -52,7 +52,7 @@ const SLIDES: Slide[] = [
     subtitle:
       "Stunning color accuracy, ultra-fast refresh rates, and immersive workspace ergonomics.",
     ctaText: "Shop Monitors",
-    ctaHref: "/store?q=monitors",
+    ctaHref: "/shop?q=monitors",
     imageSrc: "/hero-monitor.webp",
     imageAlt: "Curved 4K Gaming & Office Monitor",
     bgClass: "from-zinc-950 via-neutral-900 to-stone-950",
@@ -65,7 +65,7 @@ const SLIDES: Slide[] = [
     subtitle:
       "Experience next-gen titanium builds, pro cameras, and all-day battery life.",
     ctaText: "Shop Mobile Devices",
-    ctaHref: "/store?q=phone",
+    ctaHref: "/shop?q=phone",
     imageSrc: "/hero-phone.webp",
     imageAlt: "Flagship Smartphones and Tablets",
     bgClass: "from-[#1c1917] via-[#0c0a09] to-black",

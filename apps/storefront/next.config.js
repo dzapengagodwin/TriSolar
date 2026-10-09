@@ -116,6 +116,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: "/:countryCode/store",
+        destination: "/:countryCode/shop",
+        permanent: true,
+      },
+      {
+        source: "/store",
+        destination: "/shop",
+        permanent: true,
+      },
+      {
         source: "/:countryCode/terms-and-conditions",
         destination: "/:countryCode/terms",
         permanent: true,

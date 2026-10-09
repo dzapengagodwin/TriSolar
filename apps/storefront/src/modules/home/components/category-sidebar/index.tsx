@@ -11,7 +11,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 42,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Gaming Laptops",
@@ -21,7 +21,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 18,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Business Notebooks",
@@ -31,7 +31,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 24,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Printers & Toners",
@@ -41,7 +41,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 35,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Desktops & All-in-Ones",
@@ -51,7 +51,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 15,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Phones & Accessories",
@@ -61,7 +61,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 29,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Networking & Routers",
@@ -71,7 +71,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 12,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Monitors & Displays",
@@ -81,7 +81,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 16,
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Software & OS Setup",
@@ -91,7 +91,7 @@ export default function CategorySidebar() {
         </svg>
       ),
       count: 8,
-      href: "/store",
+      href: "/shop",
     },
   ]
 
