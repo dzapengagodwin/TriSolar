@@ -18,33 +18,78 @@ export default async function RelatedProducts({
     return null
   }
 
-  const queryParams: HttpTypes.StoreProductListParams = {
-    limit: 10,
-  }
-  if (region?.id) {
-    queryParams.region_id = region.id
-  }
-  if (product.collection_id) {
-    queryParams.collection_id = [product.collection_id]
-  }
-  if (product.tags) {
-    queryParams.tag_id = product.tags
-      .map((t) => t.id)
-      .filter(Boolean) as string[]
-  }
-  queryParams.is_giftcard = false
+  const categories = product.categories || []
+  const categoryIds = categories.map((c) => c.id).filter(Boolean) as string[]
 
-  const products = await listProducts({
-    queryParams,
-    countryCode,
-  }).then(({ response }) => {
-    return response.products.filter(
+  let relatedProducts: HttpTypes.StoreProduct[] = []
+
+  if (categoryIds.length > 0) {
+    // Prefer the most specific (child) category if available
+    const childCategories = categories.filter(
+      (c) => Boolean(c.parent_category_id || c.parent_category)
+    )
+    const primaryCategory = childCategories[0] || categories[0]
+
+    // 1. Fetch products from the primary / specific category
+    const { response } = await listProducts({
+      queryParams: {
+        category_id: [primaryCategory.id],
+        region_id: region.id,
+        is_giftcard: false,
+        limit: 10,
+      },
+      countryCode,
+    })
+
+    relatedProducts = response.products.filter(
       (responseProduct) => responseProduct.id !== product.id
     )
-  })
+
+    // 2. If fewer than 4 products were found and the product belongs to multiple categories,
+    // fetch from remaining categories to fill up the row
+    if (relatedProducts.length < 4 && categoryIds.length > 1) {
+      const remainingCatIds = categoryIds.filter((id) => id !== primaryCategory.id)
+      if (remainingCatIds.length > 0) {
+        const { response: fallbackResponse } = await listProducts({
+          queryParams: {
+            category_id: remainingCatIds,
+            region_id: region.id,
+            is_giftcard: false,
+            limit: 10,
+          },
+          countryCode,
+        })
+
+        const existingIds = new Set([product.id, ...relatedProducts.map((p) => p.id)])
+        const additional = fallbackResponse.products.filter(
+          (p) => !existingIds.has(p.id)
+        )
+        relatedProducts = [...relatedProducts, ...additional]
+      }
+    }
+  } else {
+    // Fallback for products without any categories assigned
+    const queryParams: HttpTypes.StoreProductListParams = {
+      limit: 10,
+      region_id: region.id,
+      is_giftcard: false,
+    }
+    if (product.collection_id) {
+      queryParams.collection_id = [product.collection_id]
+    }
+
+    const { response } = await listProducts({
+      queryParams,
+      countryCode,
+    })
+
+    relatedProducts = response.products.filter(
+      (responseProduct) => responseProduct.id !== product.id
+    )
+  }
 
   // Limit to single row (max 4 products)
-  const singleRowProducts = products.slice(0, 4)
+  const singleRowProducts = relatedProducts.slice(0, 4)
 
   if (!singleRowProducts.length) {
     return null

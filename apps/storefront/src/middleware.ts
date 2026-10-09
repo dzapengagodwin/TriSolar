@@ -172,8 +172,14 @@ export async function middleware(request: NextRequest) {
     if (handle && !handle.includes("/")) return rewriteLegacyPath(`/brands/${handle}`)
   }
 
+  if (publicPath === "store") {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = "/shop"
+    return NextResponse.redirect(redirectUrl, 308)
+  }
+
   const shopPageMatch = publicPath.match(/^shop\/page\/(\d+)$/)
-  if (shopPageMatch) return rewriteLegacyPath("/store", shopPageMatch[1])
+  if (shopPageMatch) return rewriteLegacyPath("/shop", shopPageMatch[1])
 
   // Keep the route parameter available to the existing Medusa pages while
   // serving countryless public URLs. This is an internal rewrite, not a URL redirect.

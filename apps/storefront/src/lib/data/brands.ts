@@ -7,7 +7,7 @@ export type { StoreBrand }
 function resolveBrandLogo(brand: StoreBrand): StoreBrand {
   return {
     ...brand,
-    logo: brand.logo || brand.image || null,
+    logo: brand.logo || null,
   }
 }
 
