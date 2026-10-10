@@ -36,6 +36,14 @@ export default function robots(): MetadataRoute.Robots {
           "/*/wishlist",
         ],
       },
+      {
+        userAgent: "facebookexternalhit",
+        allow: "/",
+      },
+      {
+        userAgent: "Facebot",
+        allow: "/",
+      },
     ],
     sitemap: [
       `${baseUrl}/sitemap.xml`,
