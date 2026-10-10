@@ -89,7 +89,7 @@ export default function FooterDealsBox() {
                 if (status !== "idle") setStatus("idle")
               }}
               placeholder="Enter email address"
-              className="w-full bg-[#1A1A1A] text-white border border-[#3e3e3e] focus:border-primary focus:ring-1 focus:ring-primary rounded-lg px-3.5 py-2.5 text-xs placeholder-gray-400 outline-none transition-all"
+              className="w-full bg-white text-gray-900 border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-lg px-3.5 py-2.5 text-xs placeholder:text-gray-500 outline-none transition-all shadow-2xs"
               required
               disabled={status === "loading"}
             />
