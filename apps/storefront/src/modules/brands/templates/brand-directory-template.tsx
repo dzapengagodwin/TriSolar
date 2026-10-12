@@ -25,44 +25,37 @@ export default function BrandDirectoryTemplate({
       {/* Brands Grid */}
       {brands && brands.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-          {brands.map((brand) => {
-            const count = brand.total_products || brand.products_count || 0
+          {brands.map((brand) => (
+            <LocalizedClientLink
+              key={brand.id}
+              href={`/brands/${brand.handle}`}
+              className="group bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center transition-all duration-300 shadow-xs hover:shadow-md h-44 sm:h-48"
+            >
+              <div className="w-full flex-1 flex items-center justify-center p-2">
+                {brand.logo ? (
+                  <div className="relative w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
+                    <Image
+                      src={brand.logo}
+                      alt={`${brand.name} logo`}
+                      fill
+                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 160px"
+                      className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-700 font-bold text-sm">
+                    {brand.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+              </div>
 
-            return (
-              <LocalizedClientLink
-                key={brand.id}
-                href={`/brand/${brand.handle}`}
-                className="group bg-white hover:bg-gray-50/80 border border-gray-100 hover:border-gray-300 rounded-3xl p-5 flex flex-col items-center justify-between text-center transition-all duration-300 shadow-xs hover:shadow-md h-48 sm:h-52"
-              >
-                <div className="w-full flex-1 flex items-center justify-center p-2">
-                  {brand.logo ? (
-                    <div className="relative w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
-                      <Image
-                        src={brand.logo}
-                        alt={`${brand.name} logo`}
-                        fill
-                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 160px"
-                        className="object-contain object-center group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-700 font-bold text-sm">
-                      {brand.name.substring(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1 w-full pt-2 border-t border-gray-50">
-                  <span className="text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-laptopzone-orange transition-colors line-clamp-1 block">
-                    {brand.name}
-                  </span>
-                  <span className="text-[10px] font-bold text-gray-400 block">
-                    {count > 0 ? `${count} ${count === 1 ? "Product" : "Products"}` : "Official Brand"}
-                  </span>
-                </div>
-              </LocalizedClientLink>
-            )
-          })}
+              <div className="w-full pt-2 border-t border-gray-50">
+                <span className="text-xs sm:text-sm font-semibold text-gray-900 group-hover:text-laptopzone-orange transition-colors line-clamp-1 block">
+                  {brand.name}
+                </span>
+              </div>
+            </LocalizedClientLink>
+          ))}
         </div>
       ) : (
         <div className="bg-white border border-gray-100 rounded-3xl p-12 text-center space-y-4">

@@ -76,13 +76,13 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
     setIsOpen(false)
 
     if (!query.trim()) {
-      router.push(`/${countryCode}/store`)
+      router.push(`/${countryCode}/shop`)
       return
     }
 
     const searchUrlParams = new URLSearchParams()
     searchUrlParams.set("q", query.trim())
-    router.push(`/${countryCode}/store?${searchUrlParams.toString()}`)
+    router.push(`/${countryCode}/shop?${searchUrlParams.toString()}`)
   }
 
   return (

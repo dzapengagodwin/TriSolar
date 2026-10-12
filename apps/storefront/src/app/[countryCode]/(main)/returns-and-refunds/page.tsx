@@ -1,4 +1,4 @@
-import ReturnsPage, { metadata } from "../returns/page"
+import ReturnsPage, { generateMetadata } from "../returns/page"
 
-export { metadata }
+export { generateMetadata }
 export default ReturnsPage

@@ -137,3 +137,36 @@ export async function getBrandSeo(
     return null
   }
 }
+
+/**
+ * Fetches persistent SEO metadata for a static page (home, about, faq, etc.) from the commerce backend
+ */
+export async function getPageSeo(
+  pageHandle: string
+): Promise<SeoMetadataDTO | null> {
+  if (!pageHandle) return null
+
+  try {
+    const headers = {
+      ...(await getAuthHeaders()),
+    }
+
+    const res = await sdk.client.fetch<{ seo: SeoMetadataDTO | null }>(
+      `/store/pages/${pageHandle}/seo`,
+      {
+        method: "GET",
+        headers,
+        next: {
+          tags: ["seo", `seo-page-${pageHandle}`],
+          revalidate: 60,
+        },
+      }
+    )
+
+    return res.seo || null
+  } catch (_error) {
+    // Return null silently so standard page fallback metadata is used
+    return null
+  }
+}
+

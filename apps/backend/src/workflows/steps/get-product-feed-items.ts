@@ -1,7 +1,7 @@
 import { createStep, StepResponse } from "@medusajs/framework/workflows-sdk"
-import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
+import { ContainerRegistrationKeys, QueryContext } from "@medusajs/framework/utils"
 import { ProductFeedConfig, ProductFeedDiagnostic, ProductFeedItem } from "./types"
-import { mapProductToFeedItem } from "./map-product-to-feed-item"
+import { FeedProduct, mapProductToFeedItem } from "./map-product-to-feed-item"
 import { validateFeedItem } from "./validate-feed-item"
 
 export const getProductFeedItemsStep = createStep(
@@ -9,61 +9,75 @@ export const getProductFeedItemsStep = createStep(
   async (config: ProductFeedConfig, { container }) => {
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
 
-    const queryFilters: any = {
-      status: "published",
-    }
+    const queryFilters = { status: "published" }
+    const fields = [
+      "id",
+      "title",
+      "subtitle",
+      "description",
+      "handle",
+      "thumbnail",
+      "status",
+      "metadata",
+      "images.id",
+      "images.url",
+      "categories.id",
+      "categories.name",
+      "categories.handle",
+      "collection.id",
+      "collection.title",
+      "brand.id",
+      "brand.name",
+      "brand.handle",
+      "variants.id",
+      "variants.title",
+      "variants.sku",
+      "variants.barcode",
+      "variants.ean",
+      "variants.upc",
+      "variants.manage_inventory",
+      "variants.allow_backorder",
+      "variants.metadata",
+      "variants.options.value",
+      "variants.options.option.title",
+      "variants.prices.amount",
+      "variants.prices.currency_code",
+      "variants.prices.price_list_id",
+      "variants.calculated_price.calculated_amount",
+      "variants.calculated_price.original_amount",
+      "variants.calculated_price.currency_code",
+      "sales_channels.id",
+      "sales_channels.stock_locations.id",
+      "sales_channels.stock_locations.address.country_code",
+      "variants.inventory_items.inventory.location_levels.location_id",
+      "variants.inventory_items.inventory.location_levels.stocked_quantity",
+      "variants.inventory_items.inventory.location_levels.reserved_quantity",
+    ]
+    const pageSize = 100
+    let offset = 0
+    let productCount = 0
+    const products: FeedProduct[] = []
 
-    if (config.sales_channel_id) {
-      queryFilters.sales_channels = {
-        id: config.sales_channel_id,
-      }
-    }
+    do {
+      const { data, metadata } = await query.graph({
+        entity: "product",
+        fields,
+        filters: queryFilters,
+        context: {
+          variants: {
+            calculated_price: QueryContext({
+              currency_code: config.currency_code.toLowerCase(),
+            }),
+          },
+        },
+        pagination: { skip: offset, take: pageSize },
+      })
 
-    // Query published products with all relations, inventory, variants and pricing
-    const { data: products } = await query.graph({
-      entity: "product",
-      fields: [
-        "id",
-        "title",
-        "subtitle",
-        "description",
-        "handle",
-        "thumbnail",
-        "status",
-        "metadata",
-        "images.id",
-        "images.url",
-        "categories.id",
-        "categories.name",
-        "categories.handle",
-        "collection.id",
-        "collection.title",
-        "brand.id",
-        "brand.name",
-        "brand.handle",
-        "variants.id",
-        "variants.title",
-        "variants.sku",
-        "variants.barcode",
-        "variants.ean",
-        "variants.upc",
-        "variants.manage_inventory",
-        "variants.allow_backorder",
-        "variants.metadata",
-        "variants.options.value",
-        "variants.options.option.title",
-        "variants.prices.amount",
-        "variants.prices.currency_code",
-        "variants.prices.price_list_id",
-        "variants.inventory_items.inventory.location_levels.stocked_quantity",
-        "variants.inventory_items.inventory.location_levels.reserved_quantity",
-      ],
-      filters: queryFilters,
-      context: {
-        currency_code: config.currency_code.toLowerCase(),
-        country_code: config.country_code.toLowerCase(),
-      },
-    })
+      const page = data as FeedProduct[]
+      products.push(...page)
+      productCount = metadata?.count ?? offset + page.length
+      offset += page.length
+    } while (offset < productCount && offset > 0)
 
     const validItems: ProductFeedItem[] = []
     const diagnostics: ProductFeedDiagnostic[] = []
@@ -79,6 +93,27 @@ export const getProductFeedItemsStep = createStep(
       for (const variant of variants) {
         const rawFeedItem = mapProductToFeedItem(product, variant, config)
         const validation = validateFeedItem(rawFeedItem)
+        const warnings = [...validation.warnings]
+        const hasVariantIdentifiers = Boolean(
+          variant.barcode ||
+            variant.ean ||
+            variant.upc ||
+            variant.metadata?.gtin ||
+            (variant.metadata?.google_merchant as Record<string, unknown> | undefined)?.gtin ||
+            (variant.metadata?.google_merchant as Record<string, unknown> | undefined)?.mpn ||
+            variant.metadata?.mpn ||
+            variant.metadata?.manufacturer_mpn ||
+            variant.metadata?.part_number
+        )
+        if (
+          variants.length > 1 &&
+          !hasVariantIdentifiers &&
+          (merchant.gtin || merchant.mpn || product.metadata?.gtin || product.metadata?.mpn)
+        ) {
+          warnings.push(
+            "Product-level GTIN/MPN was omitted for a multi-variant product; add each variant's manufacturer identifiers to its variant metadata."
+          )
+        }
 
         diagnostics.push({
           variant_id: variant.id,
@@ -86,7 +121,7 @@ export const getProductFeedItemsStep = createStep(
           title: rawFeedItem.title,
           valid: validation.valid,
           errors: validation.errors,
-          warnings: validation.warnings,
+          warnings,
         })
 
         if (validation.valid) {

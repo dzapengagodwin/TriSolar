@@ -7,36 +7,47 @@ import TopBrands from "@modules/home/components/top-brands"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import TrustBar from "@modules/home/components/trust-bar"
 import { listProducts } from "@lib/data/products"
-import { STATIC_BRANDS } from "@lib/data/brands"
+import { listBrands } from "@lib/data/brands"
 import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 import { getRegion } from "@lib/data/regions"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Laptopzone | Laptops, Computers & Tech Store",
-  description:
-    "Laptopzone - Premium Laptops, Computers, Tech & Accessories. High performance e-commerce store.",
+type Props = {
+  params: Promise<{ countryCode: string }>
 }
 
-export default async function Home(props: {
-  params: Promise<{ countryCode: string }>
-}) {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("home")
+
+  return generatePageMetadata(
+    {
+      path: "/",
+    },
+    params.countryCode,
+    seo
+  )
+}
+
+export default async function Home(props: Props) {
   const params = await props.params
 
   const { countryCode } = params
 
   const region = await getRegion(countryCode).catch(() => null)
 
-  const [productsRes] = await Promise.all([
+  const [productsRes, brands] = await Promise.all([
     region
       ? listProducts({
           regionId: region.id,
           queryParams: { limit: 10, fields: "*variants.calculated_price,*categories" },
         }).catch(() => ({ response: { products: [] } }))
       : Promise.resolve({ response: { products: [] } }),
+    listBrands({ limit: 20 }).catch(() => []),
   ])
 
   const products = productsRes.response?.products || []
-  const brands = STATIC_BRANDS
 
   if (!region) {
     return null

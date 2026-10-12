@@ -13,7 +13,6 @@ import {
 import { listProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
 import { getCategoryPublicPath } from "@lib/seo/canonical"
-import SubcategoryCards from "../components/subcategory-cards"
 
 export default async function CategoryTemplate({
   category,
@@ -93,9 +92,6 @@ export default async function CategoryTemplate({
       </Suspense>
 
       <div className="w-full flex-1 min-w-0">
-        {/* Microless-style Quick Subcategory Cards */}
-        <SubcategoryCards category={category} />
-
         {category.description && (
           <div className="mb-4 text-xs text-gray-500">
             <p>{category.description}</p>

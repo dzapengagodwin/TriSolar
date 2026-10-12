@@ -231,8 +231,27 @@ class SeoModuleService extends MedusaService({
       }
     }
 
+    if (entityType === "page") {
+      const name = entity.name || entity.title || ""
+      const canonicalUrl = entity.path
+        ? `${storefrontUrl}${entity.path}`
+        : null
+
+      return {
+        meta_title: name || null,
+        meta_description: null,
+        focus_keyphrase: name || null,
+        canonical_url: canonicalUrl,
+        og_title: name || null,
+        og_description: null,
+        og_image: null,
+        robots_index: true,
+        robots_follow: true,
+      }
+    }
+
     return {
-      meta_title: entity.name || entity.title || "Laptopzone",
+      meta_title: entity.name || entity.title || null,
       meta_description: entity.description || null,
       robots_index: true,
       robots_follow: true,

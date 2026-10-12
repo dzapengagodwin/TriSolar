@@ -71,6 +71,7 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
     id: "computers",
     label: "Explore",
     directLinks: [
+      { label: "Laptops", href: getCategoryPublicPath("laptops") },
       { label: "Desktops", href: "/products/desktops" },
       { label: "Printers", href: "/products/printers_for_sale" },
       { label: "Phones & Tablets", href: "/products/cellphones-and-tablets/tablets" },

@@ -1,12 +1,24 @@
 import { Metadata } from "next"
 import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Delivery & Shipping Policy | Laptopzone",
-  description:
-    "Information on Laptopzone's delivery services, Harare same-day dispatch, nationwide courier shipping across Zimbabwe, pickup points, and delivery tracking.",
-  alternates: { canonical: "/delivery-terms" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("shipping-policy")
+
+  return generatePageMetadata(
+    {
+      path: "/shipping-policy",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 export default async function ShippingPage() {

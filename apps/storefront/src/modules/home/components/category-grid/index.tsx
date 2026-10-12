@@ -13,7 +13,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "Asus ROG, MSI, HP Omen & Lenovo Legion",
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Business Notebooks",
@@ -25,7 +25,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "ThinkPad, EliteBook, Latitude & MacBook",
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Home & Student PCs",
@@ -37,7 +37,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "Affordable HP, Lenovo & Acer Laptops",
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Printers & Toners",
@@ -49,7 +49,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "LaserJet, InkTank & Genuine Cartridges",
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Desktops & All-in-Ones",
@@ -61,7 +61,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "Workstation Desktops & Monoblocks",
-      href: "/store",
+      href: "/shop",
     },
     {
       title: "Storage & Accessories",
@@ -73,7 +73,7 @@ export default function CategoryGrid() {
         </svg>
       ),
       subtext: "External HDDs, Laptop Bags & Chargers",
-      href: "/store",
+      href: "/shop",
     },
   ]
 

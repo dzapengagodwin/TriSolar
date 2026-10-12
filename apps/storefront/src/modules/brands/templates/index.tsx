@@ -107,29 +107,9 @@ export default async function BrandTemplate({
                   <span className="font-semibold text-gray-800">{totalProductsCount}</span>{" "}
                   {totalProductsCount === 1 ? "Product" : "Products"} Available
                 </span>
-                {brand.website && (
-                  <a
-                    href={brand.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1 font-semibold"
-                  >
-                    <span>Official Website</span>
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                    </svg>
-                  </a>
-                )}
               </div>
             </div>
           </div>
-
-          <LocalizedClientLink
-            href="/brands"
-            className="text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-900 border border-gray-200 hover:border-gray-400 px-4 py-2 rounded-xl transition-all shrink-0 self-end sm:self-center"
-          >
-            ← View All Brands
-          </LocalizedClientLink>
         </div>
       </div>
 
@@ -195,13 +175,7 @@ export default async function BrandTemplate({
                 <p className="text-xs text-gray-500 max-w-md mx-auto">
                   We are currently updating our inventory for this brand. Check back soon or browse our other top brands in our directory.
                 </p>
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  <LocalizedClientLink
-                    href="/brands"
-                    className="inline-block bg-white hover:bg-gray-50 border border-gray-200 text-gray-800 text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
-                  >
-                    View All Brands
-                  </LocalizedClientLink>
+                <div className="flex items-center justify-center pt-2">
                   <LocalizedClientLink
                     href="/shop"
                     className="inline-block bg-black hover:bg-gray-800 text-white text-xs font-semibold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors shadow-sm"

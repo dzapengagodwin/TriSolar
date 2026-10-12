@@ -1,10 +1,23 @@
 import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions | Laptopzone",
-  description: "Find help with orders, delivery, returns, payments, and Laptopzone customer support.",
-  alternates: { canonical: "/faq" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("faq")
+
+  return generatePageMetadata(
+    {
+      path: "/faq",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 const questions = [

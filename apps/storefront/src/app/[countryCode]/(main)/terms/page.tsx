@@ -1,12 +1,24 @@
 import { Metadata } from "next"
 import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Terms & Conditions | Laptopzone",
-  description:
-    "Official terms and conditions of sale and website usage for Laptopzone. Read our guidelines on ordering, payments, warranties, and consumer rights.",
-  alternates: { canonical: "/terms-and-conditions" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("terms-and-conditions")
+
+  return generatePageMetadata(
+    {
+      path: "/terms-and-conditions",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 export default async function TermsPage() {

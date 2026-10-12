@@ -1,12 +1,24 @@
 import { Metadata } from "next"
 import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getPageSeo } from "@lib/data/seo"
+import { generatePageMetadata } from "@lib/seo/page"
 
-export const metadata: Metadata = {
-  title: "Returns & Refunds Policy | Laptopzone",
-  description:
-    "Review our 7-day defective replacement guarantee, 14-day return conditions, RMA procedure, and refund timelines for laptops and electronics.",
-  alternates: { canonical: "/returns-and-refunds" },
+type Props = {
+  params: Promise<{ countryCode: string }>
+}
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params
+  const seo = await getPageSeo("return-policy")
+
+  return generatePageMetadata(
+    {
+      path: "/return-policy",
+    },
+    params.countryCode,
+    seo
+  )
 }
 
 export default async function ReturnsPage() {

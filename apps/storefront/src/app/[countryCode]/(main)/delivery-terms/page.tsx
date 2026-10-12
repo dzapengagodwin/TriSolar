@@ -1,4 +1,4 @@
-import ShippingPage, { metadata } from "../shipping/page"
+import ShippingPage, { generateMetadata } from "../shipping/page"
 
-export { metadata }
+export { generateMetadata }
 export default ShippingPage

@@ -75,7 +75,7 @@ export function getBrandCanonicalUrl(
   handle: string,
   countryCode: string = DEFAULT_COUNTRY_CODE
 ): string {
-  return getCanonicalUrl(`/brand/${handle}`, countryCode)
+  return getCanonicalUrl(`/brands/${handle}`, countryCode)
 }
 
 /**
