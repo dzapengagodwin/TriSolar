@@ -107,10 +107,12 @@ export default function PolicyPageLayout({
                 Phone & WhatsApp
               </span>
               <a
-                href="tel:+263772953946"
+                href="https://wa.me/263718211330"
+                target="_blank"
+                rel="noreferrer"
                 className="font-semibold text-gray-900 hover:text-primary transition-colors"
               >
-                +263 77 295 3946
+                071 821 1330
               </a>
             </div>
             <div className="bg-white p-3.5 rounded-xl border border-gray-200/70">

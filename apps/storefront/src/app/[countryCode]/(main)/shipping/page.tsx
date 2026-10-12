@@ -160,7 +160,7 @@ export default async function ShippingPage() {
             Important Delivery Checklist
           </p>
           <p className="leading-relaxed text-amber-900/90">
-            Before signing the courier receipt or delivery manifest, please visually inspect the exterior box for signs of tampering, tears, water damage, or open tape. If you suspect any tampering, ask the courier to note the damage on the delivery manifest, or decline acceptance and contact our support team immediately at +263 77 295 3946.
+            Before signing the courier receipt or delivery manifest, please visually inspect the exterior box for signs of tampering, tears, water damage, or open tape. If you suspect any tampering, ask the courier to note the damage on the delivery manifest, or decline acceptance and contact our support team immediately at 071 821 1330.
           </p>
         </div>
       </section>

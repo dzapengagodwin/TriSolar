@@ -99,12 +99,12 @@ export default async function Nav({
                 <div className="flex items-center gap-1 shrink-0">
                   <span className="text-gray-500">WhatsApp:</span>
                   <a
-                    href="https://wa.me/263772953946"
+                    href="https://wa.me/263718211330"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:underline font-medium hover:text-primary transition-colors"
                   >
-                    +263772953946
+                    071 821 1330
                   </a>
                 </div>
               </div>

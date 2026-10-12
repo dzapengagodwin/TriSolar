@@ -54,7 +54,7 @@ export default async function TermsPage() {
         </p>
         <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-1 text-xs">
           <p><span className="font-bold text-gray-900">Physical Address:</span> 64 Ridgeway, Borrowdale, Harare, Zimbabwe</p>
-          <p><span className="font-bold text-gray-900">Customer Support:</span> support@laptopzone.co.zw | +263 77 295 3946 / +263 8612 600 600</p>
+          <p><span className="font-bold text-gray-900">Customer Support:</span> support@laptopzone.co.zw | 071 821 1330 / +263 8612 600 600</p>
           <p><span className="font-bold text-gray-900">Website:</span> laptopzone.co.zw</p>
         </div>
       </section>
