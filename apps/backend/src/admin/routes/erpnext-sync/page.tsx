@@ -77,6 +77,7 @@ interface PreviewRow {
   erp_warehouse: string
   medusa_location_id: string
   medusa_variant_id: string
+  medusa_product_id?: string
   medusa_product_title: string
   medusa_variant_title: string
   current_quantity: number

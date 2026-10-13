@@ -83,3 +83,4 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     error: result.message || "Failed to generate or retrieve ERPNext Sales Order PDF",
   })
 }
+

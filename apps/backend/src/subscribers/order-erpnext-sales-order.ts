@@ -35,3 +35,4 @@ export default async function orderErpnextSalesOrderHandler({
 export const config: SubscriberConfig = {
   event: "order.placed",
 }
+
