@@ -121,6 +121,19 @@ export async function syncMedusaOrderToErpnext(
   }
 
   const client = new ErpnextClient({ baseUrl, apiKey, apiSecret })
+  const companyWarehouses = await client.getWarehouses(defaultCompany)
+  const defaultWarehouseIsValid = companyWarehouses.some(
+    (warehouse) =>
+      warehouse.name === defaultWarehouse && warehouse.company === defaultCompany
+  )
+
+  if (!defaultWarehouseIsValid) {
+    const message =
+      `ERPNext warehouse "${defaultWarehouse}" does not belong to company ` +
+      `"${defaultCompany}". Configure an active warehouse belonging to that company.`
+    logger.error(`[ERPNext Sales Order] ${message}`)
+    return { success: false, message }
+  }
 
   // 2. Resolve Customer in ERPNext
   const customerName =
@@ -167,6 +180,14 @@ export async function syncMedusaOrderToErpnext(
     return { success: false, message: "Order has no line items" }
   }
 
+  const shippingAddress = [
+    order.shipping_address?.address_1,
+    order.shipping_address?.city,
+    order.shipping_address?.country_code?.toUpperCase(),
+  ]
+    .filter(Boolean)
+    .join(", ")
+
   // 4. Create Sales Order in ERPNext
   const soData: ErpnextSalesOrderData = {
     company: defaultCompany,
@@ -176,8 +197,10 @@ export async function syncMedusaOrderToErpnext(
     currency: (order.currency_code || "usd").toUpperCase(),
     po_no: `#${order.display_id || order.id.slice(-6)}`,
     items: soItems,
-    customer_address: order.shipping_address?.address_1,
-    remarks: `Created automatically from Medusa Order #${order.display_id || order.id}`,
+    remarks: [
+      `Created automatically from Medusa Order #${order.display_id || order.id}`,
+      ...(shippingAddress ? [`Shipping address (from Medusa): ${shippingAddress}`] : []),
+    ].join("\n"),
   }
 
   let salesOrder: any

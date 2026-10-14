@@ -9,7 +9,11 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     const baseUrl = (req.query.baseUrl as string) || process.env.ERPNEXT_BASE_URL
     const apiKey = (req.query.apiKey as string) || process.env.ERPNEXT_API_KEY
     const apiSecret = (req.query.apiSecret as string) || process.env.ERPNEXT_API_SECRET
-    const company = (req.query.company as string) || process.env.ERPNEXT_DEFAULT_COMPANY
+    const companyParam = req.query.company as string | undefined
+    const company =
+      companyParam === "all"
+        ? undefined
+        : companyParam || process.env.ERPNEXT_DEFAULT_COMPANY
 
     if (!baseUrl || !apiKey || !apiSecret) {
       return res.status(400).json({
@@ -35,4 +39,3 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
     return res.status(500).json({ error: error.message || "Failed to load warehouses" })
   }
 }
-

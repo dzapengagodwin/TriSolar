@@ -15,6 +15,7 @@ import {
   clx,
 } from "@medusajs/ui"
 import { useState, useEffect, useCallback, useMemo } from "react"
+import { sdk } from "../../lib/sdk"
 
 type ActiveTab = "overview" | "audit" | "sync" | "history"
 
@@ -147,6 +148,17 @@ const ErpnextSyncAdminPage = () => {
   const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle")
   const [connectionMessage, setConnectionMessage] = useState("")
   const [savingSettings, setSavingSettings] = useState(false)
+  const warehouseCompanies = Array.from(
+    new Set([
+      ...erpWarehouses
+        .map((warehouse) => warehouse.company)
+        .filter((company): company is string => Boolean(company)),
+      ...(defaultCompany ? [defaultCompany] : []),
+    ])
+  ).sort()
+  const companyWarehouses = erpWarehouses.filter(
+    (warehouse) => warehouse.company === defaultCompany
+  )
 
   // Price Sync & Sales Order Settings State
   const [priceSyncEnabled, setPriceSyncEnabled] = useState(true)
@@ -182,35 +194,51 @@ const ErpnextSyncAdminPage = () => {
   // Fetch Settings & Warehouses
   const loadSettingsAndWarehouses = useCallback(async () => {
     try {
-      const settingsRes = await fetch("/admin/erpnext/settings")
-      if (settingsRes.ok) {
-        const data = await settingsRes.json()
-        setHasEnvConfig(data.hasEnvConfig)
-        setConfiguredBaseUrl(data.configuredBaseUrl || "")
-        setDefaultCompany(data.defaultCompany || "")
-        setDefaultWarehouse(data.defaultWarehouse || "")
-        setWarehouseMappings(data.warehouseMappings || {})
-        setPriceSyncEnabled(data.priceSyncEnabled ?? true)
-        setErpnextPriceList(data.erpnextPriceList || "Standard Selling")
-        setSyncCurrency(data.syncCurrency || "usd")
-        setAutoCreateSalesOrder(data.autoCreateSalesOrder ?? true)
-        setSalesOrderPrintFormat(data.salesOrderPrintFormat || "Standard")
-        if (data.settings) {
-          setIsSyncRunning(Boolean(data.settings.is_sync_running))
-          if (data.settings.last_audit_summary) {
-            setAuditSummary(data.settings.last_audit_summary)
-          }
+      const data = await sdk.client.fetch<{
+        hasEnvConfig: boolean
+        configuredBaseUrl?: string
+        defaultCompany?: string
+        defaultWarehouse?: string
+        warehouseMappings?: WarehouseMapping
+        priceSyncEnabled?: boolean
+        erpnextPriceList?: string
+        syncCurrency?: string
+        autoCreateSalesOrder?: boolean
+        salesOrderPrintFormat?: string
+        settings?: {
+          is_sync_running?: boolean
+          last_audit_summary?: SkuAuditSummary
+        }
+      }>("/admin/erpnext/settings")
+      setHasEnvConfig(data.hasEnvConfig)
+      setConfiguredBaseUrl(data.configuredBaseUrl || "")
+      setDefaultCompany(data.defaultCompany || "")
+      setDefaultWarehouse(data.defaultWarehouse || "")
+      setWarehouseMappings(data.warehouseMappings || {})
+      setPriceSyncEnabled(data.priceSyncEnabled ?? true)
+      setErpnextPriceList(data.erpnextPriceList || "Standard Selling")
+      setSyncCurrency(data.syncCurrency || "usd")
+      setAutoCreateSalesOrder(data.autoCreateSalesOrder ?? true)
+      setSalesOrderPrintFormat(data.salesOrderPrintFormat || "Standard")
+      if (data.settings) {
+        setIsSyncRunning(Boolean(data.settings.is_sync_running))
+        if (data.settings.last_audit_summary) {
+          setAuditSummary(data.settings.last_audit_summary)
         }
       }
 
-      const whRes = await fetch("/admin/erpnext/warehouses")
-      if (whRes.ok) {
-        const whData = await whRes.json()
-        setErpWarehouses(whData.erpWarehouses || [])
-        setMedusaLocations(whData.medusaStockLocations || [])
-      }
-    } catch {
-      // Quiet fail if initial load error
+      const whData = await sdk.client.fetch<{
+        erpWarehouses: ErpWarehouse[]
+        medusaStockLocations: MedusaStockLocation[]
+      }>("/admin/erpnext/warehouses?company=all")
+      setErpWarehouses(whData.erpWarehouses || [])
+      setMedusaLocations(whData.medusaStockLocations || [])
+    } catch (error) {
+      console.error("Failed to load ERPNext settings and warehouses", error)
+      toast.error("ERPNext Settings Unavailable", {
+        description:
+          error instanceof Error ? error.message : "Could not load ERPNext settings.",
+      })
     }
   }, [])
 
@@ -270,10 +298,9 @@ const ErpnextSyncAdminPage = () => {
   const handleSaveSettings = async () => {
     setSavingSettings(true)
     try {
-      const res = await fetch("/admin/erpnext/settings", {
+      await sdk.client.fetch("/admin/erpnext/settings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: {
           default_company: defaultCompany,
           default_warehouse: defaultWarehouse,
           warehouse_mappings: warehouseMappings,
@@ -282,16 +309,16 @@ const ErpnextSyncAdminPage = () => {
           sync_currency: syncCurrency,
           auto_create_sales_order: autoCreateSalesOrder,
           sales_order_print_format: salesOrderPrintFormat,
-        }),
+        },
       })
-      if (res.ok) {
-        toast.success("Settings Saved", { description: "Settings and warehouse mappings updated." })
-      } else {
-        const err = await res.json()
-        toast.error("Save Failed", { description: err.error || "Could not save settings." })
-      }
-    } catch (err: any) {
-      toast.error("Save Error", { description: err.message })
+      toast.success("Settings Saved", {
+        description: "Settings and warehouse mappings updated.",
+      })
+    } catch (error) {
+      toast.error("Save Error", {
+        description:
+          error instanceof Error ? error.message : "Could not save ERPNext settings.",
+      })
     } finally {
       setSavingSettings(false)
     }
@@ -735,6 +762,57 @@ const ErpnextSyncAdminPage = () => {
                 <Text className="text-xs text-ui-fg-muted">
                   Automatically generates a Sales Order in ERPNext when orders are placed in Medusa and archives the official Frappe PDF.
                 </Text>
+
+                <div className="space-y-3 border-t border-ui-border-base pt-3">
+                  <div>
+                    <Label size="small" className="text-xs text-ui-fg-subtle">
+                      ERPNext Company
+                    </Label>
+                    <select
+                      value={defaultCompany}
+                      onChange={(e) => {
+                        setDefaultCompany(e.target.value)
+                        setDefaultWarehouse("")
+                      }}
+                      className="mt-1 w-full text-sm bg-ui-bg-subtle border border-ui-border-base rounded px-3 py-2 text-ui-fg-base"
+                    >
+                      <option value="">Select a company</option>
+                      {warehouseCompanies.map((company) => (
+                        <option key={company} value={company}>
+                          {company}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label size="small" className="text-xs text-ui-fg-subtle">
+                      Default Sales Order Warehouse
+                    </Label>
+                    <select
+                      value={defaultWarehouse}
+                      onChange={(e) => setDefaultWarehouse(e.target.value)}
+                      disabled={!defaultCompany || companyWarehouses.length === 0}
+                      className="mt-1 w-full text-sm bg-ui-bg-subtle border border-ui-border-base rounded px-3 py-2 text-ui-fg-base disabled:opacity-50"
+                    >
+                      <option value="">Select an active warehouse</option>
+                      {companyWarehouses.map((warehouse) => (
+                        <option key={warehouse.name} value={warehouse.name}>
+                          {warehouse.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <Text className="text-xs text-ui-fg-muted">
+                    Choose an active, non-group ERPNext warehouse owned by the selected company. Save Settings below to apply these values to future Sales Orders.
+                  </Text>
+                  {defaultCompany && companyWarehouses.length === 0 && (
+                    <Text className="text-xs text-ui-fg-error">
+                      No active warehouses were found for this company. Create or activate a warehouse for the company in ERPNext, then refresh this page.
+                    </Text>
+                  )}
+                </div>
 
                 <div className="space-y-1.5 pt-2">
                   <Label size="small" className="text-xs text-ui-fg-subtle">
@@ -1371,4 +1449,3 @@ export const config = defineRouteConfig({
 })
 
 export default ErpnextSyncAdminPage
-

@@ -54,7 +54,6 @@ export interface ErpnextSalesOrderData {
   currency: string
   po_no?: string
   items: ErpnextSalesOrderItem[]
-  customer_address?: string
   remarks?: string
 }
 
@@ -401,7 +400,6 @@ export class ErpnextClient {
           warehouse: item.warehouse,
           delivery_date: orderData.delivery_date,
         })),
-        customer_address: orderData.customer_address,
         remarks: orderData.remarks,
       }),
     })

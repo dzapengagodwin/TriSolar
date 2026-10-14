@@ -187,6 +187,10 @@ describe("ERPNext Client Unit Tests", () => {
 
     expect(so.name).toBe("SO-2026-0001")
     expect(so.grand_total).toBe(500)
+    const requestBody = JSON.parse(
+      (global.fetch as jest.Mock).mock.calls[0][1].body
+    )
+    expect(requestBody).not.toHaveProperty("customer_address")
   })
 
   it("getSalesOrderPdf retrieves binary PDF Buffer", async () => {
@@ -208,4 +212,3 @@ describe("ERPNext Client Unit Tests", () => {
     expect(pdfBuffer.toString()).toContain("%PDF-1.4")
   })
 })
-

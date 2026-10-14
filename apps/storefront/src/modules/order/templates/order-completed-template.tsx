@@ -369,7 +369,7 @@ export default async function OrderCompletedTemplate({
             </div>
           </div>
           <a
-            href={`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/store/orders/${order.id}/sales-order-pdf?email=${encodeURIComponent(order.email)}`}
+            href={`/api/orders/${encodeURIComponent(order.id)}/sales-order-pdf?email=${encodeURIComponent(order.email)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold py-2.5 px-5 rounded-full transition-all shadow-sm shrink-0"

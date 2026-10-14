@@ -59,7 +59,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
 
       <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
         <a
-          href={`${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"}/store/orders/${order.id}/sales-order-pdf?email=${encodeURIComponent(order.email)}`}
+          href={`/api/orders/${encodeURIComponent(order.id)}/sales-order-pdf?email=${encodeURIComponent(order.email)}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
