@@ -51,7 +51,17 @@ export async function retrieveCart(cartId?: string, fields?: string) {
       cache: "no-store",
     })
     .then(({ cart }: { cart: HttpTypes.StoreCart }) => cart)
-    .catch(() => null)
+    .catch(async (error: unknown) => {
+      const fetchError = error as {
+        status?: number
+        response?: { status?: number }
+      }
+      if (fetchError.status === 404 || fetchError.response?.status === 404) {
+        await removeCartId()
+        return null
+      }
+      throw error
+    })
 
   if (
     cart &&
@@ -610,6 +620,14 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
     return { error: "Please sign in to complete your checkout." }
   }
 
+  if (!data.shipping_method_id) {
+    return { error: "Please select a delivery or pickup method." }
+  }
+
+  if (!data.payment_provider_id) {
+    return { error: "Please select a payment method." }
+  }
+
   try {
     const shippingAddress = {
       first_name: data.shipping_address.first_name.trim(),
@@ -682,10 +700,6 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
     }
 
     // 4. Validate payment provider
-    if (!data.payment_provider_id) {
-      return { error: "Please select a payment method." }
-    }
-
     // 5. Initiate payment session
     let paymentSessionRes: HttpTypes.StorePaymentCollectionResponse | undefined
     try {
@@ -725,12 +739,13 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
         paymentSessionRes?.payment_collection?.payment_sessions ||
         freshCart.payment_collection?.payment_sessions ||
         []
-      const session =
-        sessions.find((s) => isPesepay(s.provider_id)) || sessions[0]
+      const session = sessions.find((s) => isPesepay(s.provider_id))
       const sData = (session?.data || {}) as Record<string, unknown>
-      const redirectUrl = (sData.redirectUrl ||
+      const redirectValue = sData.redirectUrl ||
         sData.redirect_url ||
-        sData.payment_url) as string | undefined
+        sData.payment_url
+      const redirectUrl =
+        typeof redirectValue === "string" ? redirectValue : undefined
 
       if (redirectUrl) {
         return { success: true, redirectUrl }
@@ -780,14 +795,24 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
       const sessions =
         paymentSessionRes?.payment_collection?.payment_sessions || []
       const session = sessions.find((s) => isStripeLike(s.provider_id))
+      const clientSecret = session?.data?.client_secret
+      if (typeof clientSecret !== "string" || !clientSecret) {
+        return {
+          error:
+            "The selected card payment method could not be initialized. Please try another method.",
+        }
+      }
       return {
         success: true,
         requiresStripeConfirm: true,
-        clientSecret: session?.data?.client_secret as string,
+        clientSecret,
       }
     }
 
-    return { success: true }
+    return {
+      error:
+        "This payment method is not supported by checkout. Please choose another method.",
+    }
   } catch (err: unknown) {
     console.error("submitOnePageCheckout error:", err)
     const errorObj = err as {
@@ -802,4 +827,3 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
     }
   }
 }
-

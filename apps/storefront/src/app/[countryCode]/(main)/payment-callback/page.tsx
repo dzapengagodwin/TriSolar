@@ -37,7 +37,10 @@ function PaymentCallbackContent() {
     setAttempted(true)
     startTransition(async () => {
       try {
-        await placeOrder(cartId)
+        const result = await placeOrder(cartId)
+        if (result?.error) {
+          setErrorMessage(result.error)
+        }
       } catch (err: unknown) {
         const redirectErr = err as { digest?: string; message?: string }
         // Next.js redirect thrown inside Server Action is expected

@@ -39,7 +39,19 @@ describe("PesepayPaymentProviderService Unit Tests", () => {
   })
 
   describe("authorizePayment", () => {
-    it("should authorize immediately if webhookConfirmed is present", async () => {
+    beforeEach(() => {
+      jest.spyOn(service as any, "getActiveConfig").mockResolvedValue({
+        integrationKey: "test_key",
+        encryptionKey: "test_encryption_key_32_bytes_long!",
+        baseUrl: "https://api.test.sandbox.pesepay.com/payments-engine/v1",
+      })
+    })
+
+    it("does not trust webhook confirmation without provider verification", async () => {
+      const request = jest
+        .spyOn(service as any, "request")
+        .mockResolvedValue({ transactionStatus: "PENDING" })
+
       const result = await service.authorizePayment({
         data: {
           referenceNumber: "PESE-REF-12345",
@@ -48,10 +60,25 @@ describe("PesepayPaymentProviderService Unit Tests", () => {
         },
       } as any)
 
+      expect(result.status).toBe("pending")
+      expect(request).toHaveBeenCalledWith(
+        "/payments/check-payment",
+        "GET",
+        undefined,
+        { referenceNumber: "PESE-REF-12345" }
+      )
+    })
+
+    it("authorizes a payment only when Pesepay reports success", async () => {
+      jest
+        .spyOn(service as any, "request")
+        .mockResolvedValue({ transactionStatus: "SUCCESS" })
+
+      const result = await service.authorizePayment({
+        data: { referenceNumber: "PESE-REF-12345" },
+      } as any)
+
       expect(result.status).toBe("authorized")
-      expect(result.data).toBeDefined()
-      expect(result.data?.webhookConfirmed).toBe(true)
-      expect(result.data?.cart_id).toBe("cart_01HXTESTCART")
     })
   })
 

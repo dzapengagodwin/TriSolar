@@ -452,15 +452,7 @@ class PesepayProviderService extends AbstractPaymentProvider<PesepayOptions> {
       `[Pesepay] authorizePayment called | ref: ${referenceNumber || 'NONE'} | webhookConfirmed: ${!!input.data?.webhookConfirmed} | session data keys: ${Object.keys(input.data ?? {}).join(', ')}`
     )
 
-    // If webhook already confirmed, authorize immediately
-    if (input.data?.webhookConfirmed) {
-      return {
-        status: 'authorized',
-        data: input.data ?? {},
-      }
-    }
-
-    // Check payment status with Pesepay API
+    // Always verify payment status with Pesepay; callback payloads are not authoritative.
     if (referenceNumber) {
       try {
         const statusResult = await this.getPaymentStatus({
