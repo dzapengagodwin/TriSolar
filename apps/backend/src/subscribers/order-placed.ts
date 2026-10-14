@@ -5,6 +5,7 @@ import { OrderConfirmationData } from "../modules/sendgrid/types"
 import { renderOrderConfirmation } from "../modules/sendgrid/templates/order-confirmation"
 import { renderOwnerOrderNotification } from "../modules/sendgrid/templates/owner-order-notification"
 import { STORE_SETTINGS_MODULE } from "../modules/store-settings"
+import { syncMedusaOrderToErpnext } from "../modules/erpnext/services/sales-order-service"
 
 function parseNotificationEmails(raw: string | null | undefined): string[] {
   if (!raw || typeof raw !== "string") return []
@@ -238,6 +239,37 @@ export default async function orderPlacedHandler({
       day: "numeric",
     })
 
+    // ----------------------------------------------------
+    // ERPNext Sales Order Synchronization & PDF Generation
+    // ----------------------------------------------------
+    let salesOrderPdfAttachments: Array<{
+      content: string
+      filename: string
+      type: string
+      disposition: string
+    }> = []
+
+    try {
+      const erpResult = await syncMedusaOrderToErpnext(order.id, container)
+      if (erpResult.success && erpResult.pdfBuffer) {
+        salesOrderPdfAttachments = [
+          {
+            content: erpResult.pdfBuffer.toString("base64"),
+            filename: `Sales-Order-${order.display_id || order.id}.pdf`,
+            type: "application/pdf",
+            disposition: "attachment",
+          },
+        ]
+        logger.info(
+          `[Subscriber: order.placed] Attached ERPNext Sales Order PDF (${erpResult.salesOrderId}) to confirmation email for order #${order.display_id || order.id}`
+        )
+      }
+    } catch (erpErr: any) {
+      logger.warn(
+        `[Subscriber: order.placed] Could not sync ERPNext Sales Order for order #${order.display_id || order.id}: ${erpErr.message}`
+      )
+    }
+
     const payload: OrderConfirmationData = {
       order_id: order.id,
       display_id: order.display_id || order.id.slice(-6),
@@ -270,6 +302,7 @@ export default async function orderPlacedHandler({
       billing_address: order.billing_address || order.shipping_address,
       customer_phone: (order.shipping_address?.phone || order.billing_address?.phone) ?? undefined,
       view_order_url: viewOrderUrl,
+      ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
     }
 
     const orderFromEmail =
@@ -308,6 +341,7 @@ export default async function orderPlacedHandler({
             subject: rendered.subject,
             html: rendered.html,
             text: rendered.text,
+            ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
           }
           const [sgRes] = await sendgrid.send(msg)
           const msgId = sgRes?.headers?.["x-message-id"] || `sg_${Date.now()}`
@@ -392,6 +426,7 @@ export default async function orderPlacedHandler({
                     subject: renderedOwner.subject,
                     html: renderedOwner.html,
                     text: renderedOwner.text,
+                    ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
                   }
                   const [ownerSgRes] = await sendgrid.send(ownerMsg)
                   const ownerMsgId =

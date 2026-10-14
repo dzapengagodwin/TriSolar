@@ -11,7 +11,7 @@ export const GET = async (req: AuthenticatedMedusaRequest, res: MedusaResponse) 
       const syncLog = await erpnextService.retrieveErpnextSyncLog(syncLogId)
       const itemLogs = await erpnextService.listErpnextSyncItemLogs(
         { sync_log_id: syncLogId },
-        { order: { createdAt: "ASC" }, take: 200 }
+        { order: { created_at: "ASC" }, take: 200 }
       )
       return res.status(200).json({ syncLog, itemLogs })
     }

@@ -79,6 +79,7 @@ export async function syncMedusaOrderToErpnext(
       "items.title",
       "items.variant_id",
       "items.variant_title",
+      "items.variant_sku",
       "items.variant.sku",
       "items.quantity",
       "items.unit_price",
@@ -90,6 +91,33 @@ export async function syncMedusaOrderToErpnext(
   const order = orders?.[0]
   if (!order) {
     return { success: false, message: `Order ${orderId} not found` }
+  }
+
+  // Idempotency check: If Sales Order already exists, return cached/existing record
+  const existingSalesOrderId = (order.metadata as any)?.erpnext_sales_order_id
+  if (existingSalesOrderId) {
+    const storageDir = getSalesOrderStorageDir()
+    const cachedPdfPath = path.join(storageDir, `${order.id}.pdf`)
+    let pdfBuffer: Buffer | undefined
+    if (fs.existsSync(cachedPdfPath)) {
+      pdfBuffer = fs.readFileSync(cachedPdfPath)
+    } else {
+      try {
+        const client = new ErpnextClient({ baseUrl, apiKey, apiSecret })
+        const printFormat = settings?.sales_order_print_format || "Standard"
+        pdfBuffer = await client.getSalesOrderPdf(existingSalesOrderId, printFormat)
+        fs.writeFileSync(cachedPdfPath, pdfBuffer)
+      } catch (err: any) {
+        logger.warn(`[ERPNext Sales Order] Could not re-fetch PDF for existing SO ${existingSalesOrderId}: ${err.message}`)
+      }
+    }
+    return {
+      success: true,
+      salesOrderId: existingSalesOrderId,
+      pdfBuffer,
+      pdfFilePath: cachedPdfPath,
+      message: `Sales Order ${existingSalesOrderId} already exists for this order`,
+    }
   }
 
   const client = new ErpnextClient({ baseUrl, apiKey, apiSecret })
@@ -120,7 +148,7 @@ export async function syncMedusaOrderToErpnext(
   const deliveryDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
 
   for (const item of orderItems) {
-    const sku = item.variant?.sku?.trim() || item.title?.trim() || "MISC"
+    const sku = item.variant_sku?.trim() || item.variant?.sku?.trim() || item.title?.trim() || "MISC"
     const unitPrice = typeof item.unit_price === "number" ? item.unit_price : Number(item.unit_price) || 0
     const qty = typeof item.quantity === "number" ? item.quantity : Number(item.quantity) || 1
 

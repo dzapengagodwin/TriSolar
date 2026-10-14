@@ -32,7 +32,9 @@ export type ErpnextInventorySyncInput = {
   syncPrices?: boolean
   priceList?: string
   currency?: string
+  force?: boolean
 }
+
 
 export interface InventoryPreviewRow {
   sku: string
@@ -452,12 +454,13 @@ export const runErpnextInventorySyncStep = createStep(
 
     // Check Mutex Lock
     const TEN_MINUTES_MS = 10 * 60 * 1000
-    if (settings.is_sync_running && settings.sync_lock_acquired_at) {
-      const lockAge = Date.now() - new Date(settings.sync_lock_acquired_at).getTime()
+    if (settings.is_sync_running && !input.force) {
+      const lockTime = settings.sync_lock_acquired_at ? new Date(settings.sync_lock_acquired_at).getTime() : 0
+      const lockAge = Date.now() - lockTime
       if (lockAge < TEN_MINUTES_MS) {
         throw new MedusaError(
           MedusaError.Types.CONFLICT,
-          "Another synchronization run is currently active. Please wait for it to complete."
+          "Another synchronization run is currently active. Please wait for it to complete or reset the lock."
         )
       }
     }
@@ -473,21 +476,22 @@ export const runErpnextInventorySyncStep = createStep(
       sync_lock_acquired_at: syncStartTime,
     })
 
-    // Create durable sync log entry
-    const syncLog = await erpnextService.createErpnextSyncLog({
-      run_type: "sync",
-      status: "in_progress",
-      started_at: syncStartTime,
-      triggered_by: input.triggeredBy || "admin",
-      metadata: { runId },
-    })
-
+    let syncLog: any = null
     let executedUpdates = 0
     let executedCreates = 0
     let executedPriceUpdates = 0
     let failedCount = 0
 
     try {
+      // Create durable sync log entry
+      syncLog = await erpnextService.createErpnextSyncLogs({
+        run_type: "sync",
+        status: "in_progress",
+        started_at: syncStartTime,
+        triggered_by: input.triggeredBy || "admin",
+        metadata: { runId },
+      })
+
       // 1. Sync inventory levels in batches of 50
       const executableRows = previewRows.filter(
         (r) => r.action === "UPDATE" || r.action === "CREATE"
@@ -503,20 +507,23 @@ export const runErpnextInventorySyncStep = createStep(
 
           if (!invItemId) {
             failedCount++
-            await erpnextService.createErpnextSyncItemLog({
-              sync_log_id: syncLog.id,
-              sku: row.sku,
-              erp_item_code: row.erp_item_code,
-              medusa_variant_id: row.medusa_variant_id,
-              location_id: row.medusa_location_id,
-              erp_warehouse: row.erp_warehouse,
-              status: "FAILED",
-              previous_quantity: row.current_quantity,
-              new_quantity: row.erp_quantity,
-              previous_price: row.current_price,
-              new_price: row.erp_price,
-              error_message: "Missing linked inventory item ID",
-            })
+            if (syncLog?.id) {
+              await erpnextService.createErpnextSyncItemLogs({
+                sync_log_id: syncLog.id,
+                sku: row.sku,
+                erp_item_code: row.erp_item_code,
+                medusa_variant_id: row.medusa_variant_id,
+                medusa_product_id: row.medusa_product_id,
+                location_id: row.medusa_location_id,
+                erp_warehouse: row.erp_warehouse,
+                status: "FAILED",
+                previous_quantity: row.current_quantity,
+                new_quantity: row.erp_quantity,
+                previous_price: row.current_price,
+                new_price: row.erp_price,
+                error_message: "Missing linked inventory item ID",
+              })
+            }
             continue
           }
 
@@ -534,19 +541,22 @@ export const runErpnextInventorySyncStep = createStep(
                 },
               })
               executedCreates++
-              await erpnextService.createErpnextSyncItemLog({
-                sync_log_id: syncLog.id,
-                sku: row.sku,
-                erp_item_code: row.erp_item_code,
-                medusa_variant_id: row.medusa_variant_id,
-                location_id: row.medusa_location_id,
-                erp_warehouse: row.erp_warehouse,
-                status: "CREATED",
-                previous_quantity: row.current_quantity,
-                new_quantity: row.erp_quantity,
-                previous_price: row.current_price,
-                new_price: row.erp_price,
-              })
+              if (syncLog?.id) {
+                await erpnextService.createErpnextSyncItemLogs({
+                  sync_log_id: syncLog.id,
+                  sku: row.sku,
+                  erp_item_code: row.erp_item_code,
+                  medusa_variant_id: row.medusa_variant_id,
+                  medusa_product_id: row.medusa_product_id,
+                  location_id: row.medusa_location_id,
+                  erp_warehouse: row.erp_warehouse,
+                  status: "CREATED",
+                  previous_quantity: row.current_quantity,
+                  new_quantity: row.erp_quantity,
+                  previous_price: row.current_price,
+                  new_price: row.erp_price,
+                })
+              }
             } else if (row.action === "UPDATE") {
               const level = details?.locationLevels.get(row.medusa_location_id)
               await updateInventoryLevelsWorkflow(container).run({
@@ -562,37 +572,67 @@ export const runErpnextInventorySyncStep = createStep(
                 },
               })
               executedUpdates++
-              await erpnextService.createErpnextSyncItemLog({
+              if (syncLog?.id) {
+                await erpnextService.createErpnextSyncItemLogs({
+                  sync_log_id: syncLog.id,
+                  sku: row.sku,
+                  erp_item_code: row.erp_item_code,
+                  medusa_variant_id: row.medusa_variant_id,
+                  medusa_product_id: row.medusa_product_id,
+                  location_id: row.medusa_location_id,
+                  erp_warehouse: row.erp_warehouse,
+                  status: "UPDATED",
+                  previous_quantity: row.current_quantity,
+                  new_quantity: row.erp_quantity,
+                  previous_price: row.current_price,
+                  new_price: row.erp_price,
+                })
+              }
+            }
+          } catch (itemErr: any) {
+            failedCount++
+            if (syncLog?.id) {
+              await erpnextService.createErpnextSyncItemLogs({
                 sync_log_id: syncLog.id,
                 sku: row.sku,
                 erp_item_code: row.erp_item_code,
                 medusa_variant_id: row.medusa_variant_id,
+                medusa_product_id: row.medusa_product_id,
                 location_id: row.medusa_location_id,
                 erp_warehouse: row.erp_warehouse,
-                status: "UPDATED",
+                status: "FAILED",
                 previous_quantity: row.current_quantity,
                 new_quantity: row.erp_quantity,
                 previous_price: row.current_price,
                 new_price: row.erp_price,
+                error_message: itemErr.message || "Failed to update inventory level",
               })
             }
-          } catch (itemErr: any) {
-            failedCount++
-            await erpnextService.createErpnextSyncItemLog({
-              sync_log_id: syncLog.id,
-              sku: row.sku,
-              erp_item_code: row.erp_item_code,
-              medusa_variant_id: row.medusa_variant_id,
-              location_id: row.medusa_location_id,
-              erp_warehouse: row.erp_warehouse,
-              status: "FAILED",
-              previous_quantity: row.current_quantity,
-              new_quantity: row.erp_quantity,
-              previous_price: row.current_price,
-              new_price: row.erp_price,
-              error_message: itemErr.message || "Failed to update inventory level",
-            })
           }
+        }
+      }
+
+      // Log skipped items (missing inventory items or unmapped warehouses)
+      const skippedRows = previewRows.filter(
+        (r) => r.action === "MISSING_INVENTORY_ITEM" || r.action === "UNMAPPED_WAREHOUSE"
+      )
+      for (const row of skippedRows) {
+        if (syncLog?.id) {
+          await erpnextService.createErpnextSyncItemLogs({
+            sync_log_id: syncLog.id,
+            sku: row.sku,
+            erp_item_code: row.erp_item_code,
+            medusa_variant_id: row.medusa_variant_id,
+            medusa_product_id: row.medusa_product_id,
+            location_id: row.medusa_location_id,
+            erp_warehouse: row.erp_warehouse,
+            status: "SKIPPED",
+            previous_quantity: row.current_quantity,
+            new_quantity: row.erp_quantity,
+            previous_price: row.current_price,
+            new_price: row.erp_price,
+            error_message: row.reason || "Skipped inventory level update",
+          })
         }
       }
 
@@ -621,13 +661,46 @@ export const runErpnextInventorySyncStep = createStep(
                     ],
                   },
                 ],
-                previousVariantIds: [],
+                previousVariantIds: [pr.medusa_variant_id],
               },
             })
             executedPriceUpdates++
+            if (syncLog?.id) {
+              await erpnextService.createErpnextSyncItemLogs({
+                sync_log_id: syncLog.id,
+                sku: pr.sku,
+                erp_item_code: pr.erp_item_code,
+                medusa_variant_id: pr.medusa_variant_id,
+                medusa_product_id: pr.medusa_product_id,
+                location_id: pr.medusa_location_id,
+                erp_warehouse: pr.erp_warehouse,
+                status: pr.price_action === "CREATE_PRICE" ? "PRICE_CREATED" : "PRICE_UPDATED",
+                previous_quantity: pr.current_quantity,
+                new_quantity: pr.erp_quantity,
+                previous_price: pr.current_price,
+                new_price: pr.erp_price,
+              })
+            }
           } catch (prErr: any) {
             failedCount++
             console.warn(`[ERPNext Price Sync] Failed to update price for variant ${pr.medusa_variant_id}:`, prErr.message)
+            if (syncLog?.id) {
+              await erpnextService.createErpnextSyncItemLogs({
+                sync_log_id: syncLog.id,
+                sku: pr.sku,
+                erp_item_code: pr.erp_item_code,
+                medusa_variant_id: pr.medusa_variant_id,
+                medusa_product_id: pr.medusa_product_id,
+                location_id: pr.medusa_location_id,
+                erp_warehouse: pr.erp_warehouse,
+                status: "PRICE_FAILED",
+                previous_quantity: pr.current_quantity,
+                new_quantity: pr.erp_quantity,
+                previous_price: pr.current_price,
+                new_price: pr.erp_price,
+                error_message: prErr.message || "Failed to update price",
+              })
+            }
           }
         }
       }
@@ -650,19 +723,26 @@ export const runErpnextInventorySyncStep = createStep(
         completed_at: completedAt.toISOString(),
       }
 
+      const anySuccess = executedUpdates > 0 || executedCreates > 0 || executedPriceUpdates > 0
+      const finalStatus =
+        failedCount > 0 && !anySuccess ? "failed" : failedCount > 0 ? "partial" : "completed"
+
       // Update sync log
-      await erpnextService.updateErpnextSyncLog({
-        id: syncLog.id,
-        status: failedCount > 0 && executedUpdates === 0 && executedCreates === 0 ? "failed" : "completed",
-        completed_at: completedAt,
-        summary: syncSummary,
-      })
+      if (syncLog?.id) {
+        await erpnextService.updateErpnextSyncLogs({
+          id: syncLog.id,
+          status: finalStatus,
+          completed_at: completedAt,
+          summary: syncSummary,
+        })
+      }
 
       // Release lock and update settings
       await erpnextService.updateErpnextSettings({
         id: settings.id,
         is_sync_running: false,
         sync_lock_run_id: null,
+        sync_lock_acquired_at: null,
         last_sync_at: completedAt,
         last_sync_summary: syncSummary,
         metadata: {
@@ -674,22 +754,33 @@ export const runErpnextInventorySyncStep = createStep(
       return new StepResponse({
         action: "execute",
         summary: syncSummary,
-        logId: syncLog.id,
+        logId: syncLog?.id,
       } as InventorySyncResult)
     } catch (fatalErr: any) {
-      // In case of fatal error, release lock
-      await erpnextService.updateErpnextSettings({
-        id: settings.id,
-        is_sync_running: false,
-        sync_lock_run_id: null,
-      })
+      // In case of fatal error, release lock reliably
+      try {
+        await erpnextService.updateErpnextSettings({
+          id: settings.id,
+          is_sync_running: false,
+          sync_lock_run_id: null,
+          sync_lock_acquired_at: null,
+        })
+      } catch (unlockErr: any) {
+        console.error("[ERPNext Sync] Failed to release lock in catch block:", unlockErr?.message)
+      }
 
-      await erpnextService.updateErpnextSyncLog({
-        id: syncLog.id,
-        status: "failed",
-        completed_at: new Date(),
-        error_message: fatalErr.message,
-      })
+      if (syncLog?.id) {
+        try {
+          await erpnextService.updateErpnextSyncLogs({
+            id: syncLog.id,
+            status: "failed",
+            completed_at: new Date(),
+            error_message: fatalErr.message,
+          })
+        } catch (logErr: any) {
+          console.error("[ERPNext Sync] Failed to update sync log in catch block:", logErr?.message)
+        }
+      }
 
       throw fatalErr
     }

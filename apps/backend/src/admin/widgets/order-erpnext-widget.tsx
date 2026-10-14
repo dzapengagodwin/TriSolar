@@ -18,9 +18,33 @@ const OrderErpnextWidget = ({ data }: OrderErpnextWidgetProps) => {
     data.metadata?.erpnext_sales_order_id || null
   )
   const [syncing, setSyncing] = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
-  const handleDownloadPdf = () => {
-    window.open(`/admin/erpnext/orders/${data.id}/sales-order-pdf`, "_blank")
+  const handleDownloadPdf = async () => {
+    setDownloading(true)
+    try {
+      const res = await fetch(`/admin/erpnext/orders/${data.id}/sales-order-pdf`)
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null)
+        throw new Error(errJson?.error || "Failed to download Sales Order PDF")
+      }
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `Sales-Order-${data.display_id || data.id}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+      toast.success("PDF Downloaded", {
+        description: "Official ERPNext Sales Order PDF downloaded successfully.",
+      })
+    } catch (err: any) {
+      toast.error("Download Error", { description: err.message })
+    } finally {
+      setDownloading(false)
+    }
   }
 
   const handleSyncSalesOrder = async () => {
@@ -72,9 +96,9 @@ const OrderErpnextWidget = ({ data }: OrderErpnextWidgetProps) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button size="small" variant="primary" onClick={handleDownloadPdf}>
+            <Button size="small" variant="primary" onClick={handleDownloadPdf} disabled={downloading}>
               <ArrowDownTray className="w-4 h-4 mr-1" />
-              Download Sales Order PDF
+              {downloading ? "Downloading..." : "Download Sales Order PDF"}
             </Button>
             <Button
               size="small"

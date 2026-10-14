@@ -170,6 +170,8 @@ const ErpnextSyncAdminPage = () => {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [confirmInput, setConfirmInput] = useState("")
   const [executingSync, setExecutingSync] = useState(false)
+  const [isSyncRunning, setIsSyncRunning] = useState(false)
+  const [unlocking, setUnlocking] = useState(false)
 
   // History State
   const [syncLogs, setSyncLogs] = useState<SyncLogItem[]>([])
@@ -193,8 +195,11 @@ const ErpnextSyncAdminPage = () => {
         setSyncCurrency(data.syncCurrency || "usd")
         setAutoCreateSalesOrder(data.autoCreateSalesOrder ?? true)
         setSalesOrderPrintFormat(data.salesOrderPrintFormat || "Standard")
-        if (data.settings?.last_audit_summary) {
-          setAuditSummary(data.settings.last_audit_summary)
+        if (data.settings) {
+          setIsSyncRunning(Boolean(data.settings.is_sync_running))
+          if (data.settings.last_audit_summary) {
+            setAuditSummary(data.settings.last_audit_summary)
+          }
         }
       }
 
@@ -343,6 +348,31 @@ const ErpnextSyncAdminPage = () => {
     return list
   }, [auditRecords, auditFilter, auditSearch])
 
+  // Reset Mutex Lock
+  const handleResetLock = async () => {
+    setUnlocking(true)
+    try {
+      const res = await fetch("/admin/erpnext/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "unlock" }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setIsSyncRunning(false)
+        toast.success("Lock Released", {
+          description: "Active sync lock cleared successfully. You may now generate preview or execute sync.",
+        })
+      } else {
+        toast.error("Reset Lock Failed", { description: data.error || "Could not clear sync lock." })
+      }
+    } catch (err: any) {
+      toast.error("Error", { description: err.message })
+    } finally {
+      setUnlocking(false)
+    }
+  }
+
   // Run Inventory Preview
   const handleRunPreview = async () => {
     setPreviewLoading(true)
@@ -357,6 +387,7 @@ const ErpnextSyncAdminPage = () => {
       })
       const data = await res.json()
       if (res.ok) {
+        setIsSyncRunning(false)
         setPreviewRows(data.previewRows || [])
         setSyncSummary(data.summary)
         setApprovalToken(data.summary.approval_token || null)
@@ -364,6 +395,9 @@ const ErpnextSyncAdminPage = () => {
           description: `${data.summary.will_update} updates and ${data.summary.will_create} creates planned.`,
         })
       } else {
+        if (res.status === 409 || (data.error && data.error.includes("active"))) {
+          setIsSyncRunning(true)
+        }
         toast.error("Preview Failed", { description: data.error || "Failed to generate preview." })
       }
     } catch (err: any) {
@@ -388,6 +422,7 @@ const ErpnextSyncAdminPage = () => {
       })
       const data = await res.json()
       if (res.ok) {
+        setIsSyncRunning(false)
         toast.success("Inventory Sync Successful", {
           description: `Applied ${data.summary.executed_updates} updates and ${data.summary.executed_creates} creates.`,
         })
@@ -397,6 +432,9 @@ const ErpnextSyncAdminPage = () => {
         setPreviewRows([])
         loadSyncLogs()
       } else {
+        if (res.status === 409 || (data.error && data.error.includes("active"))) {
+          setIsSyncRunning(true)
+        }
         toast.error("Sync Failed", { description: data.error || "Execution failed." })
       }
     } catch (err: any) {
@@ -405,6 +443,7 @@ const ErpnextSyncAdminPage = () => {
       setExecutingSync(false)
     }
   }
+
 
   // View Item Logs for a run
   const handleViewLogDetails = async (logId: string) => {
@@ -435,6 +474,11 @@ const ErpnextSyncAdminPage = () => {
             <StatusBadge color={hasEnvConfig ? "green" : "orange"}>
               {hasEnvConfig ? "Configured" : "Credentials Required"}
             </StatusBadge>
+            {isSyncRunning && (
+              <StatusBadge color="red">
+                Sync Locked / Running
+              </StatusBadge>
+            )}
           </div>
           <Text className="text-ui-fg-subtle text-sm mt-1">
             SKU-first exact matching, read-only SKU audits, and approved inventory-only synchronization.
@@ -473,6 +517,31 @@ const ErpnextSyncAdminPage = () => {
           </Button>
         </div>
       </div>
+
+      {/* Active Sync Lock Banner */}
+      {isSyncRunning && (
+        <div className="p-4 bg-ui-bg-subtle border border-ui-border-error rounded-lg flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <ExclamationCircle className="w-5 h-5 text-ui-fg-error shrink-0" />
+            <div>
+              <Text className="text-sm font-medium text-ui-fg-base">
+                A synchronization run is currently active or locked
+              </Text>
+              <Text className="text-xs text-ui-fg-subtle">
+                If a previous synchronization was interrupted or encountered an unexpected error, click Reset Sync Lock to release the database lock.
+              </Text>
+            </div>
+          </div>
+          <Button
+            size="small"
+            variant="danger"
+            onClick={handleResetLock}
+            disabled={unlocking}
+          >
+            {unlocking ? "Resetting..." : "Reset Sync Lock"}
+          </Button>
+        </div>
+      )}
 
       {/* TAB 1: OVERVIEW & SETTINGS */}
       {activeTab === "overview" && (
@@ -925,6 +994,17 @@ const ErpnextSyncAdminPage = () => {
               </Text>
             </div>
             <div className="flex items-center gap-2">
+              {isSyncRunning && (
+                <Button
+                  size="small"
+                  variant="danger"
+                  onClick={handleResetLock}
+                  disabled={unlocking}
+                >
+                  {unlocking ? "Resetting..." : "Reset Stale Lock"}
+                </Button>
+              )}
+
               <Button
                 size="small"
                 variant="secondary"
@@ -943,6 +1023,7 @@ const ErpnextSyncAdminPage = () => {
                 Approve & Execute Sync
               </Button>
             </div>
+
           </div>
 
           {/* Preview Metrics */}
@@ -1142,6 +1223,7 @@ const ErpnextSyncAdminPage = () => {
                   <Table.HeaderCell>Triggered By</Table.HeaderCell>
                   <Table.HeaderCell className="text-right">Updated</Table.HeaderCell>
                   <Table.HeaderCell className="text-right">Created</Table.HeaderCell>
+                  <Table.HeaderCell className="text-right">Prices</Table.HeaderCell>
                   <Table.HeaderCell className="text-right">Failed</Table.HeaderCell>
                   <Table.HeaderCell>Actions</Table.HeaderCell>
                 </Table.Row>
@@ -1149,7 +1231,7 @@ const ErpnextSyncAdminPage = () => {
               <Table.Body>
                 {syncLogs.length === 0 ? (
                   <Table.Row>
-                    <Table.Cell colSpan={8} className="text-center py-6 text-ui-fg-muted text-sm">
+                    <Table.Cell colSpan={9} className="text-center py-6 text-ui-fg-muted text-sm">
                       No synchronization runs recorded yet.
                     </Table.Cell>
                   </Table.Row>
@@ -1161,6 +1243,8 @@ const ErpnextSyncAdminPage = () => {
                           color={
                             log.status === "completed"
                               ? "green"
+                              : log.status === "partial"
+                              ? "orange"
                               : log.status === "in_progress"
                               ? "blue"
                               : "red"
@@ -1178,6 +1262,9 @@ const ErpnextSyncAdminPage = () => {
                       </Table.Cell>
                       <Table.Cell className="text-xs text-right font-mono">
                         {log.summary?.executed_creates ?? 0}
+                      </Table.Cell>
+                      <Table.Cell className="text-xs text-right font-mono">
+                        {log.summary?.executed_price_updates ?? 0}
                       </Table.Cell>
                       <Table.Cell className="text-xs text-right font-mono text-ui-fg-error">
                         {log.summary?.failed ?? 0}
@@ -1234,7 +1321,16 @@ const ErpnextSyncAdminPage = () => {
                         <Table.Row key={item.id}>
                           <Table.Cell>
                             <Badge
-                              color={item.status === "UPDATED" || item.status === "CREATED" ? "green" : "red"}
+                              color={
+                                item.status === "UPDATED" ||
+                                item.status === "CREATED" ||
+                                item.status === "PRICE_UPDATED" ||
+                                item.status === "PRICE_CREATED"
+                                  ? "green"
+                                  : item.status === "SKIPPED" || item.status === "UNCHANGED"
+                                  ? "grey"
+                                  : "red"
+                              }
                               size="small"
                             >
                               {item.status}
