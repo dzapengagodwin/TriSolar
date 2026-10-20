@@ -570,7 +570,9 @@ export default function ProductActions({
         <MobileActions
           product={product}
           variant={selectedVariant}
+          optionGroups={optionGroups}
           options={options}
+          variantUnavailable={isUnavailable}
           updateOptions={setOptionValue}
           inStock={inStock}
           handleAddToCart={handleAddToCart}
