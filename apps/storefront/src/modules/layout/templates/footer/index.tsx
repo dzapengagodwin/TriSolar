@@ -36,6 +36,16 @@ export default async function Footer() {
             className="lg:col-span-3 space-y-6 pr-0 lg:pr-4"
             suppressHydrationWarning
           >
+            <LocalizedClientLink href="/" className="block w-fit">
+              <Image
+                src="/white.png"
+                alt="Laptopzone"
+                width={150}
+                height={75}
+                className="h-auto w-[150px] object-contain"
+              />
+            </LocalizedClientLink>
+
             {/* Hotline Box with Headphone Icon */}
             <div className="flex items-center gap-4 pt-1">
               <div className="text-primary shrink-0">
