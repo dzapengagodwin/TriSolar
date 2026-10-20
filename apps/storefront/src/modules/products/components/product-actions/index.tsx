@@ -71,15 +71,21 @@ export default function ProductActions({
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [isBuyingNow, setIsBuyingNow] = useState(false)
+  const [buyNowError, setBuyNowError] = useState<string | null>(null)
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null)
-  const countryCode = useParams().countryCode as string
+  const countryCode =
+    (useParams().countryCode as string) ||
+    process.env.NEXT_PUBLIC_DEFAULT_REGION ||
+    "zw"
   const { options: productOptions, variants } = product
   const optionGroups = useMemo(
     () => getDistinguishingVariantOptions({ options: productOptions, variants }),
     [productOptions, variants]
   )
+  const hasVariantChoices = (product.variants?.length ?? 0) > 1
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
@@ -175,7 +181,7 @@ export default function ProductActions({
 
   // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id || isBuyingNow) return null
 
     setIsAdding(true)
 
@@ -195,6 +201,48 @@ export default function ProductActions({
       console.error("Failed to add item to cart:", error)
     } finally {
       setIsAdding(false)
+    }
+  }
+
+  const handleBuyNow = async () => {
+    if (
+      !selectedVariant?.id ||
+      !inStock ||
+      !isValidVariant ||
+      disabled ||
+      isAdding ||
+      isBuyingNow
+    ) {
+      return
+    }
+
+    setIsBuyingNow(true)
+    setBuyNowError(null)
+
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      })
+
+      trackAddToCart({
+        item: transformProductToGA4Item(product, selectedVariant, quantity),
+        quantity,
+        currency: region.currency_code?.toUpperCase() || "USD",
+      })
+
+      if (typeof window !== "undefined") {
+        window.location.href = "/checkout"
+      } else {
+        router.push("/checkout")
+      }
+    } catch (error) {
+      console.error("Failed to buy item:", error)
+      setBuyNowError(
+        error instanceof Error ? error.message : "Failed to proceed to checkout"
+      )
+      setIsBuyingNow(false)
     }
   }
 
@@ -247,7 +295,7 @@ export default function ProductActions({
                       updateOption={setOptionValue}
                       title={option.title ?? ""}
                       data-testid="product-options"
-                      disabled={!!disabled || isAdding || isAddingToWishlist}
+                      disabled={!!disabled || isAdding || isBuyingNow || isAddingToWishlist}
                     />
                   </div>
                 )
@@ -262,12 +310,12 @@ export default function ProductActions({
         {/* 3-Element Horizontal Buy Actions Row matching reference image */}
         <div className="flex items-center gap-2 sm:gap-2.5 pt-2">
           {/* 1. Quantity Selector Pill */}
-          <div className="flex items-center justify-between bg-gray-50 border border-gray-200/90 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
+          <div className="flex items-center justify-between bg-orange-50/70 border border-orange-100 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
             <button
               type="button"
               onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
-              disabled={quantity <= 1 || isAdding}
-              className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              disabled={quantity <= 1 || isAdding || isBuyingNow}
+              className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
               aria-label="Decrease quantity"
             >
               –
@@ -278,8 +326,8 @@ export default function ProductActions({
             <button
               type="button"
               onClick={() => setQuantity((prev) => prev + 1)}
-              disabled={isAdding}
-              className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              disabled={isAdding || isBuyingNow}
+              className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
               aria-label="Increase quantity"
             >
               +
@@ -295,25 +343,26 @@ export default function ProductActions({
               !selectedVariant ||
               !!disabled ||
               isAdding ||
+              isBuyingNow ||
               isAddingToWishlist ||
               !isValidVariant
             }
-            className="flex-1 min-w-0 h-12 rounded-full bg-primary hover:bg-orange-400 active:scale-[0.99] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 px-2.5 sm:px-3 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap overflow-hidden"
+            className="flex-1 min-w-0 h-12 rounded-full border-2 border-[#F9501F] bg-white hover:bg-orange-50 active:scale-[0.99] text-[#F9501F] font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 px-2.5 sm:px-3 shadow-xs transition-all disabled:cursor-not-allowed cursor-pointer whitespace-nowrap overflow-hidden"
             data-testid="add-product-button"
           >
             {isAdding ? (
-              <Spinner className="w-4 h-4 animate-spin text-white shrink-0" />
+              <Spinner className="w-4 h-4 animate-spin text-primary shrink-0" />
             ) : (
               <>
                 <span className="truncate">
-                  {!selectedVariant
-                    ? "Select variant"
-                    : !inStock || !isValidVariant
+                  {selectedVariant && !inStock
                     ? "Out of stock"
+                    : !selectedVariant && hasVariantChoices
+                    ? "Select variant"
                     : "Add to Cart"}
                 </span>
                 <svg
-                  className="w-4 h-4 text-white shrink-0 hidden 2xl:inline"
+                  className="w-4 h-4 text-current shrink-0 hidden 2xl:inline"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -329,13 +378,14 @@ export default function ProductActions({
             )}
           </button>
 
-          {/* 3. Order on WhatsApp Pill Button */}
+          {/* 3. Circular WhatsApp Button */}
           <WhatsAppOrderButton
             productTitle={product.title}
             productHandle={product.handle}
             variantTitle={selectedVariant?.title ?? undefined}
             size="full"
-            className="flex-1 min-w-0"
+            iconOnly
+            className="shrink-0"
           />
 
           {/* 4. Circular Wishlist Button */}
@@ -349,7 +399,7 @@ export default function ProductActions({
               isAddingToWishlist
             }
             aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
-            className="w-12 h-12 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
+            className="w-12 h-12 rounded-full border border-orange-100 bg-white hover:bg-orange-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
           >
             <Heart
               className={`w-5 h-5 transition-colors ${
@@ -360,6 +410,37 @@ export default function ProductActions({
             />
           </button>
         </div>
+
+        {/* Buy Now Button */}
+        <button
+          type="button"
+          onClick={handleBuyNow}
+          disabled={
+            !inStock ||
+            !selectedVariant ||
+            !!disabled ||
+            isAdding ||
+            isBuyingNow ||
+            !isValidVariant
+          }
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary hover:bg-[#D83D0F] active:scale-[0.99] px-4 text-sm font-bold text-white shadow-xs transition-all disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          data-testid="buy-now-button"
+        >
+          {isBuyingNow ? (
+            <>
+              <Spinner className="h-4 w-4 animate-spin text-white" />
+              <span>Processing...</span>
+            </>
+          ) : (
+            <span>Buy now</span>
+          )}
+        </button>
+
+        {buyNowError && (
+          <p role="alert" className="text-xs font-semibold text-red-600">
+            {buyNowError}
+          </p>
+        )}
 
         {wishlistFeedback && (
           <p role="status" className="text-xs font-semibold text-gray-700">
