@@ -4,7 +4,8 @@ import { Montserrat } from "next/font/google"
 import GoogleAnalytics from "@modules/analytics/components/google-analytics"
 import PageViewTracker from "@modules/analytics/components/page-view-tracker"
 import WhatsAppFAB from "@modules/common/components/whatsapp-fab"
-import "styles/globals.css"
+// @ts-ignore -- Next.js handles this global CSS side-effect import.
+import "../styles/globals.css";
 
 const montserrat = Montserrat({
   subsets: ["latin"],

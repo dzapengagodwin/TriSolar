@@ -29,7 +29,4 @@ export const listCartPaymentMethods = async (regionId: string) => {
         return (a?.id ?? "") > (b?.id ?? "") ? 1 : -1
       })
     )
-    .catch(() => {
-      return []
-    })
 }

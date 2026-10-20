@@ -1,15 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react"
+import { HttpTypes } from "@medusajs/types"
+import { getProductPrice } from "@lib/util/get-product-price"
 import { Button, clx } from "@modules/common/components/ui"
-import React, { Fragment, useMemo } from "react"
-
-import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
-
-import { getProductPrice } from "@lib/util/get-product-price"
-import { getVariantOptionSummary } from "@lib/util/product-variants"
+import useToggleState from "@lib/hooks/use-toggle-state"
 import OptionSelect from "./option-select"
-import { HttpTypes } from "@medusajs/types"
+import React, { Fragment, useMemo } from "react"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
@@ -17,7 +14,7 @@ type MobileActionsProps = {
   optionGroups: HttpTypes.StoreProductOption[]
   options: Record<string, string | undefined>
   variantUnavailable: boolean
-  updateOptions: (title: string, value: string) => void
+  updateOptions: (optionId: string, value: string) => void
   inStock?: boolean
   handleAddToCart: () => void
   isAdding?: boolean
@@ -41,7 +38,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   const { state, open, close } = useToggleState()
 
   const price = getProductPrice({
-    product: product,
+    product,
     variantId: variant?.id,
   })
 
@@ -49,13 +46,30 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     if (!price) {
       return null
     }
-    const { variantPrice, cheapestPrice } = price
 
+    const { variantPrice, cheapestPrice } = price
     return variantPrice || cheapestPrice || null
   }, [price])
 
+  const getSelectedOptionValue = (optionId: string) =>
+    variant?.options?.find(
+      (variantOption) => variantOption.option_id === optionId
+    )?.value ?? options[optionId]
+
+  const selectedOptionSummary = optionGroups
+    .map((option) => getSelectedOptionValue(option.id))
+    .filter((value): value is string => Boolean(value))
+    .join(" / ")
+
+  const variantSummary = optionGroups
+    .map((option) => {
+      const value = getSelectedOptionValue(option.id)
+      return value ? `${option.title}: ${value}` : null
+    })
+    .filter((value): value is string => Boolean(value))
+    .join(", ")
+
   const isSimple = optionGroups.length === 0
-  const variantSummary = getVariantOptionSummary(product, variant)
 
   return (
     <>
@@ -103,32 +117,33 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     {selectedPrice.calculated_price}
                   </span>
                 </div>
-              ) : (
-                <div></div>
-              )}
+              ) : null}
             </div>
-            <div className={clx("grid grid-cols-2 w-full gap-x-4", {
-              "!grid-cols-1": isSimple
-            })}>
-              {!isSimple && <Button
-                onClick={open}
-                variant="secondary"
-                className="w-full"
-                data-testid="mobile-actions-button"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>
-                    {variant
-                      ? Object.values(options).join(" / ")
-                      : "Select Options"}
-                  </span>
-                  <ChevronDown />
-                </div>
-              </Button>}
+
+            <div
+              className={clx("grid grid-cols-2 w-full gap-x-4", {
+                "!grid-cols-1": isSimple,
+              })}
+            >
+              {!isSimple && (
+                <Button
+                  onClick={open}
+                  variant="secondary"
+                  className="w-full"
+                  data-testid="mobile-actions-button"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>{selectedOptionSummary || "Select Options"}</span>
+                    <ChevronDown />
+                  </div>
+                </Button>
+              )}
+
               <Button
                 onClick={handleAddToCart}
                 disabled={!inStock || !variant}
-                className="w-full"
+                variant="secondary"
+                className="w-full border-2 border-[#F9501F] text-[#F9501F] hover:bg-orange-50 disabled:opacity-100"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
@@ -144,6 +159,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           </div>
         </Transition>
       </div>
+
       <Transition appear show={state} as={Fragment}>
         <Dialog as="div" className="relative z-[75]" onClose={close}>
           <Transition.Child
@@ -182,22 +198,21 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       <X />
                     </button>
                   </div>
+
                   <div className="bg-white px-6 py-12">
                     {optionGroups.length > 0 && (
                       <div className="flex flex-col gap-y-6">
-                        {optionGroups.map((option) => {
-                          return (
-                            <div key={option.id}>
-                              <OptionSelect
-                                option={option}
-                                current={options[option.id]}
-                                updateOption={updateOptions}
-                                title={option.title ?? ""}
-                                disabled={optionsDisabled}
-                              />
-                            </div>
-                          )
-                        })}
+                        {optionGroups.map((option) => (
+                          <div key={option.id}>
+                            <OptionSelect
+                              option={option}
+                              current={getSelectedOptionValue(option.id)}
+                              updateOption={updateOptions}
+                              title={option.title ?? ""}
+                              disabled={optionsDisabled}
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

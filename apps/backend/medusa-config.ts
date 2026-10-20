@@ -89,6 +89,9 @@ export default defineConfig({
       resolve: "./src/modules/brand",
     },
     {
+      resolve: "./src/modules/erpnext",
+    },
+    {
       resolve: "./src/modules/pesepay-config",
     },
     {

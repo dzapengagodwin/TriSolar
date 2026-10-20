@@ -11,20 +11,25 @@ export const getDistinctVariantOptions = (
       return false
     }
 
-    const values = new Set(
-      variants
-        .map((variant) =>
-          variant.options
-            ?.find((variantOption) => variantOption.option_id === option.id)
-            ?.value?.trim()
-            .toLowerCase()
-        )
-        .filter((value): value is string => Boolean(value))
+    if (variants.length === 0) {
+      return true
+    }
+
+    const values = variants.map((variant) =>
+      variant.options?.find(
+        (variantOption) => variantOption.option_id === option.id
+      )?.value
     )
 
-    return values.size > 1
+    if (values.some((value) => value === undefined)) {
+      return true
+    }
+
+    return new Set(values.map((value) => value.trim().toLowerCase())).size > 1
   })
 }
+
+export const getDistinguishingVariantOptions = getDistinctVariantOptions
 
 export const getVariantOptionSummary = (
   product: HttpTypes.StoreProduct,

@@ -1,32 +1,33 @@
 "use client"
 
+import { Heart } from "@medusajs/icons"
+import { HttpTypes } from "@medusajs/types"
 import { addToCart } from "@lib/data/cart"
-import {
-  trackAddToCart,
-  transformProductToGA4Item,
-} from "@lib/analytics/ecommerce"
+import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
 import {
   addToWishlist,
   isVariantInWishlist,
   removeFromWishlist,
 } from "@lib/data/wishlist"
 import { useIntersection } from "@lib/hooks/use-in-view"
-import {
-  getDistinctVariantOptions,
-  getVariantOptionSummary,
-} from "@lib/util/product-variants"
-import { HttpTypes } from "@medusajs/types"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import Divider from "@modules/common/components/divider"
-import OptionSelect from "@modules/products/components/product-actions/option-select"
-import { useParams, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState } from "react"
-import ProductPrice from "../product-price"
-import MobileActions from "./mobile-actions"
-import { useRouter } from "next/navigation"
-import { Heart } from "@medusajs/icons"
 import Spinner from "@modules/common/icons/spinner"
+import OptionSelect from "@modules/products/components/product-actions/option-select"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import {
+  Dispatch,
+  SetStateAction,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import ProductPrice from "../product-price"
 import ProductTrustBadge from "../product-trust-badge"
 import WhatsAppOrderButton from "../whatsapp-order-button"
+import MobileActions from "./mobile-actions"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -37,10 +38,61 @@ type ProductActionsProps = {
 const optionsAsKeymap = (
   variantOptions: HttpTypes.StoreProductVariant["options"] | undefined
 ) =>
-  variantOptions?.reduce((acc: Record<string, string>, varopt) => {
-    if (varopt.option_id) acc[varopt.option_id] = varopt.value
+  variantOptions?.reduce((acc: Record<string, string>, variantOption) => {
+    if (variantOption.option_id) {
+      acc[variantOption.option_id] = variantOption.value
+    }
+
     return acc
   }, {})
+
+function VariantOptionsInitializer({
+  variants,
+  optionGroups,
+  setOptions,
+}: {
+  variants?: HttpTypes.StoreProductVariant[] | null
+  optionGroups: HttpTypes.StoreProductOption[]
+  setOptions: Dispatch<SetStateAction<Record<string, string | undefined>>>
+}) {
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const variantId = searchParams.get("v_id")
+    const variant = variants?.find((item) => item.id === variantId)
+
+    if (variant) {
+      const variantOptions = optionsAsKeymap(variant.options)
+
+      setOptions(
+        optionGroups.reduce<Record<string, string | undefined>>(
+          (selectedOptions, option) => {
+            selectedOptions[option.id] = variantOptions?.[option.id]
+            return selectedOptions
+          },
+          {}
+        )
+      )
+      return
+    }
+
+    if (variants?.length === 1) {
+      const variantOptions = optionsAsKeymap(variants[0].options)
+
+      setOptions(
+        optionGroups.reduce<Record<string, string | undefined>>(
+          (selectedOptions, option) => {
+            selectedOptions[option.id] = variantOptions?.[option.id]
+            return selectedOptions
+          },
+          {}
+        )
+      )
+    }
+  }, [searchParams, variants, optionGroups, setOptions])
+
+  return null
+}
 
 export default function ProductActions({
   product,
@@ -50,17 +102,25 @@ export default function ProductActions({
   const router = useRouter()
   const searchParams = useSearchParams()
   const initialVariantId = searchParams.get("v_id")
-  const selectedVariantId = initialVariantId
+  const { options: productOptions, variants } = product
+
   const optionGroups = useMemo(
-    () => getDistinctVariantOptions(product),
-    [product]
+    () =>
+      getDistinguishingVariantOptions({
+        options: productOptions,
+        variants,
+      }),
+    [productOptions, variants]
   )
+
   const initialVariant =
-    product.variants?.find((variant) => variant.id === initialVariantId) ||
-    (product.variants?.length === 1 ? product.variants[0] : undefined)
+    variants?.find((variant) => variant.id === initialVariantId) ||
+    (variants?.length === 1 ? variants[0] : undefined)
+
   const [options, setOptions] = useState<Record<string, string | undefined>>(
     () => {
       const initialOptions = optionsAsKeymap(initialVariant?.options)
+
       return optionGroups.reduce<Record<string, string | undefined>>(
         (selectedOptions, option) => {
           selectedOptions[option.id] = initialOptions?.[option.id]
@@ -72,45 +132,31 @@ export default function ProductActions({
   )
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
+  const [isBuyingNow, setIsBuyingNow] = useState(false)
+  const [buyNowError, setBuyNowError] = useState<string | null>(null)
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null)
-  const countryCode = useParams().countryCode as string
 
-  useEffect(() => {
-    const variantId = searchParams.get("v_id")
-    if (!variantId) {
-      return
-    }
+  const params = useParams()
+  const countryCode =
+    (params.countryCode as string) ||
+    process.env.NEXT_PUBLIC_DEFAULT_REGION ||
+    "zw"
 
-    const variant = product.variants?.find((item) => item.id === variantId)
-    if (!variant) {
-      return
-    }
-
-    const variantOptions = optionsAsKeymap(variant?.options)
-
-    setOptions(
-      optionGroups.reduce<Record<string, string | undefined>>(
-        (selectedOptions, option) => {
-          selectedOptions[option.id] = variantOptions?.[option.id]
-          return selectedOptions
-        },
-        {}
-      )
-    )
-  }, [searchParams, product.variants, optionGroups])
+  const hasVariantChoices = (variants?.length ?? 0) > 1
 
   const selectedVariant = useMemo(() => {
-    const variants = product.variants || []
-    if (variants.length === 0) {
+    const productVariants = variants || []
+
+    if (productVariants.length === 0) {
       return
     }
 
     if (optionGroups.length === 0) {
       return (
-        variants.find((variant) => variant.id === selectedVariantId) ||
-        variants[0]
+        productVariants.find((variant) => variant.id === initialVariantId) ||
+        productVariants[0]
       )
     }
 
@@ -118,21 +164,29 @@ export default function ProductActions({
       return
     }
 
-    return variants.find((variant) =>
+    return productVariants.find((variant) =>
       optionGroups.every((option) => {
         const value = variant.options?.find(
           (variantOption) => variantOption.option_id === option.id
         )?.value
+
         return value === options[option.id]
       })
     )
-  }, [product.variants, optionGroups, options, selectedVariantId])
+  }, [variants, optionGroups, options, initialVariantId])
+
+  const hasCompleteSelection = optionGroups.every((option) =>
+    Boolean(options[option.id])
+  )
+  const isValidVariant = Boolean(selectedVariant)
+  const isUnavailable = hasCompleteSelection && !selectedVariant
 
   useEffect(() => {
     let isMounted = true
 
     if (!selectedVariant?.id) {
       setIsInWishlist(false)
+
       return () => {
         isMounted = false
       }
@@ -164,6 +218,7 @@ export default function ProductActions({
     }
 
     const href = `${url.pathname}${url.search}${url.hash}`
+
     if (variantId) {
       router.push(href, { scroll: false })
     } else {
@@ -176,17 +231,20 @@ export default function ProductActions({
       ...options,
       [optionId]: value,
     }
+
     setOptions(nextOptions)
 
-    const hasCompleteSelection = optionGroups.every((option) =>
+    const selectionIsComplete = optionGroups.every((option) =>
       Boolean(nextOptions[option.id])
     )
-    const matchingVariant = hasCompleteSelection
-      ? product.variants?.find((variant) =>
+
+    const matchingVariant = selectionIsComplete
+      ? variants?.find((variant) =>
           optionGroups.every((option) => {
             const variantValue = variant.options?.find(
               (variantOption) => variantOption.option_id === option.id
             )?.value
+
             return variantValue === nextOptions[option.id]
           })
         )
@@ -195,43 +253,32 @@ export default function ProductActions({
     updateVariantUrl(matchingVariant?.id)
   }
 
-  const isValidVariant = Boolean(selectedVariant)
-  const hasCompleteSelection = optionGroups.every((option) =>
-    Boolean(options[option.id])
-  )
-  const isUnavailable = hasCompleteSelection && !selectedVariant
-
-  // check if the selected variant is in stock
   const inStock = useMemo(() => {
-    // If we don't manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
     }
 
-    // If we allow back orders on the variant, we can add to cart
     if (selectedVariant?.allow_backorder) {
       return true
     }
 
-    // If there is inventory available, we can add to cart
     if (
       selectedVariant?.manage_inventory &&
-      (selectedVariant?.inventory_quantity || 0) > 0
+      (selectedVariant.inventory_quantity || 0) > 0
     ) {
       return true
     }
 
-    // Otherwise, we can't add to cart
     return false
   }, [selectedVariant])
 
   const actionsRef = useRef<HTMLDivElement>(null)
-
   const inView = useIntersection(actionsRef, "0px")
 
-  // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id || isBuyingNow) {
+      return
+    }
 
     setIsAdding(true)
 
@@ -254,187 +301,284 @@ export default function ProductActions({
     }
   }
 
-  // Toggle the selected variant in the wishlist
+  const handleBuyNow = async () => {
+    if (
+      !selectedVariant?.id ||
+      !inStock ||
+      !isValidVariant ||
+      disabled ||
+      isAdding ||
+      isBuyingNow
+    ) {
+      return
+    }
+
+    setIsBuyingNow(true)
+    setBuyNowError(null)
+
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      })
+
+      trackAddToCart({
+        item: transformProductToGA4Item(product, selectedVariant, quantity),
+        quantity,
+        currency: region.currency_code?.toUpperCase() || "USD",
+      })
+
+      window.location.href = "/checkout"
+    } catch (error) {
+      console.error("Failed to buy item:", error)
+      setBuyNowError(
+        error instanceof Error ? error.message : "Failed to proceed to checkout"
+      )
+      setIsBuyingNow(false)
+    }
+  }
+
   const handleAddToWishlist = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id) {
+      return
+    }
 
     setIsAddingToWishlist(true)
+
     try {
-      const res = isInWishlist
+      const result = isInWishlist
         ? await removeFromWishlist(selectedVariant.id)
         : await addToWishlist(selectedVariant.id, countryCode, product.id)
-      if (res.success) {
+
+      if (result.success) {
         setIsInWishlist(!isInWishlist)
         setWishlistFeedback(
           isInWishlist ? "Removed from wishlist" : "Saved to wishlist"
         )
         router.refresh()
       } else {
-        setWishlistFeedback(res.error || "Could not save this item")
+        setWishlistFeedback(result.error || "Could not save this item")
       }
-    } catch (err: unknown) {
-      console.error(err)
+    } catch (error: unknown) {
+      console.error(error)
       setWishlistFeedback(
-        err instanceof Error ? err.message : "Could not save this item"
+        error instanceof Error ? error.message : "Could not save this item"
       )
     } finally {
       setIsAddingToWishlist(false)
     }
   }
 
+  const variantOptionSummary = selectedVariant
+    ? optionGroups
+        .map((option) => {
+          const value = selectedVariant.options?.find(
+            (variantOption) => variantOption.option_id === option.id
+          )?.value
+
+          return value ? `${option.title}: ${value}` : null
+        })
+        .filter((value): value is string => Boolean(value))
+        .join(", ") || selectedVariant.title || undefined
+    : undefined
+
   return (
-    <div className="flex flex-col gap-y-3" ref={actionsRef}>
-      <div>
+    <>
+      <Suspense fallback={null}>
+        <VariantOptionsInitializer
+          variants={variants}
+          optionGroups={optionGroups}
+          setOptions={setOptions}
+        />
+      </Suspense>
+
+      <div className="flex flex-col gap-y-3" ref={actionsRef}>
         {optionGroups.length > 0 && (
           <div className="flex flex-col gap-y-4">
-            {optionGroups.map((option) => {
-              return (
-                <div key={option.id}>
-                  <OptionSelect
-                    option={option}
-                    current={options[option.id]}
-                    updateOption={setOptionValue}
-                    title={option.title ?? ""}
-                    data-testid="product-options"
-                    disabled={!!disabled || isAdding || isAddingToWishlist}
-                  />
-                </div>
-              )
-            })}
+            {optionGroups.map((option) => (
+              <div key={option.id}>
+                <OptionSelect
+                  option={option}
+                  current={options[option.id]}
+                  updateOption={setOptionValue}
+                  title={option.title ?? ""}
+                  data-testid="product-options"
+                  disabled={
+                    !!disabled ||
+                    isAdding ||
+                    isBuyingNow ||
+                    isAddingToWishlist
+                  }
+                />
+              </div>
+            ))}
             <Divider />
           </div>
         )}
-      </div>
 
-      <ProductPrice product={product} variant={selectedVariant} />
+        <ProductPrice product={product} variant={selectedVariant} />
 
-      {/* 3-Element Horizontal Buy Actions Row matching reference image */}
-      <div className="flex items-center gap-2 sm:gap-2.5 pt-2">
-        {/* 1. Quantity Selector Pill */}
-        <div className="flex items-center justify-between bg-gray-50 border border-gray-200/90 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
+        <div className="flex items-center gap-2 sm:gap-2.5 pt-2">
+          <div className="flex items-center justify-between bg-orange-50/70 border border-orange-100 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
+            <button
+              type="button"
+              onClick={() =>
+                setQuantity((previous) => (previous > 1 ? previous - 1 : 1))
+              }
+              disabled={quantity <= 1 || isAdding || isBuyingNow}
+              className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              aria-label="Decrease quantity"
+            >
+              –
+            </button>
+
+            <span className="text-sm sm:text-base font-bold text-gray-900 select-none">
+              {quantity}
+            </span>
+
+            <button
+              type="button"
+              onClick={() => setQuantity((previous) => previous + 1)}
+              disabled={isAdding || isBuyingNow}
+              className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
-            disabled={quantity <= 1 || isAdding}
-            className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
-            aria-label="Decrease quantity"
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              isBuyingNow ||
+              isAddingToWishlist ||
+              !isValidVariant
+            }
+            className="flex-1 min-w-0 h-12 rounded-full border-2 border-[#F9501F] bg-white hover:bg-orange-50 active:scale-[0.99] text-[#F9501F] font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 px-2.5 sm:px-3 shadow-xs transition-all disabled:cursor-not-allowed cursor-pointer whitespace-nowrap overflow-hidden"
+            data-testid="add-product-button"
           >
-            –
+            {isAdding ? (
+              <Spinner className="w-4 h-4 animate-spin text-primary shrink-0" />
+            ) : (
+              <>
+                <span className="truncate">
+                  {selectedVariant && !inStock
+                    ? "Out of stock"
+                    : !selectedVariant && isUnavailable
+                    ? "Unavailable"
+                    : !selectedVariant && hasVariantChoices
+                    ? "Select variant"
+                    : "Add to Cart"}
+                </span>
+
+                <svg
+                  className="w-4 h-4 text-current shrink-0 hidden 2xl:inline"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2.2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+              </>
+            )}
           </button>
-          <span className="text-sm sm:text-base font-bold text-gray-900 select-none">
-            {quantity}
-          </span>
+
+          <WhatsAppOrderButton
+            productTitle={product.title}
+            productHandle={product.handle}
+            variantTitle={variantOptionSummary}
+            size="full"
+            iconOnly
+            className="shrink-0"
+          />
+
           <button
             type="button"
-            onClick={() => setQuantity((prev) => prev + 1)}
-            disabled={isAdding}
-            className="w-8 h-8 rounded-full bg-white text-gray-700 flex items-center justify-center font-bold text-sm hover:bg-gray-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
-            aria-label="Increase quantity"
+            onClick={handleAddToWishlist}
+            disabled={
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              isBuyingNow ||
+              isAddingToWishlist
+            }
+            aria-label={
+              isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"
+            }
+            className="w-12 h-12 rounded-full border border-orange-100 bg-white hover:bg-orange-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
           >
-            +
+            <Heart
+              className={`w-5 h-5 transition-colors ${
+                isInWishlist
+                  ? "fill-primary text-primary"
+                  : "text-gray-700 hover:text-primary"
+              }`}
+            />
           </button>
         </div>
 
-        {/* 2. Main Add to Cart Pill Button */}
         <button
           type="button"
-          onClick={handleAddToCart}
+          onClick={handleBuyNow}
           disabled={
             !inStock ||
             !selectedVariant ||
             !!disabled ||
             isAdding ||
+            isBuyingNow ||
             isAddingToWishlist ||
             !isValidVariant
           }
-          className="flex-1 min-w-0 h-12 rounded-full bg-primary hover:bg-orange-400 active:scale-[0.99] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 px-2.5 sm:px-3 shadow-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer whitespace-nowrap overflow-hidden"
-          data-testid="add-product-button"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary hover:bg-[#D83D0F] active:scale-[0.99] px-4 text-sm font-bold text-white shadow-xs transition-all disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+          data-testid="buy-now-button"
         >
-          {isAdding ? (
-            <Spinner className="w-4 h-4 animate-spin text-white shrink-0" />
-          ) : (
+          {isBuyingNow ? (
             <>
-              <span className="truncate">
-                {!selectedVariant
-                  ? isUnavailable
-                    ? "Unavailable"
-                    : "Select variant"
-                  : !inStock
-                  ? "Out of stock"
-                  : "Add to Cart"}
-              </span>
-              <svg
-                className="w-4 h-4 text-white shrink-0 hidden 2xl:inline"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
+              <Spinner className="h-4 w-4 animate-spin text-white" />
+              <span>Processing...</span>
             </>
+          ) : (
+            <span>Buy now</span>
           )}
         </button>
 
-        {/* 3. Order on WhatsApp Pill Button */}
-        <WhatsAppOrderButton
-          productTitle={product.title}
-          productHandle={product.handle}
-          variantTitle={
-            getVariantOptionSummary(product, selectedVariant) || undefined
-          }
-          size="full"
-          className="flex-1 min-w-0"
+        {buyNowError && (
+          <p role="alert" className="text-xs font-semibold text-red-600">
+            {buyNowError}
+          </p>
+        )}
+
+        {wishlistFeedback && (
+          <p role="status" className="text-xs font-semibold text-gray-700">
+            {wishlistFeedback}
+          </p>
+        )}
+
+        <ProductTrustBadge />
+
+        <MobileActions
+          product={product}
+          variant={selectedVariant}
+          options={options}
+          updateOptions={setOptionValue}
+          inStock={inStock}
+          handleAddToCart={handleAddToCart}
+          isAdding={isAdding}
+          show={!inView}
+          optionsDisabled={!!disabled || isAdding || isBuyingNow || isAddingToWishlist}
         />
-
-        {/* 4. Circular Wishlist Button */}
-        <button
-          type="button"
-          onClick={handleAddToWishlist}
-          disabled={
-            !selectedVariant || !!disabled || isAdding || isAddingToWishlist
-          }
-          aria-label={
-            isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"
-          }
-          className="w-12 h-12 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
-        >
-          <Heart
-            className={`w-5 h-5 transition-colors ${
-              isInWishlist
-                ? "fill-primary text-primary"
-                : "text-gray-700 hover:text-primary"
-            }`}
-          />
-        </button>
       </div>
-
-      {wishlistFeedback && (
-        <p role="status" className="text-xs font-semibold text-gray-700">
-          {wishlistFeedback}
-        </p>
-      )}
-
-      {/* Delivery Guarantee & Payment Trust Badge */}
-      <ProductTrustBadge />
-
-      <MobileActions
-        product={product}
-        variant={selectedVariant}
-        optionGroups={optionGroups}
-        options={options}
-        variantUnavailable={isUnavailable}
-        updateOptions={setOptionValue}
-        inStock={inStock}
-        handleAddToCart={handleAddToCart}
-        isAdding={isAdding}
-        show={!inView}
-        optionsDisabled={!!disabled || isAdding || isAddingToWishlist}
-      />
-    </div>
+    </>
   )
 }

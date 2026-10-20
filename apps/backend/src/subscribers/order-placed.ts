@@ -5,6 +5,9 @@ import { OrderConfirmationData } from "../modules/sendgrid/types"
 import { renderOrderConfirmation } from "../modules/sendgrid/templates/order-confirmation"
 import { renderOwnerOrderNotification } from "../modules/sendgrid/templates/owner-order-notification"
 import { STORE_SETTINGS_MODULE } from "../modules/store-settings"
+import { ERPNEXT_MODULE } from "../modules/erpnext"
+import type ErpnextModuleService from "../modules/erpnext/service"
+import { syncMedusaOrderToErpnext } from "../modules/erpnext/services/sales-order-service"
 
 function parseNotificationEmails(raw: string | null | undefined): string[] {
   if (!raw || typeof raw !== "string") return []
@@ -107,6 +110,56 @@ export default async function orderPlacedHandler({
     if (!order) {
       logger.warn(`[Subscriber: order.placed] Order with ID ${data.id} not found.`)
       return
+    }
+
+    // Sync once before email-specific checks so missing customer email does not
+    // prevent ERPNext from receiving the placed order.
+    let salesOrderPdfAttachments: Array<{
+      content: string
+      filename: string
+      type: string
+      disposition: string
+    }> = []
+
+    try {
+      const erpnextService = container.resolve(ERPNEXT_MODULE) as ErpnextModuleService
+      const [erpnextSettings] = await erpnextService.listErpnextSettings(
+        {},
+        { take: 1 }
+      )
+
+      if (erpnextSettings?.auto_create_sales_order === false) {
+        logger.info(
+          `[Subscriber: order.placed] Automatic ERPNext Sales Order creation is disabled for order #${order.display_id || order.id}.`
+        )
+      } else {
+        const erpResult = await syncMedusaOrderToErpnext(order.id, container)
+        if (erpResult.success && erpResult.pdfBuffer) {
+          salesOrderPdfAttachments = [
+            {
+              content: erpResult.pdfBuffer.toString("base64"),
+              filename: `Sales-Order-${order.display_id || order.id}.pdf`,
+              type: "application/pdf",
+              disposition: "attachment",
+            },
+          ]
+          logger.info(
+            `[Subscriber: order.placed] Generated ERPNext Sales Order PDF (${erpResult.salesOrderId}) for order #${order.display_id || order.id}.`
+          )
+        } else {
+          logger.warn(
+            `[Subscriber: order.placed] ERPNext Sales Order/PDF unavailable for order #${order.display_id || order.id}: ${
+              erpResult.message || "PDF was not returned"
+            }`
+          )
+        }
+      }
+    } catch (erpErr: unknown) {
+      logger.warn(
+        `[Subscriber: order.placed] Could not sync ERPNext Sales Order for order #${order.display_id || order.id}: ${
+          erpErr instanceof Error ? erpErr.message : "Unknown error"
+        }`
+      )
     }
 
     const recipientEmail = order.email || order.customer?.email
@@ -270,6 +323,7 @@ export default async function orderPlacedHandler({
       billing_address: order.billing_address || order.shipping_address,
       customer_phone: (order.shipping_address?.phone || order.billing_address?.phone) ?? undefined,
       view_order_url: viewOrderUrl,
+      ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
     }
 
     const orderFromEmail =
@@ -308,6 +362,7 @@ export default async function orderPlacedHandler({
             subject: rendered.subject,
             html: rendered.html,
             text: rendered.text,
+            ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
           }
           const [sgRes] = await sendgrid.send(msg)
           const msgId = sgRes?.headers?.["x-message-id"] || `sg_${Date.now()}`
@@ -392,6 +447,7 @@ export default async function orderPlacedHandler({
                     subject: renderedOwner.subject,
                     html: renderedOwner.html,
                     text: renderedOwner.text,
+                    ...(salesOrderPdfAttachments.length > 0 ? { attachments: salesOrderPdfAttachments } : {}),
                   }
                   const [ownerSgRes] = await sendgrid.send(ownerMsg)
                   const ownerMsgId =

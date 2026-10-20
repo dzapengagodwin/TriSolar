@@ -35,7 +35,7 @@ export default async function Checkout(props: {
     return notFound()
   }
 
-  const shippingMethods = await listCartShippingMethods(cart.id).catch(() => [])
+  const shippingMethods = await listCartShippingMethods(cart.id)
   const pickupOptions = shippingMethods.filter(isPickupShippingOption)
   const deliveryOptions = shippingMethods.filter(isDeliveryShippingOption)
   const isPickupOnly = pickupOptions.length > 0 && deliveryOptions.length === 0

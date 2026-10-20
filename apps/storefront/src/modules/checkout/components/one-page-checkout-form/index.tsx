@@ -74,12 +74,15 @@ const OnePageCheckoutForm = ({
   const existingShippingOption = shippingMethods.find(
     (option) => option.id === cart.shipping_methods?.at(-1)?.shipping_option_id
   )
+  const defaultFulfillmentType = existingShippingOption
+    ? isPickupShippingOption(existingShippingOption)
+      ? "pickup"
+      : "delivery"
+    : shippingEnabled || !pickupEnabled
+      ? "delivery"
+      : "pickup"
   const [fulfillmentType, setFulfillmentType] = useState<"delivery" | "pickup" | null>(
-    existingShippingOption
-      ? isPickupShippingOption(existingShippingOption)
-        ? "pickup"
-        : "delivery"
-      : null
+    defaultFulfillmentType
   )
 
   const displayedShippingMethods = useMemo(() => {
@@ -696,8 +699,10 @@ const OnePageCheckoutForm = ({
         return
       }
 
-      // Fallback
-      router.refresh()
+      setErrorMessage(
+        "Checkout could not start the selected payment method. Please choose another method and try again."
+      )
+      setSubmitting(false)
     } catch (err: unknown) {
       console.error("Order submission failed:", err)
       const msg = err instanceof Error ? err.message : "Failed to place order. Please try again."
@@ -857,7 +862,7 @@ const OnePageCheckoutForm = ({
               </span>
               <AddressSelect
                 addresses={customer.addresses}
-                addressInput={cart.shipping_address}
+                addressInput={cart.shipping_address ?? null}
                 onSelect={handleSavedAddressSelect}
               />
             </div>

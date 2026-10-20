@@ -229,7 +229,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
   return (
     <>
       {/* Trigger Button in Nav */}
-      <button
+       <button
         onClick={open}
         className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-2.5 sm:px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm shrink-0"
         data-testid="nav-cart-link"
@@ -237,7 +237,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
       >
         <span className="hidden sm:inline">
           {convertToLocale({
-            amount: subtotal,
+            amount: total,
             currency_code: cartState?.currency_code || "usd",
           })}
         </span>

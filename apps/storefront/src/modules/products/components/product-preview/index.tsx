@@ -1,8 +1,5 @@
 import { getProductPrice, getPricesForVariant } from "@lib/util/get-product-price"
-import {
-  getDistinctVariantOptions,
-  getVariantOptionSummary,
-} from "@lib/util/product-variants"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { getProductImageAlt } from "@lib/seo"
@@ -26,72 +23,96 @@ export default function ProductPreview({
   viewMode?: "grid" | "list"
   region: HttpTypes.StoreRegion
 }) {
-  const { cheapestPrice } = getProductPrice({
-    product,
-  })
+  const { cheapestPrice } = getProductPrice({ product })
 
   const priceInfo = variant
     ? getPricesForVariant(variant)
     : cheapestPrice ||
-      (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
-  const optionGroups = variantOptions || getDistinctVariantOptions(product)
-  const variantSummary = getVariantOptionSummary(
-    product,
-    variant,
-    optionGroups
-  )
+      (product.variants?.[0]
+        ? getPricesForVariant(product.variants[0])
+        : null)
+
+  const optionGroups =
+    variantOptions ?? getDistinguishingVariantOptions(product)
+
+  const variantSummary = variant
+    ? optionGroups
+        .map((option) => {
+          const value = variant.options?.find(
+            (variantOption) => variantOption.option_id === option.id
+          )?.value
+
+          return value ? `${option.title}: ${value}` : null
+        })
+        .filter((value): value is string => Boolean(value))
+        .join(", ")
+    : ""
+
   const displayTitle = variantSummary
     ? `${product.title} - ${variantSummary}`
     : product.title
+
   const productHref = `/products/${product.handle}${
     variant ? `?v_id=${encodeURIComponent(variant.id)}` : ""
   }`
 
-  // Format category breadcrumb / tags string
+  const variantImage =
+    variant?.images?.[0]?.url || product.thumbnail || undefined
+
+  const variantImages =
+    variant?.images?.length ? variant.images : product.images
+
+  const brand =
+    ((product as unknown as Record<string, unknown>).brand as
+      | { name?: string }
+      | undefined)?.name || (product.metadata?.brand as string)
+
   const categoriesString =
     product.categories && product.categories.length > 0
-      ? product.categories.map((c: HttpTypes.StoreProductCategory) => c.name).join(", ")
+      ? product.categories
+          .map((category: HttpTypes.StoreProductCategory) => category.name)
+          .join(", ")
       : "General Category"
 
   const isSale = Boolean(
     priceInfo &&
       (priceInfo.price_type === "sale" ||
-        (typeof priceInfo.percentage_diff === "number" && priceInfo.percentage_diff > 0) ||
-        (typeof priceInfo.percentage_diff === "string" && parseInt(priceInfo.percentage_diff) > 0) ||
+        (typeof priceInfo.percentage_diff === "number" &&
+          priceInfo.percentage_diff > 0) ||
+        (typeof priceInfo.percentage_diff === "string" &&
+          parseInt(priceInfo.percentage_diff) > 0) ||
         priceInfo.original_price_number > priceInfo.calculated_price_number)
   )
 
   const discountText =
-    priceInfo?.percentage_diff && parseInt(String(priceInfo.percentage_diff)) > 0
+    priceInfo?.percentage_diff &&
+    parseInt(String(priceInfo.percentage_diff)) > 0
       ? `-${priceInfo.percentage_diff}%`
       : "Sale!"
 
-  // Horizontal List View Mode
   if (viewMode === "list") {
     return (
       <div
         data-testid="product-wrapper"
         className="group bg-white p-4 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative transition-all duration-200 shadow-xs hover:shadow-md w-full"
       >
-        {/* Left: Thumbnail & Badges */}
         <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
           {isSale && (
             <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
               {discountText}
             </span>
           )}
+
           <LocalizedClientLink href={productHref} className="block w-full">
             <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
               <Thumbnail
-                thumbnail={variant?.images?.[0]?.url || product.thumbnail || undefined}
-                images={variant?.images?.length ? variant.images : product.images}
+                thumbnail={variantImage}
+                images={variantImages}
                 size="full"
                 isFeatured={isFeatured}
                 alt={getProductImageAlt({
                   title: product.title,
-                  brand:
-                    ((product as unknown as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
-                    (product.metadata?.brand as string),
+                  brand,
                 })}
                 className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
                 objectFit="contain"
@@ -100,7 +121,6 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        {/* Center: Info, Category, Title, Short Description */}
         <div className="flex-1 space-y-2 min-w-0">
           <div className="text-[11px] font-medium text-gray-500">
             {categoriesString}
@@ -121,19 +141,19 @@ export default function ProductPreview({
             </p>
           )}
 
-          {/* Options tags preview if available */}
           {optionGroups.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {optionGroups.slice(0, 3).map((opt) => {
+              {optionGroups.slice(0, 3).map((option) => {
                 const value = variant?.options?.find(
-                  (variantOption) => variantOption.option_id === opt.id
+                  (variantOption) => variantOption.option_id === option.id
                 )?.value
+
                 return (
                   <span
-                    key={opt.id}
+                    key={option.id}
                     className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
                   >
-                    {value ? `${opt.title}: ${value}` : opt.title}
+                    {value ? `${option.title}: ${value}` : option.title}
                   </span>
                 )
               })}
@@ -141,7 +161,6 @@ export default function ProductPreview({
           )}
         </div>
 
-        {/* Right: Price & Add to Cart */}
         <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
@@ -152,8 +171,9 @@ export default function ProductPreview({
               size="lg"
               viewMode="list"
             />
+
             <WhatsAppOrderButton
-              productTitle={product.title}
+              productTitle={displayTitle}
               productHandle={product.handle}
               variantTitle={variantSummary || undefined}
               size="lg"
@@ -164,13 +184,11 @@ export default function ProductPreview({
     )
   }
 
-  // Standard Multi-column Grid View Mode
   return (
     <div
       data-testid="product-wrapper"
       className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative transition-all duration-200 shadow-xs hover:shadow-md"
     >
-      {/* Product Image & Sale Badge */}
       <div className="relative mb-3 flex items-center justify-center">
         {isSale && (
           <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
@@ -181,15 +199,13 @@ export default function ProductPreview({
         <LocalizedClientLink href={productHref} className="block w-full">
           <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
             <Thumbnail
-              thumbnail={variant?.images?.[0]?.url || product.thumbnail || undefined}
-              images={variant?.images?.length ? variant.images : product.images}
+              thumbnail={variantImage}
+              images={variantImages}
               size="full"
               isFeatured={isFeatured}
               alt={getProductImageAlt({
                 title: product.title,
-                brand:
-                  ((product as unknown as Record<string, unknown>).brand as { name?: string } | undefined)?.name ||
-                  (product.metadata?.brand as string),
+                brand,
               })}
               className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
               objectFit="contain"
@@ -198,9 +214,7 @@ export default function ProductPreview({
         </LocalizedClientLink>
       </div>
 
-      {/* Content Body */}
       <div className="flex-1 flex flex-col justify-between">
-        {/* Category Subtitle & Product Title */}
         <div className="space-y-1">
           <div className="text-[11px] font-medium text-gray-500 line-clamp-1">
             {categoriesString}
@@ -216,7 +230,6 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        {/* Bottom Bar: Price & Add to Cart (Instant on mobile, revealed on hover on desktop) */}
         <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
@@ -227,8 +240,9 @@ export default function ProductPreview({
               size="md"
               viewMode="grid"
             />
+
             <WhatsAppOrderButton
-              productTitle={product.title}
+              productTitle={displayTitle}
               productHandle={product.handle}
               variantTitle={variantSummary || undefined}
               size="md"

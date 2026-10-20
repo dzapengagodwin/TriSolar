@@ -176,6 +176,9 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
         subject: rendered.subject,
         html: rendered.html,
         text: rendered.text,
+        ...(templateData.attachments && Array.isArray(templateData.attachments)
+          ? { attachments: templateData.attachments }
+          : {}),
       }
 
       const [response] = await sendgrid.send(msg)

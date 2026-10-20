@@ -53,6 +53,12 @@ export type OrderConfirmationData = {
   billing_address?: OrderConfirmationAddress | null
   customer_phone?: string
   view_order_url?: string
+  attachments?: Array<{
+    content: string
+    filename: string
+    type?: string
+    disposition?: string
+  }>
 }
 
 export type PaymentConfirmationData = {
