@@ -101,7 +101,7 @@ export default function QuickAddToCart({
   if (hasMultipleVariants && !propVariant) {
     return (
       <LocalizedClientLink
-        href={`/product/${product.handle}`}
+        href={`/products/${product.handle}`}
         className={`w-full block bg-primary hover:bg-primary-hover text-white text-xs font-bold py-2 px-3 transition-colors uppercase tracking-wider text-center shadow-xs ${className}`}
       >
         Select Options

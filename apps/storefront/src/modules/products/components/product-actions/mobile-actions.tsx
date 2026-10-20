@@ -1,21 +1,20 @@
 import { Dialog, Transition } from "@headlessui/react"
+import { HttpTypes } from "@medusajs/types"
+import { getProductPrice } from "@lib/util/get-product-price"
 import { Button, clx } from "@modules/common/components/ui"
-import React, { Fragment, useMemo } from "react"
-
-import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
-
-import { getProductPrice } from "@lib/util/get-product-price"
-import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
+import useToggleState from "@lib/hooks/use-toggle-state"
 import OptionSelect from "./option-select"
-import { HttpTypes } from "@medusajs/types"
+import React, { Fragment, useMemo } from "react"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
+  optionGroups: HttpTypes.StoreProductOption[]
   options: Record<string, string | undefined>
-  updateOptions: (title: string, value: string) => void
+  variantUnavailable: boolean
+  updateOptions: (optionId: string, value: string) => void
   inStock?: boolean
   handleAddToCart: () => void
   isAdding?: boolean
@@ -26,7 +25,9 @@ type MobileActionsProps = {
 const MobileActions: React.FC<MobileActionsProps> = ({
   product,
   variant,
+  optionGroups,
   options,
+  variantUnavailable,
   updateOptions,
   inStock,
   handleAddToCart,
@@ -37,7 +38,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   const { state, open, close } = useToggleState()
 
   const price = getProductPrice({
-    product: product,
+    product,
     variantId: variant?.id,
   })
 
@@ -45,21 +46,30 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     if (!price) {
       return null
     }
-    const { variantPrice, cheapestPrice } = price
 
+    const { variantPrice, cheapestPrice } = price
     return variantPrice || cheapestPrice || null
   }, [price])
 
-  const optionGroups = getDistinguishingVariantOptions(product)
-  const isSimple = optionGroups.length === 0
   const getSelectedOptionValue = (optionId: string) =>
-    variant?.options?.find((option) => option.option_id === optionId)?.value ??
-    options[optionId]
+    variant?.options?.find(
+      (variantOption) => variantOption.option_id === optionId
+    )?.value ?? options[optionId]
+
   const selectedOptionSummary = optionGroups
     .map((option) => getSelectedOptionValue(option.id))
     .filter((value): value is string => Boolean(value))
     .join(" / ")
-  const hasVariantChoices = (product.variants?.length ?? 0) > 1
+
+  const variantSummary = optionGroups
+    .map((option) => {
+      const value = getSelectedOptionValue(option.id)
+      return value ? `${option.title}: ${value}` : null
+    })
+    .filter((value): value is string => Boolean(value))
+    .join(", ")
+
+  const isSimple = optionGroups.length === 0
 
   return (
     <>
@@ -83,7 +93,11 @@ const MobileActions: React.FC<MobileActionsProps> = ({
             data-testid="mobile-actions"
           >
             <div className="flex items-center gap-x-2">
-              <span data-testid="mobile-title">{product.title}</span>
+              <span data-testid="mobile-title">
+                {variantSummary
+                  ? `${product.title} - ${variantSummary}`
+                  : product.title}
+              </span>
               <span>—</span>
               {selectedPrice ? (
                 <div className="flex items-end gap-x-2 text-ui-fg-base">
@@ -103,26 +117,28 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     {selectedPrice.calculated_price}
                   </span>
                 </div>
-              ) : (
-                <div></div>
-              )}
+              ) : null}
             </div>
-            <div className={clx("grid grid-cols-2 w-full gap-x-4", {
-              "!grid-cols-1": isSimple
-            })}>
-              {!isSimple && <Button
-                onClick={open}
-                variant="secondary"
-                className="w-full"
-                data-testid="mobile-actions-button"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>
-                    {selectedOptionSummary || "Select Options"}
-                  </span>
-                  <ChevronDown />
-                </div>
-              </Button>}
+
+            <div
+              className={clx("grid grid-cols-2 w-full gap-x-4", {
+                "!grid-cols-1": isSimple,
+              })}
+            >
+              {!isSimple && (
+                <Button
+                  onClick={open}
+                  variant="secondary"
+                  className="w-full"
+                  data-testid="mobile-actions-button"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>{selectedOptionSummary || "Select Options"}</span>
+                    <ChevronDown />
+                  </div>
+                </Button>
+              )}
+
               <Button
                 onClick={handleAddToCart}
                 disabled={!inStock || !variant}
@@ -131,16 +147,19 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
-                {variant && !inStock
+                {!variant
+                  ? variantUnavailable
+                    ? "Unavailable"
+                    : "Select variant"
+                  : !inStock
                   ? "Out of stock"
-                  : !variant && hasVariantChoices
-                  ? "Select variant"
                   : "Add to cart"}
               </Button>
             </div>
           </div>
         </Transition>
       </div>
+
       <Transition appear show={state} as={Fragment}>
         <Dialog as="div" className="relative z-[75]" onClose={close}>
           <Transition.Child
@@ -179,22 +198,21 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       <X />
                     </button>
                   </div>
+
                   <div className="bg-white px-6 py-12">
-                    {(product.variants?.length ?? 0) > 1 && (
+                    {optionGroups.length > 0 && (
                       <div className="flex flex-col gap-y-6">
-                        {optionGroups.map((option) => {
-                          return (
-                            <div key={option.id}>
-                              <OptionSelect
-                                option={option}
-                                current={getSelectedOptionValue(option.id)}
-                                updateOption={updateOptions}
-                                title={option.title ?? ""}
-                                disabled={optionsDisabled}
-                              />
-                            </div>
-                          )
-                        })}
+                        {optionGroups.map((option) => (
+                          <div key={option.id}>
+                            <OptionSelect
+                              option={option}
+                              current={getSelectedOptionValue(option.id)}
+                              updateOption={updateOptions}
+                              title={option.title ?? ""}
+                              disabled={optionsDisabled}
+                            />
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>

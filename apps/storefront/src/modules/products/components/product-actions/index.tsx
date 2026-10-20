@@ -1,26 +1,33 @@
 "use client"
 
+import { Heart } from "@medusajs/icons"
+import { HttpTypes } from "@medusajs/types"
 import { addToCart } from "@lib/data/cart"
 import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
-import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import {
   addToWishlist,
   isVariantInWishlist,
   removeFromWishlist,
 } from "@lib/data/wishlist"
 import { useIntersection } from "@lib/hooks/use-in-view"
-import { HttpTypes } from "@medusajs/types"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import Divider from "@modules/common/components/divider"
-import OptionSelect from "@modules/products/components/product-actions/option-select"
-import { useParams, useSearchParams } from "next/navigation"
-import { Dispatch, SetStateAction, Suspense, useEffect, useMemo, useRef, useState } from "react"
-import ProductPrice from "../product-price"
-import MobileActions from "./mobile-actions"
-import { useRouter } from "next/navigation"
-import { Heart } from "@medusajs/icons"
 import Spinner from "@modules/common/icons/spinner"
+import OptionSelect from "@modules/products/components/product-actions/option-select"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
+import {
+  Dispatch,
+  SetStateAction,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import ProductPrice from "../product-price"
 import ProductTrustBadge from "../product-trust-badge"
 import WhatsAppOrderButton from "../whatsapp-order-button"
+import MobileActions from "./mobile-actions"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -29,34 +36,60 @@ type ProductActionsProps = {
 }
 
 const optionsAsKeymap = (
-  variantOptions: HttpTypes.StoreProductVariant["options"]
-) => {
-  return variantOptions?.reduce((acc: Record<string, string>, varopt) => {
-    if (varopt.option_id) acc[varopt.option_id] = varopt.value
+  variantOptions: HttpTypes.StoreProductVariant["options"] | undefined
+) =>
+  variantOptions?.reduce((acc: Record<string, string>, variantOption) => {
+    if (variantOption.option_id) {
+      acc[variantOption.option_id] = variantOption.value
+    }
+
     return acc
   }, {})
-}
 
-function LegacyVariantInitializer({
+function VariantOptionsInitializer({
   variants,
+  optionGroups,
   setOptions,
 }: {
-  variants?: HttpTypes.StoreProductVariant[]
+  variants?: HttpTypes.StoreProductVariant[] | null
+  optionGroups: HttpTypes.StoreProductOption[]
   setOptions: Dispatch<SetStateAction<Record<string, string | undefined>>>
 }) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const initialVariantId = searchParams.get("v_id")
-    if (!initialVariantId) return
+    const variantId = searchParams.get("v_id")
+    const variant = variants?.find((item) => item.id === variantId)
 
-    const initialVariant = variants?.find(
-      (variant) => variant.id === initialVariantId
-    )
-    if (initialVariant) {
-      setOptions(optionsAsKeymap(initialVariant.options) ?? {})
+    if (variant) {
+      const variantOptions = optionsAsKeymap(variant.options)
+
+      setOptions(
+        optionGroups.reduce<Record<string, string | undefined>>(
+          (selectedOptions, option) => {
+            selectedOptions[option.id] = variantOptions?.[option.id]
+            return selectedOptions
+          },
+          {}
+        )
+      )
+      return
     }
-  }, [searchParams, setOptions, variants])
+
+    if (variants?.length === 1) {
+      const variantOptions = optionsAsKeymap(variants[0].options)
+
+      setOptions(
+        optionGroups.reduce<Record<string, string | undefined>>(
+          (selectedOptions, option) => {
+            selectedOptions[option.id] = variantOptions?.[option.id]
+            return selectedOptions
+          },
+          {}
+        )
+      )
+    }
+  }, [searchParams, variants, optionGroups, setOptions])
 
   return null
 }
@@ -67,8 +100,36 @@ export default function ProductActions({
   disabled,
 }: ProductActionsProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialVariantId = searchParams.get("v_id")
+  const { options: productOptions, variants } = product
 
-  const [options, setOptions] = useState<Record<string, string | undefined>>({})
+  const optionGroups = useMemo(
+    () =>
+      getDistinguishingVariantOptions({
+        options: productOptions,
+        variants,
+      }),
+    [productOptions, variants]
+  )
+
+  const initialVariant =
+    variants?.find((variant) => variant.id === initialVariantId) ||
+    (variants?.length === 1 ? variants[0] : undefined)
+
+  const [options, setOptions] = useState<Record<string, string | undefined>>(
+    () => {
+      const initialOptions = optionsAsKeymap(initialVariant?.options)
+
+      return optionGroups.reduce<Record<string, string | undefined>>(
+        (selectedOptions, option) => {
+          selectedOptions[option.id] = initialOptions?.[option.id]
+          return selectedOptions
+        },
+        {}
+      )
+    }
+  )
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [isBuyingNow, setIsBuyingNow] = useState(false)
@@ -76,36 +137,30 @@ export default function ProductActions({
   const [isAddingToWishlist, setIsAddingToWishlist] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null)
+
+  const params = useParams()
   const countryCode =
-    (useParams().countryCode as string) ||
+    (params.countryCode as string) ||
     process.env.NEXT_PUBLIC_DEFAULT_REGION ||
     "zw"
-  const { options: productOptions, variants } = product
-  const optionGroups = useMemo(
-    () => getDistinguishingVariantOptions({ options: productOptions, variants }),
-    [productOptions, variants]
-  )
-  const hasVariantChoices = (product.variants?.length ?? 0) > 1
 
-  // If there is only 1 variant, preselect the options
-  useEffect(() => {
-    if (variants?.length === 1) {
-      const variantOptions = optionsAsKeymap(variants[0].options)
-      setOptions(variantOptions ?? {})
-    }
-  }, [variants])
+  const hasVariantChoices = (variants?.length ?? 0) > 1
 
   const selectedVariant = useMemo(() => {
     const productVariants = variants || []
+
     if (productVariants.length === 0) {
       return
     }
 
     if (optionGroups.length === 0) {
-      return productVariants[0]
+      return (
+        productVariants.find((variant) => variant.id === initialVariantId) ||
+        productVariants[0]
+      )
     }
 
-    if (optionGroups.some((option) => options[option.id] === undefined)) {
+    if (optionGroups.some((option) => !options[option.id])) {
       return
     }
 
@@ -114,16 +169,24 @@ export default function ProductActions({
         const value = variant.options?.find(
           (variantOption) => variantOption.option_id === option.id
         )?.value
+
         return value === options[option.id]
       })
     )
-  }, [variants, optionGroups, options])
+  }, [variants, optionGroups, options, initialVariantId])
+
+  const hasCompleteSelection = optionGroups.every((option) =>
+    Boolean(options[option.id])
+  )
+  const isValidVariant = Boolean(selectedVariant)
+  const isUnavailable = hasCompleteSelection && !selectedVariant
 
   useEffect(() => {
     let isMounted = true
 
     if (!selectedVariant?.id) {
       setIsInWishlist(false)
+
       return () => {
         isMounted = false
       }
@@ -140,48 +203,82 @@ export default function ProductActions({
     }
   }, [selectedVariant?.id])
 
-  // update the options when a variant is selected
-  const setOptionValue = (optionId: string, value: string) => {
-    setOptions((prev) => ({
-      ...prev,
-      [optionId]: value,
-    }))
+  const updateVariantUrl = (variantId?: string) => {
+    const url = new URL(window.location.href)
+    const currentVariantId = url.searchParams.get("v_id")
+
+    if (variantId) {
+      url.searchParams.set("v_id", variantId)
+    } else {
+      url.searchParams.delete("v_id")
+    }
+
+    if (currentVariantId === (variantId || null)) {
+      return
+    }
+
+    const href = `${url.pathname}${url.search}${url.hash}`
+
+    if (variantId) {
+      router.push(href, { scroll: false })
+    } else {
+      router.replace(href, { scroll: false })
+    }
   }
 
-  //check if the selected options produce a valid variant
-  const isValidVariant = Boolean(selectedVariant)
+  const setOptionValue = (optionId: string, value: string) => {
+    const nextOptions = {
+      ...options,
+      [optionId]: value,
+    }
 
-  // check if the selected variant is in stock
+    setOptions(nextOptions)
+
+    const selectionIsComplete = optionGroups.every((option) =>
+      Boolean(nextOptions[option.id])
+    )
+
+    const matchingVariant = selectionIsComplete
+      ? variants?.find((variant) =>
+          optionGroups.every((option) => {
+            const variantValue = variant.options?.find(
+              (variantOption) => variantOption.option_id === option.id
+            )?.value
+
+            return variantValue === nextOptions[option.id]
+          })
+        )
+      : undefined
+
+    updateVariantUrl(matchingVariant?.id)
+  }
+
   const inStock = useMemo(() => {
-    // If we don't manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
     }
 
-    // If we allow back orders on the variant, we can add to cart
     if (selectedVariant?.allow_backorder) {
       return true
     }
 
-    // If there is inventory available, we can add to cart
     if (
       selectedVariant?.manage_inventory &&
-      (selectedVariant?.inventory_quantity || 0) > 0
+      (selectedVariant.inventory_quantity || 0) > 0
     ) {
       return true
     }
 
-    // Otherwise, we can't add to cart
     return false
   }, [selectedVariant])
 
   const actionsRef = useRef<HTMLDivElement>(null)
-
   const inView = useIntersection(actionsRef, "0px")
 
-  // add the selected variant to the cart
   const handleAddToCart = async () => {
-    if (!selectedVariant?.id || isBuyingNow) return null
+    if (!selectedVariant?.id || isBuyingNow) {
+      return
+    }
 
     setIsAdding(true)
 
@@ -232,11 +329,7 @@ export default function ProductActions({
         currency: region.currency_code?.toUpperCase() || "USD",
       })
 
-      if (typeof window !== "undefined") {
-        window.location.href = "/checkout"
-      } else {
-        router.push("/checkout")
-      }
+      window.location.href = "/checkout"
     } catch (error) {
       console.error("Failed to buy item:", error)
       setBuyNowError(
@@ -246,86 +339,107 @@ export default function ProductActions({
     }
   }
 
-  // Toggle the selected variant in the wishlist
   const handleAddToWishlist = async () => {
-    if (!selectedVariant?.id) return null
+    if (!selectedVariant?.id) {
+      return
+    }
 
     setIsAddingToWishlist(true)
+
     try {
-      const res = isInWishlist
+      const result = isInWishlist
         ? await removeFromWishlist(selectedVariant.id)
         : await addToWishlist(selectedVariant.id, countryCode, product.id)
-      if (res.success) {
+
+      if (result.success) {
         setIsInWishlist(!isInWishlist)
         setWishlistFeedback(
           isInWishlist ? "Removed from wishlist" : "Saved to wishlist"
         )
         router.refresh()
       } else {
-        setWishlistFeedback(res.error || "Could not save this item")
+        setWishlistFeedback(result.error || "Could not save this item")
       }
-    } catch (err: unknown) {
-      console.error(err)
+    } catch (error: unknown) {
+      console.error(error)
       setWishlistFeedback(
-        err instanceof Error ? err.message : "Could not save this item"
+        error instanceof Error ? error.message : "Could not save this item"
       )
     } finally {
       setIsAddingToWishlist(false)
     }
   }
 
+  const variantOptionSummary = selectedVariant
+    ? optionGroups
+        .map((option) => {
+          const value = selectedVariant.options?.find(
+            (variantOption) => variantOption.option_id === option.id
+          )?.value
+
+          return value ? `${option.title}: ${value}` : null
+        })
+        .filter((value): value is string => Boolean(value))
+        .join(", ") || selectedVariant.title || undefined
+    : undefined
+
   return (
     <>
       <Suspense fallback={null}>
-        <LegacyVariantInitializer
-          variants={variants ?? undefined}
+        <VariantOptionsInitializer
+          variants={variants}
+          optionGroups={optionGroups}
           setOptions={setOptions}
         />
       </Suspense>
+
       <div className="flex flex-col gap-y-3" ref={actionsRef}>
-        <div>
-          {optionGroups.length > 0 && (
-            <div className="flex flex-col gap-y-4">
-              {optionGroups.map((option) => {
-                return (
-                  <div key={option.id}>
-                    <OptionSelect
-                      option={option}
-                      current={options[option.id]}
-                      updateOption={setOptionValue}
-                      title={option.title ?? ""}
-                      data-testid="product-options"
-                      disabled={!!disabled || isAdding || isBuyingNow || isAddingToWishlist}
-                    />
-                  </div>
-                )
-              })}
-              <Divider />
-            </div>
-          )}
-        </div>
+        {optionGroups.length > 0 && (
+          <div className="flex flex-col gap-y-4">
+            {optionGroups.map((option) => (
+              <div key={option.id}>
+                <OptionSelect
+                  option={option}
+                  current={options[option.id]}
+                  updateOption={setOptionValue}
+                  title={option.title ?? ""}
+                  data-testid="product-options"
+                  disabled={
+                    !!disabled ||
+                    isAdding ||
+                    isBuyingNow ||
+                    isAddingToWishlist
+                  }
+                />
+              </div>
+            ))}
+            <Divider />
+          </div>
+        )}
 
         <ProductPrice product={product} variant={selectedVariant} />
 
-        {/* 3-Element Horizontal Buy Actions Row matching reference image */}
         <div className="flex items-center gap-2 sm:gap-2.5 pt-2">
-          {/* 1. Quantity Selector Pill */}
           <div className="flex items-center justify-between bg-orange-50/70 border border-orange-100 rounded-full p-1 h-12 w-24 sm:w-28 shrink-0 shadow-2xs">
             <button
               type="button"
-              onClick={() => setQuantity((prev) => (prev > 1 ? prev - 1 : 1))}
+              onClick={() =>
+                setQuantity((previous) => (previous > 1 ? previous - 1 : 1))
+              }
               disabled={quantity <= 1 || isAdding || isBuyingNow}
               className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
               aria-label="Decrease quantity"
             >
               –
             </button>
+
             <span className="text-sm sm:text-base font-bold text-gray-900 select-none">
               {quantity}
             </span>
+
             <button
               type="button"
-              onClick={() => setQuantity((prev) => prev + 1)}
+              onClick={() => setQuantity((previous) => previous + 1)}
               disabled={isAdding || isBuyingNow}
               className="w-8 h-8 rounded-full bg-white border border-orange-100 text-primary flex items-center justify-center font-bold text-sm hover:bg-orange-100 disabled:opacity-40 transition-colors shadow-2xs cursor-pointer select-none"
               aria-label="Increase quantity"
@@ -334,7 +448,6 @@ export default function ProductActions({
             </button>
           </div>
 
-          {/* 2. Main Add to Cart Pill Button */}
           <button
             type="button"
             onClick={handleAddToCart}
@@ -357,10 +470,13 @@ export default function ProductActions({
                 <span className="truncate">
                   {selectedVariant && !inStock
                     ? "Out of stock"
+                    : !selectedVariant && isUnavailable
+                    ? "Unavailable"
                     : !selectedVariant && hasVariantChoices
                     ? "Select variant"
                     : "Add to Cart"}
                 </span>
+
                 <svg
                   className="w-4 h-4 text-current shrink-0 hidden 2xl:inline"
                   viewBox="0 0 24 24"
@@ -378,17 +494,15 @@ export default function ProductActions({
             )}
           </button>
 
-          {/* 3. Circular WhatsApp Button */}
           <WhatsAppOrderButton
             productTitle={product.title}
             productHandle={product.handle}
-            variantTitle={selectedVariant?.title ?? undefined}
+            variantTitle={variantOptionSummary}
             size="full"
             iconOnly
             className="shrink-0"
           />
 
-          {/* 4. Circular Wishlist Button */}
           <button
             type="button"
             onClick={handleAddToWishlist}
@@ -396,9 +510,12 @@ export default function ProductActions({
               !selectedVariant ||
               !!disabled ||
               isAdding ||
+              isBuyingNow ||
               isAddingToWishlist
             }
-            aria-label={isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"}
+            aria-label={
+              isInWishlist ? "Remove from Wishlist" : "Save to Wishlist"
+            }
             className="w-12 h-12 rounded-full border border-orange-100 bg-white hover:bg-orange-50 flex items-center justify-center text-gray-700 hover:text-red-500 hover:border-red-200 shadow-2xs transition-all shrink-0 cursor-pointer disabled:opacity-50"
           >
             <Heart
@@ -411,7 +528,6 @@ export default function ProductActions({
           </button>
         </div>
 
-        {/* Buy Now Button */}
         <button
           type="button"
           onClick={handleBuyNow}
@@ -421,6 +537,7 @@ export default function ProductActions({
             !!disabled ||
             isAdding ||
             isBuyingNow ||
+            isAddingToWishlist ||
             !isValidVariant
           }
           className="flex h-11 w-full items-center justify-center gap-2 rounded-full bg-primary hover:bg-[#D83D0F] active:scale-[0.99] px-4 text-sm font-bold text-white shadow-xs transition-all disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
@@ -448,7 +565,6 @@ export default function ProductActions({
           </p>
         )}
 
-        {/* Delivery Guarantee & Payment Trust Badge */}
         <ProductTrustBadge />
 
         <MobileActions
@@ -460,7 +576,7 @@ export default function ProductActions({
           handleAddToCart={handleAddToCart}
           isAdding={isAdding}
           show={!inView}
-          optionsDisabled={!!disabled || isAdding || isAddingToWishlist}
+          optionsDisabled={!!disabled || isAdding || isBuyingNow || isAddingToWishlist}
         />
       </div>
     </>

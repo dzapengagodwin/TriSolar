@@ -15,7 +15,6 @@ import {
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
-  searchParams: Promise<{ v_id?: string }>
 }
 
 export async function generateStaticParams() {

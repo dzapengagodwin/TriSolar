@@ -3,23 +3,46 @@
 import { useState, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
-import { XMark, ChevronLeft, ChevronRight, ArrowsPointingOut } from "@medusajs/icons"
+import {
+  XMark,
+  ChevronLeft,
+  ChevronRight,
+  ArrowsPointingOut,
+} from "@medusajs/icons"
 import { getProductImageAlt } from "@lib/seo"
+import { useSearchParams } from "next/navigation"
 
 type ImageGalleryProps = {
   images: HttpTypes.StoreProductImage[]
+  variants?: HttpTypes.StoreProductVariant[] | null
   productTitle?: string
   brand?: string
 }
 
-const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
+const ImageGallery = ({
+  images,
+  variants,
+  productTitle,
+  brand,
+}: ImageGalleryProps) => {
+  const searchParams = useSearchParams()
+  const selectedVariantId = searchParams.get("v_id")
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const galleryImages = images && images.length > 0 ? images : []
+  const selectedVariant = variants?.find(
+    (variant) => variant.id === selectedVariantId
+  )
+  const variantImages = selectedVariant?.images
+  const galleryImages =
+    variantImages && variantImages.length > 0 ? variantImages : images || []
   const totalCount = galleryImages.length
 
   const activeImage = galleryImages[selectedIndex] || galleryImages[0]
+
+  useEffect(() => {
+    setSelectedIndex(0)
+  }, [selectedVariantId])
 
   // Keyboard navigation for modal (Escape, ArrowLeft, ArrowRight)
   useEffect(() => {
@@ -27,10 +50,14 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
       if (!isModalOpen) return
       if (e.key === "Escape") setIsModalOpen(false)
       if (e.key === "ArrowLeft") {
-        setSelectedIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))
+        setSelectedIndex((prev) =>
+          prev === 0 ? galleryImages.length - 1 : prev - 1
+        )
       }
       if (e.key === "ArrowRight") {
-        setSelectedIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))
+        setSelectedIndex((prev) =>
+          prev === galleryImages.length - 1 ? 0 : prev + 1
+        )
       }
     }
     window.addEventListener("keydown", handleKeyDown)
@@ -41,7 +68,6 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
     <div className="w-full relative">
       {/* 1. Main Gallery Grid: Left Thumbnails + Right Main Image */}
       <div className="flex flex-col-reverse sm:flex-row gap-4 items-start">
-        
         {/* Left Column: Vertical Thumbnails Stack */}
         <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto max-h-[500px] w-full sm:w-24 shrink-0 pb-2 sm:pb-0 scrollbar-none">
           {galleryImages.map((img, idx) => {
@@ -72,7 +98,9 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
                     sizes="80px"
                   />
                 ) : (
-                  <span className="text-xs text-gray-400 font-mono">No Image</span>
+                  <span className="text-xs text-gray-400 font-mono">
+                    No Image
+                  </span>
                 )}
               </button>
             )
@@ -112,13 +140,11 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
             <ArrowsPointingOut className="w-5 h-5 text-gray-700" />
           </button>
         </div>
-
       </div>
 
       {/* 2. Full-Screen Image Lightbox Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex flex-col justify-between p-4 sm:p-8 animate-fade-in select-none">
-          
           {/* Modal Top Header: Counter & Close Button */}
           <div className="flex items-center justify-between text-white w-full max-w-6xl mx-auto">
             <span className="text-xs font-mono font-semibold bg-white/10 px-3 py-1 rounded-full border border-white/20">
@@ -136,11 +162,12 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
 
           {/* Modal Body: Left Arrow, Main Display, Right Arrow */}
           <div className="relative flex-1 flex items-center justify-between max-w-6xl w-full mx-auto my-4 overflow-hidden">
-            
             {/* Previous Arrow */}
             <button
               onClick={() =>
-                setSelectedIndex((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))
+                setSelectedIndex((prev) =>
+                  prev === 0 ? galleryImages.length - 1 : prev - 1
+                )
               }
               className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors border border-white/20 z-20 shrink-0"
               aria-label="Previous Image"
@@ -170,7 +197,9 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
             {/* Next Arrow */}
             <button
               onClick={() =>
-                setSelectedIndex((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))
+                setSelectedIndex((prev) =>
+                  prev === galleryImages.length - 1 ? 0 : prev + 1
+                )
               }
               className="w-12 h-12 bg-white/10 hover:bg-white/30 text-white rounded-full flex items-center justify-center transition-colors border border-white/20 z-20 shrink-0"
               aria-label="Next Image"
@@ -212,7 +241,6 @@ const ImageGallery = ({ images, productTitle, brand }: ImageGalleryProps) => {
               )
             })}
           </div>
-
         </div>
       )}
     </div>

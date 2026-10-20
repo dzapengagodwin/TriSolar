@@ -3,6 +3,8 @@
 import { sdk } from "@lib/config"
 import { OptionValueIds } from "@lib/util/product-option-filters"
 import { sortProducts } from "@lib/util/sort-products"
+import { getPricesForVariant } from "@lib/util/get-product-price"
+import { getDistinctVariantOptions } from "@lib/util/product-variants"
 import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import {
@@ -141,6 +143,7 @@ export const listProductsWithSort = async ({
   optionValueIds,
   minPrice,
   maxPrice,
+  showVariantsAsProducts = false,
 }: {
   page?: number
   queryParams?: ProductListQueryParams
@@ -149,8 +152,13 @@ export const listProductsWithSort = async ({
   optionValueIds?: OptionValueIds
   minPrice?: number
   maxPrice?: number
+  showVariantsAsProducts?: boolean
 }): Promise<{
-  response: { products: HttpTypes.StoreProduct[]; count: number }
+  response: {
+    products: HttpTypes.StoreProduct[]
+    count: number
+    variantOptionsByProductId: Record<string, HttpTypes.StoreProductOption[]>
+  }
   nextPage: number | null
   queryParams?: ProductListQueryParams
 }> => {
@@ -186,9 +194,76 @@ export const listProductsWithSort = async ({
     )
   }
 
-  // Apply price range filtering
-  if (minPrice !== undefined || maxPrice !== undefined) {
-    const { getPricesForVariant } = await import("@lib/util/get-product-price")
+  // Expand variants before price filtering so each displayed variant uses its own price.
+  const variantOptionsByProductId: Record<
+    string,
+    HttpTypes.StoreProductOption[]
+  > = {}
+
+  if (showVariantsAsProducts) {
+    filteredProducts = filteredProducts.flatMap((product) => {
+      if (!product.variants?.length) {
+        return [product]
+      }
+
+      if (product.id && product.variants.length > 1) {
+        variantOptionsByProductId[product.id] =
+          getDistinctVariantOptions(product)
+      }
+
+      const matchingOptionGroups = (product.options || [])
+        .map((option) => ({
+          optionId: option.id,
+          values: (option.values || [])
+            .filter((value) => optionFilters.includes(value.id))
+            .map((value) => value.value?.trim().toLowerCase())
+            .filter((value): value is string => Boolean(value)),
+        }))
+        .filter((group) => group.values.length > 0)
+
+      const matchingVariants = product.variants.filter((variant) => {
+        const matchesOptions = matchingOptionGroups.every((group) => {
+          const variantOption = variant.options?.find(
+            (option) => option.option_id === group.optionId
+          )
+          return group.values.includes(variantOption?.value?.trim().toLowerCase() || "")
+        })
+
+        if (!matchesOptions) {
+          return false
+        }
+
+        if (minPrice === undefined && maxPrice === undefined) {
+          return true
+        }
+
+        const price = getPricesForVariant(variant)
+        if (!price) {
+          return false
+        }
+
+        return (
+          (minPrice === undefined || price.calculated_price_number >= minPrice) &&
+          (maxPrice === undefined || price.calculated_price_number <= maxPrice)
+        )
+      })
+
+      if (product.variants.length === 1) {
+        return matchingVariants.length > 0 ? [product] : []
+      }
+
+      return matchingVariants.map((variant) => ({
+        ...product,
+        variants: [variant],
+      }))
+    })
+  }
+
+  // Apply product-level price filtering for standard product listings.
+  if (
+    !showVariantsAsProducts &&
+    (minPrice !== undefined || maxPrice !== undefined)
+  ) {
     filteredProducts = filteredProducts.filter((product) => {
       if (!product.variants || product.variants.length === 0) return true
       return product.variants.some((v) => {
@@ -216,6 +291,7 @@ export const listProductsWithSort = async ({
     response: {
       products: paginatedProducts,
       count: filteredCount,
+      variantOptionsByProductId,
     },
     nextPage,
     queryParams,
@@ -300,4 +376,3 @@ export async function getCartAccessoryRecommendations(
 
   return accessories
 }
-
