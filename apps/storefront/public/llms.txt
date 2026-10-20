@@ -1,0 +1,62 @@
+# Laptopzone
+
+> Laptopzone is a Zimbabwean retailer of laptops, desktop computers, mobile phones, printers, and accessories. Browse products from leading technology brands, with product-specific pricing, availability, specifications, and warranty information on each listing.
+
+Laptopzone serves customers in Zimbabwe. Product selection, prices, stock, and variant availability can change; use the live product and policy pages as the source of truth.
+
+For a detailed guide with the current catalog, categories, brands, and product configurations, see [llms-full.txt](https://laptopzone.co.zw/llms-full.txt).
+
+## Main pages
+
+- [Home](https://laptopzone.co.zw/): Storefront home page and featured products.
+- [Shop all products](https://laptopzone.co.zw/shop): Browse the current catalog.
+- [Brands](https://laptopzone.co.zw/brands): Browse the brand directory.
+- [Frequently asked questions](https://laptopzone.co.zw/faq): Answers to common shopping questions.
+- [Contact Laptopzone](https://laptopzone.co.zw/contact-us): Customer contact details and support.
+- [Customer help](https://laptopzone.co.zw/customer-help): Help and customer support.
+
+## Product categories
+
+- [Laptops](https://laptopzone.co.zw/products/laptops)
+- [Business laptops](https://laptopzone.co.zw/products/laptops/business-laptops)
+- [Home and student laptops](https://laptopzone.co.zw/products/laptops/home-student)
+- [Gaming laptops](https://laptopzone.co.zw/products/laptops/gaming-laptops)
+- [Desktop computers](https://laptopzone.co.zw/products/desktops)
+- [Printers](https://laptopzone.co.zw/products/printers_for_sale)
+- [Networking](https://laptopzone.co.zw/products/networking)
+- [Monitors](https://laptopzone.co.zw/products/monitors)
+- [Mobile phones and tablets](https://laptopzone.co.zw/products/cellphones-and-tablets)
+- [Computer accessories](https://laptopzone.co.zw/products/computer_accessories)
+
+## Brands
+
+- [HP](https://laptopzone.co.zw/brands/hp)
+- [ASUS](https://laptopzone.co.zw/brands/asus)
+- [Lenovo](https://laptopzone.co.zw/brands/lenovo)
+- [Samsung](https://laptopzone.co.zw/brands/samsung)
+- [Brother](https://laptopzone.co.zw/brands/brother)
+- [Dell](https://laptopzone.co.zw/brands/dell)
+- [Acer](https://laptopzone.co.zw/brands/acer)
+- [Apple](https://laptopzone.co.zw/brands/apple)
+- [Canon](https://laptopzone.co.zw/brands/canon)
+- [Epson](https://laptopzone.co.zw/brands/epson)
+
+## Shopping information and policies
+
+- [Delivery terms](https://laptopzone.co.zw/delivery-terms): Delivery information and terms.
+- [Returns and refunds](https://laptopzone.co.zw/returns-and-refunds): Return and refund information.
+- [Terms and conditions](https://laptopzone.co.zw/terms-and-conditions): Store terms.
+- [Privacy policy](https://laptopzone.co.zw/privacy-policy): How customer information is handled.
+- [Track an order](https://laptopzone.co.zw/track-order): Order tracking.
+
+## Product and catalog guidance
+
+Use the live catalog and product pages for current product names, specifications, configuration options, prices, stock status, and warranty information. Variant options may represent distinct purchasable configurations.
+
+## Sitemaps
+
+- [Sitemap](https://laptopzone.co.zw/sitemap.xml)
+- [Product sitemap](https://laptopzone.co.zw/product-sitemap.xml)
+- [Category sitemap](https://laptopzone.co.zw/category-sitemap.xml)
+- [Brand sitemap](https://laptopzone.co.zw/brand-sitemap.xml)
+- [Informational pages sitemap](https://laptopzone.co.zw/pages-sitemap.xml)
