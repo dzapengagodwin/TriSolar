@@ -1,27 +1,53 @@
 import { HttpTypes } from "@medusajs/types"
+import { isMeaningfulOption } from "./product-option-filters"
 
-export const getDistinguishingVariantOptions = (
-  product: Pick<HttpTypes.StoreProduct, "options" | "variants">
-) => {
-  const options = product.options || []
-  const variants = product.variants
+export const getDistinctVariantOptions = (
+  product: HttpTypes.StoreProduct
+): HttpTypes.StoreProductOption[] => {
+  const variants = product.variants || []
 
-  if (!variants?.length) {
-    return options
-  }
+  return (product.options || []).filter((option) => {
+    if (!isMeaningfulOption(option.title, option.values)) {
+      return false
+    }
 
-  return options.filter((option) => {
-    const values = variants.map(
-      (variant) =>
-        variant.options?.find(
-          (variantOption) => variantOption.option_id === option.id
-        )?.value
+    if (variants.length === 0) {
+      return true
+    }
+
+    const values = variants.map((variant) =>
+      variant.options?.find(
+        (variantOption) => variantOption.option_id === option.id
+      )?.value
     )
 
     if (values.some((value) => value === undefined)) {
       return true
     }
 
-    return new Set(values).size > 1
+    return new Set(values.map((value) => value.trim().toLowerCase())).size > 1
   })
+}
+
+export const getDistinguishingVariantOptions = getDistinctVariantOptions
+
+export const getVariantOptionSummary = (
+  product: HttpTypes.StoreProduct,
+  variant?: HttpTypes.StoreProductVariant,
+  optionGroups?: HttpTypes.StoreProductOption[]
+): string => {
+  if (!variant) {
+    return ""
+  }
+
+  return (optionGroups || getDistinctVariantOptions(product))
+    .map((option) => {
+      const value = variant.options?.find(
+        (variantOption) => variantOption.option_id === option.id
+      )?.value
+
+      return value ? `${option.title}: ${value}` : null
+    })
+    .filter((value): value is string => Boolean(value))
+    .join(", ")
 }

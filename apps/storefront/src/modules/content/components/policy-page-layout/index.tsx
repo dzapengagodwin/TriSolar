@@ -108,6 +108,8 @@ export default function PolicyPageLayout({
               </span>
               <a
                 href="tel:+263772953946"
+                target="_blank"
+                rel="noreferrer"
                 className="font-semibold text-gray-900 hover:text-primary transition-colors"
               >
                 +263 77 295 3946

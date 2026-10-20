@@ -146,6 +146,7 @@ export default async function BrandTemplate({
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 viewMode={viewMode}
+                showVariantsAsProducts
                 title={`${brand.name} Catalog`}
                 breadcrumbs={breadcrumbs}
               />
@@ -159,6 +160,7 @@ export default async function BrandTemplate({
                 minPrice={minPrice}
                 maxPrice={maxPrice}
                 viewMode={viewMode}
+                showVariantsAsProducts
                 title={`${brand.name} Catalog`}
                 breadcrumbs={breadcrumbs}
               />

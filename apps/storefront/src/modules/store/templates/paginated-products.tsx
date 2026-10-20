@@ -31,6 +31,7 @@ export default async function PaginatedProducts({
   minPrice,
   maxPrice,
   viewMode = "grid",
+  showVariantsAsProducts = false,
   title,
   breadcrumbs,
 }: {
@@ -45,6 +46,7 @@ export default async function PaginatedProducts({
   minPrice?: number
   maxPrice?: number
   viewMode?: "grid" | "list"
+  showVariantsAsProducts?: boolean
   title?: string
   breadcrumbs?: { name: string; href?: string }[]
 }) {
@@ -79,7 +81,7 @@ export default async function PaginatedProducts({
   }
 
   const {
-    response: { products, count },
+    response: { products, count, variantOptionsByProductId },
   } = await listProductsWithSort({
     page,
     queryParams,
@@ -88,6 +90,7 @@ export default async function PaginatedProducts({
     optionValueIds,
     minPrice,
     maxPrice,
+    showVariantsAsProducts,
   })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
@@ -134,9 +137,18 @@ export default async function PaginatedProducts({
           >
             {products.map((p) => {
               return (
-                <li key={p.id} className={viewMode === "list" ? "w-full" : ""}>
+                <li
+                  key={p.variants?.length === 1 ? p.variants[0].id : p.id}
+                  className={viewMode === "list" ? "w-full" : ""}
+                >
                   <ProductPreview
                     product={p}
+                    variant={
+                      showVariantsAsProducts && p.variants?.length === 1
+                        ? p.variants[0]
+                        : undefined
+                    }
+                    variantOptions={variantOptionsByProductId[p.id]}
                     region={region}
                     viewMode={viewMode}
                   />
