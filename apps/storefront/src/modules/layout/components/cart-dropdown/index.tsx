@@ -229,25 +229,21 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
   return (
     <>
       {/* Trigger Button in Nav */}
-      <button
+       <button
         onClick={open}
         className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-2.5 sm:px-4 py-2 rounded-full font-bold text-xs transition-colors shadow-sm shrink-0"
         data-testid="nav-cart-link"
         aria-label="Open Shopping Cart"
       >
-        <div className="relative mt-1">
-          <span
-            className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-primary px-1.5 py-1 text-[9px] leading-none font-bold text-white shadow-sm"
-            data-testid="nav-cart-total"
-            data-value={total}
-          >
-            {convertToLocale({
-              amount: total,
-              currency_code: cartState?.currency_code || "usd",
-            })}
-          </span>
+        <span className="hidden sm:inline">
+          {convertToLocale({
+            amount: total,
+            currency_code: cartState?.currency_code || "usd",
+          })}
+        </span>
+        <div className="relative">
           <ShoppingBag className="w-4 h-4 text-white" />
-          <span className="absolute -bottom-2 -right-2 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+          <span className="absolute -top-2 -right-2 bg-primary text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
             {totalItems}
           </span>
         </div>
