@@ -30,9 +30,9 @@ const ImageGallery = ({
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const selectedVariant = variants?.find(
-    (variant) => variant.id === selectedVariantId
-  )
+  const selectedVariant =
+    variants?.find((variant) => variant.id === selectedVariantId) ||
+    variants?.[0]
   const variantImages = selectedVariant?.images
   const galleryImages =
     variantImages && variantImages.length > 0 ? variantImages : images || []

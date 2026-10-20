@@ -115,7 +115,7 @@ export default function ProductActions({
 
   const initialVariant =
     variants?.find((variant) => variant.id === initialVariantId) ||
-    (variants?.length === 1 ? variants[0] : undefined)
+    variants?.[0]
 
   const [options, setOptions] = useState<Record<string, string | undefined>>(
     () => {
