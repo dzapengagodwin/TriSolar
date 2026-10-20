@@ -1,12 +1,23 @@
+"use client"
+
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { getVariantOptionSummary } from "@lib/util/product-variants"
+import { useSearchParams } from "next/navigation"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
 }
 
 const ProductInfo = ({ product }: ProductInfoProps) => {
+  const searchParams = useSearchParams()
+  const selectedVariantId = searchParams.get("v_id")
+  const selectedVariant = product.variants?.find(
+    (variant) => variant.id === selectedVariantId
+  )
+  const variantSummary = getVariantOptionSummary(product, selectedVariant)
+
   return (
     <div id="product-info">
       <div className="flex flex-col gap-y-4 lg:max-w-[500px] mx-auto">
@@ -25,6 +36,15 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         >
           {product.title}
         </Heading>
+
+        {variantSummary && (
+          <Text
+            className="text-medium font-semibold text-ui-fg-base"
+            data-testid="selected-variant"
+          >
+            {variantSummary}
+          </Text>
+        )}
 
         {(product.subtitle || product.description) && (
           <Text

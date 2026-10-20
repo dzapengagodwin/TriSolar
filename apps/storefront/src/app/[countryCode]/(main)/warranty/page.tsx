@@ -119,7 +119,7 @@ export default async function WarrantyPage() {
             <div>
               <p className="font-bold text-gray-900 text-xs sm:text-sm">Initiate Technical Support</p>
               <p className="text-xs text-gray-600">
-                Contact our support team via WhatsApp (071 821 1330) or email (
+                Contact our support team via WhatsApp (+263 77 295 3946) or email (
                 <a href="mailto:support@laptopzone.co.zw" className="text-primary hover:underline">
                   support@laptopzone.co.zw
                 </a>

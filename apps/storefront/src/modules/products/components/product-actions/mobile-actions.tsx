@@ -7,14 +7,16 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
 
 import { getProductPrice } from "@lib/util/get-product-price"
+import { getVariantOptionSummary } from "@lib/util/product-variants"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
-import { isSimpleProduct } from "@lib/util/product"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
+  optionGroups: HttpTypes.StoreProductOption[]
   options: Record<string, string | undefined>
+  variantUnavailable: boolean
   updateOptions: (title: string, value: string) => void
   inStock?: boolean
   handleAddToCart: () => void
@@ -26,7 +28,9 @@ type MobileActionsProps = {
 const MobileActions: React.FC<MobileActionsProps> = ({
   product,
   variant,
+  optionGroups,
   options,
+  variantUnavailable,
   updateOptions,
   inStock,
   handleAddToCart,
@@ -50,7 +54,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     return variantPrice || cheapestPrice || null
   }, [price])
 
-  const isSimple = isSimpleProduct(product)
+  const isSimple = optionGroups.length === 0
+  const variantSummary = getVariantOptionSummary(product, variant)
 
   return (
     <>
@@ -74,7 +79,11 @@ const MobileActions: React.FC<MobileActionsProps> = ({
             data-testid="mobile-actions"
           >
             <div className="flex items-center gap-x-2">
-              <span data-testid="mobile-title">{product.title}</span>
+              <span data-testid="mobile-title">
+                {variantSummary
+                  ? `${product.title} - ${variantSummary}`
+                  : product.title}
+              </span>
               <span>—</span>
               {selectedPrice ? (
                 <div className="flex items-end gap-x-2 text-ui-fg-base">
@@ -124,7 +133,9 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                 data-testid="mobile-cart-button"
               >
                 {!variant
-                  ? "Select variant"
+                  ? variantUnavailable
+                    ? "Unavailable"
+                    : "Select variant"
                   : !inStock
                   ? "Out of stock"
                   : "Add to cart"}
@@ -172,9 +183,9 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     </button>
                   </div>
                   <div className="bg-white px-6 py-12">
-                    {(product.variants?.length ?? 0) > 1 && (
+                    {optionGroups.length > 0 && (
                       <div className="flex flex-col gap-y-6">
-                        {(product.options || []).map((option) => {
+                        {optionGroups.map((option) => {
                           return (
                             <div key={option.id}>
                               <OptionSelect

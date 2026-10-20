@@ -7,7 +7,7 @@ export type WhatsAppFABProps = {
 }
 
 export function WhatsAppFAB({
-  phoneNumber = "263718211330",
+  phoneNumber = "263772953946",
   defaultMessage = "Hi Laptopzone, I have an inquiry.",
   className = "",
 }: WhatsAppFABProps) {

@@ -314,7 +314,7 @@ const OnePageCheckoutForm = ({
             company: formData["shipping_address.company"] || "",
             postal_code: formData["shipping_address.postal_code"] || "",
             city: formData["shipping_address.city"].trim(),
-            country_code,
+            country_code: countryCode,
             province: formData["shipping_address.province"] || "",
             phone: formData["shipping_address.phone"].trim(),
           }

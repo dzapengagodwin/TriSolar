@@ -138,7 +138,7 @@ export default async function ReturnsPage() {
                 <a href="mailto:support@laptopzone.co.zw" className="text-primary hover:underline">
                   support@laptopzone.co.zw
                 </a>
-                ) or WhatsApp (071 821 1330) with your Order ID, product serial number, and reason for return. Attach photos or video if claiming a defect.
+                ) or WhatsApp (+263 77 295 3946) with your Order ID, product serial number, and reason for return. Attach photos or video if claiming a defect.
               </p>
             </div>
           </div>

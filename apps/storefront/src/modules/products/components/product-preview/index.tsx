@@ -1,4 +1,8 @@
 import { getProductPrice, getPricesForVariant } from "@lib/util/get-product-price"
+import {
+  getDistinctVariantOptions,
+  getVariantOptionSummary,
+} from "@lib/util/product-variants"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { getProductImageAlt } from "@lib/seo"
@@ -9,11 +13,15 @@ import WhatsAppOrderButton from "../whatsapp-order-button"
 
 export default function ProductPreview({
   product,
+  variant,
+  variantOptions,
   isFeatured,
   viewMode = "grid",
   region: _region,
 }: {
   product: HttpTypes.StoreProduct
+  variant?: HttpTypes.StoreProductVariant
+  variantOptions?: HttpTypes.StoreProductOption[]
   isFeatured?: boolean
   viewMode?: "grid" | "list"
   region: HttpTypes.StoreRegion
@@ -22,9 +30,22 @@ export default function ProductPreview({
     product,
   })
 
-  const priceInfo =
-    cheapestPrice ||
-    (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
+  const priceInfo = variant
+    ? getPricesForVariant(variant)
+    : cheapestPrice ||
+      (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
+  const optionGroups = variantOptions || getDistinctVariantOptions(product)
+  const variantSummary = getVariantOptionSummary(
+    product,
+    variant,
+    optionGroups
+  )
+  const displayTitle = variantSummary
+    ? `${product.title} - ${variantSummary}`
+    : product.title
+  const productHref = `/products/${product.handle}${
+    variant ? `?v_id=${encodeURIComponent(variant.id)}` : ""
+  }`
 
   // Format category breadcrumb / tags string
   const categoriesString =
@@ -59,11 +80,11 @@ export default function ProductPreview({
               {discountText}
             </span>
           )}
-          <LocalizedClientLink href={`/product/${product.handle}`} className="block w-full">
+          <LocalizedClientLink href={productHref} className="block w-full">
             <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
               <Thumbnail
-                thumbnail={product.thumbnail}
-                images={product.images}
+                thumbnail={variant?.images?.[0]?.url || product.thumbnail || undefined}
+                images={variant?.images?.length ? variant.images : product.images}
                 size="full"
                 isFeatured={isFeatured}
                 alt={getProductImageAlt({
@@ -85,12 +106,12 @@ export default function ProductPreview({
             {categoriesString}
           </div>
 
-          <LocalizedClientLink href={`/product/${product.handle}`}>
+          <LocalizedClientLink href={productHref}>
             <h3
               className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
-              {product.title}
+              {displayTitle}
             </h3>
           </LocalizedClientLink>
 
@@ -101,16 +122,21 @@ export default function ProductPreview({
           )}
 
           {/* Options tags preview if available */}
-          {product.options && product.options.length > 0 && (
+          {optionGroups.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {product.options.slice(0, 3).map((opt) => (
-                <span
-                  key={opt.id}
-                  className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
-                >
-                  {opt.title}
-                </span>
-              ))}
+              {optionGroups.slice(0, 3).map((opt) => {
+                const value = variant?.options?.find(
+                  (variantOption) => variantOption.option_id === opt.id
+                )?.value
+                return (
+                  <span
+                    key={opt.id}
+                    className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
+                  >
+                    {value ? `${opt.title}: ${value}` : opt.title}
+                  </span>
+                )
+              })}
             </div>
           )}
         </div>
@@ -122,12 +148,14 @@ export default function ProductPreview({
           <div className="w-full space-y-1.5">
             <QuickAddToCart
               product={product}
+              variant={variant}
               size="lg"
               viewMode="list"
             />
             <WhatsAppOrderButton
               productTitle={product.title}
               productHandle={product.handle}
+              variantTitle={variantSummary || undefined}
               size="lg"
             />
           </div>
@@ -150,11 +178,11 @@ export default function ProductPreview({
           </span>
         )}
 
-        <LocalizedClientLink href={`/product/${product.handle}`} className="block w-full">
+        <LocalizedClientLink href={productHref} className="block w-full">
           <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
             <Thumbnail
-              thumbnail={product.thumbnail}
-              images={product.images}
+              thumbnail={variant?.images?.[0]?.url || product.thumbnail || undefined}
+              images={variant?.images?.length ? variant.images : product.images}
               size="full"
               isFeatured={isFeatured}
               alt={getProductImageAlt({
@@ -178,12 +206,12 @@ export default function ProductPreview({
             {categoriesString}
           </div>
 
-          <LocalizedClientLink href={`/product/${product.handle}`}>
+          <LocalizedClientLink href={productHref}>
             <h3
               className="text-[13px] sm:text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
               data-testid="product-title"
             >
-              {product.title}
+              {displayTitle}
             </h3>
           </LocalizedClientLink>
         </div>
@@ -195,12 +223,14 @@ export default function ProductPreview({
           <div className="space-y-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
             <QuickAddToCart
               product={product}
+              variant={variant}
               size="md"
               viewMode="grid"
             />
             <WhatsAppOrderButton
               productTitle={product.title}
               productHandle={product.handle}
+              variantTitle={variantSummary || undefined}
               size="md"
             />
           </div>
