@@ -15,7 +15,10 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const selectedVariant = product.variants?.find(
     (variant) => variant.id === selectedVariantId
   ) || product.variants?.[0]
-  const displayTitle = selectedVariant?.title || product.title
+  const displayTitle =
+    product.variants && product.variants.length > 1
+      ? selectedVariant?.title || product.title
+      : product.title
 
   return (
     <div id="product-info">
