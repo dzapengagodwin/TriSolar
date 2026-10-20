@@ -75,6 +75,7 @@ const StoreTemplate = async ({
             minPrice={minPrice}
             maxPrice={maxPrice}
             viewMode={viewMode}
+            showVariantsAsProducts
             title={title}
             breadcrumbs={breadcrumbs}
           />
