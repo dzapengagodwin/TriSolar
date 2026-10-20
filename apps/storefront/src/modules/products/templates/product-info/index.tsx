@@ -3,7 +3,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@modules/common/components/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { getVariantOptionSummary } from "@lib/util/product-variants"
 import { useSearchParams } from "next/navigation"
 
 type ProductInfoProps = {
@@ -15,8 +14,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const selectedVariantId = searchParams.get("v_id")
   const selectedVariant = product.variants?.find(
     (variant) => variant.id === selectedVariantId
-  )
-  const variantSummary = getVariantOptionSummary(product, selectedVariant)
+  ) || product.variants?.[0]
+  const displayTitle = selectedVariant?.title || product.title
 
   return (
     <div id="product-info">
@@ -34,17 +33,8 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           className="text-3xl leading-10 text-ui-fg-base"
           data-testid="product-title"
         >
-          {product.title}
+          {displayTitle}
         </Heading>
-
-        {variantSummary && (
-          <Text
-            className="text-medium font-semibold text-ui-fg-base"
-            data-testid="selected-variant"
-          >
-            {variantSummary}
-          </Text>
-        )}
 
         {(product.subtitle || product.description) && (
           <Text
