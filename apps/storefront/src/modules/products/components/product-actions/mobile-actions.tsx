@@ -51,6 +51,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   }, [price])
 
   const isSimple = isSimpleProduct(product)
+  const hasVariantChoices = (product.variants?.length ?? 0) > 1
 
   return (
     <>
@@ -119,14 +120,15 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <Button
                 onClick={handleAddToCart}
                 disabled={!inStock || !variant}
-                className="w-full"
+                variant="secondary"
+                className="w-full border-2 border-[#F9501F] text-[#F9501F] hover:bg-orange-50 disabled:opacity-100"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
-                {!variant
-                  ? "Select variant"
-                  : !inStock
+                {variant && !inStock
                   ? "Out of stock"
+                  : !variant && hasVariantChoices
+                  ? "Select variant"
                   : "Add to cart"}
               </Button>
             </div>
