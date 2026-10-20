@@ -115,6 +115,7 @@ export default async function CategoryTemplate({
             minPrice={minPrice}
             maxPrice={maxPrice}
             viewMode={viewMode}
+            showVariantsAsProducts
             title={category.name}
             breadcrumbs={breadcrumbs}
           />
