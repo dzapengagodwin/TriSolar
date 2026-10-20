@@ -15,7 +15,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.TOKEN }}
         with:
-          # Keep your existing host, username and SSH key settings.
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
           envs: GH_TOKEN
           script: |
             set -e
