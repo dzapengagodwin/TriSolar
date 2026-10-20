@@ -2,6 +2,7 @@
 
 import { addToCart } from "@lib/data/cart"
 import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import {
   addToWishlist,
   isVariantInWishlist,
@@ -11,7 +12,6 @@ import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
-import isEqual from "lodash/isEqual"
 import { useParams, useSearchParams } from "next/navigation"
 import { Dispatch, SetStateAction, Suspense, useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
@@ -75,25 +75,43 @@ export default function ProductActions({
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [wishlistFeedback, setWishlistFeedback] = useState<string | null>(null)
   const countryCode = useParams().countryCode as string
+  const { options: productOptions, variants } = product
+  const optionGroups = useMemo(
+    () => getDistinguishingVariantOptions({ options: productOptions, variants }),
+    [productOptions, variants]
+  )
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
-    if (product.variants?.length === 1) {
-      const variantOptions = optionsAsKeymap(product.variants[0].options)
+    if (variants?.length === 1) {
+      const variantOptions = optionsAsKeymap(variants[0].options)
       setOptions(variantOptions ?? {})
     }
-  }, [product.variants])
+  }, [variants])
 
   const selectedVariant = useMemo(() => {
-    if (!product.variants || product.variants.length === 0) {
+    const productVariants = variants || []
+    if (productVariants.length === 0) {
       return
     }
 
-    return product.variants.find((v) => {
-      const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
-    })
-  }, [product.variants, options])
+    if (optionGroups.length === 0) {
+      return productVariants[0]
+    }
+
+    if (optionGroups.some((option) => options[option.id] === undefined)) {
+      return
+    }
+
+    return productVariants.find((variant) =>
+      optionGroups.every((option) => {
+        const value = variant.options?.find(
+          (variantOption) => variantOption.option_id === option.id
+        )?.value
+        return value === options[option.id]
+      })
+    )
+  }, [variants, optionGroups, options])
 
   useEffect(() => {
     let isMounted = true
@@ -125,12 +143,7 @@ export default function ProductActions({
   }
 
   //check if the selected options produce a valid variant
-  const isValidVariant = useMemo(() => {
-    return product.variants?.some((v) => {
-      const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
-    })
-  }, [product.variants, options])
+  const isValidVariant = Boolean(selectedVariant)
 
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
@@ -217,15 +230,15 @@ export default function ProductActions({
     <>
       <Suspense fallback={null}>
         <LegacyVariantInitializer
-          variants={product.variants}
+          variants={variants ?? undefined}
           setOptions={setOptions}
         />
       </Suspense>
       <div className="flex flex-col gap-y-3" ref={actionsRef}>
         <div>
-          {(product.variants?.length ?? 0) > 1 && (
+          {optionGroups.length > 0 && (
             <div className="flex flex-col gap-y-4">
-              {(product.options || []).map((option) => {
+              {optionGroups.map((option) => {
                 return (
                   <div key={option.id}>
                     <OptionSelect
@@ -320,7 +333,7 @@ export default function ProductActions({
           <WhatsAppOrderButton
             productTitle={product.title}
             productHandle={product.handle}
-            variantTitle={selectedVariant?.title}
+            variantTitle={selectedVariant?.title ?? undefined}
             size="full"
             className="flex-1 min-w-0"
           />

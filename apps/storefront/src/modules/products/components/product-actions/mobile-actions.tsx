@@ -7,9 +7,9 @@ import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
 
 import { getProductPrice } from "@lib/util/get-product-price"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
-import { isSimpleProduct } from "@lib/util/product"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
@@ -50,7 +50,15 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     return variantPrice || cheapestPrice || null
   }, [price])
 
-  const isSimple = isSimpleProduct(product)
+  const optionGroups = getDistinguishingVariantOptions(product)
+  const isSimple = optionGroups.length === 0
+  const getSelectedOptionValue = (optionId: string) =>
+    variant?.options?.find((option) => option.option_id === optionId)?.value ??
+    options[optionId]
+  const selectedOptionSummary = optionGroups
+    .map((option) => getSelectedOptionValue(option.id))
+    .filter((value): value is string => Boolean(value))
+    .join(" / ")
 
   return (
     <>
@@ -109,9 +117,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               >
                 <div className="flex items-center justify-between w-full">
                   <span>
-                    {variant
-                      ? Object.values(options).join(" / ")
-                      : "Select Options"}
+                    {selectedOptionSummary || "Select Options"}
                   </span>
                   <ChevronDown />
                 </div>
@@ -174,12 +180,12 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   <div className="bg-white px-6 py-12">
                     {(product.variants?.length ?? 0) > 1 && (
                       <div className="flex flex-col gap-y-6">
-                        {(product.options || []).map((option) => {
+                        {optionGroups.map((option) => {
                           return (
                             <div key={option.id}>
                               <OptionSelect
                                 option={option}
-                                current={options[option.id]}
+                                current={getSelectedOptionValue(option.id)}
                                 updateOption={updateOptions}
                                 title={option.title ?? ""}
                                 disabled={optionsDisabled}

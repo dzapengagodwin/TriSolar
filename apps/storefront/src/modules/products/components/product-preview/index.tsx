@@ -1,4 +1,5 @@
 import { getProductPrice, getPricesForVariant } from "@lib/util/get-product-price"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { getProductImageAlt } from "@lib/seo"
@@ -25,6 +26,7 @@ export default function ProductPreview({
   const priceInfo =
     cheapestPrice ||
     (product.variants?.[0] ? getPricesForVariant(product.variants[0]) : null)
+  const optionGroups = getDistinguishingVariantOptions(product)
 
   // Format category breadcrumb / tags string
   const categoriesString =
@@ -101,9 +103,9 @@ export default function ProductPreview({
           )}
 
           {/* Options tags preview if available */}
-          {product.options && product.options.length > 0 && (
+          {optionGroups.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-1">
-              {product.options.slice(0, 3).map((opt) => (
+              {optionGroups.slice(0, 3).map((opt) => (
                 <span
                   key={opt.id}
                   className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"

@@ -4,6 +4,7 @@ import React, { useState, useTransition, useEffect } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { getPricesForVariant } from "@lib/util/get-product-price"
 import { convertToLocale } from "@lib/util/money"
+import { getDistinguishingVariantOptions } from "@lib/util/product-variants"
 import { addToCart } from "@lib/data/cart"
 import { trackAddToCart, transformProductToGA4Item } from "@lib/analytics/ecommerce"
 import { getProductRecommendations } from "@lib/data/recommendations"
@@ -105,6 +106,7 @@ export default function ProductDetailsTabs({
   initialAccessories = [],
 }: ProductDetailsTabsProps) {
   const [activeTab, setActiveTab] = useState<TabType>("accessories")
+  const optionGroups = getDistinguishingVariantOptions(product)
   const [accessories, setAccessories] = useState<HttpTypes.StoreProduct[]>(
     initialAccessories
   )
@@ -471,8 +473,7 @@ export default function ProductDetailsTabs({
                     </tr>
                   ))}
                   {/* Options */}
-                  {product.options &&
-                    product.options.map((opt) => (
+                  {optionGroups.map((opt) => (
                       <tr
                         key={opt.id}
                         className="border-b border-gray-100 last:border-b-0 even:bg-gray-50/50"
@@ -741,4 +742,3 @@ export default function ProductDetailsTabs({
     </div>
   )
 }
-
