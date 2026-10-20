@@ -1,4 +1,3 @@
-```yaml
 name: LaptopZone CD
 
 on:
@@ -53,4 +52,3 @@ jobs:
             sudo systemctl is-active --quiet laptopzone-storefront
 
             echo "=== Deployment successful ==="
-```
