@@ -48,9 +48,10 @@ export default function ProductPreview({
         .join(", ")
     : ""
 
-  const displayTitle = variantSummary
-    ? `${product.title} - ${variantSummary}`
-    : product.title
+  const displayTitle =
+    variant && variantOptions !== undefined
+      ? variant.title || product.title
+      : product.title
 
   const productHref = `/products/${product.handle}${
     variant ? `?v_id=${encodeURIComponent(variant.id)}` : ""
@@ -111,7 +112,7 @@ export default function ProductPreview({
                 size="full"
                 isFeatured={isFeatured}
                 alt={getProductImageAlt({
-                  title: product.title,
+                  title: displayTitle,
                   brand,
                 })}
                 className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
@@ -204,7 +205,7 @@ export default function ProductPreview({
               size="full"
               isFeatured={isFeatured}
               alt={getProductImageAlt({
-                title: product.title,
+                title: displayTitle,
                 brand,
               })}
               className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
