@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@modules/common/components/ui"
+import Image from "next/image"
 import React from "react"
 
 type OptionSelectProps = {
@@ -8,6 +9,7 @@ type OptionSelectProps = {
   updateOption: (title: string, value: string) => void
   title: string
   disabled: boolean
+  variants?: HttpTypes.StoreProductVariant[] | null
   "data-testid"?: string
 }
 
@@ -16,35 +18,77 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   current,
   updateOption,
   title,
+  variants,
   "data-testid": dataTestId,
   disabled,
 }) => {
-  const filteredOptions = (option.values ?? []).map((v) => v.value)
+  const values = option.values ?? []
+  const isColorOption =
+    title.toLowerCase().includes("color") ||
+    title.toLowerCase().includes("colour")
 
   return (
     <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
+      {isColorOption ? (
+        <span className="text-sm">
+          Color: <strong>{current || "Select a color"}</strong>
+        </span>
+      ) : (
+        <span className="text-sm">Select {title}</span>
+      )}
       <div
-        className="flex flex-wrap justify-between gap-2"
+        className={clx("flex flex-wrap gap-2", {
+          "justify-start": isColorOption,
+          "justify-between": !isColorOption,
+        })}
         data-testid={dataTestId}
       >
-        {filteredOptions.map((v) => {
+        {values.map((optionValue) => {
+          const value = optionValue.value
+          const variantImage = isColorOption
+            ? variants
+                ?.find((variant) =>
+                  variant.options?.some(
+                    (variantOption) =>
+                      variantOption.option_id === option.id &&
+                      variantOption.value === value
+                  )
+                )
+                ?.thumbnail
+            : undefined
+
           return (
             <button
-              onClick={() => updateOption(option.id, v)}
-              key={v}
+              type="button"
+              onClick={() => updateOption(option.id, value)}
+              key={optionValue.id || value}
+              aria-label={isColorOption ? value : undefined}
+              aria-pressed={value === current}
               className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
+                isColorOption
+                  ? "relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border bg-white p-1"
+                  : "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1",
                 {
-                  "border-ui-border-interactive": v === current,
+                  "border-ui-border-interactive ring-2 ring-ui-border-interactive":
+                    value === current,
                   "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                    v !== current,
+                    value !== current,
                 }
               )}
               disabled={disabled}
               data-testid="option-button"
             >
-              {v}
+              {variantImage ? (
+                <Image
+                  src={variantImage}
+                  alt={value}
+                  fill
+                  sizes="56px"
+                  className="object-contain p-1"
+                />
+              ) : (
+                value
+              )}
             </button>
           )
         })}

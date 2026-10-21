@@ -403,6 +403,7 @@ export default function ProductActions({
                   current={options[option.id]}
                   updateOption={setOptionValue}
                   title={option.title ?? ""}
+                  variants={variants}
                   data-testid="product-options"
                   disabled={
                     !!disabled ||
