@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" fill="none">
+<defs>
+  <linearGradient id="bg" x1="120" y1="40" x2="1080" y2="720" gradientUnits="userSpaceOnUse"><stop stop-color="#F7FAFF"/><stop offset="1" stop-color="#DCE9FF"/></linearGradient>
+  <linearGradient id="screen" x1="330" y1="170" x2="800" y2="570" gradientUnits="userSpaceOnUse"><stop stop-color="#0B1B36"/><stop offset=".52" stop-color="#1769E8"/><stop offset="1" stop-color="#63B3FF"/></linearGradient>
+  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFFFFF"/><stop offset="1" stop-color="#AEBBD0"/></linearGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<rect width="1200" height="760" rx="34" fill="url(#bg)"/>
+<circle cx="970" cy="135" r="180" fill="#A9CCFF" opacity=".32"/>
+<circle cx="180" cy="630" r="170" fill="#B9D6FF" opacity=".38"/>
+<ellipse cx="625" cy="650" rx="470" ry="42" fill="#60799D" opacity=".18" filter="url(#shadow)"/>
+<!-- laptop -->
+<g>
+ <path d="M355 126Q360 105 383 105H827Q850 105 846 128L793 515H303L355 126Z" fill="#17263E"/>
+ <path d="M369 128Q371 119 383 119H825Q835 119 833 130L785 491H319L369 128Z" fill="url(#screen)"/>
+ <path d="M319 491H785L850 545Q857 554 842 559H251Q237 554 249 544L319 491Z" fill="url(#metal)" stroke="#9AAAC0" stroke-width="3"/>
+ <path d="M490 502H641L655 531H475L490 502Z" fill="#A8B6CA"/>
+ <path d="M275 547H822" stroke="#FFFFFF" stroke-width="4" opacity=".8"/>
+ <path d="M395 420C500 300 580 485 740 280" stroke="#8BC8FF" stroke-width="15" opacity=".38"/>
+ <path d="M340 390C470 250 565 430 760 220" stroke="#FFFFFF" stroke-width="5" opacity=".22"/>
+</g>
+<!-- smartphone -->
+<g transform="translate(805 195) rotate(7)">
+ <rect width="190" height="355" rx="32" fill="#24354E"/>
+ <rect x="8" y="8" width="174" height="339" rx="26" fill="#F8FBFF"/>
+ <rect x="20" y="26" width="150" height="290" rx="18" fill="url(#screen)"/>
+ <rect x="65" y="14" width="60" height="10" rx="5" fill="#15243A"/>
+ <circle cx="95" cy="330" r="5" fill="#C7D2E2"/>
+ <path d="M31 242C67 180 98 268 158 155" stroke="#A9D9FF" stroke-width="12" opacity=".65"/>
+ <circle cx="95" cy="96" r="38" fill="#FFFFFF" opacity=".12"/>
+</g>
+<!-- headphones -->
+<g transform="translate(110 275)">
+ <path d="M22 112V83C22 20 67 -15 120 -15C173 -15 218 20 218 83V112" stroke="#17263E" stroke-width="25" stroke-linecap="round"/>
+ <rect x="6" y="91" width="48" height="105" rx="20" fill="#17263E"/>
+ <rect x="188" y="91" width="48" height="105" rx="20" fill="#17263E"/>
+ <rect x="17" y="103" width="26" height="80" rx="12" fill="#4C8FF5"/>
+ <rect x="199" y="103" width="26" height="80" rx="12" fill="#4C8FF5"/>
+</g>
+<!-- smartwatch -->
+<g transform="translate(670 505) rotate(-9)">
+ <path d="M44 0H110L126 66H28L44 0Z" fill="#263850"/>
+ <rect x="12" y="48" width="130" height="124" rx="30" fill="#17263E"/>
+ <rect x="23" y="59" width="108" height="102" rx="22" fill="#07152E"/>
+ <path d="M78 77V108L99 121" stroke="#5CB1FF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+ <path d="M44 168H110L126 236H28L44 168Z" fill="#263850"/>
+</g>
+<!-- wireless speaker -->
+<g transform="translate(1000 430)">
+ <rect width="145" height="210" rx="48" fill="#1C2C43"/>
+ <rect x="12" y="12" width="121" height="186" rx="40" fill="#263B57"/>
+ <path d="M26 35H119M26 48H119M26 61H119M26 74H119M26 87H119M26 100H119M26 113H119M26 126H119M26 139H119M26 152H119M26 165H119" stroke="#536B89" stroke-width="3" opacity=".8"/>
+ <circle cx="72" cy="22" r="5" fill="#5CB1FF"/>
+</g>
+<g fill="#FFFFFF" opacity=".85"><circle cx="1050" cy="110" r="7"/><circle cx="1080" cy="140" r="4"/><circle cx="150" cy="150" r="6"/></g>
+</svg>
