@@ -37,7 +37,7 @@ export default async function Home(props: Props) {
     region
       ? listProducts({
           regionId: region.id,
-          queryParams: { limit: 10, fields: "*variants.calculated_price,*categories" },
+          queryParams: { limit: 10, fields: "*variants.calculated_price,*categories,*images" },
         }).catch(() => ({ response: { products: [] } }))
       : Promise.resolve({ response: { products: [] } }),
     listBrands({ limit: 20 }).catch(() => []),
@@ -52,7 +52,7 @@ export default async function Home(props: Props) {
   return (
     <div className="min-h-screen bg-white pb-0">
       <TritechHomeHero />
-      <FeaturedProducts region={region} />
+      <FeaturedProducts region={region} fallbackProducts={products} />
       <MonthlyDeals products={products} region={region} />
       <TopBrands brands={brands} />
       <TrustBar />
