@@ -36,14 +36,9 @@ export default async function Footer() {
             className="lg:col-span-3 space-y-6 pr-0 lg:pr-4"
             suppressHydrationWarning
           >
-            <LocalizedClientLink href="/" className="block w-fit">
-              <Image
-                src="/white.png"
-                alt="TRITECH"
-                width={150}
-                height={75}
-                className="h-auto w-[150px] object-contain"
-              />
+            <LocalizedClientLink href="/" className="inline-flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-blue-600 text-lg font-extrabold text-white">T.</span>
+              <span className="text-xl font-extrabold tracking-[.14em] text-white">TRITECH</span>
             </LocalizedClientLink>
 
             {/* Hotline Box with Headphone Icon */}
@@ -121,6 +116,12 @@ export default async function Footer() {
               <p className="text-gray-400 text-xs leading-relaxed max-w-sm">
                 Laptops. Networking. Technology.
               </p>
+              <a href="https://wa.me/263784721912" target="_blank" rel="noopener noreferrer" className="block text-gray-300 hover:text-white transition-colors">
+                WhatsApp: 078 472 1912
+              </a>
+              <a href="mailto:godwindzapenga06@gmail.com" className="block break-all text-gray-300 hover:text-white transition-colors">
+                godwindzapenga06@gmail.com
+              </a>
             </div>
           </div>
 
