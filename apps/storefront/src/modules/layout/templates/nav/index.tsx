@@ -178,7 +178,7 @@ export default async function Nav({
           <>
 
         {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
-        <nav className="bg-[#07152E] border-[#07152E] hidden small:block text-white">
+        <nav className="bg-white border-y border-slate-100 hidden small:block text-[#0B1B36]">
           <div className="content-container flex items-center justify-between text-xs font-semibold py-1 relative">
             <div className="flex items-center gap-x-2 flex-1">
               {/* Browse All Categories Button */}
