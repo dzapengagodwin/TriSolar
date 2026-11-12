@@ -1,65 +1,79 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { useState } from "react"
+import type { FormEvent } from "react"
 
-type QuoteRequestFormProps = {
-  destinationEmail?: string
-}
-
-export default function QuoteRequestForm({ destinationEmail }: QuoteRequestFormProps) {
+export default function QuoteRequestForm() {
   const [submitted, setSubmitted] = useState(false)
+  const [requestId, setRequestId] = useState("")
   const [error, setError] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError("")
+    setSubmitted(false)
+    setRequestId("")
+    setIsSubmitting(true)
+
     const form = event.currentTarget
     const data = new FormData(form)
-    const fields = [
-      ["Contact name", data.get("name")],
-      ["Organisation", data.get("organisation")],
-      ["Email", data.get("email")],
-      ["Phone", data.get("phone")],
-      ["Project type", data.get("projectType")],
-      ["Project location", data.get("location")],
-      ["Estimated budget", data.get("budget") || "Not specified"],
-      ["Project requirements", data.get("requirements")],
-      ["Preferred contact method", data.get("contactMethod")],
-    ]
-    const body = fields.map(([label, value]) => `${label}: ${String(value || "").trim()}`).join("\n\n")
-
-    if (!destinationEmail) {
-      setError("The quotation inbox has not been configured yet. Please contact the TRITECH team directly while we complete the email setup.")
-      return
+    const payload = {
+      contact_name: data.get("name"),
+      organization: data.get("organisation"),
+      email: data.get("email"),
+      phone: data.get("phone"),
+      project_type: data.get("projectType"),
+      location: data.get("location"),
+      budget: data.get("budget"),
+      requirements: data.get("requirements"),
+      contact_method: data.get("contactMethod"),
     }
 
-    const subject = encodeURIComponent(`TRITECH project quotation request - ${String(data.get("organisation") || data.get("name"))}`)
-    window.location.href = `mailto:${destinationEmail}?subject=${subject}&body=${encodeURIComponent(body)}`
-    setSubmitted(true)
-    form.reset()
+    try {
+      const response = await fetch("/api/quote-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+      const result = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(result.error || "We could not submit your request. Please try again.")
+      }
+
+      setRequestId(result.quote_request?.id || "")
+      setSubmitted(true)
+      form.reset()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {submitted && (
         <div role="status" className="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
-          Your email application has opened with the quotation details. Review the message and send it to complete your request.
+          Your quotation request has been saved successfully. Our team can now review it.
+          {requestId && <span className="mt-1 block font-semibold">Reference: {requestId}</span>}
         </div>
       )}
       {error && <div role="alert" className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">{error}</div>}
 
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-sm font-medium text-slate-700">Your name *
-          <input name="name" required autoComplete="name" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Full name" />
+          <input name="name" required maxLength={120} autoComplete="name" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Full name" />
         </label>
         <label className="block text-sm font-medium text-slate-700">Company / organisation *
-          <input name="organisation" required autoComplete="organization" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Organisation name" />
+          <input name="organisation" required maxLength={160} autoComplete="organization" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Organisation name" />
         </label>
         <label className="block text-sm font-medium text-slate-700">Work email *
-          <input name="email" type="email" required autoComplete="email" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="name@company.com" />
+          <input name="email" type="email" required maxLength={254} autoComplete="email" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="name@company.com" />
         </label>
         <label className="block text-sm font-medium text-slate-700">Phone number *
-          <input name="phone" type="tel" required autoComplete="tel" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="+263 ..." />
+          <input name="phone" type="tel" required maxLength={40} autoComplete="tel" className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="+263 ..." />
         </label>
         <label className="block text-sm font-medium text-slate-700">What do you need? *
           <select name="projectType" required defaultValue="" className="mt-2 w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
@@ -75,7 +89,7 @@ export default function QuoteRequestForm({ destinationEmail }: QuoteRequestFormP
           </select>
         </label>
         <label className="block text-sm font-medium text-slate-700">Project location *
-          <input name="location" required className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="City / town and site" />
+          <input name="location" required maxLength={160} className="mt-2 w-full rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="City / town and site" />
         </label>
         <label className="block text-sm font-medium text-slate-700 sm:col-span-2">Estimated budget
           <select name="budget" defaultValue="" className="mt-2 w-full rounded-md border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
@@ -89,7 +103,7 @@ export default function QuoteRequestForm({ destinationEmail }: QuoteRequestFormP
           </select>
         </label>
         <label className="block text-sm font-medium text-slate-700 sm:col-span-2">Tell us about your project *
-          <textarea name="requirements" required rows={6} className="mt-2 w-full resize-y rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Describe your current setup, what you want to achieve, number of users or devices, and any important timelines." />
+          <textarea name="requirements" required maxLength={5000} rows={6} className="mt-2 w-full resize-y rounded-md border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" placeholder="Describe your current setup, what you want to achieve, number of users or devices, and any important timelines." />
         </label>
         <fieldset className="sm:col-span-2">
           <legend className="text-sm font-medium text-slate-700">Preferred way to contact you</legend>
@@ -101,8 +115,10 @@ export default function QuoteRequestForm({ destinationEmail }: QuoteRequestFormP
         </fieldset>
       </div>
       <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-        <p className="max-w-md text-xs leading-5 text-slate-500">Submitting this enquiry prepares an email with your project details. We will only receive it once you send that email.</p>
-        <button type="submit" className="inline-flex min-h-12 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2">Prepare quotation request <span className="ml-3">→</span></button>
+        <p className="max-w-md text-xs leading-5 text-slate-500">Your enquiry is sent securely to the TRITECH backend and saved for the team to review.</p>
+        <button disabled={isSubmitting} type="submit" className="inline-flex min-h-12 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2">
+          {isSubmitting ? "Submitting..." : "Submit quotation request"} <span className="ml-3">→</span>
+        </button>
       </div>
     </form>
   )
