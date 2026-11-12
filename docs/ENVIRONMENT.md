@@ -54,7 +54,6 @@ This document lists all environment variables used by the **Laptopzone** monorep
 | `NEXT_PUBLIC_MEDUSA_BACKEND_URL` | Base HTTP URL of the Medusa backend server | **Required** | Storefront SDK & Data Fetchers | `http://localhost:9000` or `https://dev.laptopzone.co.zw` |
 | `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | Medusa publishable API key for store endpoints | **Required** | Storefront Client & Middleware | `pk_<medusa-publishable-key>` |
 | `NEXT_PUBLIC_BASE_URL` | Public canonical website domain for SEO and schema | **Required** | SEO canonical engine & Sitemaps | `https://your-domain.example` |
-| `NEXT_PUBLIC_QUOTE_EMAIL` | Inbox that receives prepared TRITECH project quotation requests | Optional until configured | IT solutions quotation form | `quotes@your-domain.example` |
 | `NEXT_PUBLIC_DEFAULT_REGION` | Fallback ISO country code for region resolution | Optional (default: `zw`) | Storefront Middleware & Data Layer | `zw` |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 Measurement ID | Optional | GA4 Tracking Component | `G-XXXXXXXXXX` |
 | `REVALIDATION_SECRET` | Server-only shared secret for Next.js ISR tag revalidation | **Required** | `apps/storefront/src/app/api/revalidate` | `<same-secret-as-backend>` |
