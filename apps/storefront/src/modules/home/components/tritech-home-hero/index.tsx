@@ -129,7 +129,7 @@ export default function TritechHomeHero() {
             <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">Let’s build the right solution for your business.</h2>
             <p className="mt-3 text-sm leading-6 text-slate-300">Tell us about your network, infrastructure or bulk technology requirements.</p>
           </div>
-          <LocalizedClientLink href="/contact-us" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white transition hover:bg-blue-500">Request a project quotation <span className="ml-3">↗</span></LocalizedClientLink>
+          <LocalizedClientLink href="/it-solutions#request-quote" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white transition hover:bg-blue-500">Request a project quotation <span className="ml-3">↗</span></LocalizedClientLink>
         </div>
       </section>
     </main>
