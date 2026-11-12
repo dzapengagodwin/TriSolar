@@ -79,6 +79,8 @@ export const MEGA_MENUS: MegaMenuConfig[] = [
       { label: "Monitors", href: "/products/monitors" },
       { label: "Software", href: "/products/software" },
       { label: "Brands", href: "/brands" },
+      { label: "IT Solutions", href: "/it-solutions" },
+      { label: "Contact Us", href: "/contact-us" },
     ],
     sections: [
       {
