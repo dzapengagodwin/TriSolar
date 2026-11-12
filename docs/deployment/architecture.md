@@ -34,7 +34,6 @@ flowchart TD
     subgraph CloudServices["External Cloud Dependencies"]
         S3Bucket[(AWS S3 Media Bucket)]
         SendGridAPI[SendGrid Mail API]
-        PesepayAPI[Pesepay Gateway API]
     end
 
     Internet --> Cloudflare
@@ -48,7 +47,6 @@ flowchart TD
     MedusaService --> Redis
     MedusaService --> S3Bucket
     MedusaService --> SendGridAPI
-    MedusaService --> PesepayAPI
 ```
 
 ---

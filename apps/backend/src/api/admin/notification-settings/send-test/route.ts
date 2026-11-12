@@ -96,7 +96,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
       shipping_total: 0.0,
       tax_total: 0.0,
       total: 850.0,
-      payment_method: "Credit / Debit Card (Pesepay)",
+      payment_method: "Credit / Debit Card",
       payment_status: "Paid",
       delivery_method: "Express Doorstep Delivery (Harare)",
       shipping_address: {

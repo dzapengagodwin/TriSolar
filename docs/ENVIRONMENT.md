@@ -12,6 +12,7 @@ This document lists all environment variables used by the **Laptopzone** monorep
 |---|---|---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string | **Required** | Medusa Core & Custom Modules | `postgres://user:password@localhost:5432/medusa_db` |
 | `DB_NAME` | Database name | Optional | Local setup scripts | `medusa-backend` |
+| `DATABASE_SSL` | Enable TLS for PostgreSQL connections | Optional (default: `false`) | Medusa Core & Custom Modules | `true` or `false` |
 | `REDIS_URL` | Redis instance for event bus and caching | Optional in local dev, **Required** in prod | Medusa Core & Subscribers | `redis://localhost:6379` |
 | `JWT_SECRET` | Secret key used to sign Admin & Customer JWT auth tokens | **Required** | Medusa Core Authentication | `<secure-random-32-char-string>` |
 | `COOKIE_SECRET` | Secret key used to sign HTTP cookies | **Required** | Medusa Core Cookie Handler | `<secure-random-32-char-string>` |
@@ -27,11 +28,6 @@ This document lists all environment variables used by the **Laptopzone** monorep
 | `S3_SECRET_ACCESS_KEY` | IAM User Secret Key for S3 storage | Optional in dev, **Required** in prod | File S3 Provider | `<aws-secret-access-key>` |
 | `S3_FILE_URL` | Public base URL or CDN domain for uploaded images | Optional in dev, **Required** in prod | File S3 Provider | `https://cdn.laptopzone.co.zw` |
 | `S3_ENDPOINT` | Custom endpoint for S3-compatible providers (R2, MinIO) | Optional | File S3 Provider | `https://s3.af-south-1.amazonaws.com` |
-| `PESEPAY_INTEGRATION_KEY` | Pesepay Merchant Integration Key | Optional in dev, **Required** for payments | Pesepay Payment Provider | `<pesepay-integration-key>` |
-| `PESEPAY_ENCRYPTION_KEY` | Pesepay AES-256 Encryption & Decryption Key | Optional in dev, **Required** for payments | Pesepay Provider & Webhooks | `<32-char-encryption-key>` |
-| `PESEPAY_ENV` | Active Pesepay processing environment | Optional (default: `sandbox`) | Pesepay Payment Provider | `sandbox` or `live` |
-| `PESEPAY_CALLBACK_URL` | Browser redirect URL after Pesepay checkout | Optional | Pesepay Payment Provider | `https://laptopzone.co.zw/zw/payment-callback` |
-| `PESEPAY_WEBHOOK_SECRET` | Signature secret for Pesepay webhooks | Optional | Pesepay Webhook Endpoint | `<webhook-secret>` |
 | `SENDGRID_API_KEY` | SendGrid transactional mail API key | Optional in dev, **Required** for emails | SendGrid Module & Subscribers | `SG.<sendgrid-api-key>` |
 | `SENDGRID_FROM_EMAIL` | Default sender email address | Optional (default: `orders@laptopzone.co.zw`) | SendGrid Module | `orders@laptopzone.co.zw` |
 | `SENDGRID_FROM_NAME` | Default sender display name | Optional (default: `Laptopzone`) | SendGrid Module | `Laptopzone Zimbabwe` |

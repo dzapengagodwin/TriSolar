@@ -117,7 +117,7 @@ export default async function TermsPage() {
           <p className="font-semibold text-gray-900">Accepted Payment Methods:</p>
           <ul className="list-disc pl-5 space-y-1 text-gray-600">
             <li>Visa &amp; Mastercard (processed securely via PCI-DSS compliant payment gateways)</li>
-            <li>Mobile Money (EcoCash USD and local options via integrated gateways such as Pesepay)</li>
+            <li>Mobile Money, where available through the payment methods offered at checkout</li>
             <li>Direct Bank Transfer / Electronic Funds Transfer (orders dispatched upon confirmed clearance)</li>
             <li>Cash on Collection / Point-of-Sale swipe at our Borrowdale store</li>
           </ul>
@@ -233,4 +233,3 @@ export default async function TermsPage() {
     </PolicyPageLayout>
   )
 }
-

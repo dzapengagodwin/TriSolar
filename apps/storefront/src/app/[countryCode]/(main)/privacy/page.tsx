@@ -111,7 +111,7 @@ export default async function PrivacyPage() {
             No Raw Card Data Is Ever Stored on Laptopzone Servers
           </h3>
           <p className="text-xs leading-relaxed text-amber-800">
-            All credit/debit card transactions and mobile wallet authorizations are executed directly through certified, PCI-DSS Level 1 compliant payment gateways (including Pesepay and verified banking partners). We only receive encrypted transaction tokens and confirmation statuses. Your full 16-digit card number, CVV/CVC, and PIN numbers never touch our servers.
+            Card transactions and mobile wallet authorizations are handled by the payment providers selected during checkout. We only receive payment tokens and confirmation statuses. Your full 16-digit card number, CVV/CVC, and PIN numbers are not stored on our servers.
           </p>
         </div>
       </section>
@@ -208,4 +208,3 @@ export default async function PrivacyPage() {
     </PolicyPageLayout>
   )
 }
-

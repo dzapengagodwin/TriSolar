@@ -20,7 +20,6 @@ import {
 } from "@lib/data/cart"
 import {
   paymentInfoMap,
-  isPesepay,
   isManual,
   isStripeLike,
 } from "@lib/constants"
@@ -107,8 +106,8 @@ const OnePageCheckoutForm = ({
     "Pay on Collection is only available for in-store pickup orders. Please select an online payment method for delivery."
 
   // Displayed payment methods:
-  // - In pickup mode: allow ALL payment methods (both Pay On Collection and online payments like Pesepay)
-  // - In shipping/delivery mode: hide Pay On Collection (only show Pesepay / online payments)
+  // - In pickup mode: allow all payment methods, including Pay On Collection
+  // - In shipping/delivery mode: hide Pay On Collection and show online payments
   const displayedPaymentMethods = useMemo(() => {
     if (isPickupSelected) {
       return availablePaymentMethods
@@ -482,9 +481,7 @@ const OnePageCheckoutForm = ({
     ]
   )
 
-  // Auto-switch payment method if current selection is not valid in displayedPaymentMethods
-  // (e.g. user selected Shop Pickup -> Pesepay is hidden -> automatically switch to Pay On Collection
-  //  or user selected Shipping -> Pay On Collection is hidden -> automatically switch to Pesepay / online)
+  // Auto-switch payment method if current selection is not valid in displayedPaymentMethods.
   useEffect(() => {
     const isCurrentValid = displayedPaymentMethods.some(
       (pm) => pm.id === paymentProviderId
@@ -688,12 +685,12 @@ const OnePageCheckoutForm = ({
 
       // Handle Stripe confirmation if ever configured
       if (result.requiresStripeConfirm) {
-        setErrorMessage("Direct card processing is currently unavailable. Please select Pesepay or Pay on Collection.")
+        setErrorMessage("Direct card processing is currently unavailable. Please choose another available payment method.")
         setSubmitting(false)
         return
       }
 
-      // Handle Pesepay or Order Confirmed redirect
+      // Handle order-confirmation redirects.
       if (result.redirectUrl) {
         window.location.href = result.redirectUrl
         return
@@ -714,12 +711,7 @@ const OnePageCheckoutForm = ({
   // Dynamic submit button label based on payment method
   const getSubmitButtonLabel = () => {
     if (submitting) {
-      if (isPesepay(paymentProviderId)) return "Connecting to Pesepay..."
       return "Processing Order..."
-    }
-
-    if (isPesepay(paymentProviderId)) {
-      return "Pay with Pesepay"
     }
 
     if (isStripeLike(paymentProviderId)) {
@@ -1310,11 +1302,6 @@ const OnePageCheckoutForm = ({
                         <span className="text-sm font-semibold text-gray-900 block">
                           {isManualMethod ? "Pay On Collection" : info.title}
                         </span>
-                        {isPesepay(pm.id) && (
-                          <span className="text-xs text-gray-500 block mt-0.5">
-                            EcoCash, OneMoney, Visa, Mastercard, InnBucks &amp; Zimswitch
-                          </span>
-                        )}
                         {isManualMethod && (
                           <span className="text-xs text-gray-500 block mt-0.5">
                             Cash or card swipe in store upon collection

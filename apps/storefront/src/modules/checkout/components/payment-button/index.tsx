@@ -1,6 +1,6 @@
 "use client"
 
-import { isManual, isPesepay, isStripeLike } from "@lib/constants"
+import { isManual, isStripeLike } from "@lib/constants"
 import { placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { useElements, useStripe } from "@stripe/react-stripe-js"
@@ -35,14 +35,6 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
         <StripePaymentButton
           notReady={notReady}
           cart={cart}
-          data-testid={dataTestId}
-        />
-      )
-    case isPesepay(paymentSession?.provider_id):
-      return (
-        <PesepayPaymentButton
-          cart={cart}
-          notReady={notReady}
           data-testid={dataTestId}
         />
       )
@@ -175,105 +167,6 @@ const StripePaymentButton = ({
       <ErrorMessage
         error={errorMessage}
         data-testid="stripe-payment-error-message"
-      />
-    </>
-  )
-}
-
-const PesepayPaymentButton = ({
-  cart,
-  notReady,
-  "data-testid": dataTestId,
-}: {
-  cart: HttpTypes.StoreCart
-  notReady: boolean
-  "data-testid"?: string
-}) => {
-  const [submitting, setSubmitting] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const paymentSession =
-    cart.payment_collection?.payment_sessions?.find(
-      (s) => s.status === "pending" && isPesepay(s.provider_id)
-    ) ||
-    cart.payment_collection?.payment_sessions?.find(
-      (s) => s.status === "pending"
-    ) ||
-    cart.payment_collection?.payment_sessions?.[0]
-  const sessionData = paymentSession?.data as Record<string, unknown> | undefined
-  const redirectUrl =
-    (sessionData?.redirectUrl as string | undefined) ??
-    (sessionData?.redirect_url as string | undefined) ??
-    (sessionData?.payment_url as string | undefined) ??
-    undefined
-
-  // Validate redirect URL to prevent open redirect attacks while allowing all Pesepay endpoints
-  const isValidRedirectUrl = (url: string | undefined): boolean => {
-    if (!url || typeof url !== "string") return false
-    try {
-      const parsedUrl = new URL(url)
-      const isHttp =
-        parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:"
-      const isPesepay =
-        parsedUrl.hostname.endsWith("pesepay.com") ||
-        parsedUrl.hostname.includes("pesepay") ||
-        parsedUrl.hostname === "localhost"
-      return isHttp && isPesepay
-    } catch {
-      return false
-    }
-  }
-
-  const handlePayment = async () => {
-    setSubmitting(true)
-
-    if (!redirectUrl) {
-      setErrorMessage(
-        "Payment session not initialized. Please re-select payment method or refresh the page."
-      )
-      setSubmitting(false)
-      return
-    }
-
-    if (!isValidRedirectUrl(redirectUrl)) {
-      console.warn("Pesepay redirect URL rejected:", redirectUrl)
-      setErrorMessage(
-        `Invalid payment redirect URL (${redirectUrl}). Please contact support.`
-      )
-      setSubmitting(false)
-      return
-    }
-
-    // Redirect to Pesepay's hosted checkout page for customer payment
-    window.location.href = redirectUrl
-  }
-
-  const isButtonDisabled = notReady || submitting || !redirectUrl
-
-  return (
-    <>
-      <button
-        disabled={isButtonDisabled}
-        onClick={handlePayment}
-        data-testid={dataTestId}
-        className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-3.5 px-6 rounded-full text-sm transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        {submitting ? (
-          <>
-            <Spinner size="16" />
-            <span>Redirecting to Pesepay...</span>
-          </>
-        ) : !redirectUrl ? (
-          <>
-            <Spinner size="16" />
-            <span>Initializing Pesepay...</span>
-          </>
-        ) : (
-          <span>Pay with Pesepay</span>
-        )}
-      </button>
-      <ErrorMessage
-        error={errorMessage}
-        data-testid="pesepay-payment-error-message"
       />
     </>
   )

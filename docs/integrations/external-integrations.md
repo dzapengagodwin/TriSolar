@@ -8,7 +8,6 @@
 
 | Service | Category | Integration Type | Active In Production |
 |---|---|---|---|
-| **Pesepay** | Payment Gateway | Custom Medusa Payment Provider (`src/modules/pesepay`) | Yes (Primary Zimbabwean Gateway) |
 | **SendGrid** | Transactional Email | Custom Notification Provider (`src/modules/sendgrid`) | Yes (Orders, Invites, Password Resets) |
 | **AWS S3 / S3-Compatible** | Cloud File Storage | `@medusajs/medusa/file-s3` | Yes (Product & Brand Media) |
 | **Google Analytics 4** | Web Analytics | Next.js Client Script Component (`@modules/analytics`) | Yes (`G-XXXXXXXXXX`) |
@@ -23,26 +22,7 @@
 
 ## 2. Detailed Service Specifications
 
-### 2.1 Pesepay Payment Gateway
-
-- **Purpose**: Process payments in Zimbabwe using local mobile money (EcoCash, OneMoney, Innbucks, Zimswitch) and international Visa/Mastercard.
-- **Where Configured**: `apps/backend/medusa-config.ts` (Payment module options) and database `PesepayConfig` table.
-- **Environment Variables**:
-  - `PESEPAY_INTEGRATION_KEY`: Merchant identification key.
-  - `PESEPAY_ENCRYPTION_KEY`: AES-256 secret key for encrypting and decrypting transaction requests/webhooks.
-  - `PESEPAY_ENV`: `"sandbox"` or `"live"`.
-  - `PESEPAY_CALLBACK_URL`: Direct browser redirect URL upon payment completion (e.g. `https://laptopzone.co.zw/payment-callback`).
-  - `PESEPAY_WEBHOOK_SECRET`: Optional signature verification key for asynchronous webhooks.
-- **Used by**: Medusa backend payment module, Storefront checkout, Storefront payment callback page.
-- **Data Sent**: Currency (`USD`), total amount in cents, merchant transaction reference (`cart_id`), customer phone/email, redirect URL.
-- **Data Received**: Transaction reference, status (`SUCCESS`, `FAILED`, `PENDING`), payment method used, transaction fee.
-- **Failure Behaviour**:
-  - If a user cancels or payment fails, Pesepay redirects with `?status=failed`, displaying a clear error message and allowing the customer to retry without losing their cart.
-  - If the webhook payload cannot be decrypted, a warning is logged and transaction processing falls back to polling or client return verification.
-
----
-
-### 2.2 SendGrid (Twilio)
+### 2.1 SendGrid (Twilio)
 
 - **Purpose**: Delivery of transactional emails for customer order confirmations, admin order notifications, staff invitations, and customer password resets.
 - **Where Configured**: `apps/backend/medusa-config.ts` (Notification module) and `src/modules/sendgrid`.
@@ -61,7 +41,7 @@
 
 ---
 
-### 2.3 AWS S3 / Cloud Storage
+### 2.2 AWS S3 / Cloud Storage
 
 - **Purpose**: Scalable cloud object storage for product photography, variant images, brand logos, and store banners.
 - **Where Configured**: `apps/backend/medusa-config.ts` (File module with `@medusajs/medusa/file-s3`).
@@ -79,7 +59,7 @@
 
 ---
 
-### 2.4 Google Analytics 4
+### 2.3 Google Analytics 4
 
 - **Purpose**: Monitor web traffic, page views, and user engagement on the Next.js storefront.
 - **Where Configured**: Storefront root layout (`apps/storefront/src/app/layout.tsx`) via `@modules/analytics/components/google-analytics`.
@@ -91,7 +71,7 @@
 
 ---
 
-### 2.5 Google Merchant Center
+### 2.4 Google Merchant Center
 
 - **Purpose**: Synchronize live laptop and electronics inventory with Google Shopping ads and organic product listings.
 - **Where Configured**: `apps/backend/src/api/product-feed/route.ts` and `apps/backend/src/workflows/generate-product-feed.ts`.
@@ -105,7 +85,7 @@
 
 ---
 
-### 2.6 WooCommerce & Yoast SEO Importers
+### 2.5 WooCommerce & Yoast SEO Importers
 
 - **Purpose**: One-time or batch migration of legacy product catalog, categories, image attachments, and Yoast SEO metadata from WordPress.
 - **Where Configured**: Admin UI (`/app/woocommerce-migrator` & `/app/yoast-seo-importer`).

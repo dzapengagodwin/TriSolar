@@ -245,7 +245,7 @@ export default async function Footer() {
             <div className="px-3 py-1 flex items-center justify-center">
               <Image
                 src="/payment-methods.webp"
-                alt="Accepted Payment Methods - Visa, Mastercard, PayPal, EcoCash, Pesepay"
+                alt="Accepted payment methods"
                 width={280}
                 height={32}
                 className="h-9 w-auto object-contain"

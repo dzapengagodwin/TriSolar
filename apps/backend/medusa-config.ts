@@ -12,10 +12,6 @@ if (!process.env.SENDGRID_API_KEY) {
   loadEnv(process.env.NODE_ENV || "development", process.cwd())
 }
 
-const hasPesepayConfig =
-  !!process.env.PESEPAY_INTEGRATION_KEY &&
-  !!process.env.PESEPAY_ENCRYPTION_KEY
-
 export default defineConfig({
   plugins: [
     {
@@ -143,7 +139,7 @@ export default defineConfig({
 
     databaseDriverOptions: {
       connection: {
-        ssl: false,
+        ssl: process.env.DATABASE_SSL === "true",
       },
     },
 
@@ -158,13 +154,21 @@ export default defineConfig({
 
   modules: [
     {
+      resolve: "@medusajs/medusa/auth",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/medusa/auth-emailpass",
+            id: "emailpass",
+          },
+        ],
+      },
+    },
+    {
       resolve: "./src/modules/brand",
     },
     {
       resolve: "./src/modules/erpnext",
-    },
-    {
-      resolve: "./src/modules/pesepay-config",
     },
     {
       resolve: "./src/modules/product-recommendation",
@@ -177,27 +181,6 @@ export default defineConfig({
     },
     {
       resolve: "./src/modules/store-settings",
-    },
-
-    {
-      resolve: "@medusajs/medusa/payment",
-      options: {
-        providers: [
-          {
-            resolve: "./src/modules/pesepay",
-            id: "pesepay",
-            options: {
-              integrationKey: process.env.PESEPAY_INTEGRATION_KEY,
-              encryptionKey: process.env.PESEPAY_ENCRYPTION_KEY,
-              environment: process.env.PESEPAY_ENV || "sandbox",
-              webhookSecret: process.env.PESEPAY_WEBHOOK_SECRET,
-              callbackUrl:
-                process.env.PESEPAY_CALLBACK_URL ||
-                "http://localhost:8000/zw/payment-callback",
-            },
-          },
-        ],
-      },
     },
 
     // Local file storage instead of S3.

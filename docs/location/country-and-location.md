@@ -21,7 +21,7 @@ flowchart TD
 
     subgraph MedusaBackend["Medusa Backend Engine"]
         RegionAPI["GET /store/regions"]
-        RegionEntity["Medusa Region ('zw' / Zimbabwe)\nCurrency: USD\nTaxes: 15% VAT\nPayment: Pesepay"]
+        RegionEntity["Medusa Region ('zw' / Zimbabwe)\nCurrency: USD\nTaxes: 15% VAT"]
     end
 
     subgraph CommerceScope["Commerce Operations"]

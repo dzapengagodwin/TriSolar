@@ -74,14 +74,6 @@ Medusa v2 uses file-based routing located under `apps/backend/src/api`:
 
 ### 2.3 Payment & Webhook Endpoints
 
-#### `POST /store/pesepay/webhook`
-- **Purpose**: Handle asynchronous transaction notifications from Pesepay gateway.
-- **Authentication**: None (`export const AUTHENTICATE = false`). Secured via AES-256 decryption using `PESEPAY_ENCRYPTION_KEY`.
-- **Input (JSON Body)**: `{ payload: "<base64-encrypted-string>" }` or raw `{ referenceNumber, transactionStatus }`
-- **Output**: `{ received: true, status: "SUCCESS" | "FAILED" }`
-- **Dependencies**: `processPesepayWebhookWorkflow`
-- **Used by**: Pesepay Payment Gateway.
-
 #### `GET /product-feed` & `GET /store/product-feed`
 - **Purpose**: Serve real-time Google Merchant Center RSS/XML product feed.
 - **Authentication**: None (`export const AUTHENTICATE = false`).
@@ -110,9 +102,7 @@ Medusa v2 uses file-based routing located under `apps/backend/src/api`:
   - Input: `{ brand_id: string | null }`
   - Dependencies: `link-product-brand` workflow.
 
-### 3.3 Pesepay & Notification Settings
-- **`GET/POST /admin/pesepay/settings`**: Read or update runtime Pesepay merchant keys and mode.
-- **`POST /admin/pesepay/test-connection`**: Send an test handshake to Pesepay API to verify credentials.
+### 3.3 Notification Settings
 - **`GET/POST /admin/notification-settings`**: Configure notification recipients for new orders.
 - **`POST /admin/notification-settings/send-test`**: Trigger an immediate test email via SendGrid.
 

@@ -1,6 +1,6 @@
 "use server"
 
-import { isManual, isPesepay, isStripeLike } from "@lib/constants"
+import { isManual, isStripeLike } from "@lib/constants"
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { isPickupShippingOption } from "@lib/util/fulfillment"
@@ -733,30 +733,7 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
       "zw"
 
     // 6. Provider-specific actions
-    // A) Pesepay
-    if (isPesepay(data.payment_provider_id)) {
-      const sessions =
-        paymentSessionRes?.payment_collection?.payment_sessions ||
-        freshCart.payment_collection?.payment_sessions ||
-        []
-      const session = sessions.find((s) => isPesepay(s.provider_id))
-      const sData = (session?.data || {}) as Record<string, unknown>
-      const redirectValue = sData.redirectUrl ||
-        sData.redirect_url ||
-        sData.payment_url
-      const redirectUrl =
-        typeof redirectValue === "string" ? redirectValue : undefined
-
-      if (redirectUrl) {
-        return { success: true, redirectUrl }
-      }
-      return {
-        error:
-          "Pesepay payment gateway URL could not be generated. Please try again or choose another payment method.",
-      }
-    }
-
-    // B) Manual / Pay on Collection
+    // A) Manual / Pay on Collection
     if (
       isManual(data.payment_provider_id) ||
       data.payment_provider_id === "pp_system_default"
@@ -790,7 +767,7 @@ export async function submitOnePageCheckout(data: CheckoutFormData) {
       }
     }
 
-    // C) Stripe
+    // B) Stripe
     if (isStripeLike(data.payment_provider_id)) {
       const sessions =
         paymentSessionRes?.payment_collection?.payment_sessions || []

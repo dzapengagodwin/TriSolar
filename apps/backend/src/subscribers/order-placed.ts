@@ -308,9 +308,7 @@ export default async function orderPlacedHandler({
       tax_label: taxLabel,
       total: finalTotal,
       payment_method:
-        order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("pesepay")
-          ? "Pesepay"
-          : order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("stripe")
+        order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("stripe")
             ? "Credit / Debit Card"
             : order.payment_collections?.[0]?.payments?.[0]?.provider_id?.includes("manual")
               ? "Cash on Delivery"

@@ -16,7 +16,6 @@ flowchart TD
     subgraph ClientLayer["Clients & Frontends"]
         Storefront["Next.js Storefront (:8000)"]
         AdminDashboard["Medusa Admin Dashboard (/app)"]
-        ExternalWebhooks["Pesepay Gateway Webhooks"]
     end
 
     subgraph MedusaServer["Medusa Core Engine (:9000)"]
@@ -37,7 +36,6 @@ flowchart TD
         subgraph CustomModules["Custom Laptopzone Modules"]
             BrandMod["Brand Module"]
             SeoMod["SEO Metadata Module"]
-            PesepayConfigMod["Pesepay Config Module"]
             StoreSettingsMod["Store Settings Module"]
             ReviewsMod["Product Review Module"]
             RecommendationsMod["Product Recommendation Module"]
@@ -48,7 +46,6 @@ flowchart TD
         end
 
         subgraph Providers["Service Providers"]
-            PesepayProvider["Pesepay Payment Provider"]
             SendgridProvider["SendGrid Notification Provider"]
             S3FileProvider["AWS S3 File Provider"]
         end
@@ -59,12 +56,10 @@ flowchart TD
         Redis[(Redis Cache & Event Bus)]
         S3Bucket[(AWS S3 / Cloud Object Storage)]
         SendGridAPI[SendGrid Mail API]
-        PesepayAPI[Pesepay Payment API]
     end
 
     Storefront -->|REST + API Key| API
     AdminDashboard -->|Session / Bearer JWT| API
-    ExternalWebhooks -->|POST /store/pesepay/webhook| API
 
     API --> Workflows
     Workflows --> CoreModules
@@ -76,7 +71,6 @@ flowchart TD
     Subscribers -->|Async Events via Redis| Workflows
     Subscribers --> SendgridProvider
     SendgridProvider --> SendGridAPI
-    PesepayProvider --> PesepayAPI
     S3FileProvider --> S3Bucket
 ```
 
@@ -88,7 +82,7 @@ flowchart TD
 |---|---|---|
 | **Catalog Hierarchy** | Categories, Collections, Tags | Added custom **Brand Module** (`src/modules/brand`) linked via module link `product-brand.ts`. |
 | **Product Attributes** | Standard metadata JSON field | Added dedicated **SEO Metadata Module** (`src/modules/seo`), **Product Reviews** (`src/modules/product-review`), and **Recommendations** (`src/modules/product-recommendation`). |
-| **Payments** | Stripe, Manual, System Default | Custom **Pesepay Module & Payment Provider** (`src/modules/pesepay`) for Zimbabwean payment processing (EcoCash, OneMoney, Zimswitch, Visa/Mastercard). |
+| **Payments** | Providers enabled in Medusa configuration | Payment provider integrations are not bundled with this application. |
 | **Notifications** | Local console or generic notification | Custom **SendGrid Notification Provider** (`src/modules/sendgrid`) with transactional HTML templates for orders, admin alerts, invites, and password resets. |
 | **Media / File Storage** | Local static filesystem | Production uses `@medusajs/medusa/file-s3` pointing to S3-compatible cloud storage. |
 | **Store Settings** | Hardcoded or basic store name | Custom **Store Settings Module** (`src/modules/store-settings`) storing notification emails, brand metadata, and operational configs in Postgres. |
@@ -123,19 +117,15 @@ Custom modules are registered in [`medusa-config.ts`](file:///c:/Users/kundai/De
   - `metadata`: JSON storage
   - Unique composite index on `(entity_type, entity_id)`.
 
-### 3.3 Pesepay Configuration Module (`src/modules/pesepay-config`)
-- **Model**: `PesepayConfig` (`models/pesepay-config.ts`)
-  - Stores merchant runtime configuration, active environment (`sandbox` vs `live`), encryption keys, and webhook secrets dynamically in the database.
-
-### 3.4 Product Recommendation Module (`src/modules/product-recommendation`)
+### 3.3 Product Recommendation Module (`src/modules/product-recommendation`)
 - **Model**: `ProductRecommendation` (`models/product-recommendation.ts`)
   - Handles curated upsells, cross-sells, related accessories, and laptop bundles per product with rank/ordering support.
 
-### 3.5 Product Review Module (`src/modules/product-review`)
+### 3.4 Product Review Module (`src/modules/product-review`)
 - **Model**: `Review` (`models/review.ts`)
   - Customer product reviews with rating (1-5), review title, content, verified buyer status, and approval workflow status (`pending`, `approved`, `rejected`).
 
-### 3.6 Store Settings Module (`src/modules/store-settings`)
+### 3.5 Store Settings Module (`src/modules/store-settings`)
 - **Model**: `StoreSettings` (`models/store-settings.ts`)
   - Singleton configuration record storing order alert email recipients, admin dashboard URL, support contact details, and custom store properties.
 
@@ -159,8 +149,6 @@ apps/backend/src/workflows/
 ├── delete-product-recommendation.ts
 ├── reorder-product-recommendations.ts
 ├── generate-product-feed.ts
-├── process-pesepay-webhook.ts
-├── set-pesepay-config.ts
 ├── set-store-settings.ts
 ├── upsert-entity-seo.ts
 ├── upsert-product-seo.ts
@@ -170,7 +158,6 @@ apps/backend/src/workflows/
 
 ### Key Workflows:
 1. **`generateProductFeedWorkflow`**: Reads the catalog, cleans descriptions, validates variants, calculates pricing, resolves brand links, and produces Google Merchant Center XML.
-2. **`processPesepayWebhookWorkflow`**: Decrypts AES-256 payload, matches cart/order reference, verifies transaction status, captures payment or marks status, and triggers order completion if needed.
 3. **`importWooCommerceProductsWorkflow`**: Connects to legacy WooCommerce REST API, maps products, creates categories/variants, downloads media to S3, and links SEO metadata.
 4. **`importYoastSeoWorkflow`**: Extracts Yoast SEO meta from WordPress and populates the `seo_metadata` table for matching handles.
 
@@ -199,7 +186,6 @@ Laptopzone heavily extends Medusa's standard Vite-powered admin dashboard (`src/
 - **Routes**:
   - `/app/brands`: Complete Brand management interface (add, edit, delete, assign logos).
   - `/app/bulk-products`: Batch product editor (status, category, brand, and pricing).
-  - `/app/pesepay`: Interactive Pesepay settings and live connection test suite.
   - `/app/settings/branding`: Store logo, favicon, and login page branding.
   - `/app/settings/order-notifications`: Notification recipient emails and SendGrid test mailer.
   - `/app/woocommerce-migrator`: WordPress/WooCommerce live import console.

@@ -666,7 +666,7 @@ describe("SendgridNotificationService", () => {
       shipping_total: 10,
       tax_total: 0,
       total: 1260,
-      payment_method: "Pesepay (EcoCash)",
+      payment_method: "Mobile Money",
       payment_status: "Paid",
       delivery_method: "Harare Same-Day Delivery",
       shipping_address: {
@@ -695,7 +695,7 @@ describe("SendgridNotificationService", () => {
       expect(result.html).toContain("Lenovo ThinkPad E14 Gen 5")
       expect(result.html).toContain("16GB RAM / 512GB SSD")
       expect(result.html).toContain("Qty 2 &times; $650.00")
-      expect(result.html).toContain("Pesepay (EcoCash)")
+      expect(result.html).toContain("Mobile Money")
       expect(result.html).toContain("Harare Same-Day Delivery")
       expect(result.html).toContain("View in Medusa Admin")
       expect(result.html).toContain("http://localhost:9000/app/orders/order_12345")
@@ -721,4 +721,3 @@ describe("SendgridNotificationService", () => {
     })
   })
 })
-

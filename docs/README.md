@@ -40,7 +40,7 @@ docs/
 │   └── data-flows.md                       # Sequence diagrams for catalog, cart, checkout, and orders
 │
 ├── integrations/
-│   └── external-integrations.md            # Pesepay, SendGrid, AWS S3, Google Analytics & Merchant
+│   └── external-integrations.md            # SendGrid, AWS S3, Google Analytics & Merchant
 │
 ├── deployment/
 │   └── architecture.md                     # Production topology, systemd services, reverse proxy & ports
@@ -78,7 +78,6 @@ flowchart TD
     end
 
     subgraph Integrations["Third-Party Integrations"]
-        Pesepay["Pesepay Payment Gateway"]
         SendGrid["SendGrid Transactional Email"]
         GA4["Google Analytics 4"]
     end
@@ -97,7 +96,6 @@ flowchart TD
     Medusa --> Postgres
     Medusa --> Redis
     Medusa --> S3
-    Medusa --> Pesepay
     Medusa --> SendGrid
     GoogleBot -->|/product-feed| Medusa
     GoogleBot -->|/sitemap.xml| Storefront
@@ -111,13 +109,13 @@ flowchart TD
 2. **[Repository Structure](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/repository-structure.md)**: Monorepo folder layout, Turborepo tasks, and conventions.
 3. **[Technology Stack](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/technology-stack.md)**: Exact versions for Node, Next.js, Medusa, React, Tailwind, and plugins.
 4. **[Storefront Routing & Components](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/storefront/routing-and-components.md)**: App router routes, dynamic segments, catalog toolbar, and UI components.
-5. **[Medusa Backend Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/medusa/architecture.md)**: Core vs custom modules (Brand, SEO, Pesepay, Reviews), workflows, subscribers, and admin widgets.
+5. **[Medusa Backend Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/medusa/architecture.md)**: Core vs custom modules (Brand, SEO, Reviews), workflows, subscribers, and admin widgets.
 6. **[Product Architecture & Lifecycle](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/products/architecture.md)**: Product models, variant strategies, AWS S3 image storage, and pricing engine.
 7. **[SEO Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/seo/architecture.md)**: Dynamic metadata, Canonical URL engine, Schema.org JSON-LD, multi-sitemap, and Google Merchant Center feeds.
 8. **[Country & Location Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/location/country-and-location.md)**: Clean URL redirection, geolocation resolution hierarchy, and planned Zimbabwean town delivery selectors.
 9. **[API Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/api/architecture.md)**: Complete guide to all Storefront, Admin, and Webhook REST endpoints.
-10. **[Data Flow Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/data-flows/data-flows.md)**: Sequence diagrams for catalog ingestion, cart management, Pesepay checkout, and order notification dispatches.
-11. **[External Integrations](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/integrations/external-integrations.md)**: Specifications for Pesepay, SendGrid, AWS S3, Google Analytics 4, and migration utilities.
+10. **[Data Flow Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/data-flows/data-flows.md)**: Sequence diagrams for catalog ingestion, cart management, checkout, and order notification dispatches.
+11. **[External Integrations](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/integrations/external-integrations.md)**: Specifications for SendGrid, AWS S3, Google Analytics 4, and migration utilities.
 12. **[Environment Variables](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/ENVIRONMENT.md)**: Full reference table of all backend, storefront, and CI/CD secrets and configuration flags.
 13. **[Deployment Architecture](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/deployment/architecture.md)**: Host configuration, systemd services, reverse proxy ports, and maintenance procedures.
 14. **[CI/CD Pipelines](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/docs/ci-cd/pipelines.md)**: GitHub Actions continuous integration and SSH-based zero-downtime deployment workflows.

@@ -194,7 +194,7 @@ export default async function ReturnsPage() {
             <span className="font-semibold text-gray-900">Card Payments (Visa / Mastercard):</span> Refund reflected on your card account within 5 to 10 banking days depending on your issuing bank.
           </li>
           <li>
-            <span className="font-semibold text-gray-900">Mobile Money (EcoCash / Pesepay):</span> Refund credited to your mobile wallet within 24 to 48 hours following approval.
+            <span className="font-semibold text-gray-900">Mobile Money:</span> Refund credited to your mobile wallet within 24 to 48 hours following approval.
           </li>
           <li>
             <span className="font-semibold text-gray-900">Direct Bank Transfer (EFT):</span> Processed within 2 to 3 business days.

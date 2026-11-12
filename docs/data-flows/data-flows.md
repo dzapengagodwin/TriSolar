@@ -64,7 +64,7 @@ sequenceDiagram
 
 ---
 
-## 3. Checkout & Payment Flow (Pesepay Gateway)
+## 3. Checkout & Payment Flow
 
 ```mermaid
 sequenceDiagram
@@ -72,34 +72,17 @@ sequenceDiagram
     actor Customer as Shopper
     participant Storefront as Next.js Storefront
     participant Medusa as Medusa Backend
-    participant PesepayProvider as Pesepay Payment Provider
-    participant PesepayGateway as Pesepay API (Sandbox / Live)
-    participant WebhookHandler as POST /store/pesepay/webhook
+    participant PaymentProvider as Configured Payment Provider
 
     Customer->>Storefront: Fills shipping address & selects Delivery method
     Storefront->>Medusa: POST /store/carts/:id (shipping_address)
     Storefront->>Medusa: POST /store/carts/:id/shipping-methods
-    Customer->>Storefront: Chooses "Pesepay" (EcoCash, OneMoney, Card)
-    Storefront->>Medusa: POST /store/payment-collections/:id/payment-sessions (provider_id: "pesepay")
-    Medusa->>PesepayProvider: authorizePayment()
-    PesepayProvider->>PesepayGateway: Initiates transaction with reference & returnUrl
-    PesepayGateway-->>PesepayProvider: Returns redirectUrl & transaction reference
-    PesepayProvider-->>Medusa-->>Storefront: Return redirectUrl
-    Storefront-->>Customer: Redirect to Pesepay secure payment gateway
-    Customer->>PesepayGateway: Completes PIN / OTP mobile money authorization
-
-    par Direct Callback / Return
-        PesepayGateway-->>Customer: Redirect to /payment-callback?cart_id=...&status=SUCCESS
-        Customer->>Storefront: Lands on /payment-callback
-        Storefront->>Medusa: POST /store/carts/:id/complete
-        Medusa-->>Storefront: Returns confirmed Order object
-        Storefront-->>Customer: Redirect to /order/confirmed/[id]
-    and Asynchronous Webhook
-        PesepayGateway->>WebhookHandler: POST /store/pesepay/webhook (AES-256 payload)
-        WebhookHandler->>WebhookHandler: Decrypt payload using PESEPAY_ENCRYPTION_KEY
-        WebhookHandler->>Medusa: Run processPesepayWebhookWorkflow
-        Medusa->>Medusa: Verify payment status & capture payment
-    end
+    Customer->>Storefront: Selects a payment method offered at checkout
+    Storefront->>Medusa: Initiates the selected payment session
+    Medusa->>PaymentProvider: Processes or authorizes payment
+    PaymentProvider-->>Medusa: Returns payment status
+    Medusa-->>Storefront: Returns session or order result
+    Storefront-->>Customer: Shows confirmation or payment status
 ```
 
 ---

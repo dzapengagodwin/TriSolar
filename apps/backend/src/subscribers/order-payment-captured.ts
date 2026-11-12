@@ -59,7 +59,6 @@ export default async function orderPaymentCapturedHandler({
     const rawProvider = (order as any).payment_collections?.[0]?.payments?.[0]?.provider_id
     const formatPaymentMethod = (providerId?: string) => {
       if (!providerId) return undefined
-      if (providerId.includes("pesepay")) return "Pesepay"
       if (providerId.includes("stripe")) return "Credit / Debit Card"
       if (providerId.includes("manual")) return "Cash on Delivery"
       return providerId

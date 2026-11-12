@@ -18,9 +18,9 @@ The repository is organized as a Turborepo workspace:
 
 ## 2. Core Features & Customizations
 
-### Zimbabwean Payment Processing (Pesepay)
-- Native integration with **Pesepay** supporting EcoCash, OneMoney, Zimswitch, and Visa/Mastercard.
-- Synchronous browser callback handling (`/payment-callback`) and asynchronous AES-256 encrypted webhook verification (`/store/pesepay/webhook`).
+### Checkout & Payments
+- Payment methods are configured through the Medusa payment module.
+- Store pickup supports the configured Pay on Collection option.
 
 ### Transactional Email Automation (SendGrid)
 - Automated dispatch of responsive HTML customer order receipts and operational admin notifications.
