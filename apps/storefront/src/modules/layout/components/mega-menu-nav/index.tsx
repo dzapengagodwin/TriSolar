@@ -96,8 +96,8 @@ export default function MegaMenuNav() {
               }}
               aria-expanded={isOpen}
               aria-controls={menuPanelId}
-              className={`px-3.5 py-2 text-white transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-semibold cursor-pointer rounded-md ${
-                isOpen ? "bg-gray-800" : "hover:bg-gray-800"
+              className={`px-3.5 py-2 text-[#0B1B36] transition-colors uppercase tracking-wider text-[11px] flex items-center gap-1 font-semibold cursor-pointer rounded-md ${
+                isOpen ? "bg-blue-50 text-blue-700" : "hover:bg-blue-50 hover:text-blue-700"
               }`}
             >
               <span>{menu.label}</span>
@@ -126,7 +126,7 @@ export default function MegaMenuNav() {
             href={link.href}
             onClick={closeMenu}
             onMouseEnter={closeMenu}
-            className="whitespace-nowrap rounded-md px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+            className="whitespace-nowrap rounded-md px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-[#0B1B36] transition-colors hover:bg-blue-50 hover:text-blue-700"
           >
             {link.label}
           </LocalizedClientLink>
@@ -138,7 +138,7 @@ export default function MegaMenuNav() {
         href="/shop"
         onClick={closeMenu}
         onMouseEnter={closeMenu}
-        className="flex items-center gap-1.5 text-primary hover:text-primary-hover hover:bg-gray-800 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold rounded-md ml-auto shrink-0"
+        className="flex items-center gap-1.5 text-blue-700 hover:text-blue-800 hover:bg-blue-50 px-3.5 py-2 transition-colors uppercase tracking-wider text-[11px] font-semibold rounded-md ml-auto shrink-0"
       >
         <span>Hot Deals</span>
         <svg
