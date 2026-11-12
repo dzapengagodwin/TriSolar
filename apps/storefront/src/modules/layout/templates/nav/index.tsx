@@ -50,9 +50,7 @@ export default async function Nav({
               {/* Left: Call Us */}
               <div className="flex items-center gap-1 shrink-0">
                 <span className="text-gray-500">Technology that powers your world</span>
-                <a href="tel:+2638612600600" className="hover:underline font-medium hover:text-primary transition-colors">
-                  Shop technology and IT solutions
-                </a>
+                <span className="font-medium text-[#0B1B36]">Laptops. Networking. Technology.</span>
               </div>
 
               {/* Center: Technology retail */}
@@ -77,11 +75,11 @@ export default async function Nav({
               {/* Right: IT Solutions, Shop Products, WhatsApp */}
               <div className="flex items-center gap-x-3.5 shrink-0">
                 <LocalizedClientLink
-                  href="/contact-us"
+                  href="/it-solutions"
                   className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
                 >
                   <MapPin size="13" className="text-primary shrink-0" />
-                  <span>Find our Store</span>
+                  <span>IT Solutions</span>
                 </LocalizedClientLink>
 
                 <span className="text-gray-300">|</span>
@@ -96,17 +94,7 @@ export default async function Nav({
 
                 <span className="text-gray-300">|</span>
 
-                <div className="flex items-center gap-1 shrink-0">
-                  <span className="text-gray-500">TRITECH</span>
-                  <a
-                    href="https://wa.me/263772953946"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:underline font-medium hover:text-primary transition-colors"
-                  >
-                    Laptops. Networking. Technology.
-                  </a>
-                </div>
+                <LocalizedClientLink href="/contact-us" className="font-medium hover:text-primary transition-colors">Contact Us</LocalizedClientLink>
               </div>
             </div>
           </div>
