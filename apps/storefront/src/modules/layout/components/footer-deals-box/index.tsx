@@ -39,7 +39,7 @@ export default function FooterDealsBox() {
       }
 
       setStatus("success")
-      setMessage(data.message || "Thank you for subscribing to Laptopzone deals!")
+      setMessage(data.message || "Thank you for subscribing to TRITECH updates!")
       setEmail("")
     } catch {
       setStatus("error")
