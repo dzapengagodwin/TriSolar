@@ -75,7 +75,7 @@ export default function ITSolutionsPage() {
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
-            <QuoteRequestForm destinationEmail={process.env.NEXT_PUBLIC_QUOTE_EMAIL} />
+            <QuoteRequestForm />
           </div>
         </div>
       </section>
