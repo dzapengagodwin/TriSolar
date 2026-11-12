@@ -95,6 +95,8 @@ export default async function Nav({
                 <span className="text-gray-300">|</span>
 
                 <LocalizedClientLink href="/contact-us" className="font-medium hover:text-primary transition-colors">Contact Us</LocalizedClientLink>
+                <span className="text-gray-300">|</span>
+                <a href="https://wa.me/263784721912" target="_blank" rel="noopener noreferrer" className="font-semibold text-green-700 hover:text-green-600 transition-colors">WhatsApp: 078 472 1912</a>
               </div>
             </div>
           </div>
