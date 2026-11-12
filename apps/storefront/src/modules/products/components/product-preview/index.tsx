@@ -95,9 +95,9 @@ export default function ProductPreview({
     return (
       <div
         data-testid="product-wrapper"
-        className="group bg-white p-4 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative transition-all duration-200 shadow-xs hover:shadow-md w-full"
+        className="group relative flex w-full flex-col items-start justify-between gap-5 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-slate-900/5 sm:flex-row sm:items-center sm:p-5"
       >
-        <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
+        <div className="relative flex w-full shrink-0 items-center justify-center sm:w-44">
           {isSale && (
             <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
               {discountText}
@@ -105,7 +105,7 @@ export default function ProductPreview({
           )}
 
           <LocalizedClientLink href={productHref} className="block w-full">
-            <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
+            <div className="relative mx-auto flex h-40 w-full max-w-[190px] items-center justify-center overflow-hidden rounded-xl bg-slate-50 sm:mx-0 sm:h-36 sm:w-36">
               <Thumbnail
                 thumbnail={variantImage}
                 images={variantImages}
@@ -115,21 +115,21 @@ export default function ProductPreview({
                   title: displayTitle,
                   brand,
                 })}
-                className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+                className="h-full w-full !rounded-xl !border-0 !bg-transparent !p-2 !shadow-none !aspect-auto transition-transform duration-500 group-hover:scale-105"
                 objectFit="contain"
               />
             </div>
           </LocalizedClientLink>
         </div>
 
-        <div className="flex-1 space-y-2 min-w-0">
-          <div className="text-[11px] font-medium text-gray-500">
+        <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="inline-flex max-w-full rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">
             {categoriesString}
           </div>
 
           <LocalizedClientLink href={productHref}>
             <h3
-              className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="line-clamp-2 text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-700 sm:text-base"
               data-testid="product-title"
             >
               {displayTitle}
@@ -137,7 +137,7 @@ export default function ProductPreview({
           </LocalizedClientLink>
 
           {product.description && (
-            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-normal">
+            <p className="line-clamp-2 text-xs font-normal leading-relaxed text-slate-500">
               {product.description}
             </p>
           )}
@@ -152,7 +152,7 @@ export default function ProductPreview({
                 return (
                   <span
                     key={option.id}
-                    className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
+                    className="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] font-medium text-slate-600"
                   >
                     {value ? `${option.title}: ${value}` : option.title}
                   </span>
@@ -162,7 +162,7 @@ export default function ProductPreview({
           )}
         </div>
 
-        <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
+        <div className="flex w-full shrink-0 flex-col justify-center gap-3 border-t border-slate-100 pt-4 sm:w-48 sm:items-end sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
           <div className="w-full space-y-1.5">
@@ -188,9 +188,9 @@ export default function ProductPreview({
   return (
     <div
       data-testid="product-wrapper"
-      className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative transition-all duration-200 shadow-xs hover:shadow-md"
+      className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-slate-900/5 sm:p-4"
     >
-      <div className="relative mb-3 flex items-center justify-center">
+      <div className="relative mb-4 flex items-center justify-center">
         {isSale && (
           <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
             {discountText}
@@ -198,7 +198,7 @@ export default function ProductPreview({
         )}
 
         <LocalizedClientLink href={productHref} className="block w-full">
-          <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
+          <div className="relative mx-auto flex aspect-square w-full max-w-none items-center justify-center overflow-hidden rounded-xl bg-slate-50">
             <Thumbnail
               thumbnail={variantImage}
               images={variantImages}
@@ -208,7 +208,7 @@ export default function ProductPreview({
                 title: displayTitle,
                 brand,
               })}
-              className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+              className="h-full w-full !rounded-xl !border-0 !bg-transparent !p-2 !shadow-none !aspect-auto transition-transform duration-500 group-hover:scale-105"
               objectFit="contain"
             />
           </div>
@@ -217,13 +217,13 @@ export default function ProductPreview({
 
       <div className="flex-1 flex flex-col justify-between">
         <div className="space-y-1">
-          <div className="text-[11px] font-medium text-gray-500 line-clamp-1">
+          <div className="mb-1 inline-flex max-w-full rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-blue-700">
             {categoriesString}
           </div>
 
           <LocalizedClientLink href={productHref}>
             <h3
-              className="text-[13px] sm:text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="line-clamp-2 text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-700"
               data-testid="product-title"
             >
               {displayTitle}
@@ -231,10 +231,10 @@ export default function ProductPreview({
           </LocalizedClientLink>
         </div>
 
-        <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
+        <div className="mt-4 space-y-3 border-t border-slate-100 pt-3">
           {priceInfo && <PreviewPrice price={priceInfo} />}
 
-          <div className="space-y-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+          <div className="space-y-2">
             <QuickAddToCart
               product={product}
               variant={variant}
