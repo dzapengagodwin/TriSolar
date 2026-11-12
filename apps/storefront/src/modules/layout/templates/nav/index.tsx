@@ -57,7 +57,7 @@ export default async function Nav({
 
               {/* Center: Technology retail */}
               <div className="flex items-center gap-1.5 text-center font-medium shrink-0">
-                <span>Free Nationwide Delivery</span>
+                <span>Technology retail</span>
                 <svg
                   className="w-3.5 h-3.5 text-primary inline-block shrink-0"
                   fill="none"
@@ -71,7 +71,7 @@ export default async function Nav({
                     d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.175V3.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v10.875m12 0H2.25"
                   />
                 </svg>
-                <span>and business IT services</span>
+                <span>Business IT solutions</span>
               </div>
 
               {/* Right: IT Solutions, Shop Products, WhatsApp */}
@@ -188,7 +188,7 @@ export default async function Nav({
           <>
 
         {/* Row 3: Sub-Navigation Bar with Category Dropdown and Mega Menu */}
-        <nav className="bg-black  border-black-300 hidden small:block text-white">
+        <nav className="bg-[#07152E] border-[#07152E] hidden small:block text-white">
           <div className="content-container flex items-center justify-between text-xs font-semibold py-1 relative">
             <div className="flex items-center gap-x-2 flex-1">
               {/* Browse All Categories Button */}
