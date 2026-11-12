@@ -44,13 +44,13 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
 
   return (
     <div ref={dropdownRef} className="relative">
-      {/* Category Toggle Button (Orange with Hamburger icon) */}
+      {/* Category toggle button */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-semibold transition-all cursor-pointer relative z-50 shadow-sm ${
           isOpen
-            ? "bg-black text-white"
-            : "bg-black text-white hover:bg-gray rounded-b-xl"
+            ? "bg-blue-700 text-white"
+            : "bg-blue-600 text-white hover:bg-blue-700 rounded-b-xl"
         }`}
         aria-expanded={isOpen}
       >
