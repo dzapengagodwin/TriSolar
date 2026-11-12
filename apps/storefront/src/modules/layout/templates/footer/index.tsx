@@ -14,7 +14,7 @@ export default async function Footer() {
 
   return (
     <footer
-      className="bg-[#212121] text-gray-300 w-full pt-14 text-xs font-normal"
+      className="bg-[#07152E] text-slate-300 w-full pt-14 text-xs font-normal"
       suppressHydrationWarning
     >
       <div
@@ -96,7 +96,7 @@ export default async function Footer() {
               </div>
 
               <div>
-                <span className="block text-[11px] text-gray-400 font-medium tracking-wide">
+                <span className="block text-[11px] text-slate-400 font-medium tracking-wide">
                   Technology that powers your business
                 </span>
                 <a
@@ -113,13 +113,13 @@ export default async function Footer() {
               <h3 className="text-white font-bold text-xs tracking-wide">
                 Contact Info
               </h3>
-              <p className="text-gray-400 text-xs leading-relaxed max-w-sm">
+              <p className="text-slate-400 text-xs leading-relaxed max-w-sm">
                 Laptops. Networking. Technology.
               </p>
-              <a href="https://wa.me/263784721912" target="_blank" rel="noopener noreferrer" className="block text-gray-300 hover:text-white transition-colors">
+              <a href="https://wa.me/263784721912" target="_blank" rel="noopener noreferrer" className="block text-slate-300 hover:text-white transition-colors">
                 WhatsApp: 078 472 1912
               </a>
-              <a href="mailto:godwindzapenga06@gmail.com" className="block break-all text-gray-300 hover:text-white transition-colors">
+              <a href="mailto:godwindzapenga06@gmail.com" className="block break-all text-slate-300 hover:text-white transition-colors">
                 godwindzapenga06@gmail.com
               </a>
             </div>
@@ -130,7 +130,7 @@ export default async function Footer() {
             <h3 className="text-white font-bold text-sm tracking-wide">
               Categories
             </h3>
-            <ul className="space-y-2.5 text-gray-400 pt-1">
+            <ul className="space-y-2.5 text-slate-400 pt-1">
               {topCategories.map((cat) => (
                 <li key={cat.id}>
                   <LocalizedClientLink
@@ -150,7 +150,7 @@ export default async function Footer() {
               Customer Care
             </h3>
 
-            <ul className="space-y-2.5 text-gray-400 pt-1">
+            <ul className="space-y-2.5 text-slate-400 pt-1">
               <li>
                 <LocalizedClientLink
                   href="/account"
@@ -227,11 +227,11 @@ export default async function Footer() {
 
       {/* Bottom Bar: Copyright & Payment Badges */}
       <div
-        className="bg-[#181818] border-t border-[#2d2d2d] py-5"
+        className="bg-[#061126] border-t border-white/10 py-5"
         suppressHydrationWarning
       >
         <div
-          className="content-container flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-gray-400"
+          className="content-container flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-slate-400"
           suppressHydrationWarning
         >
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
