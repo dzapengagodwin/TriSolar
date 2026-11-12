@@ -3,10 +3,10 @@
 @import "tailwindcss/utilities";
 
 :root {
-  --primary: #F9501F;
-  --primary-hover: #D83D0F;
-  --primary-rgb: 249 80 31;
-  --theme-grey: #646464;
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-rgb: 37 99 235;
+  --theme-grey: #64748B;
 }
 
 @layer utilities {
