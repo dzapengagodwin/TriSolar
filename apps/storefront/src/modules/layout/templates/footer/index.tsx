@@ -39,7 +39,7 @@ export default async function Footer() {
             <LocalizedClientLink href="/" className="block w-fit">
               <Image
                 src="/white.png"
-                alt="Laptopzone"
+                alt="TRITECH"
                 width={150}
                 height={75}
                 className="h-auto w-[150px] object-contain"
@@ -102,13 +102,13 @@ export default async function Footer() {
 
               <div>
                 <span className="block text-[11px] text-gray-400 font-medium tracking-wide">
-                  Got Questions? Call us!
+                  Technology that powers your business
                 </span>
                 <a
-                  href="tel:+2638612600600"
+                  href="/contact-us"
                   className="block text-base font-bold text-white tracking-tight mt-0.5 hover:text-primary transition-colors"
                 >
-                  +263 8612 600 600
+                  Contact our team
                 </a>
               </div>
             </div>
@@ -119,7 +119,7 @@ export default async function Footer() {
                 Contact Info
               </h3>
               <p className="text-gray-400 text-xs leading-relaxed max-w-sm">
-                64 Ridgeway, Harare, Borrowdale, Zimbabwe
+                Laptops. Networking. Technology.
               </p>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default async function Footer() {
         >
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
             <div>
-              &copy; <span className="text-white font-semibold">Laptopzone</span>{" "}
+              &copy; <span className="text-white font-semibold">TRITECH</span>{" "}
               - All Rights Reserved
             </div>
           </div>
