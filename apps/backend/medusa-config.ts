@@ -86,6 +86,9 @@ export default defineConfig({
   },
   modules: [
     {
+      resolve: "./src/modules/quote-request",
+    },
+    {
       resolve: "./src/modules/brand",
     },
     {
