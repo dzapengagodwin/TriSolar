@@ -1,4 +1,4 @@
-name: LaptopZone CD
+name: TriTech CD
 
 on:
   push:
@@ -35,7 +35,7 @@ jobs:
             echo "=== Updating source ==="
 
             git remote set-url origin \
-              https://github.com/Cloudworxzw/laptopzone-medusa.git
+              https://github.com/dzapengagodwin/TriSolar.git
 
             git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w 0)" \
               fetch origin main
@@ -52,10 +52,10 @@ jobs:
             sudo systemctl restart medusa
 
             echo "=== Restarting Storefront ==="
-            sudo systemctl restart laptopzone-storefront
+            sudo systemctl restart tritech-storefront
 
             echo "=== Checking services ==="
             sudo systemctl is-active --quiet medusa
-            sudo systemctl is-active --quiet laptopzone-storefront
+            sudo systemctl is-active --quiet tritech-storefront
 
             echo "=== Deployment successful ==="

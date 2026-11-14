@@ -3,21 +3,15 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
 import { HttpTypes } from "@medusajs/types"
-import { HOMEPAGE_FEATURED_CATEGORIES } from "@lib/constants/categories"
 import { getCategoryPublicPath } from "@lib/seo/canonical"
 import { useRef } from "react"
 import { ChevronLeft, ChevronRight } from "@medusajs/icons"
 
 export default function TopCategories({
-  categories = HOMEPAGE_FEATURED_CATEGORIES,
+  categories = [],
 }: {
   categories?: HttpTypes.StoreProductCategory[]
 }) {
-  const displayCategories =
-    categories && categories.length > 0
-      ? categories
-      : HOMEPAGE_FEATURED_CATEGORIES
-
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const handleScroll = (direction: "left" | "right") => {
@@ -40,7 +34,7 @@ export default function TopCategories({
           </h2>
           <LocalizedClientLink
             href="/shop"
-            className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-laptopzone-orange hover:text-laptopzone-navy transition-colors inline-flex items-center gap-1"
+            className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-TriTech-orange hover:text-TriTech-navy transition-colors inline-flex items-center gap-1"
           >
             Browse All →
           </LocalizedClientLink>
@@ -61,7 +55,7 @@ export default function TopCategories({
             ref={scrollContainerRef}
             className="flex items-start gap-4 sm:gap-6 md:gap-8 overflow-x-auto no-scrollbar scroll-smooth py-2 px-10"
           >
-            {displayCategories.map((cat) => {
+            {categories.map((cat) => {
               const imageSrc =
                 (cat.metadata?.image as string) ||
                 `/top-categories/${cat.handle}.webp`
@@ -78,6 +72,7 @@ export default function TopCategories({
                       <Image
                         src={imageSrc}
                         alt={cat.name}
+                        unoptimized
                         fill
                         sizes="(max-width: 640px) 112px, (max-width: 768px) 128px, 144px"
                         className="object-contain object-center group-hover:scale-108 transition-transform duration-300 drop-shadow-2xs"

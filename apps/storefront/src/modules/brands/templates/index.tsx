@@ -54,7 +54,7 @@ export default async function BrandTemplate({
           },
           countryCode,
         }).catch(() => ({ response: { products: [], count: 0 } })),
-    listCategories({ limit: 50 }).catch(() => []),
+    listCategories({ limit: 50 }),
   ])
 
   const totalProductsCount =
@@ -79,6 +79,7 @@ export default async function BrandTemplate({
                 <Image
                   src={brandLogo}
                   alt={`${brand.name} logo`}
+                  unoptimized
                   fill
                   sizes="96px"
                   className="object-contain p-2"

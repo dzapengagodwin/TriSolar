@@ -52,6 +52,7 @@ export default function BrandDirectoryTemplate({
                   <Image
                     src={brand.logo}
                     alt={`${brand.name} logo`}
+                    unoptimized
                     fill
                     sizes="(max-width: 640px) 45vw, (max-width: 1024px) 25vw, 160px"
                     className="object-contain object-center group-hover:scale-105 transition-transform duration-300"

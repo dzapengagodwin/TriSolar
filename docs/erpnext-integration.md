@@ -1,8 +1,8 @@
-# ERPNext Integration Guide for Laptopzone Medusa
+# ERPNext Integration Guide for TriTech Medusa
 
 ## 1. Overview & Architecture
 
-The ERPNext Integration in Laptopzone Medusa is designed for safe, deterministic, and audited inventory synchronization between ERPNext and Medusa v2 (`@medusajs/medusa@2.20.1`).
+The ERPNext Integration in TriTech Medusa is designed for safe, deterministic, and audited inventory synchronization between ERPNext and Medusa v2 (`@medusajs/medusa@2.20.1`).
 
 ### Core Design Principles
 
@@ -29,10 +29,10 @@ Add the following variables to `apps/backend/.env` (documented in `apps/backend/
 
 ```env
 # ERPNext Integration
-ERPNEXT_BASE_URL=https://erp.laptopzone.co.zw
+ERPNEXT_BASE_URL=https://erp.tritech.example
 ERPNEXT_API_KEY=your_frappe_api_key
 ERPNEXT_API_SECRET=your_frappe_api_secret
-ERPNEXT_DEFAULT_COMPANY=Laptopzone
+ERPNEXT_DEFAULT_COMPANY=TriTech
 ERPNEXT_DEFAULT_WAREHOUSE=Stores - LZ
 ```
 

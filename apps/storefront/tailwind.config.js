@@ -30,7 +30,7 @@ module.exports = {
           "orange-hover": "var(--primary-hover)",
           grey: "var(--theme-grey)",
         },
-        laptopzone: {
+        TriTech: {
           black: "#141414",
           dark: "#1A1A1A",
           navy: "#111827",

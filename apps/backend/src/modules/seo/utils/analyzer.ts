@@ -33,12 +33,12 @@ function normalizeForSearch(text?: string | null): string {
 export function analyzeProductSeo(
   input: ProductSeoAnalysisInput
 ): SeoAnalysisResult {
-  const { product, seo, storefrontUrl = "https://laptopzone.co.zw" } = input
+  const { product, seo, storefrontUrl = "https://tritech.example" } = input
 
   const checks: SeoCheck[] = []
 
   const baseTitle = product.title || ""
-  const effectiveTitle = seo?.meta_title || (baseTitle ? `${baseTitle} | Laptopzone` : "")
+  const effectiveTitle = seo?.meta_title || (baseTitle ? `${baseTitle} | TriTech` : "")
 
   const baseDescription = cleanText(product.description || product.subtitle)
   const effectiveDescription = cleanText(seo?.meta_description) || baseDescription

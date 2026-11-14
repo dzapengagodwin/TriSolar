@@ -1,6 +1,6 @@
-# Laptopzone Technical Documentation
+# TriTech Technical Documentation
 
-Welcome to the engineering and architectural documentation for **Laptopzone** (`my-medusa-store`), a headless e-commerce platform built with **Medusa v2** and **Next.js 15 (App Router)** in a Turborepo monorepo.
+Welcome to the engineering and architectural documentation for **TriTech** (`my-medusa-store`), a headless e-commerce platform built with **Medusa v2** and **Next.js 15 (App Router)** in a Turborepo monorepo.
 
 This documentation serves as the single source of truth for software engineers, devops engineers, and AI coding agents working on this codebase.
 

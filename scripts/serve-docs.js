@@ -48,7 +48,7 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   const url = `http://localhost:${PORT}`
   console.log(`\n======================================================`)
-  console.log(`📚 Laptopzone Documentation Browser Viewer is live!`)
+  console.log(`📚 TriTech Documentation Browser Viewer is live!`)
   console.log(`👉 Open: ${url}`)
   console.log(`======================================================\n`)
 

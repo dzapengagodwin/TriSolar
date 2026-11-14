@@ -1,16 +1,16 @@
 # Country & Location Architecture
 
-> **Scope**: Geolocation detection, routing normalization, Medusa region mapping, currency/tax resolution, and delivery address handling for Laptopzone.
+> **Scope**: Geolocation detection, routing normalization, Medusa region mapping, currency/tax resolution, and delivery address handling for TriTech.
 
 ---
 
 ## 1. Architectural Resolution Model
 
-Laptopzone operates primarily in Zimbabwe (`zw`), with support for regional and international customers. The application uses a **clean-URL strategy** publicly, with **internal route rewrites** based on geolocation and cookies.
+TriTech operates primarily in Zimbabwe (`zw`), with support for regional and international customers. The application uses a **clean-URL strategy** publicly, with **internal route rewrites** based on geolocation and cookies.
 
 ```mermaid
 flowchart TD
-    UserRequest["Incoming User Request (e.g. https://laptopzone.co.zw/products/lenovo-t480)"]
+    UserRequest["Incoming User Request (e.g. https://tritech.example/products/lenovo-t480)"]
     
     subgraph EdgeMiddleware["Edge Middleware (middleware.ts)"]
         CheckLegacyPrefix{"Does URL contain legacy prefix (e.g. /zw/... or /dk/...)?\n"}

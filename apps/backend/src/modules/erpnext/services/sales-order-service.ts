@@ -44,7 +44,7 @@ export async function syncMedusaOrderToErpnext(
   const baseUrl = process.env.ERPNEXT_BASE_URL
   const apiKey = process.env.ERPNEXT_API_KEY
   const apiSecret = process.env.ERPNEXT_API_SECRET
-  const defaultCompany = settings?.default_company || process.env.ERPNEXT_DEFAULT_COMPANY || "Laptopzone"
+  const defaultCompany = settings?.default_company || process.env.ERPNEXT_DEFAULT_COMPANY || "TriTech"
   const defaultWarehouse = settings?.default_warehouse || process.env.ERPNEXT_DEFAULT_WAREHOUSE || "Stores - LZ"
 
   if (!baseUrl || !apiKey || !apiSecret) {

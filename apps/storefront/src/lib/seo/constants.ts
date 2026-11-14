@@ -20,14 +20,14 @@ export const ORGANIZATION_INFO = {
   url: STORE_URL,
   logo: `${STORE_URL}/favicon.png`,
   description: DEFAULT_SITE_DESCRIPTION,
-  email: "support@tritech.co.zw",
-  telephone: "+263770000000",
+  email: "Godwindzapenga@gmail.com",
+  telephone: "+263778158984",
   address: {
     streetAddress: "Harare",
     addressLocality: "Harare",
     addressCountry: "ZW",
   },
   sameAs: [
-    // Real Laptopzone verified social links
+    // Real TriTech verified social links
   ],
 }

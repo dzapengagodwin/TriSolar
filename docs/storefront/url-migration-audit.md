@@ -1,6 +1,6 @@
-﻿# Laptopzone legacy URL migration audit
+﻿# TriTech legacy URL migration audit
 
-Source: `LaptopZone_SEO_Migration_Register.xlsx`, using its `Migration Register` sheet as the URL inventory and the live Medusa product, category, and brand catalogs for destination matching. The normalized register is [url-migration-register-normalized.csv](url-migration-register-normalized.csv); verified category dispatch data is [legacy-url-map.json](legacy-url-map.json).
+Source: the legacy SEO migration register, using its `Migration Register` sheet as the URL inventory and the live Medusa product, category, and brand catalogs for destination matching. The normalized register is [url-migration-register-normalized.csv](url-migration-register-normalized.csv); verified category dispatch data is [legacy-url-map.json](legacy-url-map.json).
 
 This is a code/catalog comparison, not a deployed HTTP crawl. No migration redirects were added. Verified legacy paths are served using application rewrites so the existing URL stays in the address bar. Unmatched destinations remain unresolved rather than being guessed.
 
@@ -32,4 +32,3 @@ The country middleware continues resolving the internal `zw` region and `_medusa
 2. Review taxonomy/brand subpaths individually. Keep irrelevant spam at 404/410; do not create substitute content.
 3. Test representative URLs and response headers in staging/production, including canonical tags, sitemap URLs, feed links, cookie/region behavior, and the pre-existing `/zw` normalization.
 4. Confirm trailing-slash handling at the production edge. The storefront emits slash-free canonical URLs and does not set a global `trailingSlash` option.
-

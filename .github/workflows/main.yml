@@ -1,4 +1,4 @@
-name: LaptopZone CI
+name: TriTech CI
 
 on:
   push:

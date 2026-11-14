@@ -3,10 +3,19 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Image from "next/image"
+import { HttpTypes } from "@medusajs/types"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
+import type { StoreBrand } from "@lib/data/brands"
 import { MEGA_MENUS } from "./mega-menu-config"
 import MegaMenuPromo from "./mega-menu-promo"
 
-export default function MegaMenuNav() {
+export default function MegaMenuNav({
+  categories = [],
+  brands = [],
+}: {
+  categories?: HttpTypes.StoreProductCategory[]
+  brands?: StoreBrand[]
+}) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const navRef = useRef<HTMLDivElement>(null)
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -69,7 +78,37 @@ export default function MegaMenuNav() {
     }
   }
 
-  const activeConfig = MEGA_MENUS.find((m) => m.id === activeMenu)
+  const categoryPaths = new Set(
+    categories.map((category) => getCategoryPublicPath(category.handle))
+  )
+  const isLinkAvailable = (href: string) =>
+    (!href.startsWith("/products/") && !href.startsWith("/categories/")) ||
+    categoryPaths.has(href)
+  const visibleMenus = MEGA_MENUS.filter((menu) =>
+    [
+      ...(menu.directLinks || []).map((link) => link.href),
+      ...menu.sections.flatMap((section) => [
+        ...(section.viewAllHref ? [section.viewAllHref] : []),
+        ...section.items.map((item) => item.href),
+      ]),
+      menu.promo.href,
+    ].some(isLinkAvailable)
+  )
+  const activeConfig = visibleMenus.find((menu) => menu.id === activeMenu)
+  const activeBrands = (activeConfig?.brands || []).flatMap((menuBrand) => {
+    const handle = menuBrand.href.split("/").pop()?.toLowerCase()
+    const brand = brands.find((candidate) => candidate.handle.toLowerCase() === handle)
+
+    return brand
+      ? [
+          {
+            name: brand.name,
+            href: `/brands/${brand.handle}`,
+            logo: brand.logo || brand.image || "",
+          },
+        ]
+      : []
+  })
 
   return (
     <nav
@@ -82,7 +121,7 @@ export default function MegaMenuNav() {
     >
       {/* Dynamic Department Tabs */}
       <div className="flex items-center gap-0.5">
-        {MEGA_MENUS.map((menu) => {
+        {visibleMenus.map((menu) => {
           const isOpen = activeMenu === menu.id
 
           return (
@@ -120,17 +159,20 @@ export default function MegaMenuNav() {
             </button>
           )
         })}
-        {MEGA_MENUS.flatMap((menu) => menu.directLinks || []).map((link) => (
-          <LocalizedClientLink
-            key={link.label}
-            href={link.href}
-            onClick={closeMenu}
-            onMouseEnter={closeMenu}
-            className="whitespace-nowrap rounded-md px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
-          >
-            {link.label}
-          </LocalizedClientLink>
-        ))}
+        {visibleMenus
+          .flatMap((menu) => menu.directLinks || [])
+          .filter((link) => isLinkAvailable(link.href))
+          .map((link) => (
+            <LocalizedClientLink
+              key={link.label}
+              href={link.href}
+              onClick={closeMenu}
+              onMouseEnter={closeMenu}
+              className="whitespace-nowrap rounded-md px-2 py-2 text-[11px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gray-800"
+            >
+              {link.label}
+            </LocalizedClientLink>
+          ))}
       </div>
 
       {/* Hot Deals Link */}
@@ -165,67 +207,90 @@ export default function MegaMenuNav() {
         >
           {/* 4 Category Columns + 1 Promo Card (Total 12 cols) */}
           <div className="grid grid-cols-12 gap-6 pb-6 border-b border-gray-100">
-            {activeConfig.sections.map((section, idx) => (
-              <div
-                key={idx}
-                className="col-span-12 sm:col-span-6 lg:col-span-2 space-y-3"
-              >
-                <span className="block text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  {section.title}
-                </span>
-                <ul className="space-y-2 text-xs font-medium text-gray-600">
-                  {section.items.map((item, itemIdx) => (
-                    <li key={itemIdx}>
-                      <LocalizedClientLink
-                        href={item.href}
-                        onClick={closeMenu}
-                        className="hover:text-primary transition-colors block"
-                      >
-                        {item.label}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                  {section.viewAllHref && (
-                    <li className="pt-1">
-                      <LocalizedClientLink
-                        href={section.viewAllHref}
-                        onClick={closeMenu}
-                        className="text-[11px] font-bold text-gray-400 hover:text-primary transition-colors block"
-                      >
-                        View All &rarr;
-                      </LocalizedClientLink>
-                    </li>
-                  )}
-                </ul>
-              </div>
-            ))}
+            {activeConfig.sections
+              .map((section) => ({
+                ...section,
+                items: section.items.filter((item) =>
+                  isLinkAvailable(item.href)
+                ),
+                viewAllHref: section.viewAllHref &&
+                  isLinkAvailable(section.viewAllHref)
+                  ? section.viewAllHref
+                  : undefined,
+              }))
+              .filter(
+                (section) => section.items.length > 0 || section.viewAllHref
+              )
+              .map((section) => (
+                <div
+                  key={section.title}
+                  className="col-span-12 sm:col-span-6 lg:col-span-2 space-y-3"
+                >
+                  <span className="block text-xs font-bold text-gray-900 uppercase tracking-wider">
+                    {section.title}
+                  </span>
+                  <ul className="space-y-2 text-xs font-medium text-gray-600">
+                    {section.items.map((item) => (
+                      <li key={item.label}>
+                        <LocalizedClientLink
+                          href={item.href}
+                          onClick={closeMenu}
+                          className="hover:text-primary transition-colors block"
+                        >
+                          {item.label}
+                        </LocalizedClientLink>
+                      </li>
+                    ))}
+                    {section.viewAllHref && (
+                      <li className="pt-1">
+                        <LocalizedClientLink
+                          href={section.viewAllHref}
+                          onClick={closeMenu}
+                          className="text-[11px] font-bold text-gray-400 hover:text-primary transition-colors block"
+                        >
+                          View All &rarr;
+                        </LocalizedClientLink>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              ))}
 
             {/* Reusable Promotional Merchandising Banner */}
-            <MegaMenuPromo promo={activeConfig.promo} onClose={closeMenu} />
+            {isLinkAvailable(activeConfig.promo.href) && (
+              <MegaMenuPromo promo={activeConfig.promo} onClose={closeMenu} />
+            )}
           </div>
 
           {/* Department Brand Carousel / Row */}
-          <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3 overflow-x-auto">
-            {activeConfig.brands.map((brand) => (
-              <LocalizedClientLink
-                key={brand.name}
-                href={brand.href}
-                onClick={closeMenu}
-                title={brand.name}
-                className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200 shrink-0"
-              >
-                <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
-                  <Image
-                    src={brand.logo}
-                    alt={`${brand.name} logo`}
-                    fill
-                    sizes="80px"
-                    className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
-                  />
-                </div>
-              </LocalizedClientLink>
-            ))}
-          </div>
+          {activeBrands.length > 0 && (
+            <div className="pt-4 mt-2 border-t border-gray-100 flex items-center justify-between gap-3 overflow-x-auto">
+              {activeBrands.map((brand) => (
+                <LocalizedClientLink
+                  key={brand.name}
+                  href={brand.href}
+                  onClick={closeMenu}
+                  title={brand.name}
+                  className="group relative flex items-center justify-center p-2 rounded-xl hover:bg-gray-100/80 transition-all duration-200 shrink-0"
+                >
+                  <div className="relative w-16 h-7 sm:w-20 sm:h-8 flex items-center justify-center">
+                    {brand.logo ? (
+                      <Image
+                        src={brand.logo}
+                        alt={`${brand.name} logo`}
+                        unoptimized
+                        fill
+                        sizes="80px"
+                        className="object-contain object-center opacity-100 group-hover:scale-110 transition-all duration-200"
+                      />
+                    ) : (
+                      <span className="text-xs font-semibold">{brand.name}</span>
+                    )}
+                  </div>
+                </LocalizedClientLink>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </nav>

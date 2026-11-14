@@ -18,7 +18,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     const store = stores?.[0]
     const metadata = (store?.metadata as Record<string, unknown>) || {}
 
-    const appName = (metadata.admin_app_name as string) || store?.name || "LaptopZone"
+    const appName = (metadata.admin_app_name as string) || store?.name || "TriTech"
     const logoUrl = (metadata.admin_logo_url as string) || null
     const welcomeTitle = (metadata.admin_welcome_title as string) || `Welcome to ${appName}`
     const welcomeSubtitle = (metadata.admin_welcome_subtitle as string) || "Sign in to access your admin dashboard"
@@ -32,8 +32,8 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   } catch (error) {
     return res.status(200).json({
       logo_url: null,
-      app_name: "LaptopZone",
-      welcome_title: "Welcome to LaptopZone",
+      app_name: "TriTech",
+      welcome_title: "Welcome to TriTech",
       welcome_subtitle: "Sign in to access your admin dashboard",
     })
   }

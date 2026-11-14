@@ -6,7 +6,7 @@ import { Metadata } from "next"
 
 export const metadata: Metadata = createNoIndexMetadata(
   "Secure Checkout",
-  "Complete your secure order on Laptopzone."
+  "Complete your secure order on TriTech."
 )
 
 export default function CheckoutLayout({
@@ -32,7 +32,7 @@ export default function CheckoutLayout({
             </LocalizedClientLink>
           </div>
 
-          {/* Laptopzone Logo */}
+          {/* TriTech Logo */}
           <Logo size="sm" />
 
           {/* Right spacer to keep logo centered */}
@@ -61,7 +61,7 @@ export default function CheckoutLayout({
           </div>
 
           <p className="text-gray-400">
-            © {new Date().getFullYear()} Laptopzone. All rights reserved.
+            © {new Date().getFullYear()} TriTech. All rights reserved.
           </p>
         </div>
       </footer>

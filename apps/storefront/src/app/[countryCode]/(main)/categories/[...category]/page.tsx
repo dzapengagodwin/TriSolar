@@ -59,16 +59,12 @@ export async function generateStaticParams() {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  try {
-    const productCategory = await getCategoryByHandle(params.category)
-    if (!productCategory) {
-      notFound()
-    }
-    const seo = await getCategorySeo(productCategory.id)
-    return generateCategoryMetadata(productCategory, params.countryCode, seo)
-  } catch {
+  const productCategory = await getCategoryByHandle(params.category)
+  if (!productCategory) {
     notFound()
   }
+  const seo = await getCategorySeo(productCategory.id)
+  return generateCategoryMetadata(productCategory, params.countryCode, seo)
 }
 
 export default async function CategoryPage(props: Props) {

@@ -36,8 +36,8 @@ const BrandingSettingsPage = () => {
         const data = await res.json()
         const branding = data.branding || {}
         setLogoUrl(branding.logo_url || "")
-        setAppName(branding.app_name || "LaptopZone")
-        setWelcomeTitle(branding.welcome_title || `Welcome to ${branding.app_name || "LaptopZone"}`)
+        setAppName(branding.app_name || "TriTech")
+        setWelcomeTitle(branding.welcome_title || `Welcome to ${branding.app_name || "TriTech"}`)
         setWelcomeSubtitle(branding.welcome_subtitle || "Sign in to access your admin dashboard")
       }
     } catch (err: any) {
@@ -67,10 +67,10 @@ const BrandingSettingsPage = () => {
           : (logoUrl.trim() || null),
         app_name: overrides && "app_name" in overrides
           ? overrides.app_name
-          : (appName.trim() || "LaptopZone"),
+          : (appName.trim() || "TriTech"),
         welcome_title: overrides && "welcome_title" in overrides
           ? overrides.welcome_title
-          : (welcomeTitle.trim() || `Welcome to ${appName.trim() || "LaptopZone"}`),
+          : (welcomeTitle.trim() || `Welcome to ${appName.trim() || "TriTech"}`),
         welcome_subtitle: overrides && "welcome_subtitle" in overrides
           ? overrides.welcome_subtitle
           : (welcomeSubtitle.trim() || "Sign in to access your admin dashboard"),
@@ -156,8 +156,8 @@ const BrandingSettingsPage = () => {
 
   const handleResetDefaults = () => {
     setLogoUrl("")
-    setAppName("LaptopZone")
-    setWelcomeTitle("Welcome to LaptopZone")
+    setAppName("TriTech")
+    setWelcomeTitle("Welcome to TriTech")
     setWelcomeSubtitle("Sign in to access your admin dashboard")
   }
 
@@ -303,7 +303,7 @@ const BrandingSettingsPage = () => {
                   Admin App / Store Name
                 </Label>
                 <Input
-                  placeholder="e.g. LaptopZone"
+                  placeholder="e.g. TriTech"
                   value={appName}
                   onChange={(e) => {
                     setAppName(e.target.value)
@@ -322,7 +322,7 @@ const BrandingSettingsPage = () => {
                   Sign-in Page Welcome Title
                 </Label>
                 <Input
-                  placeholder="e.g. Welcome to LaptopZone"
+                  placeholder="e.g. Welcome to TriTech"
                   value={welcomeTitle}
                   onChange={(e) => setWelcomeTitle(e.target.value)}
                 />
@@ -404,7 +404,7 @@ const BrandingSettingsPage = () => {
                 {/* Welcome Heading */}
                 <div className="mb-5 flex flex-col items-center text-center">
                   <h3 className="text-base font-semibold text-ui-fg-base leading-snug">
-                    {welcomeTitle || `Welcome to ${appName || "LaptopZone"}`}
+                    {welcomeTitle || `Welcome to ${appName || "TriTech"}`}
                   </h3>
                   <p className="text-xs text-ui-fg-subtle mt-1 leading-normal">
                     {welcomeSubtitle || "Sign in to access your admin dashboard"}
@@ -416,7 +416,7 @@ const BrandingSettingsPage = () => {
                   <div className="space-y-1">
                     <span className="text-[11px] font-medium text-ui-fg-subtle">Email</span>
                     <div className="h-8 w-full bg-ui-bg-base border border-ui-border-base rounded-md px-2.5 flex items-center text-xs text-ui-fg-muted">
-                      admin@laptopzone.co.zw
+                      Godwindzapenga@gmail.com
                     </div>
                   </div>
                   <div className="space-y-1">

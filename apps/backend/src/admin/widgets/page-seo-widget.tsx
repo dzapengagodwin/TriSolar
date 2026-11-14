@@ -308,7 +308,7 @@ const PageSeoWidget = ({ data }: PageSeoWidgetProps) => {
                   LZ
                 </div>
                 <div className="text-[11px] text-ui-fg-subtle leading-tight">
-                  <span className="font-medium text-ui-fg-base">Laptopzone</span>
+                  <span className="font-medium text-ui-fg-base">TriTech</span>
                   <span className="text-ui-fg-muted mx-1">›</span>
                   <span className="text-ui-fg-muted text-[10px]">pages › {previewSlug}</span>
                 </div>
@@ -331,7 +331,7 @@ const PageSeoWidget = ({ data }: PageSeoWidgetProps) => {
                 </Text>
               </div>
               <Input
-                placeholder="e.g. Laptopzone About Page"
+                placeholder="e.g. TriTech About Page"
                 value={form.focus_keyphrase}
                 onChange={(e) => handleFieldChange("focus_keyphrase", e.target.value)}
               />
@@ -378,7 +378,7 @@ const PageSeoWidget = ({ data }: PageSeoWidgetProps) => {
                 </Text>
               </div>
               <Input
-                placeholder="https://laptopzone.co.zw/about"
+                placeholder="https://your-store-domain.example/about"
                 value={form.canonical_url}
                 onChange={(e) => handleFieldChange("canonical_url", e.target.value)}
               />
@@ -437,4 +437,3 @@ export const config = defineWidgetConfig({
 })
 
 export default PageSeoWidget
-

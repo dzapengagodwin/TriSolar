@@ -30,7 +30,7 @@ export const GET = async (
   }
 
   const seoService: SeoModuleService = req.scope.resolve(SEO_MODULE)
-  const storefrontUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const storefrontUrl = process.env.STOREFRONT_URL || "http://localhost:8000"
 
   // Search candidate entity IDs in priority order (e.g. "home", then "page_home", "page_laptops-...")
   const candidates = getPageEntityCandidates(handle)

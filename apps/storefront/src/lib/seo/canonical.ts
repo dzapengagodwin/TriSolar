@@ -52,10 +52,10 @@ export function getProductCanonicalUrl(
   return getCanonicalUrl(`/product/${handle}`, countryCode)
 }
 
-/** Returns the verified legacy public path for a category handle. */
+/** Returns the verified legacy path or the dynamic category route. */
 export function getCategoryPublicPath(handle: string): string {
   const path = legacyUrlMap.categoryHandleToPublicPath[handle as keyof typeof legacyUrlMap.categoryHandleToPublicPath]
-  return path ? `/${path}` : `/products/${handle}`
+  return path ? `/${path}` : `/categories/${encodeURIComponent(handle)}`
 }
 
 /**

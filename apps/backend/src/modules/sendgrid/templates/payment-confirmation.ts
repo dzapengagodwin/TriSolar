@@ -4,7 +4,7 @@ import { escapeHtml, formatMoney, renderBaseLayout } from "./base-layout"
 export function renderPaymentConfirmation(
   data: PaymentConfirmationData
 ): SendgridTemplateResult {
-  const brandName = process.env.SENDGRID_FROM_NAME || "Laptopzone"
+  const brandName = process.env.SENDGRID_FROM_NAME || "TriTech"
   const currency = data.currency_code || "USD"
   const orderNumber = data.display_id || data.order_id
   const safeOrderNumber = escapeHtml(String(orderNumber))
@@ -107,8 +107,8 @@ export function renderPaymentConfirmation(
     previewText: `Payment of ${formattedAmount} for Order #${orderNumber} has been received.`,
     content,
     trackPackageUrl: data.view_order_url,
-    supportEmail: "orders@laptopzone.co.zw",
-    supportPhone: "+263 8612 600 600",
+    supportEmail: "Godwindzapenga@gmail.com",
+    supportPhone: "+263 77 815 8984",
   })
 
   const text = `${brandName.toUpperCase()} - PAYMENT RECEIPT

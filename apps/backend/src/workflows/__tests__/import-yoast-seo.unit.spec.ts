@@ -10,11 +10,11 @@ function makeRecord(overrides: Partial<YoastSeoRecord["yoast"]> = {}, slug = "te
     yoast: {
       title: "%%title%% %%sep%% %%sitename%%",
       description: "A great laptop by HP.",
-      og_title: "%%title%% on Laptopzone",
+      og_title: "%%title%% on TriTech",
       og_description: "Buy %%title%% at the best price.",
-      og_image: [{ url: "https://cdn.laptopzone.co.zw/img/hp-840.jpg", width: 1200, height: 630 }],
+      og_image: [{ url: "https://cdn.tritech.example/img/hp-840.jpg", width: 1200, height: 630 }],
       robots: { index: "index", follow: "follow" },
-      canonical: "https://old-site.laptopzone.co.zw/product/hp-elitebook-840/",
+      canonical: "https://old-site.tritech.example/product/hp-elitebook-840/",
       ...overrides,
     },
   }
@@ -23,7 +23,7 @@ function makeRecord(overrides: Partial<YoastSeoRecord["yoast"]> = {}, slug = "te
 describe("Yoast SEO Transformer", () => {
   it("resolves %%title%% %%sep%% %%sitename%% tokens correctly", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.meta_title).toBe("HP EliteBook 840 | Laptopzone")
+    expect(result.meta_title).toBe("HP EliteBook 840 | TriTech")
   })
 
   it("strips double separator artifacts from empty tokens", () => {
@@ -34,12 +34,12 @@ describe("Yoast SEO Transformer", () => {
 
   it("resolves og_title tokens correctly", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.og_title).toBe("HP EliteBook 840 on Laptopzone")
+    expect(result.og_title).toBe("HP EliteBook 840 on TriTech")
   })
 
   it("extracts og_image url from yoast og_image array", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.og_image).toBe("https://cdn.laptopzone.co.zw/img/hp-840.jpg")
+    expect(result.og_image).toBe("https://cdn.tritech.example/img/hp-840.jpg")
   })
 
   it("returns null og_image when no og_image is defined", () => {
@@ -61,7 +61,7 @@ describe("Yoast SEO Transformer", () => {
 
   it("strips trailing slash from canonical URL", () => {
     const result = transformYoastRecord(makeRecord())
-    expect(result.canonical_url).toBe("https://old-site.laptopzone.co.zw/product/hp-elitebook-840")
+    expect(result.canonical_url).toBe("https://old-site.tritech.example/product/hp-elitebook-840")
   })
 
   it("returns null for canonical_url when canonical is undefined", () => {
@@ -88,11 +88,11 @@ describe("Yoast SEO Transformer", () => {
       entityType: "brand",
       yoast: {
         title: "%%title%% Laptops %%sep%% %%sitename%%",
-        description: "Official Lenovo range at Laptopzone.",
+        description: "Official Lenovo range at TriTech.",
         robots: { index: "index", follow: "follow" },
       },
     }
     const result = transformYoastRecord(record)
-    expect(result.meta_title).toBe("Lenovo Laptops | Laptopzone")
+    expect(result.meta_title).toBe("Lenovo Laptops | TriTech")
   })
 })

@@ -122,7 +122,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
 
   const handleResetToDefaults = () => {
     setForm({
-      meta_title: defaults.meta_title || (categoryName ? `${categoryName} | Laptopzone` : ""),
+      meta_title: defaults.meta_title || (categoryName ? `${categoryName} | TriTech` : ""),
       meta_description: defaults.meta_description || "",
       focus_keyphrase: defaults.focus_keyphrase || categoryName || "",
       canonical_url: defaults.canonical_url || "",
@@ -162,7 +162,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
   }
 
   // Live snippet preview values
-  const previewTitle = form.meta_title || defaults.meta_title || (categoryName ? `${categoryName} | Laptopzone` : "Category Title | Laptopzone")
+  const previewTitle = form.meta_title || defaults.meta_title || (categoryName ? `${categoryName} | TriTech` : "Category Title | TriTech")
   const previewSlug = categoryHandle || "category-slug"
   const previewDesc =
     form.meta_description ||
@@ -538,7 +538,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
                   LZ
                 </div>
                 <div className="text-[11px] text-ui-fg-subtle leading-tight">
-                  <span className="font-medium text-ui-fg-base">Laptopzone</span>
+                  <span className="font-medium text-ui-fg-base">TriTech</span>
                   <span className="text-ui-fg-muted mx-1">›</span>
                   <span className="text-ui-fg-muted text-[10px]">categories › {previewSlug}</span>
                 </div>
@@ -629,7 +629,7 @@ const CategorySeoWidget = ({ data }: CategorySeoWidgetProps) => {
                 <Text size="xsmall" className="text-ui-fg-muted">Optional override (default is automatic)</Text>
               </div>
               <Input
-                placeholder="https://laptopzone.co.zw/products/..."
+                placeholder="https://your-store-domain.example/products/..."
                 value={form.canonical_url}
                 onChange={(e) => handleFieldChange("canonical_url", e.target.value)}
               />
@@ -730,4 +730,3 @@ export const config = defineWidgetConfig({
 })
 
 export default CategorySeoWidget
-

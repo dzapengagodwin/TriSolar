@@ -26,7 +26,7 @@ export default async function ContactPage() {
       {/* Top Map Banner */}
       <div className="w-full h-[360px] sm:h-[420px] bg-gray-100 border-b border-gray-200 relative overflow-hidden group">
         <iframe
-          title="Laptopzone Store Location"
+          title="TriTech Store Location"
           src="https://maps.google.com/maps?q=-17.7789542,31.0952320&t=&z=16&ie=UTF8&iwloc=&output=embed"
           width="100%"
           height="100%"
@@ -89,7 +89,7 @@ export default async function ContactPage() {
 
             {/* Address */}
             <div className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-8 space-y-1">
-              <p className="font-semibold text-gray-900">Laptopzone Store</p>
+              <p className="font-semibold text-gray-900">TriTech Store</p>
               <p>64 Ridgeway, Borrowdale</p>
               <p>Harare, Zimbabwe</p>
               <div className="pt-1.5 pb-1">
@@ -107,14 +107,14 @@ export default async function ContactPage() {
               </div>
               <p className="pt-2 text-gray-600">
                 <span className="font-medium text-gray-800">Phone: </span>
-                <a href="tel:+2638612600600" className="hover:text-primary transition-colors">
-                  +263 8612 600 600
+                <a href="tel:+263778158984" className="hover:text-primary transition-colors">
+                  +263 77 815 8984
                 </a>
               </p>
               <p className="text-gray-600">
                 <span className="font-medium text-gray-800">Support: </span>
-                <a href="mailto:support@laptopzone.co.zw" className="hover:text-primary transition-colors">
-                  support@laptopzone.co.zw
+                <a href="mailto:Godwindzapenga@gmail.com" className="hover:text-primary transition-colors">
+                  Godwindzapenga@gmail.com
                 </a>
               </p>
             </div>
@@ -141,12 +141,12 @@ export default async function ContactPage() {
                 Careers
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-                If you&apos;re interested in employment opportunities at Laptopzone, please email us:{" "}
+                If you&apos;re interested in employment opportunities at TriTech, please email us:{" "}
                 <a
-                  href="mailto:contact@laptopzone.co.zw"
+                  href="mailto:Godwindzapenga@gmail.com"
                   className="underline text-gray-800 hover:text-primary font-medium transition-colors"
                 >
-                  contact@laptopzone.co.zw
+                  Godwindzapenga@gmail.com
                 </a>
               </p>
             </div>

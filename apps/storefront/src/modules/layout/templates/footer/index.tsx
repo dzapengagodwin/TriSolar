@@ -5,7 +5,7 @@ import { getCategoryPublicPath } from "@lib/seo/canonical"
 import FooterDealsBox from "@modules/layout/components/footer-deals-box"
 
 export default async function Footer() {
-  const categories = await listCategories().catch(() => [])
+  const categories = await listCategories()
 
   // Filter root categories for clean category navigation
   const topCategories = categories
@@ -104,12 +104,12 @@ export default async function Footer() {
                 <span className="block text-[11px] text-gray-400 font-medium tracking-wide">
                   Technology that powers your business
                 </span>
-                <a
+                <LocalizedClientLink
                   href="/contact-us"
                   className="block text-base font-bold text-white tracking-tight mt-0.5 hover:text-primary transition-colors"
                 >
                   Contact our team
-                </a>
+                </LocalizedClientLink>
               </div>
             </div>
 

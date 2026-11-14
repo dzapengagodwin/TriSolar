@@ -171,13 +171,17 @@ class SeoModuleService extends MedusaService({
     entity: any,
     options: { storefrontUrl?: string; countryCode?: string } = {}
   ): Promise<Partial<UpsertSeoMetadataInput>> {
-    const storefrontUrl = (options.storefrontUrl || "https://laptopzone.co.zw").replace(
+    const storefrontUrl = (
+      options.storefrontUrl ||
+      process.env.STOREFRONT_URL ||
+      "http://localhost:8000"
+    ).replace(
       /\/+$/,
       ""
     )
 
     if (entityType === "product") {
-      const title = entity.title ? `${entity.title} | Laptopzone` : "Laptopzone"
+      const title = entity.title ? `${entity.title} | TriTech` : "TriTech"
       const rawDesc = entity.description || entity.subtitle || ""
       const cleanDesc = rawDesc
         .replace(/<[^>]+>/g, " ")
@@ -207,7 +211,7 @@ class SeoModuleService extends MedusaService({
 
     if (entityType === "category") {
       const name = entity.name || "Category"
-      const title = `${name} | Laptopzone`
+      const title = `${name} | TriTech`
       const rawDesc = entity.description || ""
       const cleanDesc = rawDesc
         .replace(/<[^>]+>/g, " ")
@@ -215,7 +219,7 @@ class SeoModuleService extends MedusaService({
         .trim()
       const desc =
         cleanDesc ||
-        `Shop warranty-backed ${name.toLowerCase()} and computer hardware at Laptopzone Zimbabwe. Fast nationwide delivery and authentic products.`
+        `Shop warranty-backed ${name.toLowerCase()} and computer hardware at TriTech Zimbabwe. Fast nationwide delivery and authentic products.`
       const canonicalUrl = null
 
       return {

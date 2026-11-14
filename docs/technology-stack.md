@@ -1,6 +1,6 @@
 # Technology Stack
 
-Laptopzone is built as a **Turborepo** monorepo using **npm** as the package manager (detected from `package.json` `"packageManager": "npm@10.9.3"`). The key versions are:
+TriTech is built as a **Turborepo** monorepo using **npm** as the package manager (detected from `package.json` `"packageManager": "npm@10.9.3"`). The key versions are:
 
 | Component | Version | Source |
 |-----------|---------|--------|

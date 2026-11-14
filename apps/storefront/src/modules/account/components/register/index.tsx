@@ -23,7 +23,7 @@ const Register = ({ setCurrentView }: Props) => {
       data-testid="register-page"
     >
       <h1 className="text-large-semi uppercase mb-6">
-        Create your Laptopzone account
+        Create your TriTech account
       </h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-6">
         Create an account to track orders, save delivery addresses, and enjoy faster checkout.
@@ -83,7 +83,7 @@ const Register = ({ setCurrentView }: Props) => {
           data-testid="register-error"
         />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
-          By creating an account, you agree to Laptopzone&apos;s{" "}
+          By creating an account, you agree to TriTech&apos;s{" "}
           <LocalizedClientLink
             href="/privacy-policy"
             className="underline hover:text-black font-semibold"

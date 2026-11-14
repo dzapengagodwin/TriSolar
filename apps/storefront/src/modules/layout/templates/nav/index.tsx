@@ -3,6 +3,7 @@ import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
 import { listRegions } from "@lib/data/regions"
 import { listCategories } from "@lib/data/categories"
+import { listBrands } from "@lib/data/brands"
 import { getWishlist } from "@lib/data/wishlist"
 import { StoreRegion, HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -13,8 +14,6 @@ import StickyNav from "@modules/layout/components/sticky-nav"
 import CategoryDropdown from "@modules/layout/components/category-dropdown"
 import Logo from "@modules/common/components/logo"
 import User from "@modules/common/icons/user"
-import MapPin from "@modules/common/icons/map-pin"
-import Package from "@modules/common/icons/package"
 import {
   Heart,
   ShoppingBag,
@@ -29,14 +28,15 @@ export default async function Nav({
   cart?: HttpTypes.StoreCart | null
   shippingOptions?: HttpTypes.StoreCartShippingOption[]
 }) {
-  const [regions, locales, currentLocale, categories, wishlist] = await Promise.all([
+  const [regions, locales, currentLocale, categories, wishlist, brands] = await Promise.all([
     listRegions()
       .then((regions: StoreRegion[]) => regions)
       .catch(() => []),
     listLocales(),
     getLocale(),
-    listCategories().catch(() => []),
+    listCategories(),
     getWishlist().catch(() => null),
+    listBrands(),
   ])
 
   const wishlistCount = wishlist?.items?.length || 0
@@ -169,7 +169,7 @@ export default async function Nav({
               <CategoryDropdown categories={categories} />
 
               {/* Top Navigation Items with Mega Menu Dropdown */}
-              <MegaMenuNav />
+              <MegaMenuNav categories={categories} brands={brands} />
             </div>
           </div>
         </nav>

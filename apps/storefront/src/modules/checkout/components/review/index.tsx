@@ -51,7 +51,7 @@ const Review = ({ cart }: { cart: HttpTypes.StoreCart }) => {
               <LocalizedClientLink href="/returns-and-refunds" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
                 Returns Policy
               </LocalizedClientLink>
-              , and acknowledge Laptopzone&apos;s{" "}
+              , and acknowledge TriTech&apos;s{" "}
               <LocalizedClientLink href="/privacy-policy" target="_blank" className="underline text-gray-900 font-semibold hover:text-primary">
                 Privacy Policy
               </LocalizedClientLink>

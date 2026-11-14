@@ -194,7 +194,7 @@ const YoastSeoImporterPage = () => {
             Yoast SEO Importer
           </Heading>
           <Text className="text-sm text-ui-fg-subtle mt-1">
-            Import Yoast SEO metadata (titles, descriptions, OpenGraph, robots) from your old WordPress site into Laptopzone.
+            Import Yoast SEO metadata (titles, descriptions, OpenGraph, robots) from your old WordPress site into TriTech.
           </Text>
         </div>
         {importResult && (
@@ -227,7 +227,7 @@ const YoastSeoImporterPage = () => {
           <div className="space-y-1.5">
             <Label size="small" className="text-ui-fg-subtle">WordPress Site URL</Label>
             <Input
-              placeholder="https://old-site.laptopzone.co.zw"
+              placeholder="https://previous-store.example"
               value={wooUrl}
               onChange={(e) => { setWooUrl(e.target.value); setConnectionStatus("idle") }}
             />

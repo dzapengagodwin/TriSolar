@@ -1,6 +1,6 @@
 # API Architecture
 
-> **Scope**: Complete specification of all REST endpoints, file-based API routes, authentication mechanisms, and external webhooks in Laptopzone.
+> **Scope**: Complete specification of all REST endpoints, file-based API routes, authentication mechanisms, and external webhooks in TriTech.
 
 ---
 

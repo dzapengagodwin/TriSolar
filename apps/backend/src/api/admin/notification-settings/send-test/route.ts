@@ -64,8 +64,8 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     const orderFromEmail =
       process.env.SENDGRID_ORDER_FROM_EMAIL ||
       process.env.SENDGRID_FROM_EMAIL ||
-      "orders@laptopzone.co.zw"
-    const fromName = process.env.SENDGRID_FROM_NAME || "Laptopzone"
+      "Godwindzapenga@gmail.com"
+    const fromName = process.env.SENDGRID_FROM_NAME || "TriTech"
 
     const mockOrderData: OwnerOrderNotificationData = {
       order_id: "order_test_preview",

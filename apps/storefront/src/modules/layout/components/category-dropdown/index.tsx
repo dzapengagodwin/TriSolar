@@ -38,6 +38,12 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
   }, [isOpen, displayCategories, activeCategoryId])
 
   const activeCategory = displayCategories.find((c) => c.id === activeCategoryId)
+  const activeChildren =
+    activeCategory?.category_children?.length
+      ? activeCategory.category_children
+      : categories.filter(
+          (category) => category.parent_category_id === activeCategory?.id
+        )
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -109,8 +115,8 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
                 </div>
 
                 <div className="grid grid-cols-1 gap-1.5">
-                  {activeCategory.category_children && activeCategory.category_children.length > 0 ? (
-                    activeCategory.category_children.map((child) => (
+                  {activeChildren.length > 0 ? (
+                    activeChildren.map((child) => (
                       <LocalizedClientLink
                         key={child.id}
                         href={getCategoryPublicPath(child.handle)}

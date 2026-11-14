@@ -58,7 +58,7 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
     super()
     this.logger_ = logger
     this.options_ = {
-      from_name: "Laptopzone",
+      from_name: "TriTech",
       ...options,
     }
 
@@ -117,11 +117,11 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
       ].includes(normalizedTemplate)
 
       const defaultFrom = isOrderEmail
-        ? this.options_?.order_from_email || this.options_?.from || process.env.SENDGRID_ORDER_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL || "orders@laptopzone.co.zw"
-        : this.options_?.account_from_email || this.options_?.from || process.env.SENDGRID_ACCOUNT_FROM_EMAIL || "noreply@laptopzone.co.zw"
+        ? this.options_?.order_from_email || this.options_?.from || process.env.SENDGRID_ORDER_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL || "Godwindzapenga@gmail.com"
+        : this.options_?.account_from_email || this.options_?.from || process.env.SENDGRID_ACCOUNT_FROM_EMAIL || "Godwindzapenga@gmail.com"
 
-      const fromEmail = notification.from || defaultFrom || "orders@laptopzone.co.zw"
-      const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "Laptopzone"
+      const fromEmail = notification.from || defaultFrom || "Godwindzapenga@gmail.com"
+      const fromName = this.options_?.from_name || process.env.SENDGRID_FROM_NAME || "TriTech"
       const templateData = (notification.data || {}) as Record<string, any>
 
       // Resolve CC email for order notifications if explicitly configured
@@ -131,7 +131,7 @@ export class SendgridNotificationService extends AbstractNotificationProviderSer
           notification.data?.cc ||
           this.options_?.order_cc_email ||
           process.env.SENDGRID_ORDER_CC_EMAIL ||
-          "laptops@laptopzone.co.zw"
+          "Godwindzapenga@gmail.com"
 
         if (rawCc && typeof rawCc === "string" && !["false", "none", "off", "0"].includes(rawCc.toLowerCase().trim())) {
           ccEmails = rawCc

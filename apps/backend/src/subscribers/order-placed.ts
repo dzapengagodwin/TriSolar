@@ -327,7 +327,7 @@ export default async function orderPlacedHandler({
     const orderFromEmail =
       process.env.SENDGRID_ORDER_FROM_EMAIL ||
       process.env.SENDGRID_FROM_EMAIL ||
-      "orders@laptopzone.co.zw"
+      "Godwindzapenga@gmail.com"
 
     const createdNotifications = await notificationModuleService.createNotifications({
       to: recipientEmail,
@@ -355,7 +355,7 @@ export default async function orderPlacedHandler({
             to: recipientEmail,
             from: {
               email: orderFromEmail,
-              name: process.env.SENDGRID_FROM_NAME || "Laptopzone",
+              name: process.env.SENDGRID_FROM_NAME || "TriTech",
             },
             subject: rendered.subject,
             html: rendered.html,
@@ -440,7 +440,7 @@ export default async function orderPlacedHandler({
                     to: ownerEmail,
                     from: {
                       email: orderFromEmail,
-                      name: process.env.SENDGRID_FROM_NAME || "Laptopzone",
+                      name: process.env.SENDGRID_FROM_NAME || "TriTech",
                     },
                     subject: renderedOwner.subject,
                     html: renderedOwner.html,

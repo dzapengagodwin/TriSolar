@@ -14,7 +14,7 @@ type StoreBrandingWidgetProps = {
 const StoreBrandingWidget = ({ data }: StoreBrandingWidgetProps) => {
   const metadata = data?.metadata || {}
   const logoUrl = (metadata.admin_logo_url as string) || null
-  const appName = (metadata.admin_app_name as string) || data?.name || "LaptopZone"
+  const appName = (metadata.admin_app_name as string) || data?.name || "TriTech"
   const welcomeTitle = (metadata.admin_welcome_title as string) || `Welcome to ${appName}`
 
   return (

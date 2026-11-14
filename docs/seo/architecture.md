@@ -59,7 +59,7 @@ flowchart TD
 - **File**: `apps/storefront/src/lib/seo/product.ts` and `metadata.ts`.
 - **Precedence Hierarchy**:
   1. If `seo_metadata` exists in Medusa for the entity, `seo.meta_title` and `seo.meta_description` override default catalog values.
-  2. If missing, automatically synthesized from `product.title`, primary category name, price, and site branding: `"${product.title} | Laptopzone Zimbabwe"`.
+  2. If missing, automatically synthesized from `product.title`, primary category name, price, and site branding: `"${product.title} | TriTech Zimbabwe"`.
 - **OpenGraph & Twitter Cards**:
   - `og:type`: `"website"` for standard pages, `"product"` for product detail pages.
   - `og:image`: Uses `seo.og_image` or primary product `thumbnail`, processed through Next.js image optimizer.
@@ -67,18 +67,18 @@ flowchart TD
 
 ### 2.2 Canonical URL Engine
 - **Implementation**: [`apps/storefront/src/lib/seo/canonical.ts`](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/apps/storefront/src/lib/seo/canonical.ts)
-- **Base Domain**: Configured via `NEXT_PUBLIC_BASE_URL` (default: `https://laptopzone.co.zw`).
+- **Base Domain**: Configured via `NEXT_PUBLIC_BASE_URL` (default: `https://tritech.example`).
 - **Clean URL Normalization**:
-  - Automatically strips country code prefixes from canonical URLs (e.g. outputs `https://laptopzone.co.zw/products/dell-latitude-7400` instead of `/zw/products/...`).
+  - Automatically strips country code prefixes from canonical URLs (e.g. outputs `https://tritech.example/products/dell-latitude-7400` instead of `/zw/products/...`).
   - Ensures search engines index a single canonical URL for each resource, preventing duplicate content penalties across geographic regions.
 
 ### 2.3 Schema.org JSON-LD Structured Data
 
 | Schema Type | Component Location | Target Pages | Key Properties Emitted |
 |---|---|---|---|
-| **Product & Offers** | `src/modules/products/components/product-json-ld/index.tsx` | PDP (`/products/[handle]`) | `@type: "Product"`, `name`, `image`, `description`, `sku`, `brand`, `offers: { @type: "Offer", price, priceCurrency: "USD", availability: "InStock"/"OutOfStock", url, seller: { @type: "Organization", name: "Laptopzone" } }` |
+| **Product & Offers** | `src/modules/products/components/product-json-ld/index.tsx` | PDP (`/products/[handle]`) | `@type: "Product"`, `name`, `image`, `description`, `sku`, `brand`, `offers: { @type: "Offer", price, priceCurrency: "USD", availability: "InStock"/"OutOfStock", url, seller: { @type: "Organization", name: "TriTech" } }` |
 | **BreadcrumbList** | `src/modules/common/components/breadcrumb-json-ld/index.tsx` | PDP & Category Pages | `@type: "BreadcrumbList"`, hierarchical list with positions: `Home -> Category -> Product Title` |
-| **OnlineStore / Organization** | `src/modules/common/components/organization-json-ld/index.tsx` | Global (`layout.tsx`) | `@type: "OnlineStore"`, `legalName: "Laptopzone"`, `logo`, `contactPoint: { telephone, email, areaServed: "ZW" }`, `sameAs: [facebook, instagram, twitter]` |
+| **OnlineStore / Organization** | `src/modules/common/components/organization-json-ld/index.tsx` | Global (`layout.tsx`) | `@type: "OnlineStore"`, `legalName: "TriTech"`, `logo`, `contactPoint: { telephone, email, areaServed: "ZW" }`, `sameAs: [facebook, instagram, twitter]` |
 
 ### 2.4 Robots.txt & Multi-Sitemap Architecture
 - **Robots.txt**:
@@ -86,8 +86,8 @@ flowchart TD
   - Allows public indexable routes (`/`, `/products/`, `/categories/`, `/brands/`, `/collections/`, `/store`).
   - Disallows private and checkout routes (`/cart`, `/checkout`, `/account`, `/search`, `/wishlist`, `/api/`).
   - Declares references to both sitemaps:
-    - `https://laptopzone.co.zw/sitemap.xml`
-    - `https://laptopzone.co.zw/image-sitemap.xml`
+    - `https://tritech.example/sitemap.xml`
+    - `https://tritech.example/image-sitemap.xml`
 - **Primary Sitemap**:
   - File: [`apps/storefront/src/app/sitemap.ts`](file:///c:/Users/kundai/Desktop/projects/my-medusa-store/apps/storefront/src/app/sitemap.ts)
   - Dynamically queries products, categories, collections, and brands.

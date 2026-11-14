@@ -9,10 +9,10 @@ describe("SEO Analyzer Unit Tests", () => {
     description:
       "The Lenovo ThinkPad E14 Gen 6 is engineered for business professionals, featuring high-speed DDR5 RAM, NVMe SSD storage, and genuine manufacturer warranty with rapid Zimbabwe delivery.",
     handle: "lenovo-thinkpad-e14-gen-6",
-    thumbnail: "https://laptopzone.co.zw/images/thinkpad.jpg",
+    thumbnail: "https://tritech.example/images/thinkpad.jpg",
     images: [
-      { url: "https://laptopzone.co.zw/images/thinkpad.jpg" },
-      { url: "https://laptopzone.co.zw/images/thinkpad-side.jpg" },
+      { url: "https://tritech.example/images/thinkpad.jpg" },
+      { url: "https://tritech.example/images/thinkpad-side.jpg" },
     ],
     brand: { name: "Lenovo" },
     variants: [
@@ -32,12 +32,12 @@ describe("SEO Analyzer Unit Tests", () => {
     const analysis = analyzeProductSeo({
       product: sampleProduct,
       seo: {
-        meta_title: "Lenovo ThinkPad E14 Gen 6 Laptop | Laptopzone",
+        meta_title: "Lenovo ThinkPad E14 Gen 6 Laptop | TriTech",
         meta_description:
-          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 and 16GB RAM online at Laptopzone. Fast shipping & official warranty in Zimbabwe.",
+          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 and 16GB RAM online at TriTech. Fast shipping & official warranty in Zimbabwe.",
         focus_keyphrase: "Lenovo ThinkPad E14 Gen 6",
         canonical_url:
-          "https://laptopzone.co.zw/product/lenovo-thinkpad-e14-gen-6",
+          "https://tritech.example/product/lenovo-thinkpad-e14-gen-6",
         robots_index: true,
         robots_follow: true,
       },
@@ -109,9 +109,9 @@ describe("SEO Analyzer Unit Tests", () => {
     const analysis = analyzeProductSeo({
       product: sampleProduct,
       seo: {
-        meta_title: "Lenovo ThinkPad E14 Gen 6 | Laptopzone",
+        meta_title: "Lenovo ThinkPad E14 Gen 6 | TriTech",
         meta_description:
-          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 online at Laptopzone Zimbabwe.",
+          "Buy the Lenovo ThinkPad E14 Gen 6 with AMD Ryzen 7 online at TriTech Zimbabwe.",
         robots_index: false,
       },
     })

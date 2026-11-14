@@ -35,9 +35,9 @@ export default async function PrivacyPage() {
           1. Introduction &amp; Scope
         </h2>
         <p>
-          Laptopzone (<span className="font-semibold text-gray-900">&quot;we&quot;</span>,{" "}
+          TriTech (<span className="font-semibold text-gray-900">&quot;we&quot;</span>,{" "}
           <span className="font-semibold text-gray-900">&quot;our&quot;</span>, or{" "}
-          <span className="font-semibold text-gray-900">&quot;us&quot;</span>) is committed to protecting and respecting your personal privacy. This Privacy Policy details how we handle personal data collected when you visit our website (laptopzone.co.zw), purchase hardware or accessories, or communicate with our support team.
+          <span className="font-semibold text-gray-900">&quot;us&quot;</span>) is committed to protecting and respecting your personal privacy. This Privacy Policy details how we handle personal data collected when you visit our website (tritech.example), purchase hardware or accessories, or communicate with our support team.
         </p>
         <p>
           We adhere to applicable data privacy legislation, including the Cyber and Data Protection Act of Zimbabwe [Chapter 12:07] and international data protection standards (GDPR-aligned privacy principles).
@@ -108,7 +108,7 @@ export default async function PrivacyPage() {
             <svg className="w-4 h-4 text-amber-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            No Raw Card Data Is Ever Stored on Laptopzone Servers
+            No Raw Card Data Is Ever Stored on TriTech Servers
           </h3>
           <p className="text-xs leading-relaxed text-amber-800">
             Card transactions and mobile wallet authorizations are handled by the payment providers selected during checkout. We only receive payment tokens and confirmation statuses. Your full 16-digit card number, CVV/CVC, and PIN numbers are not stored on our servers.
@@ -199,8 +199,8 @@ export default async function PrivacyPage() {
         </h2>
         <p>
           If you have any questions or wish to exercise your data rights, please contact our Data Protection representative at{" "}
-          <a href="mailto:support@laptopzone.co.zw" className="text-primary font-semibold hover:underline">
-            support@laptopzone.co.zw
+          <a href="mailto:Godwindzapenga@gmail.com" className="text-primary font-semibold hover:underline">
+            Godwindzapenga@gmail.com
           </a>{" "}
           or by visiting our support desk at 64 Ridgeway, Borrowdale, Harare, Zimbabwe.
         </p>

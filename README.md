@@ -1,4 +1,4 @@
-# Laptopzone
+# TriTech
 
 > Zimbabwe's premier laptop and electronics e-commerce platform. Built as a high-performance headless commerce monorepo powered by **Medusa v2** and **Next.js 15 (App Router)**.
 
@@ -6,7 +6,7 @@
 
 ## 1. Overview
 
-Laptopzone ([laptopzone.co.zw](https://laptopzone.co.zw)) is an enterprise headless commerce system engineered for reliability, local Zimbabwean payment processing, fast catalog search, and search engine visibility.
+TriTech is an enterprise headless commerce system engineered for reliability, local Zimbabwean payment processing, fast catalog search, and search engine visibility.
 
 The repository is organized as a Turborepo workspace:
 
@@ -84,11 +84,11 @@ cp apps/backend/.env.template apps/backend/.env
 Configure your PostgreSQL database URL, Redis, and secret keys in `apps/backend/.env`:
 
 ```env
-DATABASE_URL=postgres://postgres:password@localhost:5432/laptopzone_db
+DATABASE_URL=postgres://postgres:password@localhost:5432/tritech_db
 REDIS_URL=redis://localhost:6379
 JWT_SECRET=your_jwt_secret_here
 COOKIE_SECRET=your_cookie_secret_here
-STORE_CORS=http://localhost:8000,https://laptopzone.co.zw
+STORE_CORS=http://localhost:8000
 ADMIN_CORS=http://localhost:9000,http://localhost:5173
 AUTH_CORS=http://localhost:9000,http://localhost:5173
 ```
@@ -98,7 +98,7 @@ Run database migrations and create an initial administrator account:
 ```bash
 cd apps/backend
 npx medusa db:migrate
-npx medusa user -e admin@laptopzone.co.zw -p supersecret
+npx medusa user -e Godwindzapenga@gmail.com -p supersecret
 cd ../..
 ```
 
@@ -181,4 +181,4 @@ And open `http://localhost:3333`.
 
 ## 7. License
 
-Private proprietary software for Laptopzone Zimbabwe. All rights reserved.
+Private proprietary software for TriTech Zimbabwe. All rights reserved.

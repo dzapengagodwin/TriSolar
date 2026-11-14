@@ -30,7 +30,7 @@ export function WhatsAppOrderButton({
     variantTitle && variantTitle !== "Default Title" ? ` (${variantTitle})` : ""
   const productUrl = getProductCanonicalUrl(productHandle)
   const message = `Hi, I would like to order: ${productTitle}${variantSuffix}\n${productUrl}`
-  const href = `https://wa.me/263772953946?text=${encodeURIComponent(message)}`
+  const href = `https://wa.me/263778158984?text=${encodeURIComponent(message)}`
 
   return (
     <a

@@ -232,7 +232,7 @@ const PageSeoPanel = ({
               LZ
             </div>
             <div className="text-[11px] text-gray-700 leading-tight">
-              <span className="font-medium text-gray-900">Laptopzone</span>
+              <span className="font-medium text-gray-900">TriTech</span>
               <span className="text-gray-400 mx-1">&rsaquo;</span>
               <span className="text-gray-500 text-[10px]">{previewSlug}</span>
             </div>
@@ -260,7 +260,7 @@ const PageSeoPanel = ({
             </span>
           </Label>
           <Input
-            placeholder={`e.g. ${page?.title ?? "Page"} Laptopzone`}
+            placeholder={`e.g. ${page?.title ?? "Page"} TriTech`}
             value={form.focus_keyphrase}
             onChange={(e) => handleChange("focus_keyphrase", e.target.value)}
           />
@@ -286,7 +286,7 @@ const PageSeoPanel = ({
             </span>
           </div>
           <Input
-            placeholder={`${page?.title ?? "Page"} | Laptopzone`}
+            placeholder={`${page?.title ?? "Page"} | TriTech`}
             value={form.meta_title}
             onChange={(e) => handleChange("meta_title", e.target.value)}
           />
@@ -331,7 +331,7 @@ const PageSeoPanel = ({
             </span>
           </Label>
           <Input
-            placeholder={`https://laptopzone.co.zw${page?.path ?? "/"}`}
+            placeholder={`https://your-store-domain.example${page?.path ?? "/"}`}
             value={form.canonical_url}
             onChange={(e) => handleChange("canonical_url", e.target.value)}
           />
@@ -640,4 +640,3 @@ export const config = defineRouteConfig({
 })
 
 export default PagesAdminPage
-

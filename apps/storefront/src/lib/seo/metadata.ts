@@ -22,8 +22,37 @@ export type BaseMetadataOptions = {
   /** Fine-grained robots control — overrides noIndex/noFollow when provided. */
   robots?: { index: boolean; follow: boolean }
   type?: "website" | "article"
-  /** When true, prevents parent layout template from appending " | Laptopzone" */
+  /** When true, prevents parent layout template from appending " | TriTech" */
   absoluteTitle?: boolean
+}
+
+export function sanitizeBrandingText(value: string | null | undefined) {
+  if (!value) {
+    return undefined
+  }
+
+  return value
+    .replace(
+      /[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)*laptopzone\.co\.zw/gi,
+      "Godwindzapenga@gmail.com"
+    )
+    .replace(
+      /(?:https?:\/\/)?(?:[A-Z0-9-]+\.)*laptopzone\.co\.zw(?:\/[^\s]*)?/gi,
+      ""
+    )
+    .replace(/\bLaptop\s*zone\b/gi, SITE_NAME)
+    .replace(
+      /(?:\+?263[\s-]*77[\s-]*295[\s-]*3946|0[\s-]*77[\s-]*295[\s-]*3946)/gi,
+      "+263 77 815 8984"
+    )
+    .replace(
+      /(?:\+?263[\s-]*8612[\s-]*600[\s-]*600|0[\s-]*8612[\s-]*600[\s-]*600)/gi,
+      "+263 77 815 8984"
+    )
+}
+
+export function hasLegacyBrandDomain(value: string | null | undefined) {
+  return Boolean(value && /(?:^|[/.])laptopzone\.co\.zw(?:[/?:#]|$)/i.test(value))
 }
 
 /**
@@ -31,20 +60,24 @@ export type BaseMetadataOptions = {
  */
 export function buildBaseMetadata(options: BaseMetadataOptions = {}): Metadata {
   // OG title/description: what the caller passes as title/description
-  const ogTitle = options.title || SITE_DEFAULT_TITLE
-  const ogDescription = options.description || DEFAULT_SITE_DESCRIPTION
+  const ogTitle = sanitizeBrandingText(options.title) || SITE_DEFAULT_TITLE
+  const ogDescription =
+    sanitizeBrandingText(options.description) || DEFAULT_SITE_DESCRIPTION
 
   // Page <title> / <meta name="description">: prefer metaTitle/metaDescription overrides
-  const pageTitle = options.metaTitle || ogTitle
-  const pageDescription = options.metaDescription || ogDescription
+  const pageTitle = sanitizeBrandingText(options.metaTitle) || ogTitle
+  const pageDescription =
+    sanitizeBrandingText(options.metaDescription) || ogDescription
 
   // Robots: fine-grained object takes precedence over noIndex/noFollow flags
   const shouldIndex = options.robots ? options.robots.index : !options.noIndex
   const shouldFollow = options.robots ? options.robots.follow : !options.noFollow && !options.noIndex
 
-  const canonical = options.canonicalUrl
+  const canonical = hasLegacyBrandDomain(options.canonicalUrl)
+    ? undefined
+    : sanitizeBrandingText(options.canonicalUrl)
 
-  const imageList = options.imageUrl
+  const imageList = options.imageUrl && !hasLegacyBrandDomain(options.imageUrl)
     ? [
         {
           url: options.imageUrl,

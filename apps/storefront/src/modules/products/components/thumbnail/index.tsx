@@ -67,6 +67,7 @@ const ImageOrPlaceholder = ({
     <Image
       src={image}
       alt={alt || "Product thumbnail"}
+      unoptimized
       className={clx(
         "absolute inset-0 object-center",
         objectFit === "contain" ? "object-contain" : "object-cover"

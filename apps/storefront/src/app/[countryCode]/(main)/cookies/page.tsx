@@ -3,16 +3,16 @@ import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | Laptopzone",
+  title: "Cookie Policy | TriTech",
   description:
-    "Learn about the cookies and local storage technologies used on Laptopzone to provide shopping cart services, account security, and analytics.",
+    "Learn about the cookies and local storage technologies used on TriTech to provide shopping cart services, account security, and analytics.",
 }
 
 export default async function CookiesPage() {
   return (
     <PolicyPageLayout
       title="Cookie Policy"
-      subtitle="This policy explains what cookies are, how we use them on Laptopzone, and how you can control your preferences."
+      subtitle="This policy explains what cookies are, how we use them on TriTech, and how you can control your preferences."
       activePolicy="cookies"
       lastUpdated="September 2026"
     >
@@ -25,7 +25,7 @@ export default async function CookiesPage() {
           Cookies are small text files placed on your computer, smartphone, or tablet when you visit websites. They are widely used to make websites work efficiently, provide a smooth browsing experience, and deliver analytical information to site operators.
         </p>
         <p>
-          In addition to cookies, Laptopzone may also use related web storage technologies (such as browser <span className="font-semibold text-gray-900">localStorage</span> and <span className="font-semibold text-gray-900">sessionStorage</span>) to temporarily store your preferences, such as your active shopping cart items and cookie consent choice.
+          In addition to cookies, TriTech may also use related web storage technologies (such as browser <span className="font-semibold text-gray-900">localStorage</span> and <span className="font-semibold text-gray-900">sessionStorage</span>) to temporarily store your preferences, such as your active shopping cart items and cookie consent choice.
         </p>
       </section>
 
@@ -86,7 +86,7 @@ export default async function CookiesPage() {
       {/* 3. Detailed Cookie Reference Table */}
       <section className="space-y-3">
         <h2 className="text-base sm:text-lg font-bold text-gray-900 border-b border-gray-100 pb-2">
-          3. Key Cookies Used on Laptopzone
+          3. Key Cookies Used on TriTech
         </h2>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border border-gray-200 rounded-2xl overflow-hidden">

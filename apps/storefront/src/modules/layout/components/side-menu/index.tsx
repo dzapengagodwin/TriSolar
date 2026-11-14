@@ -253,10 +253,10 @@ const SideMenu = ({
                           Want to chat?
                         </h2>
                         <a
-                          href="tel:+2638612600600"
+                          href="tel:+263778158984"
                           className="text-sm text-gray-700 hover:text-primary"
                         >
-                          Call us +263 8612 600 600
+                          Call us +263 77 815 8984
                         </a>
                       </section>
 

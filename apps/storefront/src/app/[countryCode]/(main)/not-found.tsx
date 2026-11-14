@@ -5,9 +5,9 @@ import { HttpTypes } from "@medusajs/types"
 import NotFoundTemplate from "@modules/not-found/templates"
 
 export const metadata: Metadata = {
-  title: "404 - Page Not Found | Laptopzone",
+  title: "404 - Page Not Found | TriTech",
   description:
-    "The page you are looking for could not be found. Discover popular laptops, gaming PCs, and tech accessories at Laptopzone.",
+    "The page you are looking for could not be found. Discover popular laptops, gaming PCs, and tech accessories at TriTech.",
 }
 
 export default async function NotFound() {

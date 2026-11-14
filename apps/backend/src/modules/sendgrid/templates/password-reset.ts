@@ -16,7 +16,7 @@ export function renderPasswordReset(
         Reset Your Password
       </h1>
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">
-        We received a request to reset the password for your Laptopzone account.
+        We received a request to reset the password for your TriTech account.
       </p>
     </div>
 
@@ -43,25 +43,25 @@ export function renderPasswordReset(
     </p>
   `
 
-  const subject = "Reset Your Laptopzone Password"
+  const subject = "Reset Your TriTech Password"
   const html = renderBaseLayout({
     title: subject,
-    previewText: "Follow this link to reset your Laptopzone account password.",
+    previewText: "Follow this link to reset your TriTech account password.",
     content,
   })
 
-  const text = `LAPTOPZONE ZIMBABWE - PASSWORD RESET
+  const text = `TriTech ZIMBABWE - PASSWORD RESET
 
 Hello ${customerName},
 
-We received a request to reset your Laptopzone account password.
+We received a request to reset your TriTech account password.
 
 To set a new password, click the link below (valid for ${expiresIn} hours):
 ${data.reset_url}
 
 If you did not request this change, please ignore this email.
 
-Laptopzone Zimbabwe`
+TriTech Zimbabwe`
 
   return { subject, html, text }
 }

@@ -4,7 +4,7 @@ import { escapeHtml, formatMoney, renderBaseLayout } from "./base-layout"
 export function renderOrderConfirmation(
   data: OrderConfirmationData
 ): SendgridTemplateResult {
-  const brandName = process.env.SENDGRID_FROM_NAME || "Laptopzone"
+  const brandName = process.env.SENDGRID_FROM_NAME || "TriTech"
   const currency = data.currency_code || "USD"
   const orderNumber = data.display_id || data.order_id
   const safe = (value: unknown) => escapeHtml(String(value ?? ""))
@@ -272,8 +272,8 @@ export function renderOrderConfirmation(
     previewText: `Great news! Your order #${orderNumber} is confirmed and being prepared.`,
     content,
     trackPackageUrl: data.view_order_url,
-    supportEmail: "orders@laptopzone.co.zw",
-    supportPhone: "+263 8612 600 600",
+    supportEmail: "Godwindzapenga@gmail.com",
+    supportPhone: "+263 77 815 8984",
   })
 
   // Plain-text alternative
@@ -303,8 +303,8 @@ ${data.gift_card_total ? `Gift card: -${formatMoney(data.gift_card_total, curren
 
 ${data.view_order_url ? `Track your order: ${data.view_order_url}\n` : ""}
 Questions with your order?
-Email: orders@laptopzone.co.zw
-Phone: +263 8612 600 600
+Email: Godwindzapenga@gmail.com
+Phone: +263 77 815 8984
 
 Thank you for choosing ${brandName}.`
 

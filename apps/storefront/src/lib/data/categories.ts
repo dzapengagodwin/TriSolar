@@ -38,17 +38,25 @@ export const listCategories = async (
 ): Promise<HttpTypes.StoreProductCategory[]> => {
   const limit = (query?.limit as number) || 100
   const tags = [CACHE_TAGS.categories, CACHE_TAGS.navigation]
+  const categories: HttpTypes.StoreProductCategory[] = []
+  let offset = (query?.offset as number) || 0
+  let count = 0
+  let pageCount = 0
 
-  return sdk.client
-    .fetch<{ product_categories: HttpTypes.StoreProductCategory[]; count: number }>(
+  do {
+    const response = await sdk.client.fetch<{
+      product_categories: HttpTypes.StoreProductCategory[]
+      count: number
+    }>(
       "/store/product-categories",
       {
         method: "GET",
         query: {
           fields:
             "*category_children,*parent_category,+metadata,+products.id",
-          limit,
           ...query,
+          limit,
+          offset,
         },
         next: {
           tags,
@@ -56,16 +64,28 @@ export const listCategories = async (
         },
       }
     )
-    .then(({ product_categories }) => {
-      if (!product_categories || product_categories.length === 0) {
-        return []
-      }
-      return product_categories.map(enrichCategory)
-    })
-    .catch((err) => {
-      console.error("Failed to fetch product categories:", err)
-      return []
-    })
+
+    categories.push(...response.product_categories)
+    count = response.count
+    pageCount = response.product_categories.length
+    offset += response.product_categories.length
+
+    if (query?.offset !== undefined) {
+      break
+    }
+  } while (offset < count && pageCount > 0)
+
+  const enrichedCategories = categories.map(enrichCategory)
+  const flattened = new Map<string, HttpTypes.StoreProductCategory>()
+  const addCategory = (category: HttpTypes.StoreProductCategory) => {
+    if (!flattened.has(category.id)) {
+      flattened.set(category.id, category)
+      category.category_children?.forEach(addCategory)
+    }
+  }
+
+  enrichedCategories.forEach(addCategory)
+  return Array.from(flattened.values())
 }
 
 /**
@@ -84,36 +104,31 @@ export const getCategoryByHandle = async (
     categoryTag(fullHandle),
   ]
 
-  // 1. Try querying backend directly for this handle
-  try {
-    const res = await sdk.client.fetch<{
-      product_categories: HttpTypes.StoreProductCategory[]
-    }>("/store/product-categories", {
-      method: "GET",
-      query: {
-        handle: [lastHandle, fullHandle],
-        fields:
-          "*category_children,*parent_category,*parent_category.parent_category,+metadata",
-        limit: 5,
-      },
-      next: {
-        tags,
-        revalidate: 3600,
-      },
-    })
+  const res = await sdk.client.fetch<{
+    product_categories: HttpTypes.StoreProductCategory[]
+  }>("/store/product-categories", {
+    method: "GET",
+    query: {
+      handle: [lastHandle, fullHandle],
+      fields:
+        "*category_children,*parent_category,*parent_category.parent_category,+metadata",
+      limit: 5,
+    },
+    next: {
+      tags,
+      revalidate: 3600,
+    },
+  })
 
-    if (res.product_categories && res.product_categories.length > 0) {
-      const matched =
-        res.product_categories.find(
-          (c) =>
-            c.handle.toLowerCase() === lastHandle ||
-            c.handle.toLowerCase() === fullHandle
-        ) || res.product_categories[0]
+  if (res.product_categories && res.product_categories.length > 0) {
+    const matched =
+      res.product_categories.find(
+        (c) =>
+          c.handle.toLowerCase() === lastHandle ||
+          c.handle.toLowerCase() === fullHandle
+      )
 
-      return enrichCategory(matched)
-    }
-  } catch (err) {
-    console.error(`Failed to fetch category by handle [${lastHandle}]:`, err)
+    return matched ? enrichCategory(matched) : null
   }
 
   return null

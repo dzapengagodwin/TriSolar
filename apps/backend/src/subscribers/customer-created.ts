@@ -39,7 +39,7 @@ export default async function customerCreatedHandler({
     const accountFromEmail =
       process.env.SENDGRID_ACCOUNT_FROM_EMAIL ||
       process.env.SENDGRID_NOREPLY_FROM_EMAIL ||
-      "noreply@laptopzone.co.zw"
+      "Godwindzapenga@gmail.com"
 
     await notificationModuleService.createNotifications({
       to: customer.email,

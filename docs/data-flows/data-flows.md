@@ -1,6 +1,6 @@
 # Data Flow Architecture
 
-> **Scope**: Detailed sequence flows and lifecycle models for Product Ingestion, Cart Management, Checkout & Payment, Order Processing & Notifications, and Cache Synchronization in Laptopzone.
+> **Scope**: Detailed sequence flows and lifecycle models for Product Ingestion, Cart Management, Checkout & Payment, Order Processing & Notifications, and Cache Synchronization in TriTech.
 
 ---
 
@@ -111,7 +111,7 @@ sequenceDiagram
         SendGrid-->>Customer: Deliver branded HTML order receipt
     and Store Owner Alert
         OrderPlacedSub->>OrderPlacedSub: Render renderOwnerOrderNotification() HTML
-        OrderPlacedSub->>SendGrid: Dispatch alert to notification recipients (e.g. orders@laptopzone.co.zw)
+        OrderPlacedSub->>SendGrid: Dispatch alert to notification recipients (e.g. Godwindzapenga@gmail.com)
         SendGrid-->>Admin: Deliver "New Order Placed" operational alert
     end
 ```
@@ -136,5 +136,5 @@ sequenceDiagram
     Medusa->>Medusa: Mark order fulfillment_status = 'fulfilled'
     Medusa-->>FulfillmentSub: Emit 'order.fulfillment_created' event
     FulfillmentSub->>SendGrid: Send shipping notification email with tracking info
-    SendGrid-->>Customer: Deliver "Your Laptopzone order is on its way!"
+    SendGrid-->>Customer: Deliver "Your TriTech order is on its way!"
 ```

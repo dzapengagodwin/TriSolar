@@ -1,6 +1,6 @@
 # Storefront Routing & Components
 
-> **Scope** – This document covers the **Next.js App Router** routes and the most important reusable UI components in the Laptopzone storefront (`apps/storefront`).  It reflects the current codebase; no assumptions are made about missing features.
+> **Scope** – This document covers the **Next.js App Router** routes and the most important reusable UI components in the TriTech storefront (`apps/storefront`).  It reflects the current codebase; no assumptions are made about missing features.
 
 ---
 

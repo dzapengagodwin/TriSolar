@@ -8,9 +8,9 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
   const sampleConfig: ProductFeedConfig = {
     country_code: "ZW",
     currency_code: "USD",
-    storefront_url: "https://laptopzone.co.zw",
-    feed_title: "Laptopzone Feed",
-    feed_description: "Laptopzone Product Feed",
+    storefront_url: "https://tritech.example",
+    feed_title: "TriTech Feed",
+    feed_description: "TriTech Product Feed",
   }
 
   describe("getProductBrand", () => {
@@ -53,8 +53,8 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         subtitle: "Enterprise ready laptop",
         description: "<p>Powerful <strong>AMD Ryzen</strong> laptop with <em>FHD</em> display.</p>",
         handle: "lenovo-thinkpad-e14",
-        thumbnail: "https://laptopzone.co.zw/images/thinkpad.jpg",
-        images: [{ url: "https://laptopzone.co.zw/images/thinkpad.jpg" }, { url: "https://laptopzone.co.zw/images/thinkpad-side.jpg" }],
+        thumbnail: "https://tritech.example/images/thinkpad.jpg",
+        images: [{ url: "https://tritech.example/images/thinkpad.jpg" }, { url: "https://tritech.example/images/thinkpad-side.jpg" }],
         categories: [{ name: "Laptops", handle: "laptops" }],
         collection: { title: "Business Laptops" },
         sales_channels: [
@@ -99,9 +99,9 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
       expect(item.item_group_id).toBe("prod_thinkpad")
       expect(item.title).toBe("Lenovo ThinkPad E14 - 16GB RAM / 512GB SSD")
       expect(item.description).toBe("Powerful AMD Ryzen laptop with FHD display.")
-      expect(item.link).toBe("https://laptopzone.co.zw/product/lenovo-thinkpad-e14")
-      expect(item.image_link).toBe("https://laptopzone.co.zw/images/thinkpad.jpg")
-      expect(item.additional_image_link).toEqual(["https://laptopzone.co.zw/images/thinkpad-side.jpg"])
+      expect(item.link).toBe("https://tritech.example/product/lenovo-thinkpad-e14")
+      expect(item.image_link).toBe("https://tritech.example/images/thinkpad.jpg")
+      expect(item.additional_image_link).toEqual(["https://tritech.example/images/thinkpad-side.jpg"])
       expect(item.availability).toBe("in_stock")
       expect(item.price).toBe("950.00 USD")
       expect(item.sale_price).toBe("850.00 USD")
@@ -173,8 +173,8 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         id: "var_123",
         title: "HP ProBook 450 G10",
         description: "Intel Core i7 13th Gen laptop",
-        link: "https://laptopzone.co.zw/product/hp-probook-450-g10",
-        image_link: "https://laptopzone.co.zw/hp.jpg",
+        link: "https://tritech.example/product/hp-probook-450-g10",
+        image_link: "https://tritech.example/hp.jpg",
         availability: "in_stock",
         price: "799.00 USD",
         condition: "new",
@@ -208,8 +208,8 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
         id: "var_custom",
         title: "Unbranded Custom Cable",
         description: "USB-C to USB-C cable",
-        link: "https://laptopzone.co.zw/zw/products/custom-cable",
-        image_link: "https://laptopzone.co.zw/cable.jpg",
+        link: "https://tritech.example/zw/products/custom-cable",
+        image_link: "https://tritech.example/cable.jpg",
         availability: "in_stock",
         price: "15.00 USD",
         condition: "new",
@@ -229,8 +229,8 @@ describe("Google Merchant Center Product Feed Unit Tests", () => {
           id: "v_1",
           title: "Lenovo Legion 5 Pro",
           description: "AMD Ryzen 7 RTX 4070 Gaming Laptop",
-          link: "https://laptopzone.co.zw/product/legion-5-pro",
-          image_link: "https://laptopzone.co.zw/legion.jpg",
+          link: "https://tritech.example/product/legion-5-pro",
+          image_link: "https://tritech.example/legion.jpg",
           availability: "in_stock",
           price: "1450.00 USD",
           sale_price: "1350.00 USD",

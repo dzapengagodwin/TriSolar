@@ -6,7 +6,7 @@ export const revalidate = 0
 /**
  * Storefront proxy route for Google Merchant Center product feed.
  * Proxies directly to the Medusa backend /product-feed endpoint,
- * ensuring storefront URL (https://laptopzone.co.zw/product-feed) serves the live XML feed.
+ * ensuring the storefront /product-feed route serves the live XML feed.
  */
 export async function GET(req: NextRequest) {
   const backendUrl =
@@ -47,4 +47,3 @@ export async function GET(req: NextRequest) {
     )
   }
 }
-

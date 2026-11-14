@@ -29,9 +29,9 @@ flowchart TD
         RemoteInstall["npm ci"]
         RemoteBuild["npm run build"]
         RestartMedusa["systemctl restart medusa"]
-        RestartStorefront["systemctl restart laptopzone-storefront"]
+        RestartStorefront["systemctl restart TriTech-storefront"]
         VerifyServices["systemctl is-active --quiet"]
-        HealthCheck["curl -f https://dev.laptopzone.co.zw"]
+        HealthCheck["curl -f https://dev.tritech.example"]
     end
 
     Production([Production Live & Verified])
@@ -117,14 +117,14 @@ echo "=== Restarting Medusa ==="
 sudo systemctl restart medusa
 
 echo "=== Restarting Storefront ==="
-sudo systemctl restart laptopzone-storefront
+sudo systemctl restart TriTech-storefront
 
 echo "=== Checking services ==="
 sudo systemctl is-active --quiet medusa
-sudo systemctl is-active --quiet laptopzone-storefront
+sudo systemctl is-active --quiet TriTech-storefront
 
 echo "=== Health check ==="
-curl -f https://dev.laptopzone.co.zw
+curl -f https://dev.tritech.example
 
 echo "=== Deployment successful ==="
 ```

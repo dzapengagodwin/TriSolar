@@ -13,11 +13,11 @@ export function renderBaseLayout({
   previewText = "",
   content,
   trackPackageUrl,
-  supportEmail = "orders@laptopzone.co.zw",
-  supportPhone = "+263 8612 600 600",
+  supportEmail = "Godwindzapenga@gmail.com",
+  supportPhone = "+263 77 815 8984",
   showHelpSection = true,
 }: BaseEmailLayoutOptions): string {
-  const storefrontUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const storefrontUrl = process.env.STOREFRONT_URL || "https://tritech.example"
   const cleanPhone = supportPhone.replace(/\s+/g, "")
   const trackUrl = trackPackageUrl || storefrontUrl
 
@@ -156,7 +156,7 @@ export function renderBaseLayout({
                 <tr>
                   <td align="left" style="vertical-align: middle;">
                     <a href="${escapeHtml(storefrontUrl)}" style="text-decoration: none; display: inline-block;">
-                      <img src="https://cdn.laptopzone.co.zw/logo.png" alt="Laptopzone" width="140" class="mobile-logo" style="display: block; height: auto; border: 0; max-height: 40px; object-fit: contain;" />
+                      <img src="https://cdn.tritech.example/logo.png" alt="TriTech" width="140" class="mobile-logo" style="display: block; height: auto; border: 0; max-height: 40px; object-fit: contain;" />
                     </a>
                   </td>
                   <td align="right" style="vertical-align: middle;">

@@ -80,7 +80,7 @@ export default async function orderPaymentCapturedHandler({
     const orderFromEmail =
       process.env.SENDGRID_ORDER_FROM_EMAIL ||
       process.env.SENDGRID_FROM_EMAIL ||
-      "orders@laptopzone.co.zw"
+      "Godwindzapenga@gmail.com"
 
     await notificationModuleService.createNotifications({
       to: recipientEmail,

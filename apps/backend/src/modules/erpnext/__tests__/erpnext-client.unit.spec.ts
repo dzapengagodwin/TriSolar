@@ -23,7 +23,7 @@ describe("ERPNext Client Unit Tests", () => {
     expect(
       () =>
         new ErpnextClient({
-          baseUrl: "https://erp.laptopzone.co.zw",
+          baseUrl: "https://erp.tritech.example",
           apiKey: "",
           apiSecret: "",
         })
@@ -33,11 +33,11 @@ describe("ERPNext Client Unit Tests", () => {
   it("testConnection returns success: true when user is authenticated", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ message: "administrator@laptopzone.co.zw" }),
+      json: async () => ({ message: "Godwindzapenga@gmail.com" }),
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
@@ -45,7 +45,7 @@ describe("ERPNext Client Unit Tests", () => {
 
     const result = await client.testConnection()
     expect(result.success).toBe(true)
-    expect(result.user).toBe("administrator@laptopzone.co.zw")
+    expect(result.user).toBe("Godwindzapenga@gmail.com")
   })
 
   it("testConnection returns success: false with safe error message on failure", async () => {
@@ -56,7 +56,7 @@ describe("ERPNext Client Unit Tests", () => {
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
@@ -86,7 +86,7 @@ describe("ERPNext Client Unit Tests", () => {
       } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
@@ -109,7 +109,7 @@ describe("ERPNext Client Unit Tests", () => {
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
@@ -129,7 +129,7 @@ describe("ERPNext Client Unit Tests", () => {
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
@@ -161,21 +161,21 @@ describe("ERPNext Client Unit Tests", () => {
         data: {
           name: "SO-2026-0001",
           customer: "CUST-001",
-          company: "Laptopzone",
+          company: "TriTech",
           grand_total: 500,
         },
       }),
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,
     })
 
     const so = await client.createSalesOrder({
-      company: "Laptopzone",
+      company: "TriTech",
       customer: "CUST-001",
       transaction_date: "2026-10-13",
       delivery_date: "2026-10-16",
@@ -201,7 +201,7 @@ describe("ERPNext Client Unit Tests", () => {
     } as any)
 
     const client = new ErpnextClient({
-      baseUrl: "https://erp.laptopzone.co.zw",
+      baseUrl: "https://erp.tritech.example",
       apiKey: "test_key",
       apiSecret: "test_secret",
       maxRetries: 0,

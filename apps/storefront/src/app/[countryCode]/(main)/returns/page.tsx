@@ -65,7 +65,7 @@ export default async function ReturnsPage() {
             <span className="font-semibold text-gray-900">Notify us within 48 hours</span> of delivery if the item has transit damage or missing components.
           </li>
           <li>
-            <span className="font-semibold text-gray-900">7-Day DOA window:</span> If a hardware defect occurs within 7 calendar days of receipt, Laptopzone will arrange expedited collection/drop-off, perform technical verification, and immediately supply a brand-new replacement unit.
+            <span className="font-semibold text-gray-900">7-Day DOA window:</span> If a hardware defect occurs within 7 calendar days of receipt, TriTech will arrange expedited collection/drop-off, perform technical verification, and immediately supply a brand-new replacement unit.
           </li>
           <li>
             If an identical replacement model is unavailable in stock, you may choose an equivalent model, an upgrade (paying the difference), or a full refund.
@@ -135,10 +135,10 @@ export default async function ReturnsPage() {
               <p className="font-bold text-gray-900 text-xs sm:text-sm">Submit Return Request</p>
               <p className="text-xs text-gray-600">
                 Contact our support team via email (
-                <a href="mailto:support@laptopzone.co.zw" className="text-primary hover:underline">
-                  support@laptopzone.co.zw
+                <a href="mailto:Godwindzapenga@gmail.com" className="text-primary hover:underline">
+                  Godwindzapenga@gmail.com
                 </a>
-                ) or WhatsApp (+263 77 295 3946) with your Order ID, product serial number, and reason for return. Attach photos or video if claiming a defect.
+                ) or WhatsApp (+263 77 815 8984) with your Order ID, product serial number, and reason for return. Attach photos or video if claiming a defect.
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default async function ReturnsPage() {
           6. Return Shipping Costs
         </h2>
         <p>
-          If the return is due to an error on our part (incorrect model dispatched) or a verified manufacturer defect within the 7-day DOA window, Laptopzone will cover 100% of the return courier fees.
+          If the return is due to an error on our part (incorrect model dispatched) or a verified manufacturer defect within the 7-day DOA window, TriTech will cover 100% of the return courier fees.
         </p>
         <p>
           For change-of-mind returns on eligible unopened goods, the customer is responsible for courier return costs to our Harare technical facility.

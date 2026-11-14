@@ -7,11 +7,11 @@ import {
 describe("ERPNext Security Utils Unit Tests", () => {
   describe("validateErpnextUrl", () => {
     it("accepts valid https URL", () => {
-      expect(() => validateErpnextUrl("https://erp.laptopzone.co.zw")).not.toThrow()
+      expect(() => validateErpnextUrl("https://erp.tritech.example")).not.toThrow()
     })
 
     it("throws for non-http/https protocol", () => {
-      expect(() => validateErpnextUrl("ftp://erp.laptopzone.co.zw")).toThrow("Only HTTP and HTTPS protocols are allowed")
+      expect(() => validateErpnextUrl("ftp://erp.tritech.example")).toThrow("Only HTTP and HTTPS protocols are allowed")
     })
 
     it("throws for invalid URL format", () => {

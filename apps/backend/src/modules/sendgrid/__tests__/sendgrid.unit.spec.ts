@@ -32,7 +32,7 @@ describe("SendgridNotificationService", () => {
     it("initializes in sandbox mode with a warning if API key is not provided", () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
-        { from: "orders@laptopzone.co.zw", sandbox: true }
+        { from: "Godwindzapenga@gmail.com", sandbox: true }
       )
 
       expect(service).toBeDefined()
@@ -46,8 +46,8 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_12345",
-          from: "orders@laptopzone.co.zw",
-          from_name: "Laptopzone",
+          from: "Godwindzapenga@gmail.com",
+          from_name: "TriTech",
         }
       )
 
@@ -93,7 +93,7 @@ describe("SendgridNotificationService", () => {
     it("simulates email sending in sandbox mode", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
-        { from: "orders@laptopzone.co.zw", sandbox: true }
+        { from: "Godwindzapenga@gmail.com", sandbox: true }
       )
 
       const result = await service.send({
@@ -115,8 +115,8 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          from_name: "Laptopzone",
+          from: "Godwindzapenga@gmail.com",
+          from_name: "TriTech",
           sandbox: false,
         }
       )
@@ -133,8 +133,8 @@ describe("SendgridNotificationService", () => {
         expect.objectContaining({
           to: "john@example.com",
           from: {
-            email: "orders@laptopzone.co.zw",
-            name: "Laptopzone",
+            email: "Godwindzapenga@gmail.com",
+            name: "TriTech",
           },
           subject: expect.stringContaining("#1001"),
           text: expect.stringContaining("HP EliteBook 840 G8"),
@@ -142,7 +142,7 @@ describe("SendgridNotificationService", () => {
       )
 
       const message = (sendgrid.send as jest.Mock).mock.calls.at(-1)?.[0]
-      expect(message.cc).toBe("laptops@laptopzone.co.zw")
+      expect(message.cc).toBe("Godwindzapenga@gmail.com")
       expect(message.html).toContain("Gift card")
       expect(message.html).toContain("Harare Same-Day Delivery")
       expect(message.html).toContain("Cash on Delivery (Pending)")
@@ -151,12 +151,12 @@ describe("SendgridNotificationService", () => {
       expect(message.html).not.toContain(">Zimbabwe<")
     })
 
-    it("attaches default CC laptops@laptopzone.co.zw to order confirmation emails", async () => {
+    it("attaches default CC Godwindzapenga@gmail.com to order confirmation emails", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -171,7 +171,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "customer@example.com",
-          cc: "laptops@laptopzone.co.zw",
+          cc: "Godwindzapenga@gmail.com",
         })
       )
     })
@@ -181,8 +181,8 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_cc_email: "sales@laptopzone.co.zw, manager@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_cc_email: "Godwindzapenga@gmail.com, Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -197,7 +197,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "customer@example.com",
-          cc: ["sales@laptopzone.co.zw", "manager@laptopzone.co.zw"],
+          cc: ["Godwindzapenga@gmail.com", "Godwindzapenga@gmail.com"],
         })
       )
     })
@@ -207,14 +207,14 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_cc_email: "laptops@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_cc_email: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
 
       await service.send({
-        to: "laptops@laptopzone.co.zw",
+        to: "Godwindzapenga@gmail.com",
         channel: "email",
         template: "order-confirmation",
         data: orderData as any,
@@ -229,7 +229,7 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           order_cc_email: "false",
           sandbox: false,
         }
@@ -251,8 +251,8 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_cc_email: "laptops@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_cc_email: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -286,8 +286,8 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          from_name: "Laptopzone",
+          from: "Godwindzapenga@gmail.com",
+          from_name: "TriTech",
           sandbox: false,
         }
       )
@@ -318,7 +318,7 @@ describe("SendgridNotificationService", () => {
       customer_email: "john@example.com",
       fulfillment_status: "Dispatched",
       tracking_number: "LZ-ZW-987654",
-      tracking_url: "https://track.laptopzone.co.zw/LZ-ZW-987654",
+      tracking_url: "https://track.tritech.example/LZ-ZW-987654",
       carrier: "Harare Express",
       items: [
         {
@@ -333,7 +333,7 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -369,7 +369,7 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -384,7 +384,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "jane@example.com",
-          subject: "Reset Your Laptopzone Password",
+          subject: "Reset Your TriTech Password",
           html: expect.stringContaining("secret_reset_token_123"),
         })
       )
@@ -403,7 +403,7 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -418,8 +418,8 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           to: "jane@example.com",
-          subject: expect.stringContaining("Welcome to Laptopzone"),
-          html: expect.stringContaining("Welcome to Laptopzone!"),
+          subject: expect.stringContaining("Welcome to TriTech"),
+          html: expect.stringContaining("Welcome to TriTech!"),
         })
       )
     })
@@ -427,7 +427,7 @@ describe("SendgridNotificationService", () => {
 
   describe("Invite Notification", () => {
     const inviteData: InviteData = {
-      email: "staff@laptopzone.co.zw",
+      email: "Godwindzapenga@gmail.com",
       token: "invite_token_456",
       invite_url: "http://localhost:9000/app/invite?token=invite_token_456",
       role: "admin",
@@ -438,13 +438,13 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
 
       await service.send({
-        to: "staff@laptopzone.co.zw",
+        to: "Godwindzapenga@gmail.com",
         channel: "email",
         template: "invite",
         data: inviteData as any,
@@ -452,8 +452,8 @@ describe("SendgridNotificationService", () => {
 
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: "staff@laptopzone.co.zw",
-          subject: "Invitation to Join Laptopzone Admin",
+          to: "Godwindzapenga@gmail.com",
+          subject: "Invitation to Join TriTech Admin",
           html: expect.stringContaining("invite_token_456"),
         })
       )
@@ -464,7 +464,7 @@ describe("SendgridNotificationService", () => {
     it("handles missing recipient gracefully", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
-        { from: "orders@laptopzone.co.zw", sandbox: true }
+        { from: "Godwindzapenga@gmail.com", sandbox: true }
       )
 
       const result = await service.send({
@@ -483,7 +483,7 @@ describe("SendgridNotificationService", () => {
     it("handles unknown template gracefully", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
-        { from: "orders@laptopzone.co.zw", sandbox: true }
+        { from: "Godwindzapenga@gmail.com", sandbox: true }
       )
 
       const result = await service.send({
@@ -514,7 +514,7 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.invalid_key",
-          from: "orders@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -538,14 +538,14 @@ describe("SendgridNotificationService", () => {
   })
 
   describe("Sender Email Routing", () => {
-    it("routes order templates to order_from_email (orders@laptopzone.co.zw)", async () => {
+    it("routes order templates to order_from_email (Godwindzapenga@gmail.com)", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_from_email: "orders@laptopzone.co.zw",
-          account_from_email: "noreply@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_from_email: "Godwindzapenga@gmail.com",
+          account_from_email: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -571,20 +571,20 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           from: expect.objectContaining({
-            email: "orders@laptopzone.co.zw",
+            email: "Godwindzapenga@gmail.com",
           }),
         })
       )
     })
 
-    it("routes account templates to account_from_email (noreply@laptopzone.co.zw)", async () => {
+    it("routes account templates to account_from_email (Godwindzapenga@gmail.com)", async () => {
       const service = new SendgridNotificationService(
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_from_email: "orders@laptopzone.co.zw",
-          account_from_email: "noreply@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_from_email: "Godwindzapenga@gmail.com",
+          account_from_email: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
@@ -603,7 +603,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           from: expect.objectContaining({
-            email: "noreply@laptopzone.co.zw",
+            email: "Godwindzapenga@gmail.com",
           }),
         })
       )
@@ -614,16 +614,16 @@ describe("SendgridNotificationService", () => {
         { logger: mockLogger },
         {
           api_key: "SG.test_key_live",
-          from: "orders@laptopzone.co.zw",
-          order_from_email: "orders@laptopzone.co.zw",
-          account_from_email: "noreply@laptopzone.co.zw",
+          from: "Godwindzapenga@gmail.com",
+          order_from_email: "Godwindzapenga@gmail.com",
+          account_from_email: "Godwindzapenga@gmail.com",
           sandbox: false,
         }
       )
 
       await service.send({
         to: "customer@example.com",
-        from: "support@laptopzone.co.zw",
+        from: "Godwindzapenga@gmail.com",
         channel: "email",
         template: "welcome",
         data: {
@@ -635,7 +635,7 @@ describe("SendgridNotificationService", () => {
       expect(sendgrid.send).toHaveBeenCalledWith(
         expect.objectContaining({
           from: expect.objectContaining({
-            email: "support@laptopzone.co.zw",
+            email: "Godwindzapenga@gmail.com",
           }),
         })
       )
@@ -658,7 +658,7 @@ describe("SendgridNotificationService", () => {
           quantity: 2,
           unit_price: 650,
           total_price: 1300,
-          thumbnail: "https://cdn.laptopzone.co.zw/thinkpad.jpg",
+          thumbnail: "https://cdn.tritech.example/thinkpad.jpg",
         },
       ],
       subtotal: 1300,
@@ -714,7 +714,7 @@ describe("SendgridNotificationService", () => {
     it("produces readable plain text version", () => {
       const result = renderOwnerOrderNotification(mockOrderData)
 
-      expect(result.text).toContain("Laptopzone Admin Notification: New Order #1001")
+      expect(result.text).toContain("TriTech Admin Notification: New Order #1001")
       expect(result.text).toContain("Customer: Jane Smith")
       expect(result.text).toContain("Total: $1,260.00")
       expect(result.text).toContain("Lenovo ThinkPad E14 Gen 5")

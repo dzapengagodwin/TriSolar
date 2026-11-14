@@ -82,6 +82,7 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
                 <Image
                   src={variantImage}
                   alt={value}
+                  unoptimized
                   fill
                   sizes="56px"
                   className="object-contain p-1"

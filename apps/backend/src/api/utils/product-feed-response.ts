@@ -8,7 +8,7 @@ function getSingleQueryValue(value: unknown): string | undefined {
 }
 
 function getStorefrontUrl(): string {
-  const configuredUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const configuredUrl = process.env.STOREFRONT_URL || "http://localhost:8000"
   const url = new URL(configuredUrl)
 
   if (
@@ -61,8 +61,8 @@ export async function serveProductFeed(
       country_code: countryCode,
       currency_code: currencyCode,
       storefront_url: getStorefrontUrl(),
-      feed_title: "Laptopzone - Google Merchant Product Feed",
-      feed_description: "Official Google Merchant Center Product Feed for Laptopzone",
+      feed_title: "TriTech - Google Merchant Product Feed",
+      feed_description: "Official Google Merchant Center Product Feed for TriTech",
     }
     const { result } = await generateProductFeedWorkflow(req.scope).run({ input: config })
 

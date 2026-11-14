@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: data.message || "Thank you for subscribing to Laptopzone deals!",
+      message: data.message || "Thank you for subscribing to TriTech deals!",
     })
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error)

@@ -12,16 +12,16 @@ export function renderInvite(
         Team Invitation
       </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px;">
-        You've Been Invited to Laptopzone
+        You've Been Invited to TriTech
       </h1>
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">
-        Join the team${escapeHtml(roleLabel)} on the Laptopzone management dashboard.
+        Join the team${escapeHtml(roleLabel)} on the TriTech management dashboard.
       </p>
     </div>
 
     <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 24px 0;">
       Hello,<br>
-      You have been invited to join the <strong>Laptopzone</strong> administration team. Click the button below to accept the invitation and set up your account.
+      You have been invited to join the <strong>TriTech</strong> administration team. Click the button below to accept the invitation and set up your account.
     </p>
 
     <div style="text-align: center; margin: 32px 0;">
@@ -38,21 +38,21 @@ export function renderInvite(
     </div>
   `
 
-  const subject = "Invitation to Join Laptopzone Admin"
+  const subject = "Invitation to Join TriTech Admin"
   const html = renderBaseLayout({
     title: subject,
-    previewText: "You have been invited to join the Laptopzone administration dashboard.",
+    previewText: "You have been invited to join the TriTech administration dashboard.",
     content,
   })
 
-  const text = `LAPTOPZONE ZIMBABWE - TEAM INVITATION
+  const text = `TriTech ZIMBABWE - TEAM INVITATION
 
-You have been invited to join the Laptopzone administration team.
+You have been invited to join the TriTech administration team.
 
 Accept your invitation here:
 ${data.invite_url}
 
-Laptopzone Zimbabwe`
+TriTech Zimbabwe`
 
   return { subject, html, text }
 }

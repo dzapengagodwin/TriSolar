@@ -78,6 +78,7 @@ export default async function ProductRail({
               <Image
                 src={bannerImage}
                 alt={title}
+                unoptimized
                 width={1440}
                 height={136}
                 className="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]"
@@ -88,6 +89,7 @@ export default async function ProductRail({
             <Image
               src={bannerImage}
               alt={title}
+              unoptimized
               width={1440}
               height={136}
               className="w-full h-auto"

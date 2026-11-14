@@ -96,10 +96,10 @@ export default function PolicyPageLayout({
                 Email
               </span>
               <a
-                href="mailto:support@laptopzone.co.zw"
+                href="mailto:Godwindzapenga@gmail.com"
                 className="font-semibold text-gray-900 hover:text-primary transition-colors"
               >
-                support@laptopzone.co.zw
+                Godwindzapenga@gmail.com
               </a>
             </div>
             <div className="bg-white p-3.5 rounded-xl border border-gray-200/70">
@@ -107,12 +107,12 @@ export default function PolicyPageLayout({
                 Phone & WhatsApp
               </span>
               <a
-                href="tel:+263772953946"
+                href="tel:+263778158984"
                 target="_blank"
                 rel="noreferrer"
                 className="font-semibold text-gray-900 hover:text-primary transition-colors"
               >
-                +263 77 295 3946
+                +263 77 815 8984
               </a>
             </div>
             <div className="bg-white p-3.5 rounded-xl border border-gray-200/70">
@@ -129,4 +129,3 @@ export default function PolicyPageLayout({
     </div>
   )
 }
-

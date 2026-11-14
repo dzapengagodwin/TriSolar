@@ -1,6 +1,6 @@
 # Repository Structure
 
-The **Laptopzone** monorepo uses **Turborepo** workspaces. The top‑level layout is:
+The **TriTech** monorepo uses **Turborepo** workspaces. The top‑level layout is:
 
 ```
 .

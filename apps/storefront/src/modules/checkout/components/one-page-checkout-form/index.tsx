@@ -1342,7 +1342,7 @@ const OnePageCheckoutForm = ({
           </button>
 
           <p className="text-center text-xs text-gray-400 leading-relaxed">
-            By placing your order, you agree to Laptopzone&apos;s{" "}
+            By placing your order, you agree to TriTech&apos;s{" "}
             <LocalizedClientLink href="/terms-and-conditions" target="_blank" className="underline hover:text-gray-700">
               Terms &amp; Conditions
             </LocalizedClientLink>

@@ -9,7 +9,7 @@
 
 ## 1. Architectural Overview
 
-Laptopzone uses Medusa v2 as a headless e-commerce engine operating in a monorepo workspace alongside the Next.js storefront. Medusa manages commerce primitives (catalog, pricing, inventory, cart, checkout, orders, customers, and taxes) and is extended with custom domain modules, workflows, event subscribers, and admin UI widgets.
+TriTech uses Medusa v2 as a headless e-commerce engine operating in a monorepo workspace alongside the Next.js storefront. Medusa manages commerce primitives (catalog, pricing, inventory, cart, checkout, orders, customers, and taxes) and is extended with custom domain modules, workflows, event subscribers, and admin UI widgets.
 
 ```mermaid
 flowchart TD
@@ -33,7 +33,7 @@ flowchart TD
             TaxMod["Tax Module"]
         end
         
-        subgraph CustomModules["Custom Laptopzone Modules"]
+        subgraph CustomModules["Custom TriTech Modules"]
             BrandMod["Brand Module"]
             SeoMod["SEO Metadata Module"]
             StoreSettingsMod["Store Settings Module"]
@@ -76,9 +76,9 @@ flowchart TD
 
 ---
 
-## 2. Standard Medusa vs. Laptopzone Custom Functionality
+## 2. Standard Medusa vs. TriTech Custom Functionality
 
-| Capability | Standard Medusa v2 | Laptopzone Custom Implementation |
+| Capability | Standard Medusa v2 | TriTech Custom Implementation |
 |---|---|---|
 | **Catalog Hierarchy** | Categories, Collections, Tags | Added custom **Brand Module** (`src/modules/brand`) linked via module link `product-brand.ts`. |
 | **Product Attributes** | Standard metadata JSON field | Added dedicated **SEO Metadata Module** (`src/modules/seo`), **Product Reviews** (`src/modules/product-review`), and **Recommendations** (`src/modules/product-recommendation`). |
@@ -181,7 +181,7 @@ Subscribers listen to internal events dispatched across the Medusa event bus (Re
 
 ## 6. Admin Dashboard Extensions
 
-Laptopzone heavily extends Medusa's standard Vite-powered admin dashboard (`src/admin`):
+TriTech heavily extends Medusa's standard Vite-powered admin dashboard (`src/admin`):
 
 - **Routes**:
   - `/app/brands`: Complete Brand management interface (add, edit, delete, assign logos).

@@ -36,10 +36,10 @@ export function generateGoogleProductFeedXml(
   items: ProductFeedItem[],
   config: ProductFeedConfig
 ): string {
-  const feedTitle = config.feed_title || "Laptopzone - Google Merchant Product Feed"
+  const feedTitle = config.feed_title || "TriTech - Google Merchant Product Feed"
   const feedDescription =
     config.feed_description ||
-    "Official Google Merchant Center Product Feed for Laptopzone"
+    "Official Google Merchant Center Product Feed for TriTech"
   const feedLink = config.storefront_url
 
   const xmlItems = items.map((item) => {

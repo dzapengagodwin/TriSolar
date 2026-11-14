@@ -20,9 +20,9 @@ export default function SubcategoryCards({ category }: SubcategoryCardsProps) {
     return null
   }
 
-  const activeChildren = children
-    .filter((c) => c.is_active !== false)
-    .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+  const activeChildren = [...children].sort(
+    (a, b) => (a.rank ?? 0) - (b.rank ?? 0)
+  )
 
   if (activeChildren.length === 0) {
     return null
@@ -89,6 +89,7 @@ export default function SubcategoryCards({ category }: SubcategoryCardsProps) {
                 <Image
                   src={item.image}
                   alt={item.name}
+                  unoptimized
                   fill
                   sizes="40px"
                   className="object-contain object-center group-hover:scale-108 transition-transform duration-200"

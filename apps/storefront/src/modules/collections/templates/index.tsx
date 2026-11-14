@@ -43,7 +43,7 @@ export default async function CollectionTemplate({
       },
       countryCode,
     }).catch(() => ({ response: { products: [], count: 0 } })),
-    listCategories({ limit: 50 }).catch(() => []),
+    listCategories({ limit: 50 }),
   ])
 
   const scopedOptions = extractScopedProductOptions(scopedProducts)

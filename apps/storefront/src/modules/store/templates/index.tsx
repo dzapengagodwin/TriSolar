@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { listProducts } from "@lib/data/products"
+import { listAllProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
 import {
   OptionValueIds,
@@ -34,15 +34,14 @@ const StoreTemplate = async ({
   const sort = sortBy || "created_at"
 
   // Fetch candidate products and categories in parallel
-  const [{ response: { products: scopedProducts } }, categories] = await Promise.all([
-    listProducts({
+  const [{ products: scopedProducts }, categories] = await Promise.all([
+    listAllProducts({
       queryParams: {
         ...(q ? { q } : {}),
-        limit: 100,
       },
       countryCode,
-    }).catch(() => ({ response: { products: [], count: 0 } })),
-    listCategories({ limit: 50 }).catch(() => []),
+    }),
+    listCategories({ limit: 50 }),
   ])
 
   const scopedOptions = extractScopedProductOptions(scopedProducts)

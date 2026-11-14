@@ -13,7 +13,7 @@ export function renderWelcome(
         Welcome to the Family
       </div>
       <h1 style="margin: 0; font-size: 24px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px;">
-        Welcome to Laptopzone!
+        Welcome to TriTech!
       </h1>
       <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">
         Your account has been created successfully.
@@ -22,7 +22,7 @@ export function renderWelcome(
 
     <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0 0 20px 0;">
       Hello <strong>${escapeHtml(customerName)}</strong>,<br>
-      We're thrilled to have you with us! Laptopzone is your premium destination for authentic laptops, high-performance desktops, printers, and accessories with nationwide delivery across Zimbabwe.
+      We're thrilled to have you with us! TriTech is your premium destination for authentic laptops, high-performance desktops, printers, and accessories with nationwide delivery across Zimbabwe.
     </p>
 
     <!-- Perks Grid -->
@@ -56,18 +56,18 @@ export function renderWelcome(
     </div>
   `
 
-  const subject = "Welcome to Laptopzone Zimbabwe!"
+  const subject = "Welcome to TriTech Zimbabwe!"
   const html = renderBaseLayout({
     title: subject,
     previewText: "Your account is ready. Discover authentic laptops and hardware with nationwide delivery.",
     content,
   })
 
-  const text = `WELCOME TO LAPTOPZONE ZIMBABWE
+  const text = `WELCOME TO TriTech ZIMBABWE
 
 Hello ${customerName},
 
-Thank you for creating an account with Laptopzone!
+Thank you for creating an account with TriTech!
 
 With your new account you can:
 - Track orders in real-time
@@ -76,7 +76,7 @@ With your new account you can:
 
 Visit our store: ${storeUrl}
 
-Laptopzone Zimbabwe
+TriTech Zimbabwe
 Authentic Hardware, Zimbabwe`
 
   return { subject, html, text }

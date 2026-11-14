@@ -10,7 +10,7 @@ import {
   OptionValueIds,
   extractScopedProductOptions,
 } from "@lib/util/product-option-filters"
-import { listProducts } from "@lib/data/products"
+import { listAllProducts } from "@lib/data/products"
 import { listCategories } from "@lib/data/categories"
 import { getCategoryPublicPath } from "@lib/seo/canonical"
 
@@ -43,18 +43,35 @@ export default async function CategoryTemplate({
 
   // Use the actual category scope instead of the parent category, so child
   // category pages show their own products instead of the parent collection.
-  const [{ response: { products: scopedProducts } }, allCategories] = await Promise.all([
-    listProducts({
-      queryParams: {
-        category_id: [queryCategoryId],
-        ...(categoryQuery ? { q: categoryQuery } : {}),
-        limit: 100,
-      },
-      countryCode,
-    }).catch(() => ({ response: { products: [], count: 0 } })),
-    listCategories({ limit: 50 }).catch(() => []),
-  ])
+  const allCategories = await listCategories({ limit: 50 })
+  const childrenByParentId = new Map<string, string[]>()
+  allCategories.forEach((candidate) => {
+    if (candidate.parent_category_id) {
+      const children = childrenByParentId.get(candidate.parent_category_id) || []
+      children.push(candidate.id)
+      childrenByParentId.set(candidate.parent_category_id, children)
+    }
+  })
 
+  const childIds = new Set([queryCategoryId])
+  const pendingCategoryIds = [queryCategoryId]
+  while (pendingCategoryIds.length > 0) {
+    const parentId = pendingCategoryIds.pop()!
+    for (const childId of childrenByParentId.get(parentId) || []) {
+      if (!childIds.has(childId)) {
+        childIds.add(childId)
+        pendingCategoryIds.push(childId)
+      }
+    }
+  }
+
+  const { products: scopedProducts } = await listAllProducts({
+    queryParams: {
+      category_id: Array.from(childIds),
+      ...(categoryQuery ? { q: categoryQuery } : {}),
+    },
+    countryCode,
+  })
   const scopedOptions = extractScopedProductOptions(scopedProducts)
 
   const parents = [] as HttpTypes.StoreProductCategory[]
@@ -109,6 +126,7 @@ export default async function CategoryTemplate({
             sortBy={sort}
             page={pageNumber}
             categoryId={queryCategoryId}
+            categoryIds={Array.from(childIds)}
             q={categoryQuery}
             countryCode={countryCode}
             optionValueIds={optionValueIds}

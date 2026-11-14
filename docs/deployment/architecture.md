@@ -3,7 +3,7 @@
 > **Target Environment**: Ubuntu Linux VPS / Dedicated Host  
 > **Deployment Method**: Automated GitHub Actions CD via SSH  
 > **Service Supervision**: `systemd`  
-> **Public Domains**: `laptopzone.co.zw` (Production) & `dev.laptopzone.co.zw` (Staging / Development)
+> **Public Domains**: `tritech.example` (Production) & `dev.tritech.example` (Staging / Development)
 
 ---
 
@@ -21,7 +21,7 @@ flowchart TD
         ReverseProxy["Reverse Proxy (Nginx / Caddy)\nHandles SSL Termination & Virtual Hosts"]
         
         subgraph SystemdSupervision["systemd Process Supervision"]
-            StorefrontService["laptopzone-storefront.service\nNext.js Server (:8000)"]
+            StorefrontService["TriTech-storefront.service\nNext.js Server (:8000)"]
             MedusaService["medusa.service\nMedusa Engine & Admin (:9000)"]
         end
 
@@ -55,8 +55,8 @@ flowchart TD
 
 | Service / Component | Process Name | Listening Port | Public Domain / Path | Purpose |
 |---|---|---|---|---|
-| **Next.js Storefront** | `laptopzone-storefront.service` | `127.0.0.1:8000` | `https://laptopzone.co.zw/` | Customer storefront and server actions |
-| **Medusa Backend** | `medusa.service` | `127.0.0.1:9000` | `https://dev.laptopzone.co.zw/` & `/app` | REST API engine and Vite Admin panel |
+| **Next.js Storefront** | `TriTech-storefront.service` | `127.0.0.1:8000` | `https://tritech.example/` | Customer storefront and server actions |
+| **Medusa Backend** | `medusa.service` | `127.0.0.1:9000` | `https://dev.tritech.example/` & `/app` | REST API engine and Vite Admin panel |
 | **Reverse Proxy** | `nginx` or `caddy` | `:80`, `:443` | All domains | SSL termination, HTTP/2, gzip, static proxy |
 | **PostgreSQL** | `postgresql.service` | `127.0.0.1:5432` | Internal only | Relational database storage |
 | **Redis** | `redis-server.service` | `127.0.0.1:6379` | Internal only | Event bus pub/sub and distributed caching |
@@ -85,10 +85,10 @@ EnvironmentFile=/root/my-medusa-store/apps/backend/.env
 WantedBy=multi-user.target
 ```
 
-### 3.2 Next.js Storefront Service (`/etc/systemd/system/laptopzone-storefront.service`)
+### 3.2 Next.js Storefront Service (`/etc/systemd/system/TriTech-storefront.service`)
 ```ini
 [Unit]
-Description=Laptopzone Next.js Storefront
+Description=TriTech Next.js Storefront
 After=network.target medusa.service
 
 [Service]
@@ -133,11 +133,11 @@ npm run build
 
 # 6. Restart systemd services
 sudo systemctl restart medusa
-sudo systemctl restart laptopzone-storefront
+sudo systemctl restart TriTech-storefront
 
 # 7. Verify service status
 sudo systemctl status medusa --no-pager
-sudo systemctl status laptopzone-storefront --no-pager
+sudo systemctl status TriTech-storefront --no-pager
 ```
 
 ### 4.2 Health Checks & Diagnostics
@@ -150,5 +150,5 @@ curl -I http://127.0.0.1:8000/
 
 # Inspect real-time logs
 journalctl -u medusa -f --lines=50
-journalctl -u laptopzone-storefront -f --lines=50
+journalctl -u TriTech-storefront -f --lines=50
 ```

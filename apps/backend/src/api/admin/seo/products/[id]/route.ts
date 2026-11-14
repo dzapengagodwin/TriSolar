@@ -59,7 +59,7 @@ export const GET = async (
     })
   }
 
-  const storefrontUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const storefrontUrl = process.env.STOREFRONT_URL || "http://localhost:8000"
   const countryCode = process.env.MERCHANT_COUNTRY || "zw"
 
   const seo = await seoService.retrieveForEntity("product", id)
@@ -177,7 +177,7 @@ export const POST = async (
     },
   })
 
-  const storefrontUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const storefrontUrl = process.env.STOREFRONT_URL || "https://tritech.example"
   const countryCode = process.env.MERCHANT_COUNTRY || "zw"
 
   const analysis = await seoService.analyze({

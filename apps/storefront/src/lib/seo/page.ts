@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { getCanonicalUrl } from "./canonical"
 import { STORE_URL, DEFAULT_LOCALE, SITE_NAME } from "./constants"
+import { hasLegacyBrandDomain, sanitizeBrandingText } from "./metadata"
 import { SeoMetadataDTO } from "@lib/data/seo"
 
 export type StaticPageInput = {
@@ -19,12 +20,20 @@ export function generatePageMetadata(
   seo?: SeoMetadataDTO | null
 ): Metadata {
   // Use strictly what was saved in the database
-  const title = seo?.meta_title || page.title || ""
-  const description = seo?.meta_description || page.description || undefined
-  const canonical = seo?.canonical_url || getCanonicalUrl(page.path, countryCode)
-  const ogTitle = seo?.og_title || title
-  const ogDescription = seo?.og_description || description
-  const ogImage = seo?.og_image
+  const title =
+    sanitizeBrandingText(seo?.meta_title || page.title) || ""
+  const description = sanitizeBrandingText(
+    seo?.meta_description || page.description
+  )
+  const canonical =
+    seo?.canonical_url && !hasLegacyBrandDomain(seo.canonical_url)
+      ? seo.canonical_url
+      : getCanonicalUrl(page.path, countryCode)
+  const ogTitle = sanitizeBrandingText(seo?.og_title || title) || title
+  const ogDescription = sanitizeBrandingText(
+    seo?.og_description || description
+  )
+  const ogImage = seo?.og_image && !hasLegacyBrandDomain(seo.og_image)
     ? [
         {
           url: seo.og_image,
@@ -40,7 +49,7 @@ export function generatePageMetadata(
 
   return {
     metadataBase: new URL(STORE_URL),
-    // Using { absolute: ... } prevents Next.js from appending layout templates like `%s | Laptopzone`
+    // Using { absolute: ... } prevents Next.js from appending layout templates like `%s | TriTech`
     title: title ? { absolute: title } : undefined,
     description: description || undefined,
     alternates: canonical ? { canonical } : undefined,

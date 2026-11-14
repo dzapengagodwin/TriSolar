@@ -3,9 +3,9 @@ import PolicyPageLayout from "@modules/content/components/policy-page-layout"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Warranty Policy | Laptopzone",
+  title: "Warranty Policy | TriTech",
   description:
-    "Explore Laptopzone's warranty coverage for brand-new laptops and computers, hardware defect protections, exclusions, and warranty claim procedures in Zimbabwe.",
+    "Explore TriTech's warranty coverage for brand-new laptops and computers, hardware defect protections, exclusions, and warranty claim procedures in Zimbabwe.",
 }
 
 export default async function WarrantyPage() {
@@ -119,9 +119,9 @@ export default async function WarrantyPage() {
             <div>
               <p className="font-bold text-gray-900 text-xs sm:text-sm">Initiate Technical Support</p>
               <p className="text-xs text-gray-600">
-                Contact our support team via WhatsApp (+263 77 295 3946) or email (
-                <a href="mailto:support@laptopzone.co.zw" className="text-primary hover:underline">
-                  support@laptopzone.co.zw
+                Contact our support team via WhatsApp (+263 77 815 8984) or email (
+                <a href="mailto:Godwindzapenga@gmail.com" className="text-primary hover:underline">
+                  Godwindzapenga@gmail.com
                 </a>
                 ) with your purchase invoice and serial number. Our technicians may provide initial troubleshooting to resolve common software issues remotely.
               </p>
@@ -147,7 +147,7 @@ export default async function WarrantyPage() {
             <div>
               <p className="font-bold text-gray-900 text-xs sm:text-sm">Diagnostics &amp; Repair Turnaround</p>
               <p className="text-xs text-gray-600">
-                Hardware diagnostics are typically completed within 2 to 4 business days. Warranty repairs are performed using genuine manufacturer parts. If a device cannot be repaired within 14 business days, Laptopzone will provide an equivalent replacement unit or store credit.
+                Hardware diagnostics are typically completed within 2 to 4 business days. Warranty repairs are performed using genuine manufacturer parts. If a device cannot be repaired within 14 business days, TriTech will provide an equivalent replacement unit or store credit.
               </p>
             </div>
           </div>
@@ -164,7 +164,7 @@ export default async function WarrantyPage() {
             IMPORTANT: Backup Your Files Prior to Service
           </p>
           <p className="leading-relaxed">
-            During diagnostic testing and motherboard or drive replacements, data on the device may be erased or drives may be formatted. <span className="font-semibold text-gray-900">Laptopzone is not responsible for any loss of confidential, personal, or business data, photos, documents, or installed software programs</span>. Customers are solely responsible for creating complete external backups before handing in devices for warranty service.
+            During diagnostic testing and motherboard or drive replacements, data on the device may be erased or drives may be formatted. <span className="font-semibold text-gray-900">TriTech is not responsible for any loss of confidential, personal, or business data, photos, documents, or installed software programs</span>. Customers are solely responsible for creating complete external backups before handing in devices for warranty service.
           </p>
         </div>
       </section>

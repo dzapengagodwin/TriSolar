@@ -60,14 +60,6 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "laptopzone.co.zw",
-      },
-      {
-        protocol: "https",
-        hostname: "*.laptopzone.co.zw",
-      },
-      {
-        protocol: "https",
         hostname: "*.r2.cloudflarestorage.com",
       },
       {

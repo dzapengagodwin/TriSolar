@@ -37,7 +37,7 @@ export const GET = async (
     })
   }
 
-  const storefrontUrl = process.env.STOREFRONT_URL || "https://laptopzone.co.zw"
+  const storefrontUrl = process.env.STOREFRONT_URL || "http://localhost:8000"
   const countryCode = process.env.MERCHANT_COUNTRY || "zw"
 
   const seo = await seoService.retrieveForEntity("category", id)
@@ -129,4 +129,3 @@ export const POST = async (
     seo: updatedSeo,
   })
 }
-

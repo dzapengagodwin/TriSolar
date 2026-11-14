@@ -1,6 +1,6 @@
 # External Integrations
 
-> **Scope**: Exhaustive inventory and architectural documentation of all third-party external services, APIs, payment gateways, file storage, email providers, and analytics integrated into Laptopzone.
+> **Scope**: Exhaustive inventory and architectural documentation of all third-party external services, APIs, payment gateways, file storage, email providers, and analytics integrated into TriTech.
 
 ---
 
@@ -28,11 +28,11 @@
 - **Where Configured**: `apps/backend/medusa-config.ts` (Notification module) and `src/modules/sendgrid`.
 - **Environment Variables**:
   - `SENDGRID_API_KEY`: Secret API key (`SG.xxx...`).
-  - `SENDGRID_FROM_EMAIL`: Default sender email (e.g. `orders@laptopzone.co.zw`).
-  - `SENDGRID_FROM_NAME`: Sender display name (e.g. `Laptopzone`).
+  - `SENDGRID_FROM_EMAIL`: Default sender email (e.g. `Godwindzapenga@gmail.com`).
+  - `SENDGRID_FROM_NAME`: Sender display name (e.g. `TriTech`).
   - `SENDGRID_ORDER_FROM_EMAIL`: Dedicated order sender address.
   - `SENDGRID_ORDER_NOTIFICATION_EMAIL`: Operational staff inbox for new order alerts.
-  - `SENDGRID_ACCOUNT_FROM_EMAIL`: Account management sender (e.g. `noreply@laptopzone.co.zw`).
+  - `SENDGRID_ACCOUNT_FROM_EMAIL`: Account management sender (e.g. `Godwindzapenga@gmail.com`).
   - `SENDGRID_SANDBOX`: If `"true"`, validates payloads against SendGrid without dispatching actual emails.
 - **Used by**: Event subscribers (`order-placed.ts`, `customer-created.ts`, `auth-password-reset.ts`, `invite-created.ts`, `order-fulfillment-created.ts`).
 - **Data Sent**: Recipient email address, order details, line item breakdown, pricing, shipping address, store URLs.

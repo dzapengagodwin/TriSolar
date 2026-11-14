@@ -1,7 +1,7 @@
 import type { YoastHeadJson, YoastSeoRecord } from "./yoast-seo-client"
 import type { UpsertSeoMetadataInput } from "../../seo/types"
 
-const SITE_NAME = "Laptopzone"
+const SITE_NAME = "TriTech"
 
 // -------------------------------------------------------------------
 // Yoast snippet variable token resolver

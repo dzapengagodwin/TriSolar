@@ -2,8 +2,8 @@ import { Metadata } from "next"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export const metadata: Metadata = {
-  title: "Track Your Order | Laptopzone",
-  description: "Find your Laptopzone order status or contact customer support for order assistance.",
+  title: "Track Your Order | TriTech",
+  description: "Find your TriTech order status or contact customer support for order assistance.",
   alternates: { canonical: "/track-order" },
 }
 

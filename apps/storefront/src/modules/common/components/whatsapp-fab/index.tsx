@@ -7,8 +7,8 @@ export type WhatsAppFABProps = {
 }
 
 export function WhatsAppFAB({
-  phoneNumber = "263772953946",
-  defaultMessage = "Hi Laptopzone, I have an inquiry.",
+  phoneNumber = "263778158984",
+  defaultMessage = "Hi TriTech, I have an inquiry.",
   className = "",
 }: WhatsAppFABProps) {
   const cleanPhone = phoneNumber.replace(/[^0-9]/g, "")
@@ -20,7 +20,7 @@ export function WhatsAppFAB({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Chat with Laptopzone on WhatsApp"
+        aria-label="Chat with TriTech on WhatsApp"
         className={`group fixed bottom-6 right-5 sm:bottom-6 sm:right-6 z-40 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#20ba5a] text-white rounded-full shadow-lg shadow-green-600/30 hover:shadow-xl hover:shadow-green-600/40 transition-all duration-300 transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-400/50 cursor-pointer ${className}`}
       >
         {/* Subtle Online Status Badge */}

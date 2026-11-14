@@ -83,7 +83,10 @@ export const listProducts = async ({
     colIds.forEach((id) => extraTags.push(collectionTag(id)))
   }
   if (queryParams?.handle) {
-    extraTags.push(productHandleTag(queryParams.handle))
+    const handles = Array.isArray(queryParams.handle)
+      ? queryParams.handle
+      : [queryParams.handle]
+    handles.forEach((handle) => extraTags.push(productHandleTag(handle)))
   }
   if (queryParams?.id) {
     const ids = Array.isArray(queryParams.id) ? queryParams.id : [queryParams.id]
@@ -131,6 +134,39 @@ export const listProducts = async ({
     })
 }
 
+export const listAllProducts = async ({
+  queryParams,
+  countryCode,
+}: {
+  queryParams?: ProductListQueryParams
+  countryCode: string
+}): Promise<{ products: HttpTypes.StoreProduct[]; count: number }> => {
+  const limit = 100
+  const products: HttpTypes.StoreProduct[] = []
+  let count = 0
+  let pageParam = 1
+
+  while (products.length < count || pageParam === 1) {
+    const {
+      response: { products: pageProducts, count: pageCount },
+    } = await listProducts({
+      pageParam,
+      queryParams: { ...queryParams, limit },
+      countryCode,
+    })
+
+    if (pageProducts.length === 0) {
+      break
+    }
+
+    products.push(...pageProducts)
+    count = pageCount
+    pageParam += 1
+  }
+
+  return { products, count }
+}
+
 /**
  * This will fetch products for the given category/collection/query and sort and filter them based on
  * dynamic scoped product options.
@@ -169,14 +205,8 @@ export const listProductsWithSort = async ({
 
   // Fetch candidate products without passing option_value_id directly to backend,
   // so we have the full product set for accurate multi-facet filtering and scoped options extraction.
-  const {
-    response: { products: allProducts },
-  } = await listProducts({
-    pageParam: 0,
-    queryParams: {
-      ...queryParams,
-      limit: 100,
-    },
+  const { products: allProducts } = await listAllProducts({
+    queryParams,
     countryCode,
   })
 

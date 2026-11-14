@@ -138,7 +138,7 @@ export default function FooterDealsBox() {
 
           {/* Instagram */}
           <a
-            href="https://www.instagram.com/laptopzonezw"
+            href="https://www.instagram.com/tritechzw"
             target="_blank"
             rel="noreferrer"
             aria-label="Instagram"
@@ -164,7 +164,7 @@ export default function FooterDealsBox() {
 
           {/* Facebook */}
           <a
-            href="https://www.facebook.com/laptopzonezw"
+            href="https://www.facebook.com/tritechzw"
             target="_blank"
             rel="noreferrer"
             aria-label="Facebook"
@@ -208,4 +208,3 @@ export default function FooterDealsBox() {
     </div>
   )
 }
-

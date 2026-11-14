@@ -25,7 +25,7 @@ export default async function TermsPage() {
   return (
     <PolicyPageLayout
       title="Terms & Conditions"
-      subtitle="These terms govern your access to and use of Laptopzone's website, online store, and purchase of tech products."
+      subtitle="These terms govern your access to and use of TriTech's website, online store, and purchase of tech products."
       activePolicy="terms"
       lastUpdated="September 2026"
     >
@@ -35,7 +35,7 @@ export default async function TermsPage() {
           1. Introduction & Acceptance
         </h2>
         <p>
-          Welcome to Laptopzone (<span className="font-semibold text-gray-900">&quot;we&quot;</span>,{" "}
+          Welcome to TriTech (<span className="font-semibold text-gray-900">&quot;we&quot;</span>,{" "}
           <span className="font-semibold text-gray-900">&quot;our&quot;</span>, or{" "}
           <span className="font-semibold text-gray-900">&quot;us&quot;</span>). By browsing our website, registering an account, or placing an order, you agree to be bound by these Terms &amp; Conditions and our related policies, including our{" "}
           <LocalizedClientLink href="/privacy-policy" className="text-primary font-semibold hover:underline">
@@ -62,12 +62,11 @@ export default async function TermsPage() {
           2. Company Information
         </h2>
         <p>
-          Laptopzone operates an online retail store and technical support center based in Harare, Zimbabwe.
+          TriTech operates an online retail store and technical support center based in Harare, Zimbabwe.
         </p>
         <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-1 text-xs">
           <p><span className="font-bold text-gray-900">Physical Address:</span> 64 Ridgeway, Borrowdale, Harare, Zimbabwe</p>
-          <p><span className="font-bold text-gray-900">Customer Support:</span> support@laptopzone.co.zw | +263 77 295 3946 / +263 8612 600 600</p>
-          <p><span className="font-bold text-gray-900">Website:</span> laptopzone.co.zw</p>
+          <p><span className="font-bold text-gray-900">Customer Support:</span> Godwindzapenga@gmail.com | +263 77 815 8984</p>
         </div>
       </section>
 
@@ -77,10 +76,10 @@ export default async function TermsPage() {
           3. Account Registration &amp; Security
         </h2>
         <p>
-          When you create an account on Laptopzone, you agree to provide accurate, complete, and current information. You are responsible for safeguarding your login credentials and for all activities that occur under your account.
+          When you create an account on TriTech, you agree to provide accurate, complete, and current information. You are responsible for safeguarding your login credentials and for all activities that occur under your account.
         </p>
         <p>
-          You must promptly notify Laptopzone if you suspect any unauthorized access to or compromise of your account. We reserve the right to suspend or terminate accounts that provide false information or violate our policies.
+          You must promptly notify TriTech if you suspect any unauthorized access to or compromise of your account. We reserve the right to suspend or terminate accounts that provide false information or violate our policies.
         </p>
       </section>
 
@@ -123,7 +122,7 @@ export default async function TermsPage() {
           </ul>
         </div>
         <p>
-          While we make every effort to prevent pricing errors, if a product is mistakenly listed at an incorrect price due to typographical or technical error, Laptopzone reserves the right to cancel the order and issue a full refund prior to dispatch.
+          While we make every effort to prevent pricing errors, if a product is mistakenly listed at an incorrect price due to typographical or technical error, TriTech reserves the right to cancel the order and issue a full refund prior to dispatch.
         </p>
       </section>
 
@@ -133,7 +132,7 @@ export default async function TermsPage() {
           6. Order Placement &amp; Acceptance
         </h2>
         <p>
-          Receipt of an electronic order confirmation does not signify our final acceptance of your order. Laptopzone reserves the right to accept, decline, or limit order quantities at any time after receipt of your order for reasons including:
+          Receipt of an electronic order confirmation does not signify our final acceptance of your order. TriTech reserves the right to accept, decline, or limit order quantities at any time after receipt of your order for reasons including:
         </p>
         <ul className="list-disc pl-5 space-y-1 text-gray-600">
           <li>Suspected fraudulent transaction or failed identity verification</li>
@@ -165,7 +164,7 @@ export default async function TermsPage() {
           8. Warranty, Returns &amp; Consumer Rights
         </h2>
         <p>
-          Every laptop and hardware product sold by Laptopzone comes with warranty protection against manufacturer defects. In addition, we maintain clear guidelines for returns, replacements, and refunds:
+          Every laptop and hardware product sold by TriTech comes with warranty protection against manufacturer defects. In addition, we maintain clear guidelines for returns, replacements, and refunds:
         </p>
         <ul className="list-disc pl-5 space-y-1 text-gray-600">
           <li>
@@ -191,7 +190,7 @@ export default async function TermsPage() {
           9. Intellectual Property
         </h2>
         <p>
-          All content included on this website—such as text, graphics, logos, button icons, software, and compilation of catalog data—is the property of Laptopzone or its content suppliers and protected by copyright and intellectual property laws.
+          All content included on this website—such as text, graphics, logos, button icons, software, and compilation of catalog data—is the property of TriTech or its content suppliers and protected by copyright and intellectual property laws.
         </p>
         <p>
           All manufacturer brand names, product logos, and registered trademarks (including HP, Dell, Lenovo, Apple, ASUS, Acer, Microsoft, Intel, AMD, and NVIDIA) belong solely to their respective trademark owners and are referenced on this site solely for compatibility, authenticity, and identification purposes.
@@ -204,7 +203,7 @@ export default async function TermsPage() {
           10. Limitation of Liability
         </h2>
         <p>
-          To the maximum extent permitted by applicable law, Laptopzone shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, loss of data, or business interruption arising out of or related to the use of or inability to use our products or services.
+          To the maximum extent permitted by applicable law, TriTech shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, loss of data, or business interruption arising out of or related to the use of or inability to use our products or services.
         </p>
         <p>
           In all circumstances, our total aggregate liability to you for any claim arising out of your purchase of a product shall be strictly limited to the actual purchase price paid by you for that specific product.

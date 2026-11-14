@@ -190,11 +190,11 @@ export async function GET() {
   const baseUrl = STORE_URL.replace(/\/+$/, "")
 
   const content = [
-    "# Laptopzone: Full Store and Product Catalog",
+    "# TriTech: Full Store and Product Catalog",
     "",
     `> ${DEFAULT_SITE_DESCRIPTION}`,
     "",
-    "Laptopzone is a Zimbabwean technology retailer. The storefront offers laptops, desktop computers, mobile phones, printers, monitors, networking equipment, and computer accessories from established technology brands.",
+    "TriTech is a Zimbabwean technology retailer. The storefront offers laptops, desktop computers, mobile phones, printers, monitors, networking equipment, and computer accessories from established technology brands.",
     "",
     "## Important catalog notes",
     "",
@@ -209,7 +209,7 @@ export async function GET() {
     `- [Brand directory](${getCanonicalUrl("/brands", DEFAULT_COUNTRY_CODE)})`,
     `- [Frequently asked questions](${getCanonicalUrl("/faq", DEFAULT_COUNTRY_CODE)})`,
     `- [Customer help](${getCanonicalUrl("/customer-help", DEFAULT_COUNTRY_CODE)})`,
-    `- [Contact Laptopzone](${getCanonicalUrl("/contact-us", DEFAULT_COUNTRY_CODE)})`,
+    `- [Contact TriTech](${getCanonicalUrl("/contact-us", DEFAULT_COUNTRY_CODE)})`,
     `- [Delivery terms](${getCanonicalUrl("/delivery-terms", DEFAULT_COUNTRY_CODE)})`,
     `- [Returns and refunds](${getCanonicalUrl("/returns-and-refunds", DEFAULT_COUNTRY_CODE)})`,
     `- [Terms and conditions](${getCanonicalUrl("/terms-and-conditions", DEFAULT_COUNTRY_CODE)})`,

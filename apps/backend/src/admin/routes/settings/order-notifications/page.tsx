@@ -176,7 +176,7 @@ const OrderNotificationsPage = () => {
             </Heading>
           </div>
           <Text className="text-ui-fg-subtle text-sm mt-1">
-            Receive dedicated email alerts whenever a customer places an order on Laptopzone.
+            Receive dedicated email alerts whenever a customer places an order on TriTech.
           </Text>
         </div>
 
@@ -216,7 +216,7 @@ const OrderNotificationsPage = () => {
             <Input
               id="notification-emails"
               type="text"
-              placeholder="owner@laptopzone.co.zw, manager@laptopzone.co.zw"
+              placeholder="Godwindzapenga@gmail.com, Godwindzapenga@gmail.com"
               value={emailsInput}
               onChange={(e) => setEmailsInput(e.target.value)}
               disabled={loading || saving}

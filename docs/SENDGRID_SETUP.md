@@ -1,10 +1,10 @@
-# SendGrid Email Integration Guide for Laptopzone (MedusaJS v2)
+# SendGrid Email Integration Guide for TriTech (MedusaJS v2)
 
-This document provides complete instructions for setting up, configuring, testing, and deploying **SendGrid Transactional Emails** in the Laptopzone MedusaJS v2 backend.
+This document provides complete instructions for setting up, configuring, testing, and deploying **SendGrid Transactional Emails** in the TriTech MedusaJS v2 backend.
 
 ---
 
-## 1. How SendGrid Works in Laptopzone
+## 1. How SendGrid Works in TriTech
 
 Our implementation uses MedusaJS v2's native event-driven notification architecture:
 
@@ -19,7 +19,7 @@ Our implementation uses MedusaJS v2's native event-driven notification architect
        │
        ▼
 [ SendGrid Provider ] (apps/backend/src/modules/sendgrid)
-       │ (Renders responsive Laptopzone-branded HTML + plain-text fallback)
+       │ (Renders responsive TriTech-branded HTML + plain-text fallback)
        ▼
 [ SendGrid Mail API ] (@sendgrid/mail)
        │
@@ -38,16 +38,16 @@ Our implementation uses MedusaJS v2's native event-driven notification architect
 ### Step 2: Authenticate Your Sending Domain
 To ensure high deliverability and prevent emails from landing in spam:
 1. Navigate to **Settings** $\rightarrow$ **Sender Authentication** $\rightarrow$ **Authenticate Your Domain**.
-2. Select your DNS host and enter your domain (e.g. `laptopzone.co.zw`).
+2. Select your DNS host and enter your domain (e.g. `tritech.example`).
 3. Add the provided DNS records (usually 3 CNAME records for DKIM/SPF) to your DNS management panel (Cloudflare, cPanel, Namecheap, etc.):
-   - `emXXXX.laptopzone.co.zw` $\rightarrow$ `uXXXX.wl.sendgrid.net`
-   - `s1._domainkey.laptopzone.co.zw` $\rightarrow$ `s1.domainkey.uXXXX.wl.sendgrid.net`
-   - `s2._domainkey.laptopzone.co.zw` $\rightarrow$ `s2.domainkey.uXXXX.wl.sendgrid.net`
+   - `emXXXX.tritech.example` $\rightarrow$ `uXXXX.wl.sendgrid.net`
+   - `s1._domainkey.tritech.example` $\rightarrow$ `s1.domainkey.uXXXX.wl.sendgrid.net`
+   - `s2._domainkey.tritech.example` $\rightarrow$ `s2.domainkey.uXXXX.wl.sendgrid.net`
 4. Click **Verify** in SendGrid until all records are marked as verified.
 
 ### Step 3: Create a Dedicated API Key
 1. Go to **Settings** $\rightarrow$ **API Keys** $\rightarrow$ **Create API Key**.
-2. Name the key: `Laptopzone-Medusa-Backend`.
+2. Name the key: `TriTech-Medusa-Backend`.
 3. Set permissions to **Restricted Access** and grant **Full Access** to **Mail Send** only (for optimal security).
 4. Copy the API key (starts with `SG.`) immediately.
 
@@ -60,10 +60,10 @@ In `apps/backend/.env`:
 ```env
 # SendGrid Credentials & Sender Addresses
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-SENDGRID_FROM_EMAIL=orders@laptopzone.co.zw
-SENDGRID_ORDER_FROM_EMAIL=orders@laptopzone.co.zw
-SENDGRID_ACCOUNT_FROM_EMAIL=noreply@laptopzone.co.zw
-SENDGRID_FROM_NAME=Laptopzone
+SENDGRID_FROM_EMAIL=Godwindzapenga@gmail.com
+SENDGRID_ORDER_FROM_EMAIL=Godwindzapenga@gmail.com
+SENDGRID_ACCOUNT_FROM_EMAIL=Godwindzapenga@gmail.com
+SENDGRID_FROM_NAME=TriTech
 SENDGRID_SANDBOX=false
 
 # Storefront & Admin URLs (used in email buttons)
@@ -72,8 +72,8 @@ ADMIN_URL=http://localhost:9000/app
 ```
 
 ### Sender Address Routing:
-- **`orders@laptopzone.co.zw`** is used for order confirmations, payment receipts, and shipping notifications.
-- **`noreply@laptopzone.co.zw`** is used for account creation welcomes, password reset tokens, and staff invitations.
+- **`Godwindzapenga@gmail.com`** is used for order confirmations, payment receipts, and shipping notifications.
+- **`Godwindzapenga@gmail.com`** is used for account creation welcomes, password reset tokens, and staff invitations.
 - Both addresses are automatically routed based on the email template, or can be customized via the respective environment variables above.
 
 > [!WARNING]
@@ -85,12 +85,12 @@ ADMIN_URL=http://localhost:9000/app
 
 | Email Type | Sender Address | Trigger Event | Description |
 |---|---|---|---|
-| **Order Confirmation** | `orders@laptopzone.co.zw` | `order.placed` | Complete order receipt with items, thumbnails, unit prices, discounts, shipping fee, total, delivery address, and "View Order" CTA. |
-| **Payment Receipt** | `orders@laptopzone.co.zw` | `order.payment_captured` | Payment confirmation showing amount paid, currency, payment date, and transaction status. |
-| **Shipment Notification** | `orders@laptopzone.co.zw` | `order.fulfillment_created` | Dispatch notification with tracking number, carrier, items in shipment, and tracking link. |
-| **Password Reset** | `noreply@laptopzone.co.zw` | `auth.password_reset` | Secure password reset email containing a tokenized link with 24-hour expiration. |
-| **Welcome Email** | `noreply@laptopzone.co.zw` | `customer.created` | Friendly welcome email introducing Laptopzone perks and store link. |
-| **Admin Invite** | `noreply@laptopzone.co.zw` | `invite.created` / `invite.resent` | Staff invitation email with a secure token to join the admin dashboard. |
+| **Order Confirmation** | `Godwindzapenga@gmail.com` | `order.placed` | Complete order receipt with items, thumbnails, unit prices, discounts, shipping fee, total, delivery address, and "View Order" CTA. |
+| **Payment Receipt** | `Godwindzapenga@gmail.com` | `order.payment_captured` | Payment confirmation showing amount paid, currency, payment date, and transaction status. |
+| **Shipment Notification** | `Godwindzapenga@gmail.com` | `order.fulfillment_created` | Dispatch notification with tracking number, carrier, items in shipment, and tracking link. |
+| **Password Reset** | `Godwindzapenga@gmail.com` | `auth.password_reset` | Secure password reset email containing a tokenized link with 24-hour expiration. |
+| **Welcome Email** | `Godwindzapenga@gmail.com` | `customer.created` | Friendly welcome email introducing TriTech perks and store link. |
+| **Admin Invite** | `Godwindzapenga@gmail.com` | `invite.created` / `invite.resent` | Staff invitation email with a secure token to join the admin dashboard. |
 
 ---
 
@@ -107,7 +107,7 @@ When `SENDGRID_SANDBOX=true` (or if `SENDGRID_API_KEY` is omitted in development
 Set in `apps/backend/.env`:
 ```env
 SENDGRID_API_KEY=SG.your_actual_key
-SENDGRID_FROM_EMAIL=your_verified_sender@laptopzone.co.zw
+SENDGRID_FROM_EMAIL=Godwindzapenga@gmail.com
 SENDGRID_SANDBOX=false
 ```
 Placing an order on the storefront or registering an account will immediately trigger real emails.
@@ -140,11 +140,11 @@ $env:TEST_TYPE="unit"; npx jest src/modules/sendgrid/__tests__/sendgrid.unit.spe
 4. Ensure `apps/backend/.env` contains your verified production credentials:
    ```env
    SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxx
-   SENDGRID_FROM_EMAIL=orders@laptopzone.co.zw
-   SENDGRID_FROM_NAME=Laptopzone
+   SENDGRID_FROM_EMAIL=Godwindzapenga@gmail.com
+   SENDGRID_FROM_NAME=TriTech
    SENDGRID_SANDBOX=false
-   STOREFRONT_URL=https://laptopzone.co.zw
-   ADMIN_URL=https://admin.laptopzone.co.zw/app
+   STOREFRONT_URL=https://tritech.example
+   ADMIN_URL=https://admin.tritech.example/app
    ```
 5. Build and restart the Medusa backend:
    ```bash

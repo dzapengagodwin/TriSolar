@@ -422,6 +422,7 @@ const CartDropdown = ({ cart: cartState, isPickupOnly = false }: CartDropdownPro
                             <Image
                               src={accessory.thumbnail}
                               alt={accessory.title || "Accessory"}
+                              unoptimized
                               width={48}
                               height={48}
                               className="w-full h-full object-contain"

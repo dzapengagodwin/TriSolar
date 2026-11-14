@@ -1,6 +1,6 @@
 # Product Architecture & Lifecycle
 
-> **Scope**: Complete architecture of the Laptopzone product catalog, data modeling, custom attribute links, inventory, pricing, and lifecycle from creation to customer fulfillment.
+> **Scope**: Complete architecture of the TriTech product catalog, data modeling, custom attribute links, inventory, pricing, and lifecycle from creation to customer fulfillment.
 
 ---
 
@@ -22,7 +22,7 @@ flowchart TD
         Collections["Product Collections"]
     end
 
-    subgraph CustomExtensions["3. Custom Laptopzone Extensions"]
+    subgraph CustomExtensions["3. Custom TriTech Extensions"]
         Brand["Brand Link (Lenovo, Dell, HP, Apple)"]
         SEO["SEO Metadata (Meta title, OG, Focus Keyword)"]
         Reviews["Product Reviews & Ratings"]
@@ -81,7 +81,7 @@ flowchart TD
 
 ## 2. Product Data Model & Storage Locations
 
-Every entity in the Laptopzone catalog has a designated storage location in the PostgreSQL database:
+Every entity in the TriTech catalog has a designated storage location in the PostgreSQL database:
 
 | Component | Storage Location / Table | Identifiers & Attributes | Description |
 |---|---|---|---|
@@ -103,7 +103,7 @@ Every entity in the Laptopzone catalog has a designated storage location in the 
 
 ## 3. Product Variant & Option Strategy
 
-Laptopzone specializes in laptops, accessories, and computing equipment. Catalog items fall into two variant strategies:
+TriTech specializes in laptops, accessories, and computing equipment. Catalog items fall into two variant strategies:
 
 1. **Single-Variant Products**: Fixed-specification machines (e.g., *HP EliteBook 840 G6 - Core i5, 16GB RAM, 512GB SSD*). These have a single default variant whose SKU directly reflects the unit inventory.
 2. **Multi-Variant Products**: Machines offered with selectable upgrade options (e.g., Option `RAM`: 8GB, 16GB, 32GB; Option `Storage`: 256GB SSD, 512GB SSD, 1TB SSD).

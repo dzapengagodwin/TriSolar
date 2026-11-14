@@ -12,7 +12,7 @@ import { notFound, redirect } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "Checkout | Laptopzone",
+  title: "Checkout | TriTech",
 }
 
 export default async function Checkout(props: {

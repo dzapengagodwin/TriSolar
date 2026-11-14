@@ -100,7 +100,7 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
             onFocus={() => {
               if (results.length > 0) setIsOpen(true)
             }}
-            placeholder="Search networking switches, WiFi 7 APs, ThinkPads, laptops, servers..."
+            placeholder="Search products, brands, or categories..."
             className="w-full bg-transparent text-gray-800 placeholder-gray-400 text-sm px-4 sm:px-5 py-2 focus:outline-none"
           />
 
@@ -170,6 +170,7 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
                         <Image
                           src={thumbnail}
                           alt={product.title}
+                          unoptimized
                           fill
                           className="object-contain p-1"
                           sizes="48px"

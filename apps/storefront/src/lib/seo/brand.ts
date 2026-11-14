@@ -24,10 +24,10 @@ export function generateBrandMetadata(
   const fallbackCanonicalUrl = getBrandCanonicalUrl(brand.handle, countryCode)
 
   const rawTitle = seo?.meta_title || brand.name
-  const title = rawTitle.replace(/\s*\|\s*(Laptopzone|Laptop Zone)\s*$/i, "").trim()
+  const title = rawTitle.replace(/\s*\|\s*(TriTech|TriTech)\s*$/i, "").trim()
 
   const rawOgTitle = seo?.og_title || title
-  const ogTitle = rawOgTitle.replace(/\s*\|\s*(Laptopzone|Laptop Zone)\s*$/i, "").trim()
+  const ogTitle = rawOgTitle.replace(/\s*\|\s*(TriTech|TriTech)\s*$/i, "").trim()
 
   const description = seo?.meta_description || brand.description || undefined
   const canonicalUrl = fallbackCanonicalUrl

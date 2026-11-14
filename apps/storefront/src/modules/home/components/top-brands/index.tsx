@@ -84,6 +84,7 @@ export default function TopBrands({ brands = [] }: { brands?: StoreBrand[] }) {
                     <Image
                       src={brand.logo}
                       alt={`${brand.name} logo`}
+                      unoptimized
                       fill
                       sizes="200px"
                       className="object-contain object-center group-hover:scale-105 transition-transform duration-200"

@@ -93,6 +93,7 @@ const ImageGallery = ({
                   <Image
                     src={img.url}
                     alt={thumbnailAlt}
+                    unoptimized
                     fill
                     className="object-contain p-1"
                     sizes="80px"
@@ -117,6 +118,7 @@ const ImageGallery = ({
             {activeImage?.url && (
               <Image
                 src={activeImage.url}
+                unoptimized
                 alt={getProductImageAlt({
                   title: productTitle,
                   brand,
@@ -180,6 +182,7 @@ const ImageGallery = ({
               {activeImage?.url && (
                 <Image
                   src={activeImage.url}
+                  unoptimized
                   alt={getProductImageAlt({
                     title: productTitle,
                     brand,
@@ -232,6 +235,7 @@ const ImageGallery = ({
                     <Image
                       src={img.url}
                       alt={modalThumbAlt}
+                      unoptimized
                       fill
                       className="object-contain p-0.5"
                       sizes="64px"
