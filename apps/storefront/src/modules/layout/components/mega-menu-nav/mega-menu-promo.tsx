@@ -16,9 +16,16 @@ export default function MegaMenuPromo({ promo, onClose }: MegaMenuPromoProps) {
       className="group relative col-span-12 lg:col-span-4 bg-[#0B0D12] border border-gray-800/80 rounded-xl p-5 sm:p-6 flex flex-col justify-between overflow-hidden shadow-sm hover:border-gray-700 transition-colors min-h-[220px] lg:min-h-full"
     >
       <div className="relative z-10 max-w-[58%] space-y-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-primary inline-block">
-          {promo.eyebrow}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 inline-block">
+            {promo.eyebrow}
+          </span>
+          {promo.badge && (
+            <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+              {promo.badge}
+            </span>
+          )}
+        </div>
 
         <p className="text-xl sm:text-2xl font-bold tracking-tight leading-tight text-white pt-0.5">
           {promo.title.map((line, idx) => (

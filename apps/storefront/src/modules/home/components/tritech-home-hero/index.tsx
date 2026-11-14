@@ -1,137 +1,200 @@
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
-const departments = [
-  { code: "01", title: "Laptops & computers", detail: "Business, student, gaming and desktop systems" },
-  { code: "02", title: "Networking equipment", detail: "Routers, switches and wireless access points" },
-  { code: "03", title: "Network infrastructure", detail: "Racks, cabinets, cabling and fibre solutions" },
-  { code: "04", title: "Computer accessories", detail: "Monitors, peripherals, storage and adapters" },
-  { code: "05", title: "Servers & storage", detail: "Reliable infrastructure for growing organisations" },
-  { code: "06", title: "Wireless solutions", detail: "Point-to-point links and outdoor connectivity" },
-]
-
-const services = [
-  { number: "01", title: "Network design & installation", detail: "Plan and deploy secure, dependable networks for your premises." },
-  { number: "02", title: "Structured & fibre cabling", detail: "Professional copper and fibre infrastructure built to scale." },
-  { number: "03", title: "Servers & business infrastructure", detail: "Server, storage and infrastructure solutions for your organisation." },
-  { number: "04", title: "Maintenance & support", detail: "Keep your technology reliable with ongoing technical support." },
+const visualCategories = [
+  {
+    title: "Networking Switches",
+    subtitle: "PoE+, Managed & 10G SFP+",
+    href: "/products/networking",
+    image: "/top-categories/networking.webp",
+  },
+  {
+    title: "Laptops & Workstations",
+    subtitle: "ThinkPad, MacBook Pro & Precision",
+    href: "/products/laptops",
+    image: "/top-categories/laptops.webp",
+  },
+  {
+    title: "WiFi 7 Access Points",
+    subtitle: "Ultra-Fast Enterprise Wireless",
+    href: "/products/networking",
+    image: "/top-categories/networking.webp",
+  },
+  {
+    title: "Rack Servers & NAS",
+    subtitle: "Synology, Dual Xeon & Storage",
+    href: "/products/server-computers",
+    image: "/top-categories/software.webp",
+  },
+  {
+    title: "Monitors & Docks",
+    subtitle: "4K Displays & Thunderbolt 4 Hubs",
+    href: "/products/monitors",
+    image: "/top-categories/monitors.webp",
+  },
+  {
+    title: "Cables & Server Racks",
+    subtitle: "Cat6A, Fiber Optic & 19\" Cabinets",
+    href: "/products/networking",
+    image: "/top-categories/gaming.webp",
+  },
 ]
 
 export default function TritechHomeHero() {
   return (
-    <main className="bg-white text-slate-900">
-      <section className="relative isolate overflow-hidden bg-[#07152E]">
+    <div className="bg-white text-slate-900">
+      {/* 1. Cinematic Tech Hero Banner */}
+      <section className="relative isolate overflow-hidden bg-slate-950 text-white min-h-[500px] sm:min-h-[560px] lg:min-h-[620px] flex items-center">
+        {/* Real High-Tech Hero Image */}
         <div className="absolute inset-0 -z-10">
           <Image
-            src="/hero-laptops.webp"
-            alt=""
+            src="/tech-hero.jpg"
+            alt="High-Performance Laptops and Enterprise Networking Devices"
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center opacity-25"
+            className="object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#07152E] via-[#07152E]/95 to-[#07152E]/55" />
-          <div className="absolute -right-24 -top-32 h-[30rem] w-[30rem] rounded-full bg-blue-500/20 blur-3xl" />
+          {/* Subtle gradient overlay to keep text ultra-readable while showcasing the photo */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-transparent sm:w-3/4 lg:w-3/5" />
+          <div className="absolute inset-0 bg-slate-950/40" />
         </div>
-        <div className="content-container grid min-h-[520px] items-center gap-10 py-20 lg:grid-cols-[1.1fr_.9fr] lg:py-24">
-          <div className="max-w-2xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-300/30 bg-blue-400/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[.2em] text-blue-200">
-              <span className="h-2 w-2 rounded-full bg-blue-400" />
-              Technology retail · IT solutions
+
+        <div className="content-container py-16 sm:py-24 relative z-10">
+          <div className="max-w-2xl space-y-6">
+
+            {/* Minimalist Tech Chip */}
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-3.5 py-1 text-xs font-semibold text-blue-300">
+              <span className="h-2 w-2 rounded-full bg-blue-400 animate-pulse" />
+              Enterprise Networking &amp; Pro Laptops
             </div>
-            <h1 className="max-w-xl text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Technology that powers your <span className="text-blue-400">world.</span>
+
+            {/* Clean Punchy Headline */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.1]">
+              Next-Gen Tech. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">
+                Connected &amp; Built to Perform.
+              </span>
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
-              Shop trusted technology for work and everyday life, or partner with our team to plan and deliver the IT infrastructure your organisation needs.
+
+            {/* Short 1-Sentence Subtitle */}
+            <p className="text-sm sm:text-base text-slate-200 max-w-lg leading-relaxed font-normal">
+              Explore managed 10GbE switches, WiFi 7 access points, and mobile workstations engineered for peak reliability.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <LocalizedClientLink href="/shop" className="inline-flex min-h-12 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500">
-                Explore products <span className="ml-3 text-lg">→</span>
+
+            {/* Clear Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <LocalizedClientLink
+                href="/products/networking"
+                className="inline-flex h-12 items-center justify-center rounded-lg bg-blue-600 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-blue-900/40 hover:bg-blue-500 transition-all"
+              >
+                <span>Shop Networking</span>
+                <span className="ml-2">&rarr;</span>
               </LocalizedClientLink>
-              <a href="#request-quote" className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/35 bg-white/5 px-7 text-sm font-semibold text-white transition hover:border-blue-300 hover:bg-white/10">
-                Request a quote <span className="ml-3 text-lg">↗</span>
-              </a>
+
+              <LocalizedClientLink
+                href="/products/laptops"
+                className="inline-flex h-12 items-center justify-center rounded-lg border border-white/30 bg-white/10 px-6 text-xs sm:text-sm font-bold uppercase tracking-wider text-white backdrop-blur-sm hover:bg-white/20 transition-all"
+              >
+                <span>Shop Laptops</span>
+              </LocalizedClientLink>
             </div>
-            <div className="mt-12 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/15 pt-6 text-xs font-medium text-slate-300">
-              <span>Technology for professionals</span>
-              <span>Business-ready infrastructure</span>
-              <span>One trusted partner</span>
+
+            {/* 4 Clean Micro-Pills */}
+            <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-300 font-medium">
+              <span className="flex items-center gap-1.5">
+                <span className="text-emerald-400 font-bold">&bull;</span> Same-Day Dispatch
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-blue-400 font-bold">&bull;</span> Tier-1 Warranty
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-cyan-400 font-bold">&bull;</span> WiFi 7 &amp; 10GbE Ready
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="text-indigo-400 font-bold">&bull;</span> B2B Volume Pricing
+              </span>
             </div>
-          </div>
-          <div className="relative hidden min-h-[360px] lg:block">
-            <div className="absolute right-0 top-1/2 h-[340px] w-[90%] -translate-y-1/2 rounded-2xl border border-white/10 bg-white/[.06] p-5 shadow-2xl backdrop-blur-sm">
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-white"><span className="flex h-8 w-8 items-center justify-center rounded bg-blue-600 text-sm">T.</span> TRITECH</div>
-                <span className="text-[10px] uppercase tracking-[.18em] text-blue-200">Technology, connected</span>
-              </div>
-              <div className="relative mt-5 h-[245px] overflow-hidden rounded-xl bg-slate-900">
-                <Image src="/hero-laptops.webp" alt="Professional laptops and computer technology" fill sizes="(min-width: 1024px) 40vw, 0px" className="object-contain p-3" />
-              </div>
-              <div className="absolute -bottom-5 -left-8 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-xl">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-blue-600">Your technology partner</p>
-                <p className="mt-1 text-sm font-bold text-slate-900">Products + IT solutions</p>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
 
-      <section className="content-container py-16 sm:py-20">
-        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      {/* 2. Visual Hardware Categories (Clean, Image-First, No Text Walls) */}
+      <section className="content-container py-12 sm:py-16" aria-label="Product Categories">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-600">Explore the store</p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-[#0B1B36] sm:text-4xl">Technology for every setup.</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">From everyday computing to business-grade infrastructure, find the equipment that keeps you moving.</p>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+              Browse by Category
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              Select a hardware department to start shopping
+            </p>
           </div>
-          <LocalizedClientLink href="/shop" className="text-sm font-semibold text-blue-700 transition hover:text-blue-500">View all products <span aria-hidden="true">→</span></LocalizedClientLink>
+
+          <LocalizedClientLink
+            href="/shop"
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors inline-flex items-center gap-1"
+          >
+            <span>View All</span>
+            <span aria-hidden="true">&rarr;</span>
+          </LocalizedClientLink>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {departments.map((item) => (
-            <LocalizedClientLink key={item.code} href="/shop" className="group flex min-h-[150px] items-start gap-5 rounded-xl border border-slate-200 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/5">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#EEF4FF] text-sm font-bold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">{item.code}</span>
-              <span>
-                <span className="block text-base font-bold text-[#0B1B36]">{item.title}</span>
-                <span className="mt-2 block text-sm leading-6 text-slate-500">{item.detail}</span>
-                <span className="mt-4 inline-block text-xs font-semibold text-blue-700">Explore department ↗</span>
-              </span>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          {visualCategories.map((cat, idx) => (
+            <LocalizedClientLink
+              key={idx}
+              href={cat.href}
+              className="group bg-slate-50 hover:bg-white rounded-xl border border-slate-200/80 p-4 flex flex-col items-center justify-between text-center transition-all duration-200 hover:shadow-lg hover:border-blue-300"
+            >
+              <div className="relative w-full h-24 sm:h-28 flex items-center justify-center mb-2">
+                <Image
+                  src={cat.image}
+                  alt={cat.title}
+                  fill
+                  sizes="160px"
+                  className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
+                />
+              </div>
+
+              <div className="w-full pt-2 border-t border-slate-100">
+                <h3 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">
+                  {cat.title}
+                </h3>
+                <span className="text-[10px] text-slate-500 block truncate mt-0.5">
+                  {cat.subtitle}
+                </span>
+              </div>
             </LocalizedClientLink>
           ))}
         </div>
       </section>
 
-      <section className="bg-[#F4F7FC] py-16 sm:py-20" id="it-solutions">
-        <div className="content-container">
-          <div className="grid gap-10 lg:grid-cols-[.85fr_1.15fr] lg:gap-16">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-600">Beyond the store</p>
-              <h2 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-[#0B1B36] sm:text-4xl">The right technology. Properly delivered.</h2>
-              <p className="mt-5 text-sm leading-7 text-slate-600">TRITECH works with businesses, schools and institutions to plan, supply and implement dependable technology environments. Tell us what you need and our team can help scope the project.</p>
-              <a href="#request-quote" className="mt-8 inline-flex min-h-12 items-center justify-center rounded-md bg-[#0B1B36] px-6 text-sm font-semibold text-white transition hover:bg-blue-700">Discuss your project <span className="ml-3">→</span></a>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {services.map((service) => (
-                <div key={service.number} className="rounded-xl border border-slate-200 bg-white p-6">
-                  <span className="text-xs font-bold tracking-widest text-blue-600">{service.number} / SERVICE</span>
-                  <h3 className="mt-5 text-base font-bold text-[#0B1B36]">{service.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-500">{service.detail}</p>
-                </div>
-              ))}
-            </div>
+      {/* 3. Simple B2B Quotation Banner */}
+      <section className="content-container pb-10">
+        <div className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-slate-800 shadow-md">
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-blue-400 font-bold block">
+              B2B &amp; Project Procurement
+            </span>
+            <h3 className="text-lg sm:text-xl font-bold text-white">
+              Planning an office network or bulk hardware purchase?
+            </h3>
+            <p className="text-xs text-slate-400">
+              Submit your Bill of Materials (BOM) for fast volume discount pricing and delivery estimates.
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section id="request-quote" className="bg-[#07152E] py-14 sm:py-16">
-        <div className="content-container flex flex-col justify-between gap-7 md:flex-row md:items-center">
-          <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-[.2em] text-blue-300">Have a project in mind?</p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-white sm:text-3xl">Let’s build the right solution for your business.</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-300">Tell us about your network, infrastructure or bulk technology requirements.</p>
-          </div>
-          <LocalizedClientLink href="/it-solutions#request-quote" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-md bg-blue-600 px-7 text-sm font-semibold text-white transition hover:bg-blue-500">Request a project quotation <span className="ml-3">↗</span></LocalizedClientLink>
+          <LocalizedClientLink
+            href="/it-solutions#request-quote"
+            className="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-blue-600 px-6 text-xs font-bold uppercase tracking-wider text-white hover:bg-blue-500 transition-colors shadow-sm"
+          >
+            <span>Request a Quote</span>
+            <span className="ml-2">&rarr;</span>
+          </LocalizedClientLink>
         </div>
       </section>
-    </main>
+    </div>
   )
 }

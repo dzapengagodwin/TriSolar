@@ -114,12 +114,12 @@ export default async function Footer() {
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-1 pt-1">
               <h3 className="text-white font-bold text-xs tracking-wide">
-                Contact Info
+                TRITECH Hardware
               </h3>
               <p className="text-gray-400 text-xs leading-relaxed max-w-sm">
-                Laptops. Networking. Technology.
+                Official supplier of enterprise networking equipment, business laptops, and IT infrastructure.
               </p>
             </div>
           </div>

@@ -16,7 +16,6 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
 
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Close dropdown on click outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -27,13 +26,11 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Filter out subcategories to get root level categories only
   const rootCategories = categories.filter(
     (c) => !c.parent_category_id && !c.parent_category
   )
   const displayCategories = rootCategories.length > 0 ? rootCategories : categories
 
-  // Set first category active by default when opening
   useEffect(() => {
     if (isOpen && displayCategories.length > 0 && !activeCategoryId) {
       setActiveCategoryId(displayCategories[0].id)
@@ -44,124 +41,107 @@ export default function CategoryDropdown({ categories = [] }: CategoryDropdownPr
 
   return (
     <div ref={dropdownRef} className="relative">
-      {/* Category Toggle Button (Orange with Hamburger icon) */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center gap-2 px-5 py-2.5 rounded-t-xl text-xs font-semibold transition-all cursor-pointer relative z-50 shadow-sm ${
+        className={`flex items-center gap-2 px-3.5 py-2 rounded-md text-xs font-bold transition-all cursor-pointer relative z-50 tracking-wider uppercase ${
           isOpen
-            ? "bg-black text-white"
-            : "bg-black text-white hover:bg-gray rounded-b-xl"
+            ? "bg-blue-600 text-white shadow-md shadow-blue-900/30"
+            : "bg-slate-800 text-white hover:bg-slate-700 hover:text-white"
         }`}
         aria-expanded={isOpen}
       >
         <BarsThree className="w-4 h-4 text-white" />
-        <span>ALL CATEGORIES</span>
+        <span>Categories</span>
         <ChevronDown
-          className={`w-3.5 h-3.5 text-white transition-transform duration-200 ${
+          className={`w-3.5 h-3.5 text-white/80 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
       </button>
 
-      {/* Multi-Tier Mega Menu Dropdown */}
       {isOpen && (
         <div 
-          className="absolute top-full mt-1 left-0 w-[920px] bg-white border border-gray-100 shadow-2xl z-50 grid grid-cols-[220px_300px_1fr] min-h-[460px] overflow-hidden animate-fade-in"
+          className="absolute top-full mt-2 left-0 w-[640px] bg-white border border-slate-200 shadow-2xl rounded-xl z-50 grid grid-cols-[240px_1fr] min-h-[360px] overflow-hidden animate-fade-in text-slate-900"
           style={{ transformOrigin: "top left" }}
         >
-       
-          {/* Column 2: Main Categories (Hover to reveal column 3) */}
-          <div className="border-r border-gray-100 py-4 max-h-[500px] overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#d1d5db_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400">
-            <div className="px-4 pb-2 border-b border-gray-50 mb-2">
-              <span className="block text-[11px] font-bold text-gray-400">All Products</span>
+          {/* Column 1: Main Category List */}
+          <div className="border-r border-slate-100 py-3 bg-slate-50/50 max-h-[460px] overflow-y-auto">
+            <div className="px-3 pb-2 border-b border-slate-200/60 mb-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                Departments
+              </span>
             </div>
-            {displayCategories.length > 0 ? (
-              <ul className="space-y-0.5 px-2">
-                {displayCategories.map((cat) => {
-                  const isActive = activeCategoryId === cat.id
-                  return (
-                    <li key={cat.id}>
-                      <button
-                        onMouseEnter={() => setActiveCategoryId(cat.id)}
-                        className={`w-full flex items-center justify-between py-2.5 px-4 rounded-xl text-xs font-semibold transition-all text-left cursor-pointer ${
-                          isActive
-                            ? "bg-gray-100 text-primary"
-                            : "text-gray-700 hover:bg-gray-50 hover:text-black"
-                        }`}
-                      >
-                        <span>{cat.name}</span>
-                        <svg
-                          className={`w-3.5 h-3.5 transition-colors ${
-                            isActive ? "text-primary" : "text-gray-300"
-                          }`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2.5}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            ) : (
-              <div className="px-4 py-3 text-xs text-gray-500 text-center">
-                No categories found.
-              </div>
-            )}
+            <ul className="space-y-0.5 px-2">
+              {displayCategories.map((cat) => {
+                const isActive = activeCategoryId === cat.id
+                return (
+                  <li key={cat.id}>
+                    <button
+                      onMouseEnter={() => setActiveCategoryId(cat.id)}
+                      className={`w-full flex items-center justify-between py-2 px-3 rounded-lg text-xs font-semibold transition-all text-left cursor-pointer ${
+                        isActive
+                          ? "bg-blue-50 text-blue-700 font-bold"
+                          : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                      }`}
+                    >
+                      <span className="truncate">{cat.name}</span>
+                      <span className="text-slate-300 ml-1 text-xs">&rsaquo;</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
           </div>
 
-          {/* Column 3: Subcategories (Children of the active category) */}
-          <div className="p-6 bg-white max-h-[500px] overflow-y-auto">
+          {/* Column 2: Subcategories & Direct Action */}
+          <div className="p-5 bg-white max-h-[460px] overflow-y-auto flex flex-col justify-between">
             {activeCategory ? (
-              <div className="space-y-6">
-                {/* Active Category Header */}
-                <div className="pb-3 border-b border-gray-100">
-                  <span className="block text-sm font-bold text-gray-900">{activeCategory.name}</span>
+              <div className="space-y-4">
+                <div className="pb-2 border-b border-slate-100 flex items-center justify-between">
+                  <span className="text-sm font-bold text-slate-900">{activeCategory.name}</span>
+                  <LocalizedClientLink
+                    href={getCategoryPublicPath(activeCategory.handle)}
+                    onClick={() => setIsOpen(false)}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-800"
+                  >
+                    View All &rarr;
+                  </LocalizedClientLink>
                 </div>
 
-                {/* Subcategories list */}
-                <div className="grid grid-cols-1 gap-y-3">
-                  {/* Real subcategories from DB if any */}
+                <div className="grid grid-cols-1 gap-1.5">
                   {activeCategory.category_children && activeCategory.category_children.length > 0 ? (
                     activeCategory.category_children.map((child) => (
                       <LocalizedClientLink
                         key={child.id}
                         href={getCategoryPublicPath(child.handle)}
                         onClick={() => setIsOpen(false)}
-                        className="text-xs font-medium text-gray-600 hover:text-black transition-colors block"
+                        className="text-xs text-slate-600 hover:text-blue-600 hover:translate-x-1 transition-all py-1 px-1.5 rounded hover:bg-blue-50/50 block"
                       >
                         {child.name}
                       </LocalizedClientLink>
                     ))
                   ) : (
-                    <div className="text-xs font-medium text-gray-400">
-                      No subcategories available.
+                    <div className="text-xs text-slate-400 py-4 italic">
+                      Explore all products in this category directly.
                     </div>
                   )}
                 </div>
-
-                {/* Shop All link */}
-                <div className="pt-4 border-t border-gray-50">
-                  <LocalizedClientLink
-                    href={getCategoryPublicPath(activeCategory.handle)}
-                    onClick={() => setIsOpen(false)}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary-hover"
-                  >
-                    <span>Shop all {activeCategory.name}</span>
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </LocalizedClientLink>
-                </div>
               </div>
             ) : (
-              <div className="text-xs text-gray-400 text-center py-12">
-                Hover a category to view subcategories.
+              <div className="text-xs text-slate-400 text-center py-10">
+                Hover a category to explore.
               </div>
             )}
+
+            <div className="pt-3 border-t border-slate-100">
+              <LocalizedClientLink
+                href="/shop"
+                onClick={() => setIsOpen(false)}
+                className="w-full inline-flex items-center justify-center py-2 px-3 rounded-lg bg-slate-900 text-white text-xs font-bold hover:bg-blue-600 transition-colors"
+              >
+                Browse Full Catalog &rarr;
+              </LocalizedClientLink>
+            </div>
           </div>
         </div>
       )}

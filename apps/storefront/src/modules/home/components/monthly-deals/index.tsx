@@ -228,10 +228,15 @@ export default function MonthlyDeals({
     return monthShuffle(onSale)
   }, [products])
 
-  // 2. Build category tabs from the categories that discounted products belong to
+  const effectiveProducts = useMemo(() => {
+    if (promoProducts.length > 0) return promoProducts
+    return products.slice(0, 10)
+  }, [promoProducts, products])
+
+  // 2. Build category tabs from the categories that products belong to
   const categoryTabs = useMemo(() => {
     const catMap = new Map<string, { id: string; name: string; count: number }>()
-    for (const product of promoProducts) {
+    for (const product of effectiveProducts) {
       for (const cat of (product.categories ?? []) as HttpTypes.StoreProductCategory[]) {
         if (!cat?.id || !cat?.name) continue
         const existing = catMap.get(cat.id)
@@ -242,35 +247,35 @@ export default function MonthlyDeals({
     return Array.from(catMap.values())
       .sort((a, b) => b.count - a.count)
       .slice(0, 6)
-  }, [promoProducts])
+  }, [effectiveProducts])
 
   const tabs = useMemo(() => {
     const list: { id: string; label: string }[] = [
-      { id: "all", label: "All Deals" },
+      { id: "all", label: promoProducts.length > 0 ? "All Deals" : "Featured Tech" },
     ]
     for (const cat of categoryTabs) {
       list.push({ id: `cat-${cat.id}`, label: cat.name })
     }
     return list
-  }, [categoryTabs])
+  }, [categoryTabs, promoProducts.length])
 
   const [activeTabId, setActiveTabId] = useState("all")
 
   // 3. Filter by selected tab
   const filteredProducts = useMemo(() => {
-    if (activeTabId === "all") return promoProducts
+    if (activeTabId === "all") return effectiveProducts
 
     const catId = activeTabId.replace("cat-", "")
-    const filtered = promoProducts.filter((p) =>
+    const filtered = effectiveProducts.filter((p) =>
       (p.categories as HttpTypes.StoreProductCategory[])?.some(
         (c: HttpTypes.StoreProductCategory) => c.id === catId
       )
     )
     return filtered
-  }, [activeTabId, promoProducts])
+  }, [activeTabId, effectiveProducts])
 
-  // Don't render if there are no genuine deals
-  if (promoProducts.length === 0) {
+  // Don't render if there are no products
+  if (effectiveProducts.length === 0) {
     return null
   }
 
@@ -282,13 +287,13 @@ export default function MonthlyDeals({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-block w-1 h-6 bg-primary rounded-full" />
+              <span className="inline-block w-1.5 h-6 bg-blue-500 rounded-full" />
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                {currentMonth} Best Deals
+                Hardware Deals
               </h2>
             </div>
-            <p className="text-sm text-gray-400 max-w-md">
-              Exclusive discounts on top-rated tech. These prices won&apos;t last.
+            <p className="text-xs sm:text-sm text-gray-400">
+              Limited-time pricing on networking devices, laptops, and workstation gear.
             </p>
           </div>
 

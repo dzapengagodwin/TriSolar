@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import type { Metadata } from "next"
 import QuoteRequestForm from "./quote-request-form"
 
@@ -75,7 +76,9 @@ export default function ITSolutionsPage() {
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8">
-            <QuoteRequestForm destinationEmail={process.env.NEXT_PUBLIC_QUOTE_EMAIL} />
+            <Suspense fallback={<div className="h-96 animate-pulse bg-slate-50 rounded-xl" />}>
+              <QuoteRequestForm />
+            </Suspense>
           </div>
         </div>
       </section>

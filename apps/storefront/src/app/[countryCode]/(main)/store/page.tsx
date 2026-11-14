@@ -7,8 +7,8 @@ import StoreTemplate from "@modules/store/templates"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 
 export const metadata: Metadata = {
-  title: "Store | Laptopzone",
-  description: "Explore all of our products.",
+  title: "Store | TRITECH - Enterprise Networking & Laptops",
+  description: "Explore enterprise networking switches, WiFi 7 access points, business laptops, servers, and computing gear at TRITECH.",
   alternates: { canonical: "/shop" },
 }
 

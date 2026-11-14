@@ -15,10 +15,8 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   metadataBase: new URL(getBaseURL()),
   icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-    ],
-    apple: { url: "/favicon.png", type: "image/png" },
+    icon: [{ url: "/favicon.png", sizes: "512x512", type: "image/png" }],
+    apple: { url: "/favicon.png", sizes: "512x512", type: "image/png" },
     shortcut: "/favicon.png",
   },
 }

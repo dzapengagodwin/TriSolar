@@ -45,56 +45,42 @@ export default async function Nav({
     <div className="relative w-full" suppressHydrationWarning>
       <StickyNav
         announcement={
-          <div className="hidden small:block bg-white text-gray-700 text-[10px] sm:text-[11px] py-1 sm:py-1.5 border-b border-gray-200" suppressHydrationWarning>
-            <div className="content-container flex justify-between items-center gap-x-4 font-normal text-[#333333]" suppressHydrationWarning>
-              {/* Left: Call Us */}
-              <div className="flex items-center gap-1 shrink-0">
-                <span className="text-gray-500">Technology that powers your world</span>
-                <span className="font-medium text-[#0B1B36]">Laptops. Networking. Technology.</span>
+          <div className="hidden small:block bg-slate-900 text-slate-300 text-[11px] py-2 border-b border-slate-800" suppressHydrationWarning>
+            <div className="content-container flex justify-between items-center gap-x-4 font-medium" suppressHydrationWarning>
+              {/* Left: Brand Badge */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+                <span className="font-semibold text-white">Laptops &amp; Enterprise Networking</span>
               </div>
 
-              {/* Center: Technology retail */}
-              <div className="flex items-center gap-1.5 text-center font-medium shrink-0">
-                <span>Technology retail</span>
-                <svg
-                  className="w-3.5 h-3.5 text-primary inline-block shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.8}
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.175V3.375c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v10.875m12 0H2.25"
-                  />
-                </svg>
-                <span>Business IT solutions</span>
+              {/* Center: Quick Notice */}
+              <div className="text-slate-400 text-xs hidden md:block">
+                ⚡ Same-Day Dispatch on In-Stock Hardware &bull; Tier-1 Warranty
               </div>
 
-              {/* Right: IT Solutions, Shop Products, WhatsApp */}
-              <div className="flex items-center gap-x-3.5 shrink-0">
+              {/* Right: Quick Links */}
+              <div className="flex items-center gap-x-4 shrink-0 text-xs text-slate-300">
                 <LocalizedClientLink
-                  href="/it-solutions"
-                  className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                  href="/it-solutions#request-quote"
+                  className="text-blue-400 hover:text-blue-300 transition-colors font-semibold"
                 >
-                  <MapPin size="13" className="text-primary shrink-0" />
-                  <span>IT Solutions</span>
+                  Request a Quote
                 </LocalizedClientLink>
 
-                <span className="text-gray-300">|</span>
+                <span className="text-slate-700">|</span>
 
                 <LocalizedClientLink
                   href="/account/orders"
-                  className="flex items-center gap-1 hover:text-primary transition-colors font-medium"
+                  className="hover:text-white transition-colors"
                 >
-                  <Package size="13" className="text-primary shrink-0" />
-                  <span>Track Your Order</span>
+                  Track Order
                 </LocalizedClientLink>
 
-                <span className="text-gray-300">|</span>
+                <span className="text-slate-700">|</span>
 
-                <LocalizedClientLink href="/contact-us" className="font-medium hover:text-primary transition-colors">Contact Us</LocalizedClientLink>
+                <LocalizedClientLink href="/contact-us" className="hover:text-white transition-colors">
+                  Contact
+                </LocalizedClientLink>
               </div>
             </div>
           </div>

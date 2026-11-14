@@ -11,11 +11,12 @@ type NotFoundTemplateProps = {
 }
 
 const POPULAR_CATEGORIES = [
-  { name: "Laptops", handle: "laptops" },
-  { name: "Gaming Laptops", handle: "gaming-laptops" },
-  { name: "Monitors", handle: "monitors" },
-  { name: "Keyboards & Mice", handle: "keyboard_-mouse" },
-  { name: "Accessories", handle: "computer-accessories" },
+  { name: "Networking & Switches", handle: "networking" },
+  { name: "Laptops & Workstations", handle: "laptops" },
+  { name: "Business Laptops", handle: "business-laptops" },
+  { name: "Servers & Storage", handle: "server-computers" },
+  { name: "Monitors & Docks", handle: "monitors" },
+  { name: "Computer Accessories", handle: "computer-accessories" },
 ]
 
 export default function NotFoundTemplate({

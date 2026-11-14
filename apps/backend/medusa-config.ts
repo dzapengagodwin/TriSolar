@@ -165,6 +165,9 @@ export default defineConfig({
       },
     },
     {
+      resolve: "./src/modules/quote-request",
+    },
+    {
       resolve: "./src/modules/brand",
     },
     {
