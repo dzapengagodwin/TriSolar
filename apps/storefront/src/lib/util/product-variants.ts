@@ -25,7 +25,11 @@ export const getDistinctVariantOptions = (
       return true
     }
 
-    return new Set(values.map((value) => value.trim().toLowerCase())).size > 1
+    const definedValues = values.filter(
+      (value): value is string => typeof value === "string"
+    )
+
+    return new Set(definedValues.map((value) => value.trim().toLowerCase())).size > 1
   })
 }
 
