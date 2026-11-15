@@ -64,7 +64,8 @@ export default async function Home(props: Props) {
 
     while (currentCategory) {
       categoriesWithProducts.add(currentCategory.id)
-      const parentId = currentCategory.parent_category_id
+      const parentId: string | null | undefined =
+        currentCategory.parent_category_id
       currentCategory = parentId
         ? categories.find((candidate) => candidate.id === parentId)
         : undefined
