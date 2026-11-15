@@ -10,6 +10,7 @@ import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-p
 import CookieConsent from "@modules/layout/components/cookie-consent"
 import OrganizationJsonLd from "@modules/common/components/organization-json-ld"
 import { buildBaseMetadata } from "@lib/seo/metadata"
+import { CompareDock } from "@modules/products/components/product-discovery-tools"
 
 export const metadata: Metadata = buildBaseMetadata()
 
@@ -48,6 +49,7 @@ export default async function PageLayout(props: {
         />
       )}
       {props.children}
+      <CompareDock />
       <CookieConsent />
       <Footer />
     </>
