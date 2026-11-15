@@ -23,6 +23,12 @@ export default async function WishlistPage() {
         items: (rawWishlist.items || []).map((item) => ({
           ...item,
           variant_id: item.variant_id || item.product_variant_id,
+          product_variant: item.product_variant
+            ? {
+                ...item.product_variant,
+                product: item.product_variant.product ?? undefined,
+              }
+            : undefined,
         })),
       }
     : null
