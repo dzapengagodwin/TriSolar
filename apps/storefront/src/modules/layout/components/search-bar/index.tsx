@@ -6,12 +6,13 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { XMark, ArrowRight } from "@medusajs/icons"
+import { getCategoryPublicPath } from "@lib/seo/canonical"
 
 type SearchBarProps = {
   categories?: HttpTypes.StoreProductCategory[]
 }
 
-export default function SearchBar({ categories: _categories }: SearchBarProps) {
+export default function SearchBar({ categories = [] }: SearchBarProps) {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -25,6 +26,12 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const searchRef = useRef<HTMLDivElement>(null)
+  const matchingCategories = categories
+    .filter((category) => {
+      const term = query.trim().toLowerCase()
+      return term.length >= 2 && (category.name.toLowerCase().includes(term) || category.handle.toLowerCase().includes(term))
+    })
+    .slice(0, 4)
 
   // Sync state with URL params
   useEffect(() => {
@@ -151,8 +158,29 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
               <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
               Searching products...
             </div>
-          ) : results.length > 0 ? (
+          ) : results.length > 0 || matchingCategories.length > 0 ? (
             <div className="py-2">
+              {matchingCategories.length > 0 && (
+                <div className="border-b border-gray-100 pb-2">
+                  <div className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                    Matching categories
+                  </div>
+                  <div className="flex flex-wrap gap-2 px-4">
+                    {matchingCategories.map((category) => (
+                      <LocalizedClientLink
+                        key={category.id}
+                        href={getCategoryPublicPath(category.handle)}
+                        onClick={() => setIsOpen(false)}
+                        className="rounded-full border border-blue-100 bg-blue-50 px-3 py-1.5 text-[11px] font-semibold text-blue-800 transition hover:border-blue-300 hover:bg-blue-100"
+                      >
+                        {category.name} <span aria-hidden="true">→</span>
+                      </LocalizedClientLink>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {results.length > 0 && (
+                <>
               <div className="px-4 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                 Matching Products ({results.length})
               </div>
@@ -199,6 +227,8 @@ export default function SearchBar({ categories: _categories }: SearchBarProps) {
                 <span>View all results for &quot;{query}&quot;</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
+                </>
+              )}
             </div>
           ) : (
             <div className="p-4 text-center text-xs text-gray-500">
