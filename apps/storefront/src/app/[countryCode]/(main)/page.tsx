@@ -51,6 +51,33 @@ export default async function Home(props: Props) {
 
   const products = productsRes.response?.products || []
 
+  // Include a top-level category only when it or one of its descendants
+  // has at least one product assigned in the Medusa catalog.
+  const categoriesWithProducts = new Set<string>()
+
+  for (const category of categories) {
+    if (!category.products?.length) {
+      continue
+    }
+
+    let currentCategory: (typeof categories)[number] | undefined = category
+
+    while (currentCategory) {
+      categoriesWithProducts.add(currentCategory.id)
+      const parentId = currentCategory.parent_category_id
+      currentCategory = parentId
+        ? categories.find((candidate) => candidate.id === parentId)
+        : undefined
+    }
+  }
+
+  const homepageCategories = categories
+    .filter(
+      (category) =>
+        !category.parent_category_id && categoriesWithProducts.has(category.id)
+    )
+    .slice(0, 8)
+
   if (!region) {
     return null
   }
@@ -82,11 +109,7 @@ export default async function Home(props: Props) {
           </LocalizedClientLink>
         </div>
       </section>
-      <TopCategories
-        categories={categories
-          .filter((category) => !category.parent_category_id)
-          .slice(0, 8)}
-      />
+      <TopCategories categories={homepageCategories} />
       {products.length > 0 && (
         <section className="content-container py-6 sm:py-8">
           <div className="mb-4 flex items-end justify-between gap-4">
