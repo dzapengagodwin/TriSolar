@@ -236,7 +236,7 @@ export async function getWishlist(): Promise<BackendWishlist> {
     }
 
     const hydratedItems: BackendWishlistItem[] = rawItems
-      .map((item) => {
+      .map<BackendWishlistItem>((item) => {
         const variantId = item.product_variant_id || item.product_variant?.id || ""
         const productId = item.product_id || item.product_variant?.product?.id
 
@@ -272,7 +272,6 @@ export async function getWishlist(): Promise<BackendWishlist> {
           created_at: item.created_at,
         }
       })
-      .filter((i): i is BackendWishlistItem => Boolean(i))
 
     return {
       id: wishlist.id,
