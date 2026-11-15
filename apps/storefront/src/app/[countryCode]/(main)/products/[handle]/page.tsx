@@ -7,6 +7,7 @@ import ProductTemplate from "@modules/products/templates"
 import ProductJsonLd from "@modules/products/components/product-json-ld"
 import BreadcrumbJsonLd from "@modules/common/components/breadcrumb-json-ld"
 import { generateProductMetadata } from "@lib/seo/product"
+import { RecentlyViewedTracker } from "@modules/products/components/product-discovery-tools"
 import {
   getCanonicalUrl,
   getCategoryCanonicalUrl,
@@ -135,6 +136,17 @@ export default async function ProductPage(props: Props) {
         seo={seo}
       />
       <BreadcrumbJsonLd items={breadcrumbItems} />
+      <RecentlyViewedTracker
+        product={{
+          id: pricedProduct.id,
+          title: pricedProduct.title,
+          handle: pricedProduct.handle,
+          thumbnail: pricedProduct.thumbnail,
+          brand: (pricedProduct.metadata?.brand as string) || undefined,
+          category: primaryCategory?.name,
+          description: pricedProduct.description || undefined,
+        }}
+      />
       <ProductTemplate
         product={pricedProduct}
         region={region}
