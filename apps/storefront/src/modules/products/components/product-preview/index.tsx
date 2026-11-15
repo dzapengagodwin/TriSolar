@@ -7,6 +7,7 @@ import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 import QuickAddToCart from "../quick-add-to-cart"
 import WhatsAppOrderButton from "../whatsapp-order-button"
+import { CompareProductButton } from "../product-discovery-tools"
 
 export default function ProductPreview({
   product,
@@ -188,6 +189,16 @@ export default function ProductPreview({
               size="lg"
               className="!rounded-lg"
             />
+            <CompareProductButton product={
+                id: product.id,
+                title: displayTitle,
+                handle: product.handle,
+                thumbnail: variantImage,
+                price: priceInfo?.calculated_price,
+                brand,
+                category,
+                description: product.description || undefined,
+              } />
           </div>
         </div>
       </article>
@@ -286,6 +297,16 @@ export default function ProductPreview({
               size="md"
               className="!min-h-10 !rounded-lg !py-2.5 !text-[10px]"
             />
+            <CompareProductButton product={
+                id: product.id,
+                title: displayTitle,
+                handle: product.handle,
+                thumbnail: variantImage,
+                price: priceInfo?.calculated_price,
+                brand,
+                category,
+                description: product.description || undefined,
+              } />
           </div>
         </div>
       </div>
