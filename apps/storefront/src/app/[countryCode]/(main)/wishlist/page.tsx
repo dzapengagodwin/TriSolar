@@ -20,9 +20,10 @@ export default async function WishlistPage() {
   const wishlist: WishlistData | null = rawWishlist
     ? {
         id: rawWishlist.id,
-        items: (rawWishlist.items || []).filter(
-          (item): item is NonNullable<typeof item> => Boolean(item)
-        ),
+        items: (rawWishlist.items || []).map((item) => ({
+          ...item,
+          variant_id: item.variant_id || item.product_variant_id,
+        })),
       }
     : null
 
