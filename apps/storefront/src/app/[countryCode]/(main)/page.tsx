@@ -71,11 +71,12 @@ export default async function Home(props: Props) {
     }
   }
 
-  const homepageCategories = categories
-    .filter(
-      (category) =>
-        !category.parent_category_id && categoriesWithProducts.has(category.id)
-    )
+  const categoriesWithAvailableProducts = categories.filter((category) =>
+    categoriesWithProducts.has(category.id)
+  )
+
+  const homepageCategories = categoriesWithAvailableProducts
+    .filter((category) => !category.parent_category_id)
     .slice(0, 8)
 
   if (!region) {
@@ -99,7 +100,7 @@ export default async function Home(props: Props) {
             </p>
           </div>
           <div className="max-w-3xl rounded-lg bg-white p-1">
-            <SearchBar categories={categories} />
+            <SearchBar categories={categoriesWithAvailableProducts} />
           </div>
           <LocalizedClientLink
             href="/shop"
