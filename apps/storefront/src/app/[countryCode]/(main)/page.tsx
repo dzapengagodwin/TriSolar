@@ -16,6 +16,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import ProductPreview from "@modules/products/components/product-preview"
 import SearchBar from "@modules/layout/components/search-bar"
 import SmartProductFinder from "@modules/home/components/smart-product-finder"
+import { RecentlyViewedProducts } from "@modules/products/components/product-discovery-tools"
 
 type Props = {
   params: Promise<{ countryCode: string }>
@@ -142,6 +143,7 @@ export default async function Home(props: Props) {
         </section>
       )}
       <FeaturedProducts region={region} />
+      <RecentlyViewedProducts />
       <MonthlyDeals products={products} region={region} />
       <TopBrands brands={brands} />
       <TrustBar />
