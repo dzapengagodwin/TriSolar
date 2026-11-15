@@ -15,6 +15,7 @@ import { generatePageMetadata } from "@lib/seo/page"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ProductPreview from "@modules/products/components/product-preview"
 import SearchBar from "@modules/layout/components/search-bar"
+import SmartProductFinder from "@modules/home/components/smart-product-finder"
 
 type Props = {
   params: Promise<{ countryCode: string }>
@@ -42,7 +43,7 @@ export default async function Home(props: Props) {
     region
       ? listProducts({
           regionId: region.id,
-          queryParams: { limit: 10 },
+          queryParams: { limit: 40 },
         }).catch(() => ({ response: { products: [] } }))
       : Promise.resolve({ response: { products: [] } }),
     listBrands({ limit: 20 }).catch(() => []),
@@ -111,6 +112,7 @@ export default async function Home(props: Props) {
           </LocalizedClientLink>
         </div>
       </section>
+      <SmartProductFinder products={products} />
       <TopCategories categories={homepageCategories} />
       {products.length > 0 && (
         <section className="content-container py-6 sm:py-8">
@@ -131,7 +133,7 @@ export default async function Home(props: Props) {
             </LocalizedClientLink>
           </div>
           <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-            {products.map((product) => (
+            {products.slice(0, 10).map((product) => (
               <li key={product.id}>
                 <ProductPreview product={product} region={region} />
               </li>
