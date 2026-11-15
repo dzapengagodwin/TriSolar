@@ -106,10 +106,7 @@ export default function ProductActions({
 
   const optionGroups = useMemo(
     () =>
-      getDistinguishingVariantOptions({
-        options: productOptions,
-        variants,
-      }),
+      getDistinguishingVariantOptions(product),
     [productOptions, variants]
   )
 
