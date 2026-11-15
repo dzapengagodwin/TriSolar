@@ -68,12 +68,7 @@ export default function ProductPreview({
       | { name?: string }
       | undefined)?.name || (product.metadata?.brand as string)
 
-  const categoriesString =
-    product.categories && product.categories.length > 0
-      ? product.categories
-          .map((category: HttpTypes.StoreProductCategory) => category.name)
-          .join(", ")
-      : "General Category"
+  const category = product.categories?.[0]?.name
 
   const isSale = Boolean(
     priceInfo &&
@@ -89,59 +84,69 @@ export default function ProductPreview({
     priceInfo?.percentage_diff &&
     parseInt(String(priceInfo.percentage_diff)) > 0
       ? `-${priceInfo.percentage_diff}%`
-      : "Sale!"
+      : "SPECIAL OFFER"
+
+  const imageAlt = getProductImageAlt({
+    title: displayTitle,
+    brand,
+  })
 
   if (viewMode === "list") {
     return (
-      <div
+      <article
         data-testid="product-wrapper"
-        className="group bg-white p-4 border border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative transition-all duration-200 shadow-xs hover:shadow-md w-full"
+        className="group relative flex w-full flex-col gap-5 overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg sm:flex-row sm:items-center sm:gap-6 sm:p-5"
       >
-        <div className="relative shrink-0 w-full sm:w-44 flex items-center justify-center">
+        <div className="relative w-full shrink-0 sm:w-48">
           {isSale && (
-            <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
+            <span className="absolute left-3 top-3 z-10 rounded-full bg-blue-700 px-3 py-1 text-[10px] font-extrabold tracking-wide text-white shadow-sm">
               {discountText}
             </span>
           )}
-
-          <LocalizedClientLink href={productHref} className="block w-full">
-            <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-36 h-36 mx-auto sm:mx-0">
+          <LocalizedClientLink
+            href={productHref}
+            className="block overflow-hidden rounded-xl bg-slate-50"
+          >
+            <div className="relative mx-auto aspect-square w-full max-w-[220px]">
               <Thumbnail
                 thumbnail={variantImage}
                 images={variantImages}
                 size="full"
                 isFeatured={isFeatured}
-                alt={getProductImageAlt({
-                  title: displayTitle,
-                  brand,
-                })}
-                className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+                alt={imageAlt}
+                className="!aspect-auto !rounded-none !border-0 !bg-transparent !p-3 !shadow-none"
                 objectFit="contain"
               />
             </div>
           </LocalizedClientLink>
         </div>
 
-        <div className="flex-1 space-y-2 min-w-0">
-          <div className="text-[11px] font-medium text-gray-500">
-            {categoriesString}
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {brand && (
+              <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-blue-700">
+                {brand}
+              </span>
+            )}
+            {category && (
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-semibold text-slate-500">
+                {category}
+              </span>
+            )}
           </div>
-
           <LocalizedClientLink href={productHref}>
             <h3
-              className="text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
+              className="line-clamp-2 text-base font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-700 sm:text-lg"
               data-testid="product-title"
             >
               {displayTitle}
             </h3>
           </LocalizedClientLink>
-
           {product.description && (
-            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed font-normal">
+            <p className="line-clamp-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
               {product.description}
             </p>
           )}
-
           {optionGroups.length > 0 && (
             <div className="flex flex-wrap gap-1.5 pt-1">
               {optionGroups.slice(0, 3).map((option) => {
@@ -152,7 +157,7 @@ export default function ProductPreview({
                 return (
                   <span
                     key={option.id}
-                    className="bg-gray-100 text-gray-700 text-[10px] font-medium px-2 py-0.5 rounded"
+                    className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-600"
                   >
                     {value ? `${option.title}: ${value}` : option.title}
                   </span>
@@ -162,95 +167,128 @@ export default function ProductPreview({
           )}
         </div>
 
-        <div className="w-full sm:w-48 shrink-0 flex flex-col sm:items-end justify-center gap-3 border-t sm:border-t-0 sm:border-l border-gray-100 pt-3 sm:pt-0 sm:pl-6">
-          {priceInfo && <PreviewPrice price={priceInfo} />}
-
-          <div className="w-full space-y-1.5">
+        <div className="flex w-full shrink-0 flex-col gap-3 border-t border-slate-100 pt-4 sm:w-52 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">
+          {priceInfo && (
+            <div className="text-slate-950">
+              <PreviewPrice price={priceInfo} />
+            </div>
+          )}
+          <div className="space-y-2">
             <QuickAddToCart
               product={product}
               variant={variant}
               size="lg"
               viewMode="list"
+              className="!rounded-lg !normal-case !tracking-normal"
             />
-
             <WhatsAppOrderButton
               productTitle={displayTitle}
               productHandle={product.handle}
               variantTitle={variantSummary || undefined}
               size="lg"
+              className="!rounded-lg"
             />
           </div>
         </div>
-      </div>
+      </article>
     )
   }
 
   return (
-    <div
+    <article
       data-testid="product-wrapper"
-      className="group bg-white p-3.5 sm:p-4 border border-gray-100 flex flex-col justify-between h-full relative transition-all duration-200 shadow-xs hover:shadow-md"
+      className="group relative flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-slate-900/10"
     >
-      <div className="relative mb-3 flex items-center justify-center">
+      <div className="relative p-3 pb-0 sm:p-4 sm:pb-0">
         {isSale && (
-          <span className="absolute top-0 left-0 z-10 bg-primary text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 uppercase tracking-wider shadow-xs">
+          <span className="absolute left-5 top-5 z-10 inline-flex items-center rounded-full bg-blue-700 px-3 py-1.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-md sm:left-6 sm:top-6">
             {discountText}
           </span>
         )}
-
-        <LocalizedClientLink href={productHref} className="block w-full">
-          <div className="relative overflow-hidden bg-gray-50/50 flex items-center justify-center w-[209.75px] h-[209.75px] max-w-full mx-auto">
+        <LocalizedClientLink
+          href={productHref}
+          className="block overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-slate-100/70"
+        >
+          <div className="relative aspect-square w-full">
             <Thumbnail
               thumbnail={variantImage}
               images={variantImages}
               size="full"
               isFeatured={isFeatured}
-              alt={getProductImageAlt({
-                title: displayTitle,
-                brand,
-              })}
-              className="w-full h-full !bg-transparent !shadow-none !border-none !p-0 !aspect-auto !rounded-none"
+              alt={imageAlt}
+              className="!aspect-auto !rounded-none !border-0 !bg-transparent !p-3 !shadow-none transition-transform duration-500 group-hover:scale-[1.04] sm:!p-5"
               objectFit="contain"
             />
           </div>
         </LocalizedClientLink>
       </div>
 
-      <div className="flex-1 flex flex-col justify-between">
-        <div className="space-y-1">
-          <div className="text-[11px] font-medium text-gray-500 line-clamp-1">
-            {categoriesString}
-          </div>
-
-          <LocalizedClientLink href={productHref}>
-            <h3
-              className="text-[13px] sm:text-sm font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2 leading-snug"
-              data-testid="product-title"
-            >
-              {displayTitle}
-            </h3>
-          </LocalizedClientLink>
+      <div className="flex flex-1 flex-col p-3 pt-4 sm:p-4">
+        <div className="mb-2 flex min-h-5 flex-wrap items-center gap-2">
+          {brand && (
+            <span className="truncate text-[9px] font-extrabold uppercase tracking-[0.16em] text-blue-700 sm:text-[10px]">
+              {brand}
+            </span>
+          )}
+          {category && (
+            <span className="max-w-full truncate rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">
+              {category}
+            </span>
+          )}
         </div>
 
-        <div className="pt-3 border-t border-gray-100 mt-3 space-y-2">
-          {priceInfo && <PreviewPrice price={priceInfo} />}
+        <LocalizedClientLink href={productHref} className="block">
+          <h3
+            className="line-clamp-2 min-h-[2.6rem] text-[13px] font-bold leading-[1.3] text-slate-900 transition-colors group-hover:text-blue-700 sm:text-sm"
+            data-testid="product-title"
+          >
+            {displayTitle}
+          </h3>
+        </LocalizedClientLink>
 
-          <div className="space-y-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+        {optionGroups.length > 0 && (
+          <div className="mt-2 flex min-h-5 flex-wrap gap-1">
+            {optionGroups.slice(0, 2).map((option) => {
+              const value = variant?.options?.find(
+                (variantOption) => variantOption.option_id === option.id
+              )?.value
+
+              return (
+                <span
+                  key={option.id}
+                  className="rounded-md border border-slate-200 px-1.5 py-0.5 text-[9px] font-medium text-slate-500"
+                >
+                  {value ? `${option.title}: ${value}` : option.title}
+                </span>
+              )
+            })}
+          </div>
+        )}
+
+        <div className="mt-auto pt-3">
+          {priceInfo && (
+            <div className="mb-3 border-t border-slate-100 pt-3">
+              <PreviewPrice price={priceInfo} />
+            </div>
+          )}
+          <div className="grid grid-cols-1 gap-2">
             <QuickAddToCart
               product={product}
               variant={variant}
               size="md"
               viewMode="grid"
+              className="!min-h-10 !rounded-lg !py-2.5 !text-[10px] !normal-case !tracking-wide"
             />
-
             <WhatsAppOrderButton
               productTitle={displayTitle}
               productHandle={product.handle}
               variantTitle={variantSummary || undefined}
               size="md"
+              className="!min-h-10 !rounded-lg !py-2.5 !text-[10px]"
             />
           </div>
         </div>
       </div>
-    </div>
+    </article>
   )
 }
