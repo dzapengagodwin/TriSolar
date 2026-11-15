@@ -6,6 +6,7 @@ type MedusaError = {
   }
   request?: unknown
   message?: string
+  statusText?: string
   config?: { url: string; baseURL: string }
 }
 
